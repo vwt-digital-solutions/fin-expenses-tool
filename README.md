@@ -1,3 +1,5 @@
+[![CodeFactor](https://www.codefactor.io/repository/github/vwt-digital/fin-expenses-tool/badge)](https://www.codefactor.io/repository/github/vwt-digital/expenses-tool)
+
 # Expenses Tool
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.0.1.
