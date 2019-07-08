@@ -1,0 +1,22 @@
+<div class="header container-fluid">
+  <div class="row">
+    <div class="brand col-10">
+      <div class="logo"></div>
+      <span>{{title}}</span>
+    </div>
+
+    <div class="col-2 navbar-container">
+      <div class="navbar">
+        <div *ngIf="email" ngbDropdown class="d-inline-block">
+          <button class="btn" id="dropdownMenu" ngbDropdownToggle>
+            <i class="fas fa-user-cog"></i>
+          </button>
+          <div ngbDropdownMenu aria-labelledby="dropdownMenu">
+            <span ngbDropdownItem>{{email}}</span>
+            <button ngbDropdownItem (click)="logout()">Logout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,63 @@
+steps:
+- name: 'ubuntu'
+  args:
+  - 'bash'
+  - '-c'
+  - |
+    mkdir -p deploy
+    cp config/app.yaml ./deploy
+    cp config/${PROJECT_ID}/env.js ./src
+
+- name: 'colthreepv/node-chrome'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    if [ "$BRANCH_NAME" == "develop" ]; then
+      pushd /
+      wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+      apt install ./google-chrome-stable_current_amd64.deb
+      popd
+    fi
+    npm install @angular/cli
+    npm install
+    npm test
+    if [ "$BRANCH_NAME" == "develop" ]; then
+      npm run e2e
+    fi
+    rm -f ns-*.html
+    rm -rf node_modules
+    rm package-lock.json
+
+- name: 'gcr.io/cloud-builders/npm'
+  args:
+  - 'install'
+  - '@angular/cli'
+
+- name: 'gcr.io/cloud-builders/npm'
+  args:
+  - 'install'
+
+- name: 'gcr.io/cloud-builders/npm'
+  args:
+  - 'run'
+  - 'build-prod'
+
+- name: 'ubuntu'
+  args:
+  - 'bash'
+  - '-c'
+  - |
+    cp -R dist/. deploy/dist
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - 'gcloud app create --region=europe-west || exit 0'
+
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - 'app'
+  - 'deploy'
+  dir: 'deploy'
