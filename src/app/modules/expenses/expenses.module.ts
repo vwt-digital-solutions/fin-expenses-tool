@@ -4,6 +4,7 @@ import { NgModule } from '@angular/core';
 import {AppRoutingModule} from '../../app-routing.module';
 import {CommonModule} from '@angular/common';
 import { ExpensesComponent } from './expenses.component';
+import {HttpClientModule} from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -13,6 +14,7 @@ import { ExpensesComponent } from './expenses.component';
     BrowserModule,
     AppRoutingModule,
     CommonModule,
+    HttpClientModule,
 
   ],
   exports: [

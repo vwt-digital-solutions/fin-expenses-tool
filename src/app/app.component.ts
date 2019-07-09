@@ -25,9 +25,6 @@ export class AppComponent {
     this.oauthService.tryLogin({});
   }
   get hasValidAccessToken() {
-    if (this.oauthService.hasValidAccessToken()) {
-      return true;
-    }
-    return true; //TODO: change to False on PRD
+    return this.oauthService.hasValidAccessToken();
   }
 }
