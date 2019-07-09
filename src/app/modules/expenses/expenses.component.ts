@@ -6,5 +6,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./expenses.component.scss']
 })
 export class ExpensesComponent {
-  title = 'This is the Expenses Tool';
+  public title;
+  constructor() {
+    this.title = 'This is the Expenses Tool';
+
+  }
 }

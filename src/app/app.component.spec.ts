@@ -3,6 +3,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 import {HttpClientModule} from '@angular/common/http';
 import {HeaderComponent} from './components/header/header.component';
+import {EnvServiceProvider} from './services/env.service.provider';
+import {OAuthLogger, OAuthService, UrlHelperService} from 'angular-oauth2-oidc';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -16,7 +18,10 @@ describe('AppComponent', () => {
         HeaderComponent
       ],
       providers: [
-
+        EnvServiceProvider,
+        UrlHelperService,
+        OAuthLogger,
+        OAuthService
       ]
     }).compileComponents();
   }));
