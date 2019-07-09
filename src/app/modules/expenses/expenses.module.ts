@@ -5,6 +5,7 @@ import {AppRoutingModule} from '../../app-routing.module';
 import {CommonModule} from '@angular/common';
 import { ExpensesComponent } from './expenses.component';
 import {HttpClientModule} from '@angular/common/http';
+import {FormsModule} from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -15,7 +16,7 @@ import {HttpClientModule} from '@angular/common/http';
     AppRoutingModule,
     CommonModule,
     HttpClientModule,
-
+    FormsModule
   ],
   exports: [
     CommonModule,
