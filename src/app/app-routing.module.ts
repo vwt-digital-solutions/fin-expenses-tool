@@ -1,7 +1,7 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { ExpensesComponent } from './modules/expenses/expenses.component';
-import { Role } from './models/role.enum';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import {ExpensesComponent} from './modules/expenses/expenses.component';
+import {Role} from './models/role.enum';
 import {AuthGuard} from './auth/auth.guard';
 
 const routes: Routes = [
@@ -13,8 +13,16 @@ const routes: Routes = [
 
   },
   {
+    path: '',
+    component: ExpensesComponent, // TODO: A landing page when the interfaces have to be different
+    canActivate: [AuthGuard],
+    data: {roles: [Role.Reader]}
+  },
+  {
     path: 'process_expenses',
-    component: ExpensesComponent
+    component: ExpensesComponent,
+    canActivate: [AuthGuard],
+    data: {roles: [Role.Creditor, Role.Manager]}
   }
 ];
 
