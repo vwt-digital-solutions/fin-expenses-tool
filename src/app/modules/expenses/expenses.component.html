@@ -3,20 +3,26 @@
 <!-- End of Testing BR -->
 
 <div class="container">
-  <div class="row d-flex justify-content-center">
-    <div class="col-md-7">
-      <form #expenseForm="ngForm" (ngSubmit)="claimForm(expenseForm)">
+  <div class="row">
+    <div class="col">
+      <form name="expenseForm" #expenseForm="ngForm" (ngSubmit)="claimForm(expenseForm)">
         <label for="amountinput">Amount:</label>
         <div class="input-group">
-          <input id="amountinput" class="form-control" type="number" step="0.01" min="0.01" name="amount" required ngModel>
-          <button type="button" id="flat_button">€ EUR</button>
+          <input id="amountinput" class="form-control" type="number" step="0.01" min="0.01" name="amount" required [(ngModel)]="formAmount">
+          <button type="button" id="flat_button" tabindex="-1">€ EUR</button>
         </div>
         <div class="form-group">
           <label for="noteinput">Note:</label>
-          <input id="noteinput" class="form-control" type="text" name="note" required ngModel>
+          <input id="noteinput" class="form-control" type="text" name="note" required [(ngModel)]="formNote">
         </div>
-        <button type="submit" class="btn btn-default" id="deep_button">Submit Claim</button>
+        <input type="submit" id="submit-form" class="hidden" />
+<!--        <button type="submit" class="btn btn-default" id="deep_button">Submit Claim</button>-->
       </form>
+    </div>
+    <div class="col col-lg-2">
+      <p>Claim Amount: <span>{{formAmount}}</span></p>
+      <p>Reason: <span>{{formNote}}</span></p>
+      <label for="submit-form" tabindex="0" class="btn btn-default" id="deep_button">Submit Claim</label>
     </div>
   </div>
 </div>

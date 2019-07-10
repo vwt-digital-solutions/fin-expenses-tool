@@ -15,6 +15,7 @@ input {
   outline: none;
   width: 65px;
   border-radius: 4px;
+  cursor: default;
 }
 #deep_button {
   opacity: 1;
@@ -33,4 +34,20 @@ input {
 }
 #noteinput {
   max-width: 365px;
+}
+form {
+  background-color: #fcfbfb;
+  padding: 15px;
+  margin-right: 100px;
+}
+p {
+  font-weight: bold;
+  color: #858585;
+}
+span {
+  font-weight: normal;
+  color: #858585;
+}
+.hidden {
+  display: none;
 }
