@@ -19,7 +19,12 @@
   @media (min-width: 1800px) { @content; }
 }
 .container {
-  margin-top: 10ex;
+  @include for-phone-only {
+    background-color: #fcfbfb;
+    height: 100vh;
+    bottom: 0;
+    top: 0;
+  }
 }
 div#landing_page {
     display: none;
@@ -40,7 +45,6 @@ input, textarea {
   :hover {
     opacity: .8;
   }
-
   opacity: 1;
   background-color: #3a89b4;
   font-weight: bold;
@@ -74,6 +78,7 @@ input, textarea {
   }
 }
 .row {
+  margin-top: 10ex;
   @include for-phone-only {
     display: inline-block;
     vertical-align: middle;
