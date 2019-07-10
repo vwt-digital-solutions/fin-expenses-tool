@@ -1,3 +1,7 @@
 export enum Role {
-    Reader = 'expenses.read'
+    Reader = 'expenses.read',
+    Admin = 'expenses.admin',
+    Employee = 'expenses.employee',
+    Manager = 'expenses.manager',
+    Creditor = 'expenses.creditor'
 }
