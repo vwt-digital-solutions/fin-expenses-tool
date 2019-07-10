@@ -14,6 +14,7 @@ import { ExpensesModule } from './modules/expenses/expenses.module';
 import {EnvServiceProvider} from './services/env.service.provider';
 import {OAuthModule, OAuthService} from 'angular-oauth2-oidc';
 import {AuthComponent} from './auth/auth.component';
+import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import {AuthComponent} from './auth/auth.component';
     OAuthModule.forRoot(),
     AppRoutingModule,
     ExpensesModule,
+    NgbDropdownModule,
   ],
 
   exports: [
