@@ -3,13 +3,19 @@
     <div class="col" id="colstep">
       <form name="expenseForm" #expenseForm="ngForm" (ngSubmit)="claimForm(expenseForm)">
         <label for="amountinput">Amount:</label>
-        <div class="input-group">                                                <!-- -->
-          <input id="amountinput" class="form-control" [ngClass]="{notFilled: eamount === false || (namount.invalid && (namount.dirty || namount.touched) )}" type="number" step="0.01" min="0.01" name="amount" required [(ngModel)]="formAmount" #namount="ngModel">
+        <div class="input-group">
+          <input id="amountinput" (click)="eamount = true" class="form-control" [ngClass]="{notFilled: eamount === false || (namount.invalid && (namount.dirty || namount.touched) )}" type="number" step="0.01" min="0.01" name="amount" required [(ngModel)]="formAmount" #namount="ngModel">
           <span class="input-group-addon">€ EUR</span>
         </div>
+        <div class="fillText" *ngIf="eamount === false || (namount.invalid && (namount.dirty || namount.touched) )">
+          <p>Please enter a valid amount</p>
+        </div>
         <div class="form-group">
-          <label for="noteinput">Note:</label>                                  <!--  -->
-          <textarea id="noteinput" class="form-control" [ngClass]="{notFilled: enote === false || (nnote.invalid && (nnote.dirty || nnote.touched) )}" type="text" name="note" required minlength="1" [(ngModel)]="formNote" #nnote="ngModel"></textarea>
+          <label for="noteinput">Note:</label>
+          <textarea id="noteinput" (click)="enote = true" class="form-control" [ngClass]="{notFilled: enote === false || (nnote.invalid && (nnote.dirty || nnote.touched) )}" type="text" name="note" required minlength="1" [(ngModel)]="formNote" #nnote="ngModel"></textarea>
+        </div>
+        <div class="fillText move-18" *ngIf="enote === false || (nnote.invalid && (nnote.dirty || nnote.touched) )">
+          <p>Please enter a note</p>
         </div>
         <input type="submit" id="submit-form" class="hidden" />
 <!--        <button type="submit" class="btn btn-default" id="deep_button">Submit Claim</button>-->
@@ -18,8 +24,7 @@
     <div class="col col-lg-2" id="bodystep">
       <p>Claim Amount: <span>{{formAmount}}</span></p>
       <p>Reason: <span>{{formNote}}</span></p>
-      <label for="submit-form" tabindex="0" class="btn btn-default" id="deep_button">Submit Claim</label>
+      <label for="submit-form" tabindex="0" class="btn btn-default deep_button" [ngClass]="{disabledBtn: (enote === false || eamount === false || nnote.invalid || namount.invalid)}">Submit Claim</label>
     </div>
-
   </div>
 </div>

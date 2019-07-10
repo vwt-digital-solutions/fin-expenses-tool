@@ -41,10 +41,7 @@ input, textarea {
   outline: none;
   border: 1px solid #dce5eb;
 }
-#deep_button {
-  :hover {
-    opacity: .8;
-  }
+.deep_button {
   opacity: 1;
   background-color: #3a89b4;
   font-weight: bold;
@@ -56,11 +53,17 @@ input, textarea {
     width: 100%;
   }
 }
+.deep_button:hover {
+  opacity: .8;
+  cursor: pointer;
+}
+
 #amountinput {
   max-width: 300px;
 }
 #noteinput {
   max-width: 365px;
+  margin-bottom: 0;
 }
 #colstep {
   background-color: #fcfbfb;
@@ -73,6 +76,7 @@ input, textarea {
 #bodystep {
   background-color: #fcfbfb;
   padding: 15px;
+  max-width: 100%;
   @include for-phone-only {
     width: 100%;
   }
@@ -116,4 +120,22 @@ span {
 }
 .notFilled {
   border: 1px solid red;
+}
+.disabledBtn {
+  opacity: .5;
+}
+.disabledBtn:hover {
+  cursor: not-allowed;
+}
+.fillText {
+  padding: 0;
+  margin: 0;
+  position: relative;
+  p {
+    color: red;
+    font-weight: lighter;
+  }
+}
+.move-18 {
+  bottom: 18px;
 }
