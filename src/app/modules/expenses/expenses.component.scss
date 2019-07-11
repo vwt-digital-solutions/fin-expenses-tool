@@ -78,8 +78,6 @@ input, textarea {
   background-color: #fcfbfb;
   padding: 15px;
   @include for-phone-only {
-    //display: flex;
-    //justify-content: center;
     position: absolute;
     width: 100%;
   }
@@ -99,12 +97,15 @@ input, textarea {
   @include for-phone-only {
     align-content: center;
     position: absolute;
-    margin-top: 30ex;
+    margin-top: 35ex;
     width: 100%;
   }
 }
 .row {
   margin-top: 10ex;
+  .hidden {
+    display: none;
+  }
   p {
     font-weight: bold;
     color: #858585;
@@ -120,9 +121,7 @@ input, textarea {
     margin-top: 0;
   }
 }
-.hidden {
-  display: none;
-}
+
 .input-group .form-control {
   float: none;
 }

@@ -26,6 +26,5 @@ export class AppComponent {
   }
   get hasValidAccessToken() {
     return this.oauthService.hasValidAccessToken();
-    return true;
   }
 }
