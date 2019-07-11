@@ -25,7 +25,7 @@ export class AppComponent {
     this.oauthService.tryLogin({});
   }
   get hasValidAccessToken() {
-    // return this.oauthService.hasValidAccessToken();
-    return true;
+    return this.oauthService.hasValidAccessToken();
+    // return true;
   }
 }
