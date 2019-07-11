@@ -35,6 +35,3 @@ export class ExpensesComponent {
     }
   }
 }
-
-
-

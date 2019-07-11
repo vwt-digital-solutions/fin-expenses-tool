@@ -1,23 +1,18 @@
+import { browser, protractor, by, element, Capabilities, Key } from 'protractor';
 import { AppPage } from './app.po';
-import { browser, logging } from 'protractor';
+const request = require('request');
 
-describe('workspace-project App', () => {
+// tslint:disable-next-line:only-arrow-functions
+describe('ExpenseApp:', function() {
   let page: AppPage;
-
   beforeEach(() => {
     page = new AppPage();
+    browser.get('employees/expenses');
   });
-
-  it('should display welcome message', () => {
-    page.navigateTo();
-    expect(page.getTitleText()).toEqual('Welcome to fin-expenses-tool!');
-  });
-
-  afterEach(async () => {
-    // Assert that there are no errors emitted from the browser
-    const logs = await browser.manage().logs().get(logging.Type.BROWSER);
-    expect(logs).not.toContain(jasmine.objectContaining({
-      level: logging.Level.SEVERE,
-    } as logging.Entry));
+  // tslint:disable-next-line:only-arrow-functions
+  it('Should have a solid Title', function() {
+    console.log('BROWSERTITLE: ' + page.getTitle());
+    console.log('BROWSERURL: ' + browser.getTitle());
+    expect(browser.getTitle).toEqual('Purchase2Pay: Expenses Tool');
   });
 });
