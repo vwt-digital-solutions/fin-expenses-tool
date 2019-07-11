@@ -1,7 +1,7 @@
 <div class="container">
   <div class="row">
 
-    <div class="col" id="colstep">
+    <div class="col col-sm-8" id="colstep">
       <div>
       Add Claim
       </div>
@@ -22,7 +22,7 @@
         </div>
         <div class="fillText"
              *ngIf="expensesAmount === false || (namount.invalid && (namount.dirty || namount.touched) )">
-          <p>Please enter a valid amount</p>
+          <small>Please enter a valid amount</small>
         </div>
         <div class="form-group">
           <label for="noteinput">Note:</label>
@@ -39,13 +39,14 @@
         </div>
         <div class="fillText move-18"
              *ngIf="expensesNote === false || (nnote.invalid && (nnote.dirty || nnote.touched) )">
-          <p>Please enter a note</p>
+          <small>Please enter a note</small>
         </div>
         <input type="submit" id="submit-form" class="hidden" />
         <!--        <button type="submit" class="btn btn-default" id="deep_button">Submit Claim</button>-->
       </form>
     </div>
-    <div class="col col-lg-2" id="bodystep">
+    <div class="col" id="linestep"></div>
+    <div class="col col-sm-2" id="bodystep">
       <p>Claim Amount: <span>{{ formAmount }}</span></p>
       <p>Reason: <span>{{ formNote }}</span></p>
       <label for="submit-form"

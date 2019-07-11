@@ -22,12 +22,14 @@
   @include for-phone-only {
     background-color: #fcfbfb;
     height: 100vh;
+    width: 100%;
     bottom: 0;
     top: 0;
+    position: relative;
   }
 }
 div#landing_page {
-    display: none;
+  display: none;
 }
 .landing_page_container {
   display: none;
@@ -60,42 +62,63 @@ input, textarea {
 
 #amountinput {
   max-width: 300px;
+  @include for-phone-only {
+    max-width: none;
+  }
 }
 #noteinput {
   max-width: 365px;
   margin-bottom: 0;
+  height: 10ex;
+  @include for-phone-only {
+    max-width: none;
+  }
 }
 #colstep {
   background-color: #fcfbfb;
   padding: 15px;
-  margin-right: 100px;
   @include for-phone-only {
+    //display: flex;
+    //justify-content: center;
+    position: absolute;
     width: 100%;
+  }
+}
+#linestep {
+  left: 17%;
+  border-left: 1px solid #80808052;
+  transform: translate(-50%);
+  @include for-phone-only {
+    display: none;
   }
 }
 #bodystep {
   background-color: #fcfbfb;
-  padding: 15px;
+  padding: 20px;
   max-width: 100%;
   @include for-phone-only {
+    align-content: center;
+    position: absolute;
+    margin-top: 30ex;
     width: 100%;
   }
 }
 .row {
   margin-top: 10ex;
+  p {
+    font-weight: bold;
+    color: #858585;
+  }
+  span {
+    font-weight: normal;
+    color: #858585;
+  }
   @include for-phone-only {
     display: inline-block;
     vertical-align: middle;
     float: none;
+    margin-top: 0;
   }
-}
-p {
-  font-weight: bold;
-  color: #858585;
-}
-span {
-  font-weight: normal;
-  color: #858585;
 }
 .hidden {
   display: none;
@@ -119,7 +142,8 @@ span {
   cursor: default;
 }
 .notFilled {
-  border: 1px solid red;
+  border: 1px solid #dc44446b;
+  background-color: #dc44440f;
 }
 .disabledBtn {
   opacity: .5;
@@ -131,10 +155,7 @@ span {
   padding: 0;
   margin: 0;
   position: relative;
-  p {
-    color: red;
-    font-weight: lighter;
-  }
+  color: #dc4444c2;
 }
 .move-18 {
   bottom: 18px;
