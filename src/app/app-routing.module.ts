@@ -9,20 +9,20 @@ const routes: Routes = [
     path: 'expenses',
     component: ExpensesComponent,
     canActivate: [AuthGuard],
-    data: { roles: [Role.Employee, Role.UnPriviledgedEmployee]}
+    data: { roles: [Role.Employee ] }
 
   },
   {
     path: '',
     component: ExpensesComponent, // TODO: A landing page when the interfaces have to be different
     canActivate: [AuthGuard],
-    data: {roles: [Role.Employee, Role.UnPriviledgedEmployee]}
+    data: {roles: [Role.Employee ] }
   },
   {
     path: 'process_expenses',
     component: ExpensesComponent,
     canActivate: [AuthGuard],
-    data: {roles: [Role.Creditor, Role.Manager, Role.PrivilegeEmployee]}
+    data: {roles: [Role.Creditor, Role.Manager ]}
   }
 ];
 
