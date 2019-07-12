@@ -4,7 +4,6 @@
   color: #FFF;
   position: fixed;
   z-index: 100;
-  width: 100%;
   top: 0;
 
   box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
@@ -24,8 +23,8 @@
       width: 100px;
       height: 25px;
     }
-    span{
-      font-size: 15px;
+    h4 {
+      font-size: 1.3em;
       line-height: 15px;
       font-weight: 600;
       padding: 17.5px 10px;
@@ -121,8 +120,7 @@
           top: 50px;
           right: 0;
           left: auto;
-
-          border-radius: 0px !important;
+          border-radius: 0 !important;
           border: none;
           margin: 0;
           padding: 0;

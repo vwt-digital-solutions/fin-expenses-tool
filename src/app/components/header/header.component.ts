@@ -12,7 +12,7 @@ interface IClaimsEmail {
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent {
-  title = 'Expenses';
+  title = 'Declaraties';
 
   constructor(
     private oauthService: OAuthService

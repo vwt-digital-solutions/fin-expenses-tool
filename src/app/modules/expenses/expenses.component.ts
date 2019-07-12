@@ -13,11 +13,33 @@ export class ExpensesComponent {
   public formAmount;
   public expensesAmount;
   public expensesNote;
+  public addClaimSuccess;
   constructor(
     private httpClient: HttpClient,
     private env: EnvService,
   ) {
+    this.addClaimSuccess = false;
   }
+
+  // Classes Logic
+
+  notFilledClass(namount) {
+    return this.expensesAmount === false || (namount.invalid && (namount.dirty || namount.touched));
+  }
+
+  successfulClaim() {
+    console.log(this.addClaimSuccess);
+    return !this.addClaimSuccess;
+  }
+
+  submitButtonController(nnote, namount) {
+    return this.expensesNote === false || this.expensesAmount === false || nnote.invalid || namount.invalid;
+  }
+
+  // End Classes Logic
+
+
+
   claimForm(form: NgForm) {
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.1));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
@@ -27,6 +49,7 @@ export class ExpensesComponent {
         obj)
         .subscribe(
           (val) => {
+            this.successfulClaim();
             console.log('>> POST SUCCESS',
               val);
           }, response => {

@@ -1,23 +1,22 @@
 @mixin for-phone-only {
-
   @media (max-width: 599px) { @content; }
 }
 @mixin for-tablet-portrait-up {
-
   @media (min-width: 600px) { @content; }
 }
 @mixin for-tablet-landscape-up {
-
   @media (min-width: 900px) { @content; }
 }
 @mixin for-desktop-up {
-
   @media (min-width: 1200px) { @content; }
 }
 @mixin for-big-desktop-up {
-
   @media (min-width: 1800px) { @content; }
 }
+
+$vwt_color_blue: #008BB8;
+$vwt_color_blue_hr: #008bb859;
+
 .container {
   @include for-phone-only {
     background-color: #fcfbfb;
@@ -51,13 +50,14 @@ input, textarea {
   border: 1px solid #3a89b4;
   outline: none;
   border-radius: 4px;
+  width: 100%;
+  &:hover {
+    opacity: .8;
+    cursor: pointer;
+  }
   @include for-phone-only {
     width: 100%;
   }
-}
-.deep_button:hover {
-  opacity: .8;
-  cursor: pointer;
 }
 
 #amountinput {
@@ -69,17 +69,19 @@ input, textarea {
 #noteinput {
   max-width: 365px;
   margin-bottom: 0;
-  height: 10ex;
+  height: 14ex;
   @include for-phone-only {
     max-width: none;
+    //height: 18ex;
   }
 }
 #colstep {
   background-color: #fcfbfb;
-  padding: 15px;
+  padding: 4em;
   @include for-phone-only {
     position: absolute;
     width: 100%;
+    padding: 1em;
   }
 }
 #linestep {
@@ -92,17 +94,19 @@ input, textarea {
 }
 #bodystep {
   background-color: #fcfbfb;
-  padding: 20px;
+  padding: 3.2em;
   max-width: 100%;
   @include for-phone-only {
     align-content: center;
     position: absolute;
     margin-top: 35ex;
     width: 100%;
+    background-color: #f6f7e9;
+    bottom: 0;
   }
 }
 .row {
-  margin-top: 10ex;
+  margin-top: 5ex;
   .hidden {
     display: none;
   }
@@ -146,6 +150,7 @@ input, textarea {
 }
 .disabledBtn {
   opacity: .5;
+  width: 100%;
 }
 .disabledBtn:hover {
   cursor: not-allowed;
@@ -158,4 +163,52 @@ input, textarea {
 }
 .move-18 {
   bottom: 18px;
+}
+
+.typewriter {
+  @include for-phone-only {
+    overflow: hidden;
+    padding: 1em;
+    margin: 0 auto;
+    letter-spacing: .001em;
+    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+  }
+}
+
+.reason {
+  textarea#text {
+    border: 0 transparent;
+    background-color: white;
+  }
+  .submit_button {
+
+  }
+}
+
+.claim {
+  h5 {
+    color: $vwt_color_blue;
+    font-weight: 100;
+  }
+  .add {
+    border-top: 1px solid $vwt_color_blue_hr;
+    margin-bottom: 2em;
+  }
+}
+
+.separator {
+  width: 1px;
+  height: 100%;
+  margin: auto;
+  position: relative;
+  overflow: hidden;
+
+  .inner {
+    position: absolute;
+    width: 100%;
+    height: 40%;
+    background: grey;
+    top: 30%;
+    box-shadow: 0px 0px 30px 20px grey;
+  }
 }
