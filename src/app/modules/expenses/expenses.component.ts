@@ -18,7 +18,7 @@ export class ExpensesComponent {
     private httpClient: HttpClient,
     private env: EnvService,
   ) {
-    this.addClaimSuccess = false;
+    this.addClaimSuccess = { success: false};
   }
 
   // Classes Logic
@@ -28,8 +28,7 @@ export class ExpensesComponent {
   }
 
   successfulClaim() {
-    console.log(this.addClaimSuccess);
-    return !this.addClaimSuccess;
+    return this.addClaimSuccess.success = true;
   }
 
   submitButtonController(nnote, namount) {
@@ -50,8 +49,7 @@ export class ExpensesComponent {
         .subscribe(
           (val) => {
             this.successfulClaim();
-            console.log('>> POST SUCCESS',
-              val);
+            console.log('>> POST SUCCESS', val);
           }, response => {
             console.error('>> POST FAILED', response.message);
           });

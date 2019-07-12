@@ -5,6 +5,9 @@
         <h5> Een declaratie indienen. </h5>
         <hr class="add">
       </div>
+      <div class="alert alert-success" role="alert" *ngIf="addClaimSuccess.success === true">
+          Declaratie is successvol ingediend
+    </div>
       <form name="expenseForm" #expenseForm="ngForm" (ngSubmit)="claimForm(expenseForm)">
         <label for="amountinput">Bedrag:</label>
         <div class="input-group">
@@ -62,7 +65,7 @@
       <div class="submit_button">
         <label for="submit-form"
                tabindex="0" class="btn btn-default deep_button"
-               [ngClass]="{disabledBtn: submitButtonController(nnote, namount)}"
+               [ngClass]="{disabledBtn: submitButtonController(nnote, namount) || addClaimSuccess.success === true}"
         >
           Indienen
         </label>

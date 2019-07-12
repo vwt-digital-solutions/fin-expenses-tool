@@ -95,7 +95,7 @@ input, textarea {
 #bodystep {
   background-color: #fcfbfb;
   padding: 3.2em;
-  max-width: 100%;
+  //max-width: 100%;
   @include for-phone-only {
     align-content: center;
     position: absolute;
@@ -151,6 +151,7 @@ input, textarea {
 .disabledBtn {
   opacity: .5;
   width: 100%;
+  margin-top: 15px;
 }
 .disabledBtn:hover {
   cursor: not-allowed;
@@ -179,6 +180,7 @@ input, textarea {
   textarea#text {
     border: 0 transparent;
     background-color: white;
+    height: 4em;
   }
   .submit_button {
 
