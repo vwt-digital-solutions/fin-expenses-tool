@@ -32,7 +32,8 @@ export class ExpensesComponent {
   }
 
   submitButtonController(nnote, namount) {
-    return this.expensesNote === false || this.expensesAmount === false || nnote.invalid || namount.invalid;
+    return this.expensesNote === false || this.expensesAmount === false ||
+      nnote.invalid || namount.invalid || this.addClaimSuccess.success === true;
   }
 
   // End Classes Logic
@@ -42,7 +43,7 @@ export class ExpensesComponent {
   claimForm(form: NgForm) {
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.1));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
-    if (this.expensesNote && this.expensesAmount) {
+    if (this.expensesNote && this.expensesAmount && this.addClaimSuccess.success === false) {
       const obj = JSON.parse('{ "amount":' + form.value.amount + ', "note":"' + form.value.note + ' "}');
       this.httpClient.post(this.env.apiUrl + '/employees/expenses',
         obj)
