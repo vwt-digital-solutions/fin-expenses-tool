@@ -23,8 +23,14 @@ export class ExpensesComponent {
 
   // Classes Logic
 
-  notFilledClass(namount) {
-    return this.expensesAmount === false || (namount.invalid && (namount.dirty || namount.touched));
+  notFilledClass(setClass) {
+    let starBool;
+    if (setClass.name === 'amount') {
+      starBool = this.expensesAmount === false;
+    } else if (setClass.name === 'note') {
+      starBool = this.expensesNote === false;
+    }
+    return starBool || (setClass.invalid && (setClass.dirty || setClass.touched));
   }
 
   successfulClaim() {
@@ -43,7 +49,7 @@ export class ExpensesComponent {
 
 
   claimForm(form: NgForm) {
-    this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.1));
+    this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
     if (this.expensesNote && this.expensesAmount && this.addClaimSuccess.success === false) {
       const obj = JSON.parse('{ "amount":' + form.value.amount + ', "note":"' + form.value.note + ' "}');
