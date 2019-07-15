@@ -1,3 +1,5 @@
+@import "~src/assets/scss/mixins";
+
 .header{
   width: 100%;
   background: #008BB8;
@@ -30,6 +32,9 @@
       padding: 17.5px 10px;
       float: left;
       text-transform: uppercase;
+       @include for-phone-only {
+          font-size: smaller;
+      }
     }
   }
 

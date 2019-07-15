@@ -1,21 +1,6 @@
-@mixin for-phone-only {
-  @media (max-width: 599px) { @content; }
-}
-@mixin for-tablet-portrait-up {
-  @media (min-width: 600px) { @content; }
-}
-@mixin for-tablet-landscape-up {
-  @media (min-width: 900px) { @content; }
-}
-@mixin for-desktop-up {
-  @media (min-width: 1200px) { @content; }
-}
-@mixin for-big-desktop-up {
-  @media (min-width: 1800px) { @content; }
-}
+@import "~src/assets/scss/mixins";
+@import "~src/assets/scss/constants";
 
-$vwt_color_blue: #008BB8;
-$vwt_color_blue_hr: #008bb859;
 
 .container {
   @include for-phone-only {
@@ -72,7 +57,7 @@ input, textarea {
   height: 14ex;
   @include for-phone-only {
     max-width: none;
-    //height: 18ex;
+    height: 18ex;
   }
 }
 #colstep {
@@ -106,7 +91,7 @@ input, textarea {
     position: absolute;
     margin-top: 35ex;
     width: 100%;
-    background-color: #f6f7e9;
+    background-color: $vwt_mobile_background_color_blue;
     bottom: 0;
   }
 }
@@ -122,6 +107,12 @@ input, textarea {
   span {
     font-weight: normal;
     color: #858585;
+    &.form-amount {
+      @include for-phone-only {
+        color: white;
+      }
+    }
+
   }
   @include for-phone-only {
     display: inline-block;
@@ -173,20 +164,24 @@ input, textarea {
 
 .typewriter {
   @include for-phone-only {
-    overflow: hidden;
+    overflow: visible;
     padding: 1em;
-    margin: 0 auto;
-    letter-spacing: .001em;
-    animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
   }
 }
 
 .reason {
   textarea#text {
     border: 0 transparent;
-    background-color: white;
-    height: 4em;
-    font-size: x-small;
+    background-color: transparent;
+    height: 8em; // To be Fixed@hardcorded with all fields
+    font-size: small;
+    -webkit-appearance: none;
+    @include for-phone-only {
+      height: 6em;
+      width: 22em;
+      color: white;
+      font-size: medium;
+    }
   }
 }
 
