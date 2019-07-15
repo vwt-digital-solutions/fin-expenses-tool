@@ -3,7 +3,7 @@
 
 
 .container {
-  @include for-phone-only {
+  @include lg-phone-only {
     background-color: #fcfbfb;
     height: 100vh;
     width: 100%;
@@ -40,14 +40,14 @@ input, textarea, select {
     opacity: .8;
     cursor: pointer;
   }
-  @include for-phone-only {
+  @include lg-phone-only {
     width: 100%;
   }
 }
 
 #amountinput {
   max-width: 300px;
-  @include for-phone-only {
+  @include lg-phone-only {
     max-width: none;
   }
 }
@@ -61,7 +61,7 @@ input, textarea, select {
   max-width: 365px;
   margin-bottom: 0;
   height: 14ex;
-  @include for-phone-only {
+  @include lg-phone-only {
     max-width: none;
     height: 18ex;
   }
@@ -69,7 +69,7 @@ input, textarea, select {
 #colstep {
   background-color: #fcfbfb;
   padding: 2em;
-  @include for-phone-only {
+  @include lg-phone-only {
     position: absolute;
     width: 100%;
     padding: 1em;
@@ -84,20 +84,17 @@ input, textarea, select {
       rgba(255, 255, 255, 0) 100%);
   border-image-slice: 1;
   transform: translate(50%, 0);
-  @include for-phone-only {
+  @include lg-phone-only {
     display: none;
   }
 }
 #bodystep {
   background-color: #fcfbfb;
   padding: 2.2em;
-  //max-width: 100%;
-  @include for-phone-only {
-    align-content: center;
-    position: absolute;
-    margin-top: 35ex;
-    width: 100%;
+
+  @include lg-phone-only {
     background-color: $vwt_mobile_background_color_blue;
+    position: absolute;
     bottom: 0;
   }
 }
@@ -114,13 +111,13 @@ input, textarea, select {
     font-weight: normal;
     color: #858585;
     &.form-amount {
-      @include for-phone-only {
+      @include lg-phone-only {
         color: white;
       }
     }
 
   }
-  @include for-phone-only {
+  @include lg-phone-only {
     display: inline-block;
     vertical-align: middle;
     float: none;
@@ -169,20 +166,23 @@ input, textarea, select {
 }
 
 .typewriter {
-  @include for-phone-only {
+  @include sm-phone-only {
     overflow: visible;
     padding: 1em;
   }
 }
 
 .reason {
+  @include lg-phone-only {
+    display: none;
+  }
   textarea#text {
     border: 0 transparent;
     background-color: transparent;
     height: 8em; // To be Fixed@hardcorded with all fields
     font-size: small;
     -webkit-appearance: none;
-    @include for-phone-only {
+    @include lg-phone-only {
       height: 6em;
       width: 22em;
       color: white;
@@ -192,11 +192,16 @@ input, textarea, select {
 }
 
 .claim {
+  @include lg-phone-only {
+    h5.summary {
+      display: none;
+    }
+  }
   h5 {
-    color: $vwt_color_blue;
+    color:  $vwt_color_blue;
     font-weight: 100;
   }
-  .add {
+  hr.add {
     border-top: 1px solid $vwt_color_blue_hr;
     margin-bottom: 2em;
   }

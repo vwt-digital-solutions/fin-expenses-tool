@@ -1,15 +1,38 @@
-@mixin for-phone-only {
-  @media (max-width: 599px) { @content; }
+// Tablet
+$breakpoint-tablet: 768px;
+$breakpoint-tablet-portrait-up: 600px;
+$breakpoint-tablet-landscape-up: 900px;
+// Mobile Phones
+$breakpoint-phone-large-screen: 599px;
+$breakpoint-phone-medium-screen: 375px;
+$breakpoint-phone-small-screen: 320px;
+
+// Desktop
+$breakpoint-desktop: 1200px;
+$breakpoint-desktop-big: 1800px;
+
+
+@mixin md-phone-only {
+  @media (max-width: $breakpoint-phone-medium-screen) { @content; }
+}
+@mixin sm-phone-only {
+  @media (max-width: $breakpoint-phone-small-screen) { @content; }
+}
+@mixin lg-phone-only {
+  @media (max-width: $breakpoint-phone-large-screen) { @content; }
+}
+@mixin for-tablet {
+  @media (max-width: $breakpoint-tablet) { @content;  }
 }
 @mixin for-tablet-portrait-up {
-  @media (min-width: 600px) { @content; }
+  @media (min-width: $breakpoint-tablet-portrait-up) { @content; }
 }
 @mixin for-tablet-landscape-up {
-  @media (min-width: 900px) { @content; }
+  @media (min-width: $breakpoint-tablet-landscape-up) { @content; }
 }
 @mixin for-desktop-up {
-  @media (min-width: 1200px) { @content; }
+  @media (min-width: $breakpoint-desktop) { @content; }
 }
 @mixin for-big-desktop-up {
-  @media (min-width: 1800px) { @content; }
+  @media (min-width: $breakpoint-desktop-big) { @content; }
 }
