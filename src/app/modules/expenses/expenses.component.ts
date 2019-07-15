@@ -18,7 +18,7 @@ export class ExpensesComponent {
     private httpClient: HttpClient,
     private env: EnvService,
   ) {
-    this.addClaimSuccess = { success: false};
+    this.addClaimSuccess = { success: false, wrong: false };
   }
 
   // Classes Logic
@@ -31,13 +31,15 @@ export class ExpensesComponent {
     return this.addClaimSuccess.success = true;
   }
 
+  wrongfulClaim() {
+    return this.addClaimSuccess.wrong = true;
+  }
   submitButtonController(nnote, namount) {
     return this.expensesNote === false || this.expensesAmount === false ||
       nnote.invalid || namount.invalid || this.addClaimSuccess.success === true;
   }
 
   // End Classes Logic
-
 
 
   claimForm(form: NgForm) {
@@ -52,6 +54,7 @@ export class ExpensesComponent {
             this.successfulClaim();
             console.log('>> POST SUCCESS', val);
           }, response => {
+            this.wrongfulClaim();
             console.error('>> POST FAILED', response.message);
           });
     }

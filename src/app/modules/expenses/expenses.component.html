@@ -7,7 +7,10 @@
       </div>
       <div class="alert alert-success" role="alert" *ngIf="addClaimSuccess.success === true">
           Declaratie is successvol ingediend
-    </div>
+      </div>
+      <div class="alert alert-danger" role="alert" *ngIf="addClaimSuccess.wrong === true">
+        Iets is fout gegaan. Probeer het later opnieuw.
+      </div>
       <form name="expenseForm" #expenseForm="ngForm" (ngSubmit)="claimForm(expenseForm)">
         <label for="amountinput">Bedrag:</label>
         <div class="input-group">
