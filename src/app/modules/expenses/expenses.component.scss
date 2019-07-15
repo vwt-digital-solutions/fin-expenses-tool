@@ -1,0 +1,214 @@
+@import "~src/assets/scss/mixins";
+@import "~src/assets/scss/constants";
+
+
+.container {
+  @include for-phone-only {
+    background-color: #fcfbfb;
+    height: 100vh;
+    width: 100%;
+    bottom: 0;
+    top: 0;
+    position: relative;
+  }
+}
+div#landing_page {
+  display: none;
+}
+.landing_page_container {
+  display: none;
+}
+label {
+  color: #3f8bb5;
+  font-weight: bold;
+}
+input, textarea {
+  border-radius: 4px;
+  outline: none;
+  border: 1px solid #dce5eb;
+}
+.deep_button {
+  opacity: 1;
+  background-color: #3a89b4;
+  font-weight: bold;
+  color: white;
+  border: 1px solid #3a89b4;
+  outline: none;
+  border-radius: 4px;
+  width: 100%;
+  &:hover {
+    opacity: .8;
+    cursor: pointer;
+  }
+  @include for-phone-only {
+    width: 100%;
+  }
+}
+
+#amountinput {
+  max-width: 300px;
+  @include for-phone-only {
+    max-width: none;
+  }
+}
+#noteinput {
+  max-width: 365px;
+  margin-bottom: 0;
+  height: 14ex;
+  @include for-phone-only {
+    max-width: none;
+    height: 18ex;
+  }
+}
+#colstep {
+  background-color: #fcfbfb;
+  padding: 2em;
+  @include for-phone-only {
+    position: absolute;
+    width: 100%;
+    padding: 1em;
+  }
+}
+#linestep {
+  border-left: 1px solid #80808052;
+  border-image: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(2, 138, 184, 0.4) 48%,
+      rgba(255, 255, 255, 0) 100%);
+  border-image-slice: 1;
+  transform: translate(50%, 0);
+  @include for-phone-only {
+    display: none;
+  }
+}
+#bodystep {
+  background-color: #fcfbfb;
+  padding: 2.2em;
+  //max-width: 100%;
+  @include for-phone-only {
+    align-content: center;
+    position: absolute;
+    margin-top: 35ex;
+    width: 100%;
+    background-color: $vwt_mobile_background_color_blue;
+    bottom: 0;
+  }
+}
+.row {
+  margin-top: 5ex;
+  .hidden {
+    display: none;
+  }
+  p {
+    font-weight: bold;
+    color: #858585;
+  }
+  span {
+    font-weight: normal;
+    color: #858585;
+    &.form-amount {
+      @include for-phone-only {
+        color: white;
+      }
+    }
+
+  }
+  @include for-phone-only {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+    margin-top: 0;
+  }
+}
+
+.input-group .form-control {
+  float: none;
+}
+.input-group .input-buttons {
+  position: relative;
+  z-index: 3;
+}
+.input-group-addon {
+  line-height:32.5px;
+  text-align: center;
+  background-color: #f6f6f6;
+  font-weight: bold;
+  color: #858585;
+  border: 1px solid #dce5eb;
+  outline: none;
+  width: 65px;
+  cursor: default;
+}
+.notFilled {
+  border: 1px solid #dc44446b;
+  background-color: #dc44440f;
+}
+.disabledBtn {
+  opacity: .5;
+  width: 100%;
+  margin-top: 15px;
+}
+.disabledBtn:hover {
+  cursor: not-allowed;
+}
+.fillText {
+  padding: 0;
+  margin: 0;
+  position: relative;
+  color: #dc4444c2;
+}
+.move-18 {
+  bottom: 18px;
+}
+
+.typewriter {
+  @include for-phone-only {
+    overflow: visible;
+    padding: 1em;
+  }
+}
+
+.reason {
+  textarea#text {
+    border: 0 transparent;
+    background-color: transparent;
+    height: 8em; // To be Fixed@hardcorded with all fields
+    font-size: small;
+    -webkit-appearance: none;
+    @include for-phone-only {
+      height: 6em;
+      width: 22em;
+      color: white;
+      font-size: medium;
+    }
+  }
+}
+
+.claim {
+  h5 {
+    color: $vwt_color_blue;
+    font-weight: 100;
+  }
+  .add {
+    border-top: 1px solid $vwt_color_blue_hr;
+    margin-bottom: 2em;
+  }
+}
+
+.separator {
+  width: 1px;
+  height: 100%;
+  margin: auto;
+  position: relative;
+  overflow: hidden;
+
+  .inner {
+    position: absolute;
+    width: 100%;
+    height: 40%;
+    background: grey;
+    top: 30%;
+    box-shadow: 0 0 30px 20px grey;
+  }
+}

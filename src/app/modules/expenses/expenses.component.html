@@ -1,0 +1,75 @@
+<div class="container">
+  <div class="row">
+    <div class="col col-sm-8" id="colstep">
+      <div class="claim">
+        <h5> Een declaratie indienen. </h5>
+        <hr class="add">
+      </div>
+      <div class="alert alert-success" role="alert" *ngIf="addClaimSuccess.success === true">
+          Declaratie is successvol ingediend
+    </div>
+      <form name="expenseForm" #expenseForm="ngForm" (ngSubmit)="claimForm(expenseForm)">
+        <label for="amountinput">Bedrag:</label>
+        <div class="input-group">
+          <input id="amountinput"
+                 (click)="expensesAmount = true" class="form-control"
+                 [ngClass]="{notFilled: notFilledClass(namount)}"
+                 type="number"
+                 step="0.01"
+                 min="0.01"
+                 name="amount"
+                 required
+                 [(ngModel)]="formAmount"
+                 #namount="ngModel">
+          <span class="input-group-addon">€ EUR</span>
+        </div>
+        <div class="fillText"
+             *ngIf="notFilledClass(namount)">
+          <small>Graag een bedrag invullen</small>
+        </div>
+        <div class="form-group">
+          <label for="noteinput">Omschrijving:</label>
+          <textarea id="noteinput"
+                    (click)="expensesNote = true"
+                    class="form-control"
+                    [ngClass]="{notFilled: notFilledClass(nnote)}"
+                    type="text"
+                    name="note"
+                    required minlength="1"
+                    [(ngModel)]="formNote"
+                    #nnote="ngModel">
+          </textarea>
+        </div>
+        <div class="fillText move-18"
+             *ngIf="notFilledClass(nnote)">
+          <small>Graag een omschrijving invullen</small>
+        </div>
+        <input type="submit" id="submit-form" class="hidden" />
+      </form>
+    </div>
+    <div class="col col-sm-1" id="linestep"></div>
+    <div class="col col-sm-3" id="bodystep">
+      <div class="claim">
+        <h5> Samenvatting </h5>
+<!--        <hr class="add dotted">-->
+      </div>
+      <div class="row reason">
+        <div class="col-12 col-sm-4"><h5>Bedrag: <span class="form-amount">{{ formAmount }}</span></h5></div>
+        <div class="w-100"></div>
+        <div class="col-12 col-sm-4"><h5>Reden:</h5></div>
+        <div class="w-100"></div>
+        <div class="col-12 col-sm-4 typewriter"><textarea id="text" rows="4" maxlength="150" disabled value="{{ formNote }}"></textarea></div>
+        <div class="w-100"></div>
+
+      </div>
+      <div class="submit_button">
+        <label for="submit-form"
+               tabindex="0" class="btn btn-default deep_button"
+               [ngClass]="{disabledBtn: submitButtonController(nnote, namount)}"
+        >
+          Indienen
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
