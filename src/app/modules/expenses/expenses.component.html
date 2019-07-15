@@ -9,14 +9,15 @@
           Declaratie is successvol ingediend
       </div>
       <div class="alert alert-danger" role="alert" *ngIf="addClaimSuccess.wrong === true">
-        Iets is fout gegaan. Probeer het later opnieuw.
+        Er is iets fout gegaan. Probeer het later opnieuw.
       </div>
 
       <form name="expenseForm" #expenseForm="ngForm" (ngSubmit)="claimForm(expenseForm)">
         <label for="amountinput">Bedrag:</label>
         <div class="input-group">
           <input id="amountinput"
-                 (click)="expensesAmount = true" class="form-control"
+                 (click)="expensesAmount = true"
+                 class="form-control"
                  [ngClass]="{notFilled: notFilledClass(namount)}"
                  type="number"
                  step="0.01"
@@ -30,6 +31,26 @@
         <div class="fillText"
              *ngIf="notFilledClass(namount)">
           <small>Graag een geldig bedrag invullen</small>
+        </div>
+
+        <label for="typeinput">Soort:</label>
+        <div class="form-group">
+          <select id="typeinput"
+                  (change)="expenseType = true"
+                  class="form-control"
+                  [ngClass]="{notFilled: notFilledClass(ntype)}"
+                  [(ngModel)]="formType"
+                  name="type"
+                  #ntype="ngModel"
+                  required>
+            <option *ngFor="let t of typeOptions">
+              {{t.name}}
+            </option>
+          </select>
+        </div>
+        <div class="fillText move-18"
+             *ngIf="notFilledClass(ntype)">
+          <small>Graag een declaratiesoort kiezen</small>
         </div>
 
         <div class="form-group">
@@ -61,7 +82,7 @@
       </div>
 
       <div class="row reason">
-        <div class="col-12 col-sm-4"><h5>Bedrag: <span class="form-amount">{{ formAmount }}</span></h5></div>
+        <div class="col-12 col-sm-4"><h5>Bedrag: <span class="form-amount">{{ formAmount | number : '1.2' }}</span></h5></div>
         <div class="w-100"></div>
         <div class="col-12 col-sm-4"><h5>Reden:</h5></div>
         <div class="w-100"></div>
@@ -72,7 +93,7 @@
       <div class="submit_button">
         <label for="submit-form"
                tabindex="0" class="btn btn-default deep_button"
-               [ngClass]="{disabledBtn: submitButtonController(nnote, namount)}">
+               [ngClass]="{disabledBtn: submitButtonController(nnote, namount, ntype)}">
           Indienen
         </label>
       </div>

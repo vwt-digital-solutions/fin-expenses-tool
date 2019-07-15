@@ -22,7 +22,7 @@ label {
   color: #3f8bb5;
   font-weight: bold;
 }
-input, textarea {
+input, textarea, select {
   border-radius: 4px;
   outline: none;
   border: 1px solid #dce5eb;
@@ -47,6 +47,12 @@ input, textarea {
 
 #amountinput {
   max-width: 300px;
+  @include for-phone-only {
+    max-width: none;
+  }
+}
+#typeinput {
+  max-width: 365px;
   @include for-phone-only {
     max-width: none;
   }
