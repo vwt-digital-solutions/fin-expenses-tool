@@ -61,11 +61,7 @@ export class ExpensesComponent {
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
     this.expenseType = !(form.value.cost_type === undefined);
     if (this.expensesNote && this.expensesAmount && this.expenseType && this.addClaimSuccess.success === false) {
-      const obj = JSON.parse('{ ' +
-        '"amount":' + form.value.amount + ', ' +
-        '"cost_type":"' + form.value.cost_type + ' "' + ', ' +
-        '"note":"' + form.value.note + ' ' +
-        '"}');
+      const obj = JSON.parse(JSON.stringify(form.value));
       this.httpClient.post(this.env.apiUrl + '/employees/expenses',
         obj)
         .subscribe(
