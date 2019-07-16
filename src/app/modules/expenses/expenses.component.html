@@ -53,6 +53,22 @@
           <small>Graag een declaratiesoort kiezen</small>
         </div>
 
+        <label for="dateinput">Verwervingsdatum:</label>
+        <div class="form-group">
+          <input id="dateinput"
+                 (click)="expenseTransDate = true"
+                 [ngClass]="{notFilled: notFilledClass(ntransdate)}"
+                 name="date_of_transaction"
+                 required
+                 [(ngModel)]="formTransDate"
+                 #ntransdate="ngModel"
+                 type="date">
+        </div>
+        <div class="fillText move-18"
+             *ngIf="notFilledClass(ntransdate)">
+          <small>Graag een geldige verwervingsdatum opgeven</small>
+        </div>
+
         <div class="form-group">
           <label for="noteinput">Omschrijving:</label>
           <textarea id="noteinput"
@@ -92,7 +108,7 @@
       <div class="submit_button">
         <label for="submit-form"
                tabindex="0" class="btn btn-default deep_button"
-               [ngClass]="{disabledBtn: submitButtonController(nnote, namount, ntype)}">
+               [ngClass]="{disabledBtn: submitButtonController(nnote, namount, ntype, ntransdate)}">
           Indienen
         </label>
       </div>

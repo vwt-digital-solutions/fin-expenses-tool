@@ -12,9 +12,11 @@ export class ExpensesComponent {
   public formNote;
   public formAmount;
   public formType;
+  public formTransDate;
   public expensesAmount;
   public expensesNote;
   public expenseType;
+  public expenseTransDate;
   public addClaimSuccess;
 
   // Testing values
@@ -38,6 +40,7 @@ export class ExpensesComponent {
     if (setClass.name === 'amount') {starBool = this.expensesAmount === false; }
     if (setClass.name === 'note') {starBool = this.expensesNote === false; }
     if (setClass.name === 'cost_type') {starBool = this.expenseType === false; }
+    if (setClass.name === 'date_of_transaction') {starBool = this.expenseTransDate === false; }
     return starBool || (setClass.invalid && (setClass.dirty || setClass.touched));
   }
 
@@ -48,19 +51,21 @@ export class ExpensesComponent {
   wrongfulClaim() {
     return this.addClaimSuccess.wrong = true;
   }
-  submitButtonController(nnote, namount, ntype) {
-    return this.expensesNote === false || this.expensesAmount === false || this.expenseType === false ||
-      nnote.invalid || namount.invalid || ntype.invalid || this.addClaimSuccess.success === true;
+  submitButtonController(nnote, namount, ntype, ntransdate) {
+    return this.expensesNote === false || this.expensesAmount === false || this.expenseType === false || this.expenseTransDate === false ||
+      nnote.invalid || namount.invalid || ntype.invalid || ntransdate.invalid || this.addClaimSuccess.success === true;
   }
 
   // End Classes Logic
 
 
   claimForm(form: NgForm) {
+    console.log(form.value); // DEV ONLY
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
     this.expenseType = !(form.value.cost_type === undefined);
-    if (this.expensesNote && this.expensesAmount && this.expenseType && this.addClaimSuccess.success === false) {
+    this.expenseTransDate = !(form.value.date_of_transaction === undefined);
+    if (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.addClaimSuccess.success === false) {
       const obj = JSON.parse(JSON.stringify(form.value));
       this.httpClient.post(this.env.apiUrl + '/employees/expenses',
         obj)
