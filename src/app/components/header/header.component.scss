@@ -10,6 +10,7 @@
 
   box-shadow: 0 2px 4px 0 rgba(0,0,0,0.1);
 
+
   .brand{
     float: left;
     display: table;
@@ -32,7 +33,7 @@
       padding: 17.5px 10px;
       float: left;
       text-transform: uppercase;
-       @include for-phone-only {
+       @include lg-phone-only {
           font-size: smaller;
       }
     }
@@ -114,7 +115,7 @@
             display: none;
           }
           i{
-            font-size: 9px;
+            font-size: 16px;
             line-height: 9px;
           }
         }

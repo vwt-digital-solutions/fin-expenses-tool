@@ -11,40 +11,57 @@ import { EnvService } from 'src/app/services/env.service';
 export class ExpensesComponent {
   public formNote;
   public formAmount;
+  public formType;
   public expensesAmount;
   public expensesNote;
+  public expenseType;
   public addClaimSuccess;
+
+  // Testing values
+  typeOptions = [
+    { name: 'Kantoorartikelen', value: 'office_utilities'},
+    { name: 'Maaltijdkosten', value: 'meal_costs'},
+    { name: 'Reiskosten', value: 'travel_costs'}
+  ];
+  // End of Testing values
   constructor(
     private httpClient: HttpClient,
     private env: EnvService,
   ) {
-    this.addClaimSuccess = { success: false};
+    this.addClaimSuccess = { success: false, wrong: false };
   }
 
   // Classes Logic
 
-  notFilledClass(namount) {
-    return this.expensesAmount === false || (namount.invalid && (namount.dirty || namount.touched));
+  notFilledClass(setClass) {
+    let starBool;
+    if (setClass.name === 'amount') {starBool = this.expensesAmount === false; }
+    if (setClass.name === 'note') {starBool = this.expensesNote === false; }
+    if (setClass.name === 'cost_type') {starBool = this.expenseType === false; }
+    return starBool || (setClass.invalid && (setClass.dirty || setClass.touched));
   }
 
   successfulClaim() {
     return this.addClaimSuccess.success = true;
   }
 
-  submitButtonController(nnote, namount) {
-    return this.expensesNote === false || this.expensesAmount === false ||
-      nnote.invalid || namount.invalid || this.addClaimSuccess.success === true;
+  wrongfulClaim() {
+    return this.addClaimSuccess.wrong = true;
+  }
+  submitButtonController(nnote, namount, ntype) {
+    return this.expensesNote === false || this.expensesAmount === false || this.expenseType === false ||
+      nnote.invalid || namount.invalid || ntype.invalid || this.addClaimSuccess.success === true;
   }
 
   // End Classes Logic
 
 
-
   claimForm(form: NgForm) {
-    this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.1));
+    this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
-    if (this.expensesNote && this.expensesAmount && this.addClaimSuccess.success === false) {
-      const obj = JSON.parse('{ "amount":' + form.value.amount + ', "note":"' + form.value.note + ' "}');
+    this.expenseType = !(form.value.cost_type === undefined);
+    if (this.expensesNote && this.expensesAmount && this.expenseType && this.addClaimSuccess.success === false) {
+      const obj = JSON.parse(JSON.stringify(form.value));
       this.httpClient.post(this.env.apiUrl + '/employees/expenses',
         obj)
         .subscribe(
@@ -52,6 +69,7 @@ export class ExpensesComponent {
             this.successfulClaim();
             console.log('>> POST SUCCESS', val);
           }, response => {
+            this.wrongfulClaim();
             console.error('>> POST FAILED', response.message);
           });
     }
