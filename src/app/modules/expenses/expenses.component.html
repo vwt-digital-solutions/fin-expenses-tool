@@ -12,7 +12,7 @@
         Er is iets fout gegaan. Probeer het later opnieuw.
       </div>
 
-      <form name="expenseForm" #expenseForm="ngForm" (ngSubmit)="claimForm(expenseForm)">
+      <form (change)="addClaimSuccess.wrong = false" name="expenseForm" #expenseForm="ngForm" (ngSubmit)="claimForm(expenseForm)">
         <label for="amountinput">Bedrag:</label>
         <div class="input-group">
           <input id="amountinput"
