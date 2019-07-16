@@ -37,7 +37,7 @@ export class ExpensesComponent {
     let starBool;
     if (setClass.name === 'amount') {starBool = this.expensesAmount === false; }
     if (setClass.name === 'note') {starBool = this.expensesNote === false; }
-    if (setClass.name === 'type') {starBool = this.expenseType === false; }
+    if (setClass.name === 'cost_type') {starBool = this.expenseType === false; }
     return starBool || (setClass.invalid && (setClass.dirty || setClass.touched));
   }
 
@@ -59,11 +59,11 @@ export class ExpensesComponent {
   claimForm(form: NgForm) {
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
-    this.expenseType = !(form.value.type === undefined);
+    this.expenseType = !(form.value.cost_type === undefined);
     if (this.expensesNote && this.expensesAmount && this.expenseType && this.addClaimSuccess.success === false) {
       const obj = JSON.parse('{ ' +
         '"amount":' + form.value.amount + ', ' +
-        '"type":"' + form.value.type + ' "' + ', ' +
+        '"cost_type":"' + form.value.cost_type + ' "' + ', ' +
         '"note":"' + form.value.note + ' ' +
         '"}');
       this.httpClient.post(this.env.apiUrl + '/employees/expenses',
