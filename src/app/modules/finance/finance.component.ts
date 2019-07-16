@@ -15,7 +15,7 @@ export class FinanceComponent {
   ) {
   }
   getExpensesData() {
-    this.httpClient.get('http://127.0.0.1:8080/employees/expenses')
+    this.httpClient.get(this.env.apiUrl + '/employees/expenses')
       .subscribe(
             (val) => {
               console.log('>> GET SUCCESS', val);
