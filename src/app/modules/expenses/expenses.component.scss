@@ -57,6 +57,14 @@ input, textarea, select {
     max-width: none;
   }
 }
+#dateinput {
+  width: 100%;
+  max-width: 365px;
+  @include lg-phone-only {
+    width: 100%;
+    max-width: none;
+  }
+}
 #noteinput {
   max-width: 365px;
   margin-bottom: 0;

@@ -23,7 +23,8 @@ export class ExpensesComponent {
   typeOptions = [
     { name: 'Kantoorartikelen', value: 'office_utilities'},
     { name: 'Maaltijdkosten', value: 'meal_costs'},
-    { name: 'Reiskosten', value: 'travel_costs'}
+    { name: 'Reiskosten', value: 'travel_costs'},
+    { name: 'Devicetest', value: 'device_test'}
   ];
   // End of Testing values
   constructor(
@@ -55,18 +56,19 @@ export class ExpensesComponent {
     return this.expensesNote === false || this.expensesAmount === false || this.expenseType === false || this.expenseTransDate === false ||
       nnote.invalid || namount.invalid || ntype.invalid || ntransdate.invalid || this.addClaimSuccess.success === true;
   }
-
   // End Classes Logic
 
 
   claimForm(form: NgForm) {
-    console.log(form.value); // DEV ONLY
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
     this.expenseType = !(form.value.cost_type === undefined);
     this.expenseTransDate = !(form.value.date_of_transaction === undefined);
     if (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.addClaimSuccess.success === false) {
+      const unDate = new Date(form.value.date_of_transaction);
+      form.value.date_of_transaction = unDate.getUTCDate() + '-' + unDate.getUTCMonth() + 1 + '-' + unDate.getUTCFullYear();
       const obj = JSON.parse(JSON.stringify(form.value));
+      console.log(form.value); // DEV ONLY
       this.httpClient.post(this.env.apiUrl + '/employees/expenses',
         obj)
         .subscribe(
