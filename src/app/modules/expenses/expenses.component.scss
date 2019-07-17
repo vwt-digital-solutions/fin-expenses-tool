@@ -45,8 +45,8 @@ input, textarea, select {
   }
 }
 
-#amountinput {
-  max-width: 300px;
+.input-group {
+  max-width: 365px;
   @include lg-phone-only {
     max-width: none;
   }
