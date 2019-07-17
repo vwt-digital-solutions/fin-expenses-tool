@@ -28,7 +28,7 @@ export class ExpensesComponent {
       .subscribe(
         (val) => {
           this.typeOptions = val;
-          console.log('>> GET SUCCESS', val);
+          console.log('>> GET SUCCESS');
         }, response => {
           console.error('>> GET FAILED', response.message);
         });

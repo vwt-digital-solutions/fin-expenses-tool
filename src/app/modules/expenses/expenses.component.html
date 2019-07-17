@@ -43,8 +43,8 @@
                   name="cost_type"
                   #ntype="ngModel"
                   required>
-            <option></option>
-            <option *ngFor="let t of typeOptions">
+            <option>Kies hieronder</option>
+            <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">
               {{t.ctype}}
             </option>
           </select>
