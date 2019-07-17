@@ -65,10 +65,7 @@ export class ExpensesComponent {
     this.expenseType = !(form.value.cost_type === undefined);
     this.expenseTransDate = !(form.value.date_of_transaction === undefined);
     if (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.addClaimSuccess.success === false) {
-      const unDate = new Date(form.value.date_of_transaction);
-      form.value.date_of_transaction = unDate.getUTCDate() + '-' + unDate.getUTCMonth() + 1 + '-' + unDate.getUTCFullYear();
       const obj = JSON.parse(JSON.stringify(form.value));
-      console.log(form.value); // DEV ONLY
       this.httpClient.post(this.env.apiUrl + '/employees/expenses',
         obj)
         .subscribe(

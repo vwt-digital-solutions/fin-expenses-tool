@@ -59,7 +59,7 @@ input, textarea, select {
 }
 #dateinput {
   width: 100%;
-  max-width: 365px;
+  max-width: 300px;
   @include lg-phone-only {
     width: 100%;
     max-width: none;
