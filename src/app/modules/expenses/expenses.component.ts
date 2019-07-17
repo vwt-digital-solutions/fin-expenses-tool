@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import { NgForm } from '@angular/forms';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import { EnvService } from 'src/app/services/env.service';
@@ -18,22 +18,22 @@ export class ExpensesComponent {
   public expenseType;
   public expenseTransDate;
   public addClaimSuccess;
+  public typeOptions;
 
-  // Testing values
-  typeOptions = [
-    { name: 'Kantoorartikelen', value: 'office_utilities'},
-    { name: 'Maaltijdkosten', value: 'meal_costs'},
-    { name: 'Reiskosten', value: 'travel_costs'},
-    { name: 'Devicetest', value: 'device_test'}
-  ];
-  // End of Testing values
   constructor(
     private httpClient: HttpClient,
     private env: EnvService,
   ) {
+    this.httpClient.get(this.env.apiUrl + '/employees/cost_types')
+      .subscribe(
+        (val) => {
+          this.typeOptions = val;
+          console.log('>> GET SUCCESS', val);
+        }, response => {
+          console.error('>> GET FAILED', response.message);
+        });
     this.addClaimSuccess = { success: false, wrong: false };
   }
-
   // Classes Logic
 
   notFilledClass(setClass) {
@@ -57,7 +57,6 @@ export class ExpensesComponent {
       nnote.invalid || namount.invalid || ntype.invalid || ntransdate.invalid || this.addClaimSuccess.success === true;
   }
   // End Classes Logic
-
 
   claimForm(form: NgForm) {
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));

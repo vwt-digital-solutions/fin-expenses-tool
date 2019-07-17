@@ -26,7 +26,7 @@
                  required
                  [(ngModel)]="formAmount"
                  #namount="ngModel">
-          <span class="input-group-addon" onclick="document.getElementById('amountinput').focus()">€ EUR</span>
+          <span class="input-group-addon" onclick="document.getElementById('dateinput').focus()">€ EUR</span>
         </div>
         <div class="fillText"
              *ngIf="notFilledClass(namount)">
@@ -43,8 +43,9 @@
                   name="cost_type"
                   #ntype="ngModel"
                   required>
+            <option></option>
             <option *ngFor="let t of typeOptions">
-              {{t.name}}
+              {{t.ctype}}
             </option>
           </select>
         </div>
