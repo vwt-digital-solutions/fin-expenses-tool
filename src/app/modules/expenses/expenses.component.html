@@ -9,7 +9,7 @@
         Declaratie is successvol ingediend
       </div>
       <div class="alert alert-danger" role="alert" *ngIf="addClaimSuccess.wrong === true">
-        Er is iets fout gegaan. Probeer het later opnieuw.
+        Er is iets fout gegaan. Probeer het later opnieuw
       </div>
 
       <form (change)="addClaimSuccess.wrong = false" name="expenseForm" #expenseForm="ngForm" (ngSubmit)="claimForm(expenseForm)">
