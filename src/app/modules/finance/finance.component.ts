@@ -36,7 +36,8 @@ export class FinanceComponent implements OnInit {
   }
   createBookingFile() {
     this.successfulDownload();
-    this.download('test.txt', 'this is my content');
+    const expensesTable = document.getElementById('expensestable');
+    this.download('test.txt', expensesTable.innerText);
     // this.httpClient.post(this.env.apiUrl + '/finance/expenses/documents', '')
     //   .subscribe(
     //     (val) => {
@@ -51,12 +52,9 @@ export class FinanceComponent implements OnInit {
     const element = document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
     element.setAttribute('download', filename);
-
     element.style.display = 'none';
     document.body.appendChild(element);
-
     element.click();
-
     document.body.removeChild(element);
   }
   searchHistory() {
