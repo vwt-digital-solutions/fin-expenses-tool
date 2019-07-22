@@ -14,7 +14,6 @@ export class FinanceComponent implements OnInit {
   ) {
     this.addBooking = { success: false, wrong: false};
   }
-  public formTransDate;
   public addBooking;
   columnDefs = [
     {headerName: 'Declaratiedatum', field: 'date_of_claim',
@@ -28,13 +27,15 @@ export class FinanceComponent implements OnInit {
     {headerName: 'Beschrijving', field: 'note',
       filter: true },
     {headerName: 'Verwervingsdatum', field: 'date_of_transaction',
-      sortable: true, filter: true }
+      sortable: true, filter: true },
+    {headerName: 'Geëxporteerd', field: 'status.exported',
+      sortable: true }
   ];
   historyColumnDefs = [
     {headerName: 'Grootboekhistorie', field: 'date_exported',
-      sortable: true, filter: true,
+      sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
       suppressMovable: true, width: 215},
-    {headerName: '', field: '',
+    {headerName: '', field: '', cellStyle: {cursor: 'pointer'},
       template: '<i class="fa fa-file-excel"></i>', width: 35}
   ];
 
@@ -42,6 +43,9 @@ export class FinanceComponent implements OnInit {
   historyRowData = null;
   ngOnInit() {
     this.rowData = this.httpClient.get(this.env.apiUrl + '/employees/expenses');
+    this.callHistoryRefresh();
+  }
+  callHistoryRefresh() {
     this.historyRowData = this.httpClient.get('http://localhost:8080/finance/expenses/bookings/documents/exports?date_id=' + 'all');
   }
   successfulDownload() {
@@ -51,9 +55,9 @@ export class FinanceComponent implements OnInit {
     return this.addBooking.wrong = true;
   }
   downloadFromHistory(event) {
-    console.log(event.data.date_exported);
+    const fileData = event.data.export.split('/').slice(2).join('_');
     this.httpClient.get('http://localhost:8080/finance/expenses/bookings/documents/exports?date_id='
-      + event.data.date_exported, {responseType: 'blob'})
+      + fileData, {responseType: 'blob'})
       .subscribe(
         (response) => {
           const blob = new Blob([response], { type: 'text/csv' });
@@ -78,7 +82,6 @@ export class FinanceComponent implements OnInit {
           } else {
             const blob = new Blob([response], { type: 'text/csv' });
             this.successfulDownload();
-            // FinanceComponent.download('test.csv', blob);
             const a = document.createElement('a');
             document.body.appendChild(a);
             const url = window.URL.createObjectURL(blob);
@@ -86,6 +89,7 @@ export class FinanceComponent implements OnInit {
             a.download = 'grootboek.csv';
             a.click();
             window.URL.revokeObjectURL(url);
+            this.callHistoryRefresh();
           }
           console.log('>> GET SUCCESS', response);
         }, response => {
@@ -93,17 +97,4 @@ export class FinanceComponent implements OnInit {
           console.error('>> GET FAILED', response.message);
         });
   }
-  // searchHistory() {
-  //   const dataDate = document.getElementById('historylist').getElementsByTagName('li');
-  //   // tslint:disable-next-line:prefer-for-of
-  //   for (let i = 0; i < dataDate.length; i++) {
-  //     const a = dataDate[i].getElementsByTagName('a')[0];
-  //     const txtValue = a.textContent || a.innerText;
-  //     if (txtValue.indexOf(this.formTransDate) > -1) {
-  //       dataDate[i].style.display = '';
-  //     } else {
-  //       dataDate[i].style.display = 'none';
-  //     }
-  //   }
-  // }
 }
