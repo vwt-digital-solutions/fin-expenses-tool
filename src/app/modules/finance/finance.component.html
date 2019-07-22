@@ -19,24 +19,32 @@
       </ag-grid-angular>
     </div>
     <div class="col col-1" id="linestep"></div>
-    <div class="col-2" style="background-color: #fcfbfb;">
-      <div class="input-group" id="bookinghistory">
-        <input id="dateinput"
-               name="date_search"
-               class="form-control fom"
-               (change)="searchHistory()"
-               [(ngModel)]="formTransDate"
-               type="date">
-        <span class="input-group-addon fa fa-times fom" (click)="formTransDate = ''; searchHistory()"></span>
-      </div>
-      <ul class="list-group" id="historylist">
-        <li class="list-group-item"><i class="fa fa-file-excel"></i> <a>2019-07-18</a> - <a>12:12:12</a></li>
-        <li class="list-group-item"><i class="fa fa-file-excel"></i> <a>2019-07-18</a> - <a>12:12:12</a></li>
-        <li class="list-group-item"><i class="fa fa-file-excel"></i> <a>2019-07-18</a> - <a>12:12:12</a></li>
-        <li class="list-group-item"><i class="fa fa-file-excel"></i> <a>2019-07-17</a> - <a>12:12:12</a></li>
-        <li class="list-group-item"><i class="fa fa-file-excel"></i> <a>2019-07-16</a> - <a>12:12:12</a></li>
-        <li class="list-group-item"><i class="fa fa-file-excel"></i> <a>2019-07-15</a> - <a>12:12:12</a></li>
-      </ul>
+    <div class="col-2" id="historydiv">
+      <ag-grid-angular
+        (rowClicked)="downloadFromHistory($event)"
+        style="width: 100%; height: 100%;"
+        id="historytable"
+        class="ag-theme-balham"
+        [rowData]="historyRowData | async"
+        [columnDefs]="historyColumnDefs">
+      </ag-grid-angular>
+<!--      <div class="input-group" id="bookinghistory">-->
+<!--        <input id="dateinput"-->
+<!--               name="date_search"-->
+<!--               class="form-control fom"-->
+<!--               (change)="searchHistory()"-->
+<!--               [(ngModel)]="formTransDate"-->
+<!--               type="date">-->
+<!--        <span class="input-group-addon fa fa-times fom" (click)="formTransDate = ''; searchHistory()"></span>-->
+<!--      </div>-->
+<!--      <ul class="list-group" id="historylist">-->
+<!--        <li class="list-group-item"><i class="fa fa-file-excel"></i> <a>2019-07-18</a> - <a>12:12:12</a></li>-->
+<!--        <li class="list-group-item"><i class="fa fa-file-excel"></i> <a>2019-07-18</a> - <a>12:12:12</a></li>-->
+<!--        <li class="list-group-item"><i class="fa fa-file-excel"></i> <a>2019-07-18</a> - <a>12:12:12</a></li>-->
+<!--        <li class="list-group-item"><i class="fa fa-file-excel"></i> <a>2019-07-17</a> - <a>12:12:12</a></li>-->
+<!--        <li class="list-group-item"><i class="fa fa-file-excel"></i> <a>2019-07-16</a> - <a>12:12:12</a></li>-->
+<!--        <li class="list-group-item"><i class="fa fa-file-excel"></i> <a>2019-07-15</a> - <a>12:12:12</a></li>-->
+<!--      </ul>-->
     </div>
   </div>
 </div>
