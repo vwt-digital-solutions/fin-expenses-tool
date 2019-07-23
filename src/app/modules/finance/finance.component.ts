@@ -12,7 +12,7 @@ export class FinanceComponent implements OnInit {
     private httpClient: HttpClient,
     private env: EnvService,
   ) {
-    this.addBooking = { success: false, wrong: false};
+    this.addBooking = { success: false, wrong: false, error: false};
   }
   public addBooking;
   columnDefs = [
@@ -28,7 +28,7 @@ export class FinanceComponent implements OnInit {
       filter: true },
     {headerName: 'Verwervingsdatum', field: 'date_of_transaction',
       sortable: true, filter: true },
-    {headerName: 'Geëxporteerd', field: 'status.exported',
+    {headerName: 'Status', field: 'status.text',
       sortable: true }
   ];
   historyColumnDefs = [
@@ -42,11 +42,11 @@ export class FinanceComponent implements OnInit {
   rowData = null;
   historyRowData = null;
   ngOnInit() {
-    this.rowData = this.httpClient.get(this.env.apiUrl + '/employees/expenses');
+    this.rowData = this.httpClient.get(this.env.apiUrl + '/finances/expenses');
     this.callHistoryRefresh();
   }
   callHistoryRefresh() {
-    this.historyRowData = this.httpClient.get('http://localhost:8080/finance/expenses/bookings/documents/exports?date_id=' + 'all');
+    this.historyRowData = this.httpClient.get(this.env.apiUrl + '/finances/expenses/bookings');
   }
   successfulDownload() {
     return this.addBooking.success = true;
@@ -54,10 +54,13 @@ export class FinanceComponent implements OnInit {
   noExpenses() {
     return this.addBooking.wrong = true;
   }
+  errorBooking() {
+    return this.addBooking.error = true;
+  }
   downloadFromHistory(event) {
-    const fileData = event.data.export.split('/').slice(2).join('_');
-    this.httpClient.get('http://localhost:8080/finance/expenses/bookings/documents/exports?date_id='
-      + fileData, {responseType: 'blob'})
+    const fileData = event.data.file_name.split('/').slice(2).join('_');
+    this.httpClient.get(this.env.apiUrl + '/finances/expenses/bookings/' + fileData + '/booking-files',
+      {responseType: 'blob'})
       .subscribe(
         (response) => {
           const blob = new Blob([response], { type: 'text/csv' });
@@ -74,14 +77,14 @@ export class FinanceComponent implements OnInit {
         });
   }
   createBookingFile() {
-    this.httpClient.get('http://localhost:8080/finance/expenses/bookings/documents', {responseType: 'blob'})
+    this.httpClient.post(this.env.apiUrl + '/finances/expenses/bookings', '', {responseType: 'blob', observe: 'response'})
       .subscribe(
         (response) => {
-          if (response.type === 'application/json') {
+          if (response.body.type === 'application/json') {
             this.noExpenses();
+            console.log('>> GET EMPTY', response);
           } else {
-            const blob = new Blob([response], { type: 'text/csv' });
-            this.successfulDownload();
+            const blob = new Blob([response.body], { type: 'text/csv' });
             const a = document.createElement('a');
             document.body.appendChild(a);
             const url = window.URL.createObjectURL(blob);
@@ -89,11 +92,12 @@ export class FinanceComponent implements OnInit {
             a.download = 'grootboek.csv';
             a.click();
             window.URL.revokeObjectURL(url);
-            this.callHistoryRefresh();
+            this.successfulDownload();
+            console.log('>> GET SUCCESS', response);
           }
-          console.log('>> GET SUCCESS', response);
         }, response => {
-          this.noExpenses();
+          this.errorBooking();
+          console.log(response);
           console.error('>> GET FAILED', response.message);
         });
   }

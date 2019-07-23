@@ -9,6 +9,9 @@
         <div class="alert alert-danger" role="alert" *ngIf="addBooking.wrong === true">
           <i class="fa fa-exclamation-circle"></i> Er zijn geen openstaande declaraties. Bekijk de eerdere grootboeken
         </div>
+        <div class="alert alert-danger" role="alert" *ngIf="addBooking.error === true">
+          <i class="fa fa-exclamation-circle"></i> Er is iets fout gegaan. Probeer het later opnieuw.
+        </div>
       </div>
       <ag-grid-angular
         style="width: 100%; height: 500px;"

@@ -24,7 +24,7 @@ export class ExpensesComponent {
     private httpClient: HttpClient,
     private env: EnvService,
   ) {
-    this.httpClient.get(this.env.apiUrl + '/employees/cost_types')
+    this.httpClient.get(this.env.apiUrl + '/employees/cost-types')
       .subscribe(
         (val) => {
           this.typeOptions = val;
