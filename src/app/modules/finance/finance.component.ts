@@ -20,7 +20,7 @@ export class FinanceComponent implements OnInit {
       sortable: true, filter: true },
     {headerName: 'Werknemer', field: 'employee.full_name',
       sortable: true, filter: true },
-    {headerName: 'Kosten', field: 'amount',
+    {headerName: 'Kosten', field: 'amount', valueFormatter: FinanceComponent.decimalFormatter,
       sortable: true, filter: true },
     {headerName: 'Soort', field: 'cost_type',
       sortable: true, filter: true },
@@ -41,6 +41,12 @@ export class FinanceComponent implements OnInit {
 
   rowData = null;
   historyRowData = null;
+  static formatNumber(numb) {
+    return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+  }
+  static decimalFormatter(amounts) {
+    return '€ ' + FinanceComponent.formatNumber(amounts.value);
+  }
   ngOnInit() {
     this.rowData = this.httpClient.get(this.env.apiUrl + '/finances/expenses');
     this.callHistoryRefresh();
@@ -79,7 +85,7 @@ export class FinanceComponent implements OnInit {
           window.URL.revokeObjectURL(url);
           console.log('>> GET SUCCESS', response);
         }, response => {
-          this.addBooking.error
+          this.errorBooking();
           console.error('>> GET FAILED', response.message);
         });
   }
