@@ -66,7 +66,7 @@ export class ExpensesComponent {
     if (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.addClaimSuccess.success === false) {
       // End Check Form Data
       // Format Values
-      form.value.amount = Number(form.value.amount).toFixed(2);
+      // form.value.amount = Number(form.value.amount).toFixed(2);
       const formattedDate = new Date(form.value.date_of_transaction);
       form.value.date_of_transaction = formattedDate.getDate() + '-' + (formattedDate.getMonth() + 1) + '-' + formattedDate.getFullYear();
       const obj = JSON.parse(JSON.stringify(form.value));

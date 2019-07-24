@@ -48,6 +48,11 @@ export class FinanceComponent implements OnInit {
   callHistoryRefresh() {
     this.historyRowData = this.httpClient.get(this.env.apiUrl + '/finances/expenses/bookings');
   }
+  resetPopups() {
+    this.addBooking.succes = false;
+    this.addBooking.wrong = false;
+    this.addBooking.error = false;
+  }
   successfulDownload() {
     return this.addBooking.success = true;
   }
@@ -58,6 +63,7 @@ export class FinanceComponent implements OnInit {
     return this.addBooking.error = true;
   }
   downloadFromHistory(event) {
+    this.resetPopups();
     const fileData = event.data.file_name.split('/').slice(2).join('_');
     this.httpClient.get(this.env.apiUrl + '/finances/expenses/bookings/' + fileData + '/booking-files',
       {responseType: 'blob'})
@@ -73,25 +79,27 @@ export class FinanceComponent implements OnInit {
           window.URL.revokeObjectURL(url);
           console.log('>> GET SUCCESS', response);
         }, response => {
+          this.addBooking.error
           console.error('>> GET FAILED', response.message);
         });
   }
   createBookingFile() {
-    // tslint:disable-next-line:max-line-length
-    this.httpClient.post('http://localhost:8080' + '/finances/expenses/bookings', '', {responseType: 'blob', observe: 'response', withCredentials: true})
+    this.resetPopups();
+    this.httpClient.post(this.env.apiUrl + '/finances/expenses/bookings', '', {responseType: 'blob', observe: 'response'})
       .subscribe(
         (response) => {
           if (response.body.type === 'application/json') {
             this.noExpenses();
             console.log('>> GET EMPTY', response);
           } else {
+            const contentDispositionHeader = response.headers.get('Content-Disposition');
+            const result = contentDispositionHeader.split('=')[1];
             const blob = new Blob([response.body], { type: 'text/csv' });
             const a = document.createElement('a');
             document.body.appendChild(a);
             const url = window.URL.createObjectURL(blob);
             a.href = url;
-            console.log(response.headers);
-            a.download = 'Nieuw_Grootboek.csv';
+            a.download = result;
             a.click();
             window.URL.revokeObjectURL(url);
             this.successfulDownload();
