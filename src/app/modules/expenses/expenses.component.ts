@@ -35,7 +35,6 @@ export class ExpensesComponent {
     this.addClaimSuccess = { success: false, wrong: false };
   }
   // Classes Logic
-
   notFilledClass(setClass) {
     let starBool;
     if (setClass.name === 'amount') {starBool = this.expensesAmount === false; }
@@ -59,12 +58,20 @@ export class ExpensesComponent {
   // End Classes Logic
 
   claimForm(form: NgForm) {
+    // Check Form Data
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
     this.expenseType = !(form.value.cost_type === undefined);
     this.expenseTransDate = !(form.value.date_of_transaction === undefined);
     if (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.addClaimSuccess.success === false) {
+      // End Check Form Data
+      // Format Values
+      form.value.amount = Number(form.value.amount).toFixed(2);
+      const formattedDate = new Date(form.value.date_of_transaction);
+      form.value.date_of_transaction = formattedDate.getDate() + '-' + (formattedDate.getMonth() + 1) + '-' + formattedDate.getFullYear();
       const obj = JSON.parse(JSON.stringify(form.value));
+      // End Format Values
+      // Send Claim
       this.httpClient.post(this.env.apiUrl + '/employees/expenses',
         obj)
         .subscribe(

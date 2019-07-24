@@ -26,7 +26,7 @@
                  required
                  [(ngModel)]="formAmount"
                  #namount="ngModel">
-          <span class="input-group-addon" onclick="document.getElementById('dateinput').focus()">€ EUR</span>
+          <span class="input-group-addon" onclick="document.getElementById('amountinput').focus()">€ EUR</span>
         </div>
         <div class="fillText"
              *ngIf="notFilledClass(namount)">
@@ -61,6 +61,7 @@
                  name="date_of_transaction"
                  class="form-control"
                  required
+                 lang="nl"
                  [(ngModel)]="formTransDate"
                  #ntransdate="ngModel"
                  type="date">
@@ -70,7 +71,6 @@
              *ngIf="notFilledClass(ntransdate)">
           <small>Graag een geldige verwervingsdatum opgeven</small>
         </div>
-
         <div class="form-group">
           <label for="noteinput">Omschrijving:</label>
           <textarea id="noteinput"
@@ -99,7 +99,7 @@
       </div>
 
       <div class="row reason">
-        <div class="col-12 col-sm-4"><h5>Bedrag: <span class="form-amount">{{ formAmount | number : '1.2' }}</span></h5></div>
+        <div class="col-12 col-sm-4"><h5>Bedrag: <span class="form-amount">{{ formAmount | currency : 'EUR'}}</span></h5></div>
         <div class="w-100"></div>
         <div class="col-12 col-sm-4"><h5>Reden:</h5></div>
         <div class="w-100"></div>

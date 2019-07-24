@@ -77,7 +77,8 @@ export class FinanceComponent implements OnInit {
         });
   }
   createBookingFile() {
-    this.httpClient.post(this.env.apiUrl + '/finances/expenses/bookings', '', {responseType: 'blob', observe: 'response'})
+    // tslint:disable-next-line:max-line-length
+    this.httpClient.post('http://localhost:8080' + '/finances/expenses/bookings', '', {responseType: 'blob', observe: 'response', withCredentials: true})
       .subscribe(
         (response) => {
           if (response.body.type === 'application/json') {
@@ -89,7 +90,8 @@ export class FinanceComponent implements OnInit {
             document.body.appendChild(a);
             const url = window.URL.createObjectURL(blob);
             a.href = url;
-            a.download = 'grootboek.csv';
+            console.log(response.headers);
+            a.download = 'Nieuw_Grootboek.csv';
             a.click();
             window.URL.revokeObjectURL(url);
             this.successfulDownload();
