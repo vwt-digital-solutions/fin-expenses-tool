@@ -9,17 +9,12 @@ import { EnvService } from 'src/app/services/env.service';
   styleUrls: ['./expenses.component.scss']
 })
 export class ExpensesComponent {
-  public formNote;
-  public formAmount;
-  public formType;
-  public formTransDate;
-  public expensesAmount;
-  public expensesNote;
-  public expenseType;
-  public expenseTransDate;
+  public formNote; public formAmount; public formType; public formTransDate;
+  public expensesAmount; public expensesNote; public expenseType; public expenseTransDate;
   public addClaimSuccess;
   public typeOptions;
-
+  public today;
+  public transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen';
   constructor(
     private httpClient: HttpClient,
     private env: EnvService,
@@ -33,6 +28,7 @@ export class ExpensesComponent {
           console.error('>> GET FAILED', response.message);
         });
     this.addClaimSuccess = { success: false, wrong: false };
+    this.today = new Date();
   }
   // Classes Logic
   notFilledClass(setClass) {
@@ -62,7 +58,10 @@ export class ExpensesComponent {
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
     this.expenseType = !(form.value.cost_type === undefined);
-    this.expenseTransDate = !(form.value.date_of_transaction === undefined);
+    this.expenseTransDate = !(form.value.date_of_transaction === undefined || new Date(form.value.date_of_transaction) > this.today);
+    if (form.value.date_of_transaction.length > 8) {
+      this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de verwerving';
+    }
     if (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.addClaimSuccess.success === false) {
       // End Check Form Data
       // Format Values

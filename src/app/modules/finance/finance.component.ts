@@ -55,7 +55,7 @@ export class FinanceComponent implements OnInit {
     this.historyRowData = this.httpClient.get(this.env.apiUrl + '/finances/expenses/bookings');
   }
   resetPopups() {
-    this.addBooking.succes = false;
+    this.addBooking.success = false;
     this.addBooking.wrong = false;
     this.addBooking.error = false;
   }
@@ -113,7 +113,27 @@ export class FinanceComponent implements OnInit {
           }
         }, response => {
           this.errorBooking();
-          console.log(response);
+          console.error('>> GET FAILED', response.message);
+        });
+  }
+  createPaymentFile() {
+    this.resetPopups();
+    this.httpClient.post(this.env.apiUrl + '/finances/expenses/bookings/paymentfile', '', {responseType: 'blob', observe: 'response'})
+      .subscribe(
+        (response) => {
+          const contentDispositionHeader = response.headers.get('Content-Disposition');
+          const result = contentDispositionHeader.split('=')[1];
+          const blob = new Blob([response.body], { type: 'application/xml' }); // Note 1-M -> application/xml could also be text/xml
+          const a = document.createElement('a');
+          document.body.appendChild(a);
+          const url = window.URL.createObjectURL(blob);
+          a.href = url;
+          a.download = result;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          console.log('>> GET SUCCESS', response);
+        }, response => {
+          this.errorBooking();
           console.error('>> GET FAILED', response.message);
         });
   }

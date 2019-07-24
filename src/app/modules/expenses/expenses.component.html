@@ -56,12 +56,11 @@
         <label for="dateinput">Verwervingsdatum:</label>
         <div class="input-group">
           <input id="dateinput"
-                 (click)="expenseTransDate = true"
+                 (click)="expenseTransDate = true; transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen'"
                  [ngClass]="{notFilled: notFilledClass(ntransdate)}"
                  name="date_of_transaction"
                  class="form-control"
                  required
-                 lang="nl"
                  [(ngModel)]="formTransDate"
                  #ntransdate="ngModel"
                  type="date">
@@ -69,7 +68,7 @@
         </div>
         <div class="fillText"
              *ngIf="notFilledClass(ntransdate)">
-          <small>Graag een geldige verwervingsdatum opgeven</small>
+          <small>{{transdateNotFilledMessage}}</small>
         </div>
         <div class="form-group">
           <label for="noteinput">Omschrijving:</label>

@@ -3,12 +3,12 @@
     <div class="col-9" style="background-color: #fcfbfb;">
       <div class="bookfile-creation-top btn-toolbar">
         <button type="button" id="createBookingFile" (click)="createBookingFile()" class="btn btn-primary">Nieuw Grootboek</button>
-        <button type="button" id="createPaymentFile" class="btn btn-primary">Genereer betalingsbestand</button>
+        <button type="button" id="createPaymentFile" (click)="createPaymentFile()" class="btn btn-primary">Genereer betalingsbestand</button>
         <div class="alert alert-success" role="alert" *ngIf="addBooking.success === true">
-          <i class="fas fa-check-circle"></i> Grootboek is aangemaakt
+          <i class="fas fa-check-circle"></i> Grootboek is aangemaakt.
         </div>
-        <div class="alert alert-danger" role="alert" *ngIf="addBooking.wrong === true">
-          <i class="fa fa-exclamation-circle"></i> Er zijn geen openstaande declaraties. Bekijk de eerdere grootboeken
+        <div class="alert alert-warning" role="alert" *ngIf="addBooking.wrong === true">
+          <i class="fa fa-exclamation-circle"></i> Er zijn geen openstaande declaraties. Bekijk de eerdere grootboeken.
         </div>
         <div class="alert alert-danger" role="alert" *ngIf="addBooking.error === true">
           <i class="fa fa-exclamation-circle"></i> Er is iets fout gegaan. Probeer het later opnieuw.
