@@ -59,9 +59,9 @@ export class ExpensesComponent {
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
     this.expenseType = !(form.value.cost_type === undefined);
     this.expenseTransDate = !(form.value.date_of_transaction === undefined || new Date(form.value.date_of_transaction) > this.today);
-    if (form.value.date_of_transaction.length > 8) {
+    if (form.value.date_of_transaction !== undefined) { if (form.value.date_of_transaction.length > 8) {
       this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de verwerving';
-    }
+    }}
     if (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.addClaimSuccess.success === false) {
       // End Check Form Data
       // Format Values
