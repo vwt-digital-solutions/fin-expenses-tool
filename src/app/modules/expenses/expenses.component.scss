@@ -12,21 +12,26 @@
     position: relative;
   }
 }
+
 div#landing_page {
   display: none;
 }
+
 .landing_page_container {
   display: none;
 }
+
 label {
   color: #3f8bb5;
   font-weight: bold;
 }
+
 input, textarea, select {
   border-radius: 4px;
   outline: none;
   border: 1px solid #dce5eb;
 }
+
 .deep_button {
   opacity: 1;
   background-color: #3a89b4;
@@ -36,10 +41,12 @@ input, textarea, select {
   outline: none;
   border-radius: 4px;
   width: 100%;
+
   &:hover {
     opacity: .8;
     cursor: pointer;
   }
+
   @include lg-phone-only {
     width: 100%;
   }
@@ -51,12 +58,21 @@ input, textarea, select {
     max-width: none;
   }
 }
+
+//.custom-file-label {
+//  font-weight: normal;
+//  &::after {
+//    content: 'Bladeren' !important;
+//    padding: 0.375rem 1.75rem !important;
+//  }
+//}
 #typeinput {
   max-width: 365px;
   @include lg-phone-only {
     max-width: none;
   }
 }
+
 #noteinput {
   max-width: 365px;
   margin-bottom: 0;
@@ -66,6 +82,7 @@ input, textarea, select {
     height: 18ex;
   }
 }
+
 #colstep {
   background-color: #fcfbfb;
   padding: 2em;
@@ -75,6 +92,7 @@ input, textarea, select {
     padding: 1em;
   }
 }
+
 #linestep {
   border-left: 1px solid #80808052;
   border-image: linear-gradient(
@@ -88,6 +106,7 @@ input, textarea, select {
     display: none;
   }
 }
+
 #bodystep {
   background-color: #fcfbfb;
   padding: 2.2em;
@@ -98,18 +117,23 @@ input, textarea, select {
     bottom: 0;
   }
 }
+
 .row {
   margin-top: 5ex;
+
   .hidden {
     display: none;
   }
+
   p {
     font-weight: bold;
     color: #858585;
   }
+
   span {
     font-weight: normal;
     color: #858585;
+
     &.form-amount {
       @include lg-phone-only {
         color: white;
@@ -117,6 +141,7 @@ input, textarea, select {
     }
 
   }
+
   @include lg-phone-only {
     display: inline-block;
     vertical-align: middle;
@@ -128,12 +153,14 @@ input, textarea, select {
 .input-group .form-control {
   float: none;
 }
+
 .input-group .input-buttons {
   position: relative;
   z-index: 3;
 }
+
 .input-group-addon {
-  line-height:32.5px;
+  line-height: 32.5px;
   text-align: center;
   background-color: #f6f6f6;
   font-weight: bold;
@@ -143,24 +170,29 @@ input, textarea, select {
   width: 65px;
   cursor: default;
 }
+
 .notFilled {
   border: 1px solid #dc44446b;
   background-color: #dc44440f;
 }
+
 .disabledBtn {
   opacity: .5;
   width: 100%;
   margin-top: 15px;
 }
+
 .disabledBtn:hover {
   cursor: not-allowed;
 }
+
 .fillText {
   padding: 0;
   margin: 0;
   position: relative;
   color: #dc4444c2;
 }
+
 .move-18 {
   bottom: 18px;
 }
@@ -176,6 +208,7 @@ input, textarea, select {
   @include lg-phone-only {
     display: none;
   }
+
   textarea#text {
     border: 0 transparent;
     background-color: transparent;
@@ -197,10 +230,12 @@ input, textarea, select {
       display: none;
     }
   }
+
   h5 {
-    color:  $vwt_color_blue;
+    color: $vwt_color_blue;
     font-weight: 100;
   }
+
   hr.add {
     border-top: 1px solid $vwt_color_blue_hr;
     margin-bottom: 2em;

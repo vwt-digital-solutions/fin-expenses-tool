@@ -9,8 +9,14 @@ import { EnvService } from 'src/app/services/env.service';
   styleUrls: ['./expenses.component.scss']
 })
 export class ExpensesComponent {
-  public formNote; public formAmount; public formType; public formTransDate;
-  public expensesAmount; public expensesNote; public expenseType; public expenseTransDate;
+  public formNote;
+  public formAmount;
+  public formType;
+  public formTransDate;
+  public expensesAmount;
+  public expensesNote;
+  public expenseType;
+  public expenseTransDate;
   public addClaimSuccess;
   public typeOptions;
   public today;

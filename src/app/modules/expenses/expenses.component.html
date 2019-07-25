@@ -12,92 +12,101 @@
         Er is iets fout gegaan. Probeer het later opnieuw
       </div>
 
-      <form (change)="addClaimSuccess.wrong = false" name="expenseForm" #expenseForm="ngForm" (ngSubmit)="claimForm(expenseForm)">
+      <form (change)="addClaimSuccess.wrong = false" name="expenseForm" #expenseForm="ngForm"
+            (ngSubmit)="claimForm(expenseForm)">
+        <!--        <div class="custom-file">-->
+        <!--          <input type="file" class="custom-file-input" id="customFileInput" required>-->
+        <!--          <label class="custom-file-label" for="customFileInput">$filename</label>-->
+        <!--        </div>-->
+        <div class="row">
+          <div class="col-sm-6" style="background-color:greenyellow;">
+            <label for="amountinput">Bedrag:</label>
+            <div class="input-group">
+              <input id="amountinput"
+                     (click)="expensesAmount = true"
+                     class="form-control"
+                     [ngClass]="{notFilled: notFilledClass(namount)}"
+                     type="number"
+                     step="0.01"
+                     min="0.01"
+                     name="amount"
+                     required
+                     [(ngModel)]="formAmount"
+                     #namount="ngModel">
+              <span class="input-group-addon" onclick="document.getElementById('amountinput').focus()">€ EUR</span>
+            </div>
+            <div class="fillText"
+                 *ngIf="notFilledClass(namount)">
+              <small>Graag een geldig bedrag invullen</small>
+            </div>
 
-        <label for="attachmentinput">Bijlage:</label>
-        <div class="form-group">
-          <input id="attachmentinput"
-                 type="file"
-                 class="form-control"
-                 accept=".pdf, .doc, .docx, image/*" capture> <!-- ;capture=camera for IOS, capture for Android -->
-        </div>
-        <input type="file" accept="image/*" capture>
+            <label for="typeinput">Soort:</label>
+            <div class="form-group">
+              <select id="typeinput"
+                      (change)="expenseType = true"
+                      class="form-control"
+                      [ngClass]="{notFilled: notFilledClass(ntype)}"
+                      [(ngModel)]="formType"
+                      name="cost_type"
+                      #ntype="ngModel"
+                      required>
+                <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">
+                  {{t.ctype}}
+                </option>
+              </select>
+            </div>
+            <div class="fillText move-18"
+                 *ngIf="notFilledClass(ntype)">
+              <small>Graag een declaratiesoort kiezen</small>
+            </div>
 
-        <label for="amountinput">Bedrag:</label>
-        <div class="input-group">
-          <input id="amountinput"
-                 (click)="expensesAmount = true"
-                 class="form-control"
-                 [ngClass]="{notFilled: notFilledClass(namount)}"
-                 type="number"
-                 step="0.01"
-                 min="0.01"
-                 name="amount"
-                 required
-                 [(ngModel)]="formAmount"
-                 #namount="ngModel">
-          <span class="input-group-addon" onclick="document.getElementById('amountinput').focus()">€ EUR</span>
-        </div>
-        <div class="fillText"
-             *ngIf="notFilledClass(namount)">
-          <small>Graag een geldig bedrag invullen</small>
-        </div>
-
-        <label for="typeinput">Soort:</label>
-        <div class="form-group">
-          <select id="typeinput"
-                  (change)="expenseType = true"
-                  class="form-control"
-                  [ngClass]="{notFilled: notFilledClass(ntype)}"
-                  [(ngModel)]="formType"
-                  name="cost_type"
-                  #ntype="ngModel"
-                  required>
-            <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">
-              {{t.ctype}}
-            </option>
-          </select>
-        </div>
-        <div class="fillText move-18"
-             *ngIf="notFilledClass(ntype)">
-          <small>Graag een declaratiesoort kiezen</small>
-        </div>
-
-        <label for="dateinput">Verwervingsdatum:</label>
-        <div class="input-group">
-          <input id="dateinput"
-                 (click)="expenseTransDate = true; transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen'"
-                 [ngClass]="{notFilled: notFilledClass(ntransdate)}"
-                 name="date_of_transaction"
-                 class="form-control"
-                 required
-                 [(ngModel)]="formTransDate"
-                 #ntransdate="ngModel"
-                 type="date">
-          <span class="input-group-addon fa fa-calendar-alt" onclick="document.getElementById('dateinput').focus()"></span>
-        </div>
-        <div class="fillText"
-             *ngIf="notFilledClass(ntransdate)">
-          <small>{{transdateNotFilledMessage}}</small>
-        </div>
-        <div class="form-group">
-          <label for="noteinput">Omschrijving:</label>
-          <textarea id="noteinput"
-                    (click)="expensesNote = true"
-                    class="form-control"
-                    [ngClass]="{notFilled: notFilledClass(nnote)}"
-                    type="text"
-                    name="note"
-                    required minlength="1"
-                    [(ngModel)]="formNote"
-                    #nnote="ngModel">
+            <label for="dateinput">Verwervingsdatum:</label>
+            <div class="input-group">
+              <input id="dateinput"
+                     (click)="expenseTransDate = true; transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen'"
+                     [ngClass]="{notFilled: notFilledClass(ntransdate)}"
+                     name="date_of_transaction"
+                     class="form-control"
+                     required
+                     [(ngModel)]="formTransDate"
+                     #ntransdate="ngModel"
+                     type="date">
+              <span class="input-group-addon fa fa-calendar-alt"
+                    onclick="document.getElementById('dateinput').focus()"></span>
+            </div>
+            <div class="fillText"
+                 *ngIf="notFilledClass(ntransdate)">
+              <small>{{transdateNotFilledMessage}}</small>
+            </div>
+            <div class="form-group">
+              <label for="noteinput">Omschrijving:</label>
+              <textarea id="noteinput"
+                        (click)="expensesNote = true"
+                        class="form-control"
+                        [ngClass]="{notFilled: notFilledClass(nnote)}"
+                        type="text"
+                        name="note"
+                        required minlength="1"
+                        [(ngModel)]="formNote"
+                        #nnote="ngModel">
           </textarea>
+            </div>
+            <div class="fillText move-18"
+                 *ngIf="notFilledClass(nnote)">
+              <small>Graag een omschrijving invullen</small>
+            </div>
+          </div>
+          <div class="col-sm-6" style="background-color:pink;">
+            <button type="button" class="btn deep_button" style="margin-bottom: 10px">Document Toevoegen</button>
+            <ul class="list-group" id="historylist">
+              <li class="list-group-item"><i class="fa fa-times"></i> Factuur%van%Staten.pdf</li>
+              <li class="list-group-item"><i class="fa fa-times"></i> 12-12-2012_Whatsapp%Image.png</li>
+            </ul>
+            <p style="color:transparent;">o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o
+              o</p> <!-- Responsive Testing. Will be removed -->
+          </div>
+          <input type="submit" id="submit-form" class="hidden"/>
         </div>
-        <div class="fillText move-18"
-             *ngIf="notFilledClass(nnote)">
-          <small>Graag een omschrijving invullen</small>
-        </div>
-        <input type="submit" id="submit-form" class="hidden" />
       </form>
     </div>
 
@@ -108,11 +117,13 @@
       </div>
 
       <div class="row reason">
-        <div class="col-12 col-sm-4"><h5>Bedrag: <span class="form-amount">{{ formAmount | currency : 'EUR'}}</span></h5></div>
+        <div class="col-12 col-sm-4"><h5>Bedrag: <span class="form-amount">{{ formAmount | currency : 'EUR'}}</span>
+        </h5></div>
         <div class="w-100"></div>
         <div class="col-12 col-sm-4"><h5>Reden:</h5></div>
         <div class="w-100"></div>
-        <div class="col-12 col-sm-4 typewriter"><textarea id="text" rows="4" maxlength="150" disabled value="{{ formNote }}"></textarea></div>
+        <div class="col-12 col-sm-4 typewriter"><textarea id="text" rows="4" maxlength="150" disabled
+                                                          value="{{ formNote }}"></textarea></div>
         <div class="w-100"></div>
       </div>
 
