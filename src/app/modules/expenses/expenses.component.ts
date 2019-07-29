@@ -22,6 +22,7 @@ export class ExpensesComponent {
   public addClaimSuccess;
   public typeOptions;
   public today;
+  public notaData;
   public transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen';
   public locatedFile;
 
@@ -39,6 +40,7 @@ export class ExpensesComponent {
         });
     this.addClaimSuccess = {success: false, wrong: false};
     this.today = new Date();
+    this.notaData = 'Toevoegen';
   }
 
   // Classes Logic
@@ -79,11 +81,17 @@ export class ExpensesComponent {
   // End Classes Logic
 
   onFileInput(file) {
-    const reader = new FileReader();
-    reader.readAsDataURL(file[0]);
-    reader.onload = () => {
-      this.locatedFile = reader.result;
-    };
+    if (file[0] === undefined || file[0] === null)  {
+      this.locatedFile = '';
+      this.notaData = 'Toevoegen';
+    } else {
+      const reader = new FileReader();
+      reader.readAsDataURL(file[0]);
+      reader.onload = () => {
+        this.locatedFile = reader.result;
+        this.notaData = '';
+      };
+    }
   }
 
   claimForm(form: NgForm) {

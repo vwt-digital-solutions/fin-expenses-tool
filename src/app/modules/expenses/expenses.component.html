@@ -110,18 +110,12 @@
                    #nattachment="ngModel"
                    #fileInputHidden capture>
             <button type="button"
+                    #buttonInput
                     class="btn tall_button"
                     [ngClass]="{notFilledBtn: notFilledClass(nattachment)}"
                     [ngStyle]="{background: 'url(' + locatedFile + ')'}"
-                    (click)="expenseAttachment = true; fileInputHidden.click()">
+                    (click)="expenseAttachment = true; fileInputHidden.click()">{{notaData}}
             </button>
-<!--            <div class="input-image-containment" *ngIf="locatedFile !== undefined">-->
-<!--              <img [src]="locatedFile"-->
-<!--                   class="input-image"-->
-<!--                   onerror="this.style.opacity='.1'"-->
-<!--                   [ngClass]="{notFilled: notFilledClass(nattachment)}">-->
-<!--              <i class="fa fa-times" (click)="fileInputHidden.value = ''; locatedFile = null; formAttachment = undefined"></i>-->
-<!--            </div>-->
             <div class="fillText"
                  *ngIf="notFilledClass(nattachment)">
               <small>Graag een document toevoegen</small>

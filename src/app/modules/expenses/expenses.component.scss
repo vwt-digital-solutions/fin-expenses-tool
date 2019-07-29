@@ -53,7 +53,6 @@ input, textarea, select {
 }
 
 .tall_button {
-  font-weight: bold;
   color: $vwt_color_blue;
   border: 2px solid $vwt_color_blue_hr;
   outline: none;
@@ -125,11 +124,11 @@ input, textarea, select {
   padding: 2.2em;
 
   @include lg-phone-only {
-    background-color: $vwt_mobile_background_color_blue;
+    background-color: #abdeef;
     position: fixed;
     bottom: 0;
     height: 75px;
-    padding: 5px;
+    padding: 5px 15px;
   }
 }
 
