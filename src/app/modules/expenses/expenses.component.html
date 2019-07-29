@@ -19,7 +19,7 @@
         <!--          <label class="custom-file-label" for="customFileInput">$filename</label>-->
         <!--        </div>-->
         <div class="row">
-          <div class="col-sm-6" style="background-color:greenyellow;">
+          <div class="col-sm-6">
             <label for="amountinput">Bedrag:</label>
             <div class="input-group">
               <input id="amountinput"
@@ -96,15 +96,18 @@
               <small>Graag een omschrijving invullen</small>
             </div>
           </div>
-          <div class="col-sm-6" style="background-color:pink;">
-            <button type="button" class="btn deep_button" style="margin-bottom: 10px">Document Toevoegen</button>
-            <ul class="list-group" id="historylist">
-              <li class="list-group-item"><i class="fa fa-times"></i> Factuur%van%Staten.pdf</li>
-              <li class="list-group-item"><i class="fa fa-times"></i> 12-12-2012_Whatsapp%Image.png</li>
-            </ul>
+
+          <div class="col-sm-6" style="text-align: center">
+            <input style="display: none" type="file" #fileInputHidden (change)="onFileInput(fileInputHidden.files)">
+            <button type="button" class="btn deep_button" (click)="fileInputHidden.click()" style="margin-bottom: 10px;">Document Toevoegen</button>
+            <div class="input-image-containment">
+              <img [src]="locatedFile" class="input-image">
+              <i class="fa fa-times" (click)="locatedFile = null"></i>
+            </div>
             <p style="color:transparent;">o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o
               o</p> <!-- Responsive Testing. Will be removed -->
           </div>
+
           <input type="submit" id="submit-form" class="hidden"/>
         </div>
       </form>

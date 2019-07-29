@@ -149,6 +149,27 @@ input, textarea, select {
     margin-top: 0;
   }
 }
+.input-image-containment {
+  position: relative;
+}
+
+.input-image-containment .input-image {
+  height: 300px;
+  width: 200px;
+  object-fit: cover;
+}
+
+.input-image-containment i {
+  position: absolute;
+  top: 5%;
+  left: 67.5%;
+  font-size: 30px;
+  color: $vwt_color_blue;
+  &:hover {
+    cursor: pointer;
+    opacity: .8;
+  }
+}
 
 .input-group .form-control {
   float: none;

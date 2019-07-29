@@ -21,6 +21,7 @@ export class ExpensesComponent {
   public typeOptions;
   public today;
   public transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen';
+  public locatedFile;
   constructor(
     private httpClient: HttpClient,
     private env: EnvService,
@@ -59,6 +60,13 @@ export class ExpensesComponent {
   }
   // End Classes Logic
 
+  onFileInput(file) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file[0]);
+    reader.onload = () => {
+      this.locatedFile = reader.result;
+    };
+  }
   claimForm(form: NgForm) {
     // Check Form Data
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
