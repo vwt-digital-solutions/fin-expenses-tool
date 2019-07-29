@@ -59,7 +59,7 @@ input, textarea, select {
   outline: none;
   border-radius: 4px;
   width: 100%;
-  height: 300px;
+  height: 39.2ex;
   background-size: cover !important;
 
   &:hover {
@@ -89,6 +89,7 @@ input, textarea, select {
   max-width: 365px;
   margin-bottom: 0;
   height: 14ex;
+  max-height: 200px;
   @include lg-phone-only {
     max-width: none;
     height: 18ex;
@@ -125,8 +126,10 @@ input, textarea, select {
 
   @include lg-phone-only {
     background-color: $vwt_mobile_background_color_blue;
-    position: absolute;
+    position: fixed;
     bottom: 0;
+    height: 75px;
+    padding: 5px;
   }
 }
 
