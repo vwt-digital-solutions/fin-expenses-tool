@@ -4,7 +4,7 @@ import { ActivatedRouteSnapshot, RouterStateSnapshot, CanActivate, Router } from
 import { OAuthService } from 'angular-oauth2-oidc';
 
 interface IClaimRoles {
-  _roles: any;
+  roles: any;
 }
 
 @Injectable({
