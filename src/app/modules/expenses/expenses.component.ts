@@ -95,8 +95,8 @@ export class ExpensesComponent {
   }
 
   claimForm(form: NgForm) {
-    console.log(form.value);
     // Check Form Data
+    console.log(this.locatedFile);
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
     this.expenseType = !(form.value.cost_type === undefined);
