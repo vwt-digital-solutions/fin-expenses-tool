@@ -7,12 +7,10 @@ import { FinanceComponent } from './finance.component';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {AgGridModule} from 'ag-grid-angular';
-import { ButtonRendererComponent } from './renderer/button-renderer.component';
 
 @NgModule({
   declarations: [
-    FinanceComponent,
-    ButtonRendererComponent
+    FinanceComponent
   ],
   imports: [
     BrowserModule,
@@ -20,7 +18,7 @@ import { ButtonRendererComponent } from './renderer/button-renderer.component';
     CommonModule,
     HttpClientModule,
     FormsModule,
-    AgGridModule.withComponents([ButtonRendererComponent])
+    AgGridModule.withComponents([])
   ],
   exports: [
     CommonModule,
