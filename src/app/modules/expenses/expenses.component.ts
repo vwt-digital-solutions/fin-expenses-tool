@@ -114,8 +114,9 @@ export class ExpensesComponent {
       form.value.amount = Number((form.value.amount).toFixed(2));
       const formattedDate = new Date(form.value.date_of_transaction);
       form.value.date_of_transaction = formattedDate.getDate() + '-' + (formattedDate.getMonth() + 1) + '-' + formattedDate.getFullYear();
-      const obj = JSON.parse(JSON.stringify(form.value));
       form.value.attachment = this.locatedFile;
+
+      const obj = JSON.parse(JSON.stringify(form.value));
       // End Format Values
       // Send Claim
       this.httpClient.post(this.env.apiUrl + '/employees/expenses',
