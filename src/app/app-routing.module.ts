@@ -17,10 +17,6 @@ const routes: Routes = [
       component: AuthComponent,
   },
   {
-    path: '**',
-    redirectTo: '/process_expenses'
-  },
-  {
     path: 'process_expenses',
     component: FinanceComponent,
     canActivate: [AuthGuard],
