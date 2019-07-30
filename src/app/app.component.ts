@@ -13,7 +13,7 @@ export class AppComponent {
   ) {
     const config = new AuthConfig();
     config.loginUrl = env.loginUrl;
-    config.redirectUri = window.location.origin + '/expenses';
+    config.redirectUri = window.location.origin + '/index.html';
     config.logoutUrl = env.logoutUrl;
     config.clientId = env.clientId;
     config.scope = env.scope;
