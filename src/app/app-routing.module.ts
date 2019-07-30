@@ -16,6 +16,7 @@ const routes: Routes = [
       path: 'auth/:authBody',
       component: AuthComponent,
   },
+  { path: '', redirectTo: 'expenses', pathMatch: 'full' },
   {
     path: 'process_expenses',
     component: FinanceComponent,
