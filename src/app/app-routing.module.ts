@@ -18,7 +18,7 @@ const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: '/expenses'
+    redirectTo: '/process_expenses'
   },
   {
     path: 'process_expenses',
