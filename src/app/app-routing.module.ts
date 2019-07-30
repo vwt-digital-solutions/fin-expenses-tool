@@ -4,18 +4,21 @@ import {ExpensesComponent} from './modules/expenses/expenses.component';
 import {FinanceComponent} from './modules/finance/finance.component';
 import {Role} from './models/role.enum';
 import {AuthGuard} from './auth/auth.guard';
+import { AuthComponent } from './auth/auth.component';
 
 const routes: Routes = [
   {
     path: 'expenses',
     component: ExpensesComponent,
     canActivate: [AuthGuard],
-
   },
   {
-    path: '',
-    component: ExpensesComponent, // TODO: A landing page when the interfaces have to be different
-    canActivate: [AuthGuard],
+      path: 'auth/:authBody',
+      component: AuthComponent,
+  },
+  {
+    path: '**',
+    redirectTo: '/'
   },
   {
     path: 'process_expenses',
