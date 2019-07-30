@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
+import { ButtonRendererComponent } from './renderer/button-renderer.component';
 
 @Component({
   selector: 'app-expenses',
@@ -8,10 +9,14 @@ import {EnvService} from 'src/app/services/env.service';
   styleUrls: ['./finance.component.scss']
 })
 export class FinanceComponent implements OnInit {
+  frameworkComponents: any;
   constructor(
     private httpClient: HttpClient,
     private env: EnvService,
   ) {
+    this.frameworkComponents = {
+      buttonRenderer: ButtonRendererComponent,
+    };
     this.addBooking = {success: false, wrong: false, error: false};
   }
 
@@ -54,7 +59,11 @@ export class FinanceComponent implements OnInit {
     },
     {
       headerName: '', field: '', cellStyle: {cursor: 'pointer'},
-      template: '<i class="fa fa-file-excel"></i>', width: 35
+      cellRenderer: 'buttonRenderer',
+      cellRendererParams: {
+        onClick: this.createPaymentFile(this),
+        label: 'Click 1'
+      }
     }
   ];
 
@@ -75,7 +84,7 @@ export class FinanceComponent implements OnInit {
   }
 
   callHistoryRefresh() {
-    this.historyRowData = this.httpClient.get(this.env.apiUrl + '/finances/expenses/bookings');
+    this.historyRowData = this.httpClient.get(this.env.apiUrl + '/finances/expenses/booking_file/files');
   }
 
   resetPopups() {
@@ -97,30 +106,31 @@ export class FinanceComponent implements OnInit {
   }
 
   downloadFromHistory(event) {
-    this.resetPopups();
-    const fileData = event.data.file_name.split('/').slice(2).join('_');
-    this.httpClient.get(this.env.apiUrl + '/finances/expenses/bookings/' + fileData + '/booking-files',
-      {responseType: 'blob'})
-      .subscribe(
-        (response) => {
-          const blob = new Blob([response], {type: 'text/csv'});
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          const url = window.URL.createObjectURL(blob);
-          a.href = url;
-          a.download = event.data.date_exported;
-          a.click();
-          window.URL.revokeObjectURL(url);
-          console.log('>> GET SUCCESS', response);
-        }, response => {
-          this.errorBooking();
-          console.error('>> GET FAILED', response.message);
-        });
+    // this.resetPopups();
+    console.log('DOWNLOAD HISTORY!', event.data);
+    // const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5);
+    // this.httpClient.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + '/kinds/booking_file',
+    //   {responseType: 'blob'})
+    //   .subscribe(
+    //     (response) => {
+    //       const blob = new Blob([response], {type: 'text/csv'});
+    //       const a = document.createElement('a');
+    //       document.body.appendChild(a);
+    //       const url = window.URL.createObjectURL(blob);
+    //       a.href = url;
+    //       a.download = event.data.date_exported;
+    //       a.click();
+    //       window.URL.revokeObjectURL(url);
+    //       console.log('>> GET SUCCESS', response);
+    //     }, response => {
+    //       this.errorBooking();
+    //       console.error('>> GET FAILED', response.message);
+    //     });
   }
 
   createBookingFile() {
     this.resetPopups();
-    this.httpClient.post(this.env.apiUrl + '/finances/expenses/bookings', '', {responseType: 'blob', observe: 'response'})
+    this.httpClient.post(this.env.apiUrl + '/finances/expenses/booking_file/files', '', {responseType: 'blob', observe: 'response'})
       .subscribe(
         (response) => {
           if (response.body.type === 'application/json') {
@@ -146,25 +156,26 @@ export class FinanceComponent implements OnInit {
         });
   }
 
-  createPaymentFile() {
-    this.resetPopups();
-    this.httpClient.post(this.env.apiUrl + '/finances/expenses/bookings/paymentfile', '', {responseType: 'blob', observe: 'response'})
-      .subscribe(
-        (response) => {
-          const contentDispositionHeader = response.headers.get('Content-Disposition');
-          const result = contentDispositionHeader.split('=')[1];
-          const blob = new Blob([response.body], {type: 'application/xml'}); // Note 1-M -> application/xml could also be text/xml
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          const url = window.URL.createObjectURL(blob);
-          a.href = url;
-          a.download = result;
-          a.click();
-          window.URL.revokeObjectURL(url);
-          console.log('>> GET SUCCESS', response);
-        }, response => {
-          this.errorBooking();
-          console.error('>> GET FAILED', response.message);
-        });
+  createPaymentFile(e) {
+    // this.resetPopups();
+    console.log('CREATE PAYMENT FILE', e.rowData);
+    // this.httpClient.post(this.env.apiUrl + '/finances/expenses/bookings/paymentfile', '', {responseType: 'blob', observe: 'response'})
+    //   .subscribe(
+    //     (response) => {
+    //       const contentDispositionHeader = response.headers.get('Content-Disposition');
+    //       const result = contentDispositionHeader.split('=')[1];
+    //       const blob = new Blob([response.body], {type: 'application/xml'}); // Note 1-M -> application/xml could also be text/xml
+    //       const a = document.createElement('a');
+    //       document.body.appendChild(a);
+    //       const url = window.URL.createObjectURL(blob);
+    //       a.href = url;
+    //       a.download = result;
+    //       a.click();
+    //       window.URL.revokeObjectURL(url);
+    //       console.log('>> GET SUCCESS', response);
+    //     }, response => {
+    //       this.errorBooking();
+    //       console.error('>> GET FAILED', response.message);
+    //     });
   }
 }
