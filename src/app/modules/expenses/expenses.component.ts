@@ -23,8 +23,9 @@ export class ExpensesComponent {
   public typeOptions;
   public today;
   public notaData;
-  public transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen';
+  public transdateNotFilledMessage = 'Graag een geldige datum invullen';
   public locatedFile;
+  public loadingThings;
 
   constructor(
     private httpClient: HttpClient,
@@ -41,6 +42,7 @@ export class ExpensesComponent {
     this.addClaimSuccess = {success: false, wrong: false};
     this.today = new Date();
     this.notaData = 'Toevoegen';
+    this.loadingThings = false;
   }
 
   // Classes Logic
@@ -96,7 +98,6 @@ export class ExpensesComponent {
 
   claimForm(form: NgForm) {
     // Check Form Data
-    console.log(this.locatedFile);
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
     this.expenseType = !(form.value.cost_type === undefined);
@@ -104,11 +105,12 @@ export class ExpensesComponent {
     this.expenseAttachment = !(form.value.attachment === undefined || form.value.attachment === null);
     if (form.value.date_of_transaction !== undefined) {
       if (form.value.date_of_transaction.length > 8) {
-        this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de verwerving';
+        this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de aankoop';
       }
     }
     if (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.expenseAttachment
       && this.addClaimSuccess.success === false) {
+      this.loadingThings = true;
       // End Check Form Data
       // Format Values
       form.value.amount = Number((form.value.amount).toFixed(2));
@@ -124,9 +126,11 @@ export class ExpensesComponent {
         .subscribe(
           (val) => {
             this.successfulClaim();
+            this.loadingThings = false;
             console.log('>> POST SUCCESS', val);
           }, response => {
             this.wrongfulClaim();
+            this.loadingThings = false;
             console.error('>> POST FAILED', response.message);
           });
     }

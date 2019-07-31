@@ -7,6 +7,7 @@ import { FinanceComponent } from './finance.component';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {AgGridModule} from 'ag-grid-angular';
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import {AgGridModule} from 'ag-grid-angular';
     CommonModule,
     HttpClientModule,
     FormsModule,
-    AgGridModule.withComponents([])
+    AgGridModule.withComponents([]),
+    NgbModule
   ],
   exports: [
     CommonModule,

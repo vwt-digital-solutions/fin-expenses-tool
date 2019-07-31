@@ -40,7 +40,7 @@
               <small>Graag een geldig bedrag invullen</small>
             </div>
 
-            <label for="typeinput">Soort:</label>
+            <label for="typeinput">Soort kosten:</label>
             <div class="form-group">
               <select id="typeinput"
                       (change)="expenseType = true"
@@ -60,7 +60,7 @@
               <small>Graag een declaratiesoort kiezen</small>
             </div>
 
-            <label for="dateinput">Verwervingsdatum:</label>
+            <label for="dateinput">Datum bon:</label>
             <div class="input-group">
               <input id="dateinput"
                      (click)="expenseTransDate = true; transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen'"
@@ -150,6 +150,9 @@
                [ngClass]="{disabledBtn: submitButtonController(nnote, namount, ntype, ntransdate, nattachment)}">
           Indienen
         </label>
+        <div *ngIf="loadingThings === true" class="spinner-border text-primary" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
       </div>
     </div>
   </div>

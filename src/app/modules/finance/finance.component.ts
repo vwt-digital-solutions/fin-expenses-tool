@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
+import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-expenses',
@@ -8,9 +9,11 @@ import {EnvService} from 'src/app/services/env.service';
   styleUrls: ['./finance.component.scss']
 })
 export class FinanceComponent implements OnInit {
+  closeResult: string;
   constructor(
     private httpClient: HttpClient,
     private env: EnvService,
+    private modalService: NgbModal
   ) {
     this.addBooking = {success: false, wrong: false, error: false};
   }
@@ -54,7 +57,7 @@ export class FinanceComponent implements OnInit {
     },
     {
       headerName: '', field: '', cellStyle: {cursor: 'pointer'},
-      template: '<i class="fa fa-file-powerpoint" style="color: #4eb7da; font-size: 20px"></i>', width: 40
+      template: '<i class="fa fa-tags" style="color: #4eb7da; font-size: 20px"></i>', width: 50
     }
   ];
 
@@ -146,6 +149,7 @@ export class FinanceComponent implements OnInit {
             a.click();
             window.URL.revokeObjectURL(url);
             this.successfulDownload();
+            this.callHistoryRefresh();
             console.log('>> GET SUCCESS', response);
           }
         }, response => {
@@ -178,5 +182,23 @@ export class FinanceComponent implements OnInit {
           this.errorBooking();
           console.error('>> GET FAILED', response.message);
         });
+  }
+
+  open(content) {
+    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
+      this.closeResult = `Closed with: ${result}`;
+    }, (reason) => {
+      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+    });
+  }
+
+  private getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return  `with: ${reason}`;
+    }
   }
 }
