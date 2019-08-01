@@ -52,7 +52,7 @@ input, textarea, select {
   }
 }
 
-.tall_button {
+.tall-button {
   color: $vwt_color_blue;
   border: 2px solid $vwt_color_blue_hr;
   outline: none;
@@ -219,17 +219,17 @@ input, textarea, select {
   color: #dc4444;
 }
 
-.disabledBtn {
+.disabledbtn {
   opacity: .5;
   width: 100%;
   margin-top: 15px;
 }
 
-.disabledBtn:hover {
+.disabledbtn:hover {
   cursor: not-allowed;
 }
 
-.fillText {
+.fill-text {
   padding: 0;
   margin: 0;
   position: relative;

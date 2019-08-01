@@ -10,6 +10,7 @@ import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 })
 export class FinanceComponent implements OnInit {
   closeResult: string;
+
   constructor(
     private httpClient: HttpClient,
     private env: EnvService,
@@ -76,7 +77,7 @@ export class FinanceComponent implements OnInit {
     if (event.colDef.template === undefined) {
       this.downloadFromHistory(event);
     } else {
-      this.createPaymentFile(event);
+      this.downloadPaymentFile(event);
     }
   }
 
@@ -105,6 +106,28 @@ export class FinanceComponent implements OnInit {
 
   errorBooking() {
     return this.addBooking.error = true;
+  }
+
+  downloadPaymentFile(event) {
+    this.resetPopups();
+    const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5);
+    this.httpClient.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + '/kinds/payment_file',
+      {responseType: 'blob'})
+      .subscribe(
+        (response) => {
+          const blob = new Blob([response], {type: 'application/xml'});
+          const a = document.createElement('a');
+          document.body.appendChild(a);
+          const url = window.URL.createObjectURL(blob);
+          a.href = url;
+          a.download = event.data.date_exported;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          console.log('>> GET SUCCESS', response);
+        }, response => {
+          this.errorBooking();
+          console.error('>> GET FAILED', response.message);
+        });
   }
 
   downloadFromHistory(event) {
@@ -139,7 +162,7 @@ export class FinanceComponent implements OnInit {
             console.log('>> GET EMPTY', response);
           } else {
             const contentDispositionHeader = response.headers.get('Content-Disposition');
-            const result = contentDispositionHeader.split('=')[1];
+            const result = contentDispositionHeader.split('=')[1].split(';')[0];
             const blob = new Blob([response.body], {type: 'text/csv'});
             const a = document.createElement('a');
             document.body.appendChild(a);
@@ -151,6 +174,7 @@ export class FinanceComponent implements OnInit {
             this.successfulDownload();
             this.callHistoryRefresh();
             console.log('>> GET SUCCESS', response);
+            this.createPaymentFile(contentDispositionHeader);
           }
         }, response => {
           this.errorBooking();
@@ -160,15 +184,17 @@ export class FinanceComponent implements OnInit {
 
   createPaymentFile(event) {
     this.resetPopups();
-    const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5);
-    console.log(fileData);
+    const fileData = event.split('=')[2];
     // tslint:disable-next-line:max-line-length
-    this.httpClient.post(this.env.apiUrl + '/finances/expenses/payment_file/files?name=' + fileData, '', {responseType: 'blob', observe: 'response'})
+    this.httpClient.post(this.env.apiUrl + '/finances/expenses/payment_file/files?name=' + fileData, '', {
+      responseType: 'blob',
+      observe: 'response'
+    })
       .subscribe(
         (response) => {
           console.log(response);
           const contentDispositionHeader = response.headers.get('Content-Disposition');
-          const result = contentDispositionHeader.split('=')[1];
+          const result = contentDispositionHeader.split('=')[1].split(';')[0];
           const blob = new Blob([response.body], {type: 'application/xml'});
           const a = document.createElement('a');
           document.body.appendChild(a);
@@ -179,7 +205,6 @@ export class FinanceComponent implements OnInit {
           window.URL.revokeObjectURL(url);
           console.log('>> GET SUCCESS', response);
         }, response => {
-          this.errorBooking();
           console.error('>> GET FAILED', response.message);
         });
   }
@@ -198,7 +223,7 @@ export class FinanceComponent implements OnInit {
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
       return 'by clicking on a backdrop';
     } else {
-      return  `with: ${reason}`;
+      return `with: ${reason}`;
     }
   }
 }
