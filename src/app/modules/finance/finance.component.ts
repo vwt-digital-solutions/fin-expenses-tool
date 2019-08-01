@@ -111,17 +111,17 @@ export class FinanceComponent implements OnInit {
   downloadPaymentFile(event) {
     this.resetPopups();
     const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5).split('.')[0];
-    console.log(fileData);
     this.httpClient.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + '/kinds/payment_file',
       {responseType: 'blob'})
       .subscribe(
         (response) => {
+          console.log(fileData);
           const blob = new Blob([response], {type: 'application/xml'});
           const a = document.createElement('a');
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
           a.href = url;
-          a.download = event.data.date_exported;
+          a.download = fileData + '.xml';
           a.click();
           window.URL.revokeObjectURL(url);
           console.log('>> GET SUCCESS', response);
