@@ -1,6 +1,6 @@
 <div class="container-fluid">
   <div class="row">
-    <div class="col-9" style="background-color: #fcfbfb;">
+    <div class="col-9">
       <div class="bookfile-creation-top btn-toolbar">
         <button type="button" id="createBookingFile" (click)="createBookingFile()" class="btn btn-primary">Nieuw
           Booking File
@@ -16,7 +16,6 @@
         </div>
       </div>
       <ag-grid-angular
-        style="width: 100%; height: 500px;"
         id="expensestable"
         class="ag-theme-balham"
         [rowData]="rowData | async"
@@ -27,7 +26,6 @@
     <div class="col-2" id="historydiv">
       <ag-grid-angular
         (cellClicked)="historyHit($event)"
-        style="width: 100%; height: 100%;"
         id="historytable"
         class="ag-theme-balham"
         [rowData]="historyRowData | async"

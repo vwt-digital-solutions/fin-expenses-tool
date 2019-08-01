@@ -118,6 +118,12 @@ input, textarea, select {
     display: none;
   }
 }
+#statictest {
+  color: transparent;
+}
+#attachmentinput {
+  display: none;
+}
 
 #bodystep {
   background-color: #fcfbfb;
@@ -258,6 +264,7 @@ input, textarea, select {
     height: 8em; // To be Fixed@hardcorded with all fields
     font-size: small;
     -webkit-appearance: none;
+    max-height: 200px;
     @include lg-phone-only {
       height: 6em;
       width: 22em;
@@ -300,4 +307,10 @@ input, textarea, select {
     top: 30%;
     box-shadow: 0 0 30px 20px grey;
   }
+}
+
+.spinner-border {
+  max-height: 20px;
+  max-width: 20px;
+  margin-left: 10px
 }

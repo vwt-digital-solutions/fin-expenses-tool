@@ -7,8 +7,21 @@ input {
   border: 1px solid #dce5eb;
 }
 
+.col-9 {
+  background-color: #fcfbfb;
+}
 #bookinghistory {
   border-bottom: 1px solid $vwt_color_blue_hr;
+}
+
+#expensestable {
+  width: 100%;
+  height: 500px;
+}
+
+#historytable {
+  width: 100%;
+  height: 100%;
 }
 
 .alert {

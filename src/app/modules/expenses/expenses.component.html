@@ -99,8 +99,7 @@
 
           <div class="col-sm-6">
             <label for="attachmentinput">Nota:</label>
-            <input style="display: none"
-                   id="attachmentinput"
+            <input id="attachmentinput"
                    type="file"
                    name="attachment"
                    required
@@ -119,7 +118,7 @@
                  *ngIf="notFilledClass(nattachment)">
               <small>Graag een document toevoegen</small>
             </div>
-            <p style="color:transparent;">o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o
+            <p id="statictest">o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o
               o</p> <!-- Responsive Testing. Will be removed -->
           </div>
 
@@ -140,7 +139,7 @@
         <div class="col-12 col-sm-4"><h5>Reden:</h5></div>
         <div class="w-100"></div>
         <div class="col-12 col-sm-4 typewriter"><textarea id="text" rows="4" maxlength="150" disabled
-                                                          value="{{ formNote }}" style="max-height: 200px;"></textarea></div>
+                                                          value="{{ formNote }}"></textarea></div>
         <div class="w-100"></div>
       </div>
 
@@ -148,7 +147,7 @@
         <label for="submit-form"
                tabindex="0" class="btn btn-default deep_button"
                [ngClass]="{disabledbtn: submitButtonController(nnote, namount, ntype, ntransdate, nattachment)}">
-          Indienen <i *ngIf="loadingThings === true" class="spinner-border text-light" style="max-height: 20px; max-width: 20px; margin-left: 10px"></i>
+          Indienen <i *ngIf="loadingThings === true" class="spinner-border text-light"></i>
         </label>
       </div>
     </div>
