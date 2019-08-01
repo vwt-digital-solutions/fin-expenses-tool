@@ -98,6 +98,7 @@ export class ExpensesComponent {
 
   claimForm(form: NgForm) {
     // Check Form Data
+    form.value.attachment = this.locatedFile;
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
     this.expenseType = !(form.value.cost_type === undefined);
@@ -116,7 +117,6 @@ export class ExpensesComponent {
       form.value.amount = Number((form.value.amount).toFixed(2));
       const formattedDate = new Date(form.value.date_of_transaction);
       form.value.date_of_transaction = formattedDate.getDate() + '-' + (formattedDate.getMonth() + 1) + '-' + formattedDate.getFullYear();
-      form.value.attachment = this.locatedFile;
 
       const obj = JSON.parse(JSON.stringify(form.value));
       // End Format Values
