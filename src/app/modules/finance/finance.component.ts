@@ -110,7 +110,8 @@ export class FinanceComponent implements OnInit {
 
   downloadPaymentFile(event) {
     this.resetPopups();
-    const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5);
+    const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5).split('.')[0];
+    console.log(fileData);
     this.httpClient.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + '/kinds/payment_file',
       {responseType: 'blob'})
       .subscribe(
@@ -192,17 +193,6 @@ export class FinanceComponent implements OnInit {
     })
       .subscribe(
         (response) => {
-          console.log(response);
-          const contentDispositionHeader = response.headers.get('Content-Disposition');
-          const result = contentDispositionHeader.split('=')[1].split(';')[0];
-          const blob = new Blob([response.body], {type: 'application/xml'});
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          const url = window.URL.createObjectURL(blob);
-          a.href = url;
-          a.download = result;
-          a.click();
-          window.URL.revokeObjectURL(url);
           console.log('>> GET SUCCESS', response);
         }, response => {
           console.error('>> GET FAILED', response.message);
