@@ -121,7 +121,7 @@ export class FinanceComponent implements OnInit {
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
           a.href = url;
-          a.download = fileData + '.xml';
+          a.download = fileData.split('_')[2] + '.xml';
           a.click();
           window.URL.revokeObjectURL(url);
           console.log('>> GET SUCCESS', response);
