@@ -12,34 +12,60 @@
     position: relative;
   }
 }
+
 div#landing_page {
   display: none;
 }
+
 .landing_page_container {
   display: none;
 }
+
 label {
   color: #3f8bb5;
   font-weight: bold;
 }
+
 input, textarea, select {
   border-radius: 4px;
   outline: none;
   border: 1px solid #dce5eb;
 }
+
 .deep_button {
   opacity: 1;
   background-color: #3a89b4;
-  font-weight: bold;
+  font-weight: normal;
   color: white;
   border: 1px solid #3a89b4;
   outline: none;
   border-radius: 4px;
   width: 100%;
+
   &:hover {
     opacity: .8;
     cursor: pointer;
   }
+
+  @include lg-phone-only {
+    width: 100%;
+  }
+}
+
+.tall-button {
+  color: $vwt_color_blue;
+  border: 2px solid $vwt_color_blue_hr;
+  outline: none;
+  border-radius: 4px;
+  width: 100%;
+  height: 39.2ex;
+  background-size: cover !important;
+
+  &:hover {
+    opacity: .6;
+    cursor: pointer;
+  }
+
   @include lg-phone-only {
     width: 100%;
   }
@@ -57,15 +83,18 @@ input, textarea, select {
     max-width: none;
   }
 }
+
 #noteinput {
   max-width: 365px;
   margin-bottom: 0;
   height: 14ex;
+  max-height: 200px;
   @include lg-phone-only {
     max-width: none;
     height: 18ex;
   }
 }
+
 #colstep {
   background-color: #fcfbfb;
   padding: 2em;
@@ -75,6 +104,7 @@ input, textarea, select {
     padding: 1em;
   }
 }
+
 #linestep {
   border-left: 1px solid #80808052;
   border-image: linear-gradient(
@@ -88,28 +118,42 @@ input, textarea, select {
     display: none;
   }
 }
+#statictest {
+  color: transparent;
+}
+#attachmentinput {
+  display: none;
+}
+
 #bodystep {
   background-color: #fcfbfb;
   padding: 2.2em;
 
   @include lg-phone-only {
-    background-color: $vwt_mobile_background_color_blue;
-    position: absolute;
+    background-color: #abdeef;
+    position: fixed;
     bottom: 0;
+    height: 75px;
+    padding: 5px 15px;
   }
 }
+
 .row {
   margin-top: 5ex;
+
   .hidden {
     display: none;
   }
+
   p {
     font-weight: bold;
     color: #858585;
   }
+
   span {
     font-weight: normal;
     color: #858585;
+
     &.form-amount {
       @include lg-phone-only {
         color: white;
@@ -117,6 +161,7 @@ input, textarea, select {
     }
 
   }
+
   @include lg-phone-only {
     display: inline-block;
     vertical-align: middle;
@@ -125,15 +170,40 @@ input, textarea, select {
   }
 }
 
+//.input-image-containment {
+//  position: relative;
+//}
+//
+//.input-image-containment .input-image {
+//  height: 300px;
+//  width: 200px;
+//  object-fit: cover;
+//}
+//
+//.input-image-containment i {
+//  position: absolute;
+//  top: 5%;
+//  left: 67.5%;
+//  font-size: 30px;
+//  color: $vwt_color_blue;
+//
+//  &:hover {
+//    cursor: pointer;
+//    opacity: .8;
+//  }
+//}
+
 .input-group .form-control {
   float: none;
 }
+
 .input-group .input-buttons {
   position: relative;
   z-index: 3;
 }
+
 .input-group-addon {
-  line-height:32.5px;
+  line-height: 32.5px;
   text-align: center;
   background-color: #f6f6f6;
   font-weight: bold;
@@ -143,24 +213,35 @@ input, textarea, select {
   width: 65px;
   cursor: default;
 }
+
 .notFilled {
   border: 1px solid #dc44446b;
   background-color: #dc44440f;
 }
-.disabledBtn {
+
+.notFilledBtn {
+  border: 1px solid #dc44446b;
+  background-color: #dc44440f;
+  color: #dc4444;
+}
+
+.disabledbtn {
   opacity: .5;
   width: 100%;
   margin-top: 15px;
 }
-.disabledBtn:hover {
+
+.disabledbtn:hover {
   cursor: not-allowed;
 }
-.fillText {
+
+.fill-text {
   padding: 0;
   margin: 0;
   position: relative;
   color: #dc4444c2;
 }
+
 .move-18 {
   bottom: 18px;
 }
@@ -176,12 +257,14 @@ input, textarea, select {
   @include lg-phone-only {
     display: none;
   }
+
   textarea#text {
     border: 0 transparent;
     background-color: transparent;
     height: 8em; // To be Fixed@hardcorded with all fields
     font-size: small;
     -webkit-appearance: none;
+    max-height: 200px;
     @include lg-phone-only {
       height: 6em;
       width: 22em;
@@ -197,10 +280,12 @@ input, textarea, select {
       display: none;
     }
   }
+
   h5 {
-    color:  $vwt_color_blue;
+    color: $vwt_color_blue;
     font-weight: 100;
   }
+
   hr.add {
     border-top: 1px solid $vwt_color_blue_hr;
     margin-bottom: 2em;
@@ -222,4 +307,10 @@ input, textarea, select {
     top: 30%;
     box-shadow: 0 0 30px 20px grey;
   }
+}
+
+.spinner-border {
+  max-height: 20px;
+  max-width: 20px;
+  margin-left: 10px
 }

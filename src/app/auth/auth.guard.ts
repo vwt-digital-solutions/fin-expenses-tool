@@ -4,7 +4,7 @@ import { ActivatedRouteSnapshot, RouterStateSnapshot, CanActivate, Router } from
 import { OAuthService } from 'angular-oauth2-oidc';
 
 interface IClaimRoles {
-  _roles: any;
+  roles: any;
 }
 
 @Injectable({
@@ -33,21 +33,21 @@ export class AuthGuard implements CanActivate {
 
     console.log('Checking necessary roles');
     const claims = this.oauthService.getIdentityClaims() as IClaimRoles;
-    if (route.data.roles && claims._roles) {
-      // let isAuthorisedRoute = false;
-      for (const role of claims._roles) {
+    if (route.data.roles && claims.roles) {
+      let isAuthorisedRoute = false;
+      for (const role of claims.roles) {
         if (route.data.roles.indexOf(role) > -1) {
-          // isAuthorisedRoute = true;
+          isAuthorisedRoute = true;
           console.log('Requested role present');
           return true;
         }
       }
 
-      // if (!isAuthorisedRoute) {
-      console.log('Requested role not granted');
-      this.router.navigate(['/']);
-      return false;
-      // }
+      if (!isAuthorisedRoute) {
+        console.log('Requested role not granted');
+        this.router.navigate(['/expenses']);
+        return false;
+      }
     }
     console.log('No role requested');
     return true;
