@@ -107,7 +107,8 @@
                    (change)="onFileInput(fileInputHidden.files)"
                    [(ngModel)]="formAttachment"
                    #nattachment="ngModel"
-                   #fileInputHidden>
+                   #fileInputHidden
+                   capture="camera">
             <button type="button"
                     #buttonInput
                     class="btn tall-button"
