@@ -4,6 +4,7 @@ import {EnvService} from 'src/app/services/env.service';
 import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {ExpensesConfigService} from '../../config/config.service';
 import {Observable} from 'rxjs';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-expenses',
@@ -14,7 +15,9 @@ export class FinanceComponent implements OnInit {
   closeResult: string;
   expensesData: Observable<any>;
 
-  public gridApi;
+  private gridApi;
+  private gridColumnApi;
+  private columnDefs;
 
   constructor(
     private httpClient: HttpClient,
@@ -22,40 +25,47 @@ export class FinanceComponent implements OnInit {
     private expenses: ExpensesConfigService,
     private modalService: NgbModal
   ) {
-    this.addBooking = {success: false, wrong: false, error: false};
+      this.columnDefs = [
+    {
+      headerName: 'Process Expenses',
+      children: [
+        {
+          headerName: 'Declaratiedatum',
+          field: 'date_of_claim',
+          sortable: true,
+          filter: true,
+        },
+        {
+          headerName: 'Werknemer', field: 'employee_full_name',
+          sortable: true, filter: true, width: 150
+        },
+        {
+          headerName: 'Kosten', field: 'amount', valueFormatter: FinanceComponent.decimalFormatter,
+          sortable: true, filter: true, width: 150
+        },
+        {
+          headerName: 'Soort', field: 'cost_type',
+          sortable: true, filter: true, resizable: true, width: 300
+        },
+        {
+          headerName: 'Beschrijving', field: 'note', resizable: true
+        },
+        {
+          headerName: 'Verwervingsdatum', field: 'date_of_transaction',
+          sortable: true, filter: true, width: 150
+        },
+        {
+          headerName: 'Status', field: 'status_text',
+          sortable: true, width: 250
+        },
+      ]
+    }
+  ];
+      this.addBooking = {success: false, wrong: false, error: false};
   }
 
   public addBooking;
-  columnDefs = [
-    {
-      headerName: 'Declaratiedatum', field: 'date_of_claim',
-      sortable: true, filter: true
-    },
-    {
-      headerName: 'Werknemer', field: 'employee_full_name',
-      sortable: true, filter: true
-    },
-    {
-      headerName: 'Kosten', field: 'amount', valueFormatter: FinanceComponent.decimalFormatter,
-      sortable: true, filter: true, width: 150
-    },
-    {
-      headerName: 'Soort', field: 'cost_type',
-      sortable: true, filter: true
-    },
-    {
-      headerName: 'Beschrijving', field: 'note',
-      filter: true
-    },
-    {
-      headerName: 'Verwervingsdatum', field: 'date_of_transaction',
-      sortable: true, filter: true
-    },
-    {
-      headerName: 'Status', field: 'status_text',
-      sortable: true
-    }
-  ];
+
 
   historyColumnDefs = [
     {
@@ -64,7 +74,7 @@ export class FinanceComponent implements OnInit {
       suppressMovable: true, width: 215
     },
     {
-      headerName: '', field: '', cellStyle: {cursor: 'pointer'},
+      headerName: 'Betaal', field: '', cellStyle: {cursor: 'pointer'},
       template: '<i class="fa fa-file-alt" style="color: #4eb7da; font-size: 20px"></i>'
     }
   ];
@@ -90,7 +100,8 @@ export class FinanceComponent implements OnInit {
 
   onGridReady(params: any) {
     this.gridApi = params.api;
-    params.api.sizeColumnsToFit();
+    this.gridColumnApi = params.columnApi;
+    // params.api.sizeColumnsToFit();
   }
 
   ngOnInit() {
@@ -100,7 +111,7 @@ export class FinanceComponent implements OnInit {
       // console.log('Observable:', data);
       data.map(
         item => api.push({
-          date_of_claim: new Date(item.date_of_claim).toLocaleString(),
+          date_of_claim: moment(item.date_of_claim).format('LLL'),
           employee_full_name: item.employee.full_name,
           amount: item.amount,
           cost_type: item.cost_type,
