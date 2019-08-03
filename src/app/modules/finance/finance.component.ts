@@ -17,7 +17,7 @@ export class FinanceComponent implements OnInit {
 
   private gridApi;
   private gridColumnApi;
-  private columnDefs;
+  public columnDefs;
 
   constructor(
     private httpClient: HttpClient,
