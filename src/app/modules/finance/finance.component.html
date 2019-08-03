@@ -1,6 +1,6 @@
 <div class="container-fluid">
   <div class="row">
-    <div class="col-9">
+    <div class="col-sm-9">
       <div class="bookfile-creation-top btn-toolbar">
         <button type="button" id="createBookingFile" (click)="createBookingFile()" class="btn btn-primary">Nieuw
           Booking File
@@ -16,48 +16,55 @@
         </div>
       </div>
       <ag-grid-angular
+        style="width: 100%; height: 750px; overflow:hidden;"
         id="expensestable"
-        class="ag-theme-balham"
-        [rowData]="rowData | async"
-        [columnDefs]="columnDefs">
+        class="ag-theme-material"
+        [rowData]="rowData"
+        [columnDefs]="columnDefs"
+        (gridReady)="onGridReady($event)"
+      >
       </ag-grid-angular>
     </div>
-    <div class="col col-1" id="linestep"></div>
-    <div class="col-2" id="historydiv">
+    <div class="col-sm-1" id="linestep">
+    </div>
+    <div class="col-sm-2">
       <ag-grid-angular
+        style="width: 100%; height: 750px; overflow:hidden;"
         (cellClicked)="historyHit($event)"
         id="historytable"
-        class="ag-theme-balham"
+        class="ag-theme-material"
         [rowData]="historyRowData | async"
-        [columnDefs]="historyColumnDefs">
+        [columnDefs]="historyColumnDefs"
+        (gridReady)="onGridReady($event)"
+      >
       </ag-grid-angular>
+      <ng-template #content let-modal>
+        <div class="modal-header">
+          <h4 class="modal-title" id="modal-basic-title">Profile update</h4>
+          <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="form-group">
+              <label for="dataofbirth">Date of birth</label>
+              <div class="input-group">
+                <input id="dataofbirth" class="form-control" placeholder="yyyy-mm-dd" name="dp" ngbDatepicker #dp="ngbDatepicker">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary calendar" (click)="dp.toggle()" type="button"></button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>
+        </div>
+      </ng-template>
+      <!--<button class="btn btn-primary" (click)="open(content)">Test Modal No Data</button>-->
+      <hr>
+      <pre>{{closeResult}}</pre>
     </div>
   </div>
 </div>
-<ng-template #content let-modal>
-  <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Profile update</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <form>
-      <div class="form-group">
-        <label for="dataofbirth">Date of birth</label>
-        <div class="input-group">
-          <input id="dataofbirth" class="form-control" placeholder="yyyy-mm-dd" name="dp" ngbDatepicker #dp="ngbDatepicker">
-          <div class="input-group-append">
-            <button class="btn btn-outline-secondary calendar" (click)="dp.toggle()" type="button"></button>
-          </div>
-        </div>
-      </div>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>
-  </div>
-</ng-template>
-<button class="btn btn-primary" (click)="open(content)">Test Modal No Data</button>
-<hr>
-<pre>{{closeResult}}</pre>

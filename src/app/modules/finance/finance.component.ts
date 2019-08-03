@@ -2,6 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
 import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {ExpensesConfigService} from '../../config/config.service';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-expenses',
@@ -10,10 +12,14 @@ import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
 })
 export class FinanceComponent implements OnInit {
   closeResult: string;
+  expensesData: Observable<any>;
+
+  public gridApi;
 
   constructor(
     private httpClient: HttpClient,
     private env: EnvService,
+    private expenses: ExpensesConfigService,
     private modalService: NgbModal
   ) {
     this.addBooking = {success: false, wrong: false, error: false};
@@ -26,12 +32,12 @@ export class FinanceComponent implements OnInit {
       sortable: true, filter: true
     },
     {
-      headerName: 'Werknemer', field: 'employee.full_name',
+      headerName: 'Werknemer', field: 'employee_full_name',
       sortable: true, filter: true
     },
     {
       headerName: 'Kosten', field: 'amount', valueFormatter: FinanceComponent.decimalFormatter,
-      sortable: true, filter: true
+      sortable: true, filter: true, width: 150
     },
     {
       headerName: 'Soort', field: 'cost_type',
@@ -46,10 +52,11 @@ export class FinanceComponent implements OnInit {
       sortable: true, filter: true
     },
     {
-      headerName: 'Status', field: 'status.text',
+      headerName: 'Status', field: 'status_text',
       sortable: true
     }
   ];
+
   historyColumnDefs = [
     {
       headerName: 'Grootboekhistorie', field: 'date_exported',
@@ -58,7 +65,7 @@ export class FinanceComponent implements OnInit {
     },
     {
       headerName: '', field: '', cellStyle: {cursor: 'pointer'},
-      template: '<i class="fa fa-tags" style="color: #4eb7da; font-size: 20px"></i>', width: 50
+      template: '<i class="fa fa-file-alt" style="color: #4eb7da; font-size: 20px"></i>'
     }
   ];
 
@@ -81,8 +88,31 @@ export class FinanceComponent implements OnInit {
     }
   }
 
+  onGridReady(params: any) {
+    this.gridApi = params.api;
+    params.api.sizeColumnsToFit();
+  }
+
   ngOnInit() {
-    this.rowData = this.httpClient.get(this.env.apiUrl + '/finances/expenses');
+    const api = [];
+    this.expensesData = this.expenses.getExpenses();
+    this.expenses.getExpenses().subscribe(data => {
+      // console.log('Observable:', data);
+      data.map(
+        item => api.push({
+          date_of_claim: new Date(item.date_of_claim).toLocaleString(),
+          employee_full_name: item.employee.full_name,
+          amount: item.amount,
+          cost_type: item.cost_type,
+          note: item.note,
+          date_of_transaction: item.date_of_transaction,
+          status_text: item.status.text
+        })
+      );
+      this.rowData = api;
+    });
+
+    // this.rowData = api;
     this.callHistoryRefresh();
   }
 
