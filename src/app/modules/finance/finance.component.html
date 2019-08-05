@@ -16,22 +16,25 @@
         </div>
       </div>
 
+      <!-- START AG-GRID EXPENSES -->
       <ag-grid-angular
         style="width: 100%; height: 750px; overflow:hidden;"
         id="expensestable"
         class="ag-theme-material"
         [rowData]="rowData"
         [columnDefs]="columnDefs"
-        [showToolPanel]="true"
         [rowSelection]="rowSelection"
         (selectionChanged)="onSelectionChanged($event, expenseContent)"
         (gridReady)="onGridReady($event)"
       >
       </ag-grid-angular>
+      <!-- END AG-GRID EXPENSES -->
     </div>
     <div class="col-sm-1" id="linestep">
     </div>
     <div class="col-sm-2">
+
+      <!-- START AG-GRID HISTORY -->
       <ag-grid-angular
         style="width: 100%; height: 750px; overflow:hidden;"
         (cellClicked)="historyHit($event)"
@@ -42,6 +45,10 @@
         (gridReady)="onGridReady($event)"
       >
       </ag-grid-angular>
+      <!-- END AG-GRID HISTORY -->
+
+
+      <!-- FORM TEMPLATE -->
       <ng-template #expenseContent let-modal>
         <div class="modal-header">
           <h4 class="modal-title" id="modal-basic-title">Expense Bewerken</h4>
@@ -49,39 +56,75 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
+
         <div class="modal-body">
           <code>{{ expenseData.employee_full_name }}</code>
-          <form #expenseUpdateForm="ngForm" (ngSubmit)="claimUpdateForm(expenseUpdateForm)" name="expenseUpdateForm">
+          <div id="updateErrors" class="alert alert-danger" role="alert" *ngIf="showErrors">
+            {{ formErrors }} {{ formResponse.detail }}
+          </div>
+          <form
+            #expenseUpdateForm="ngForm"
+            (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.info)"
+            name="expenseUpdateForm">
             <div class="form-group">
               <!-- Form: Costs -->
               <label for="expenseAmount">Kosten</label>
               <div class="input-group">
-                <input id="expenseAmount" class="form-control" placeholder="'EUR ' + {{ expenseData.amount}}" name="amount">
+                <input id="expenseAmount"
+                       type="number"
+                       class="form-control"
+                       placeholder="{{ expenseData.amount | currency: 'EUR' }}"
+                       name="amount" ngModel>
               </div>
               <!-- Form: Status -->
               <label for="expenseStatus">Status</label>
               <div class="input-group">
-                <input id="expenseStatus" class="form-control" disabled placeholder="{{ expenseData.status_text  }}" name="status_text">
-              </div>
-             <!-- Form: Cost Type -->
-              <label for="expenseCostType">Kosten Soort</label>
-              <div class="input-group">
-                <input id="expenseCostType" class="form-control" placeholder="{{ expenseData.cost_type  }}" name="cost_type">
+                <input id="expenseStatus"
+                       class="form-control"
+                       placeholder="edited_by_creditor"
+                       name="status" ngModel>
               </div>
               <!-- Form: Cost Type -->
+              <label for="expenseCostType">Soort</label>
+              <div class="input-group">
+                <select id="expenseCostType"
+                        class="form-control"
+                        name="cost_type"
+                        ngModel>
+                  <option value="" disabled selected><span class="badge badge-secondary">Huidige:</span> {{ expenseData.cost_type.split(':')[0] }}</option>
+                  <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">{{t.ctype}}</option>
+                </select>
+              </div>
+              <!-- Form: Date of Transaction -->
               <label for="expenseDateOfTransaction">Verwervingdatum</label>
               <div class="input-group">
-                <input id="expenseDateOfTransaction" class="form-control" placeholder="{{ expenseData.date_of_transaction  }}" name="date_of_transaction">
+                <input id="expenseDateOfTransaction"
+                       class="form-control"
+                       placeholder="{{ expenseData.date_of_transaction  }}"
+                       name="date_of_transaction" ngModel>
               </div>
+              <input type="submit" id="submit-update-form" hidden/>
             </div>
           </form>
         </div>
         <div class="modal-footer">
+          <div class="float-left">Creditor</div>
+
+          <div class="btn btn-warning">
+            <label for="submit-update-form" disabled="formSubmitted" [ngClass] = '{disabledbtn: formSubmitted}'>
+              Opslaan <i *ngIf="formSubmitted === true" class="spinner-border text-light"></i>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="float-left">Manager</div>
+
           <button type="button" class="btn btn-danger" (click)="modal.close('Save click')">Afwijzen</button>
           <button type="button" class="btn btn-success">Goedkeuren</button>
           <button type="button" class="btn btn-warning" (click)="getNextExpense()">Volgende</button>
         </div>
       </ng-template>
+      <!--   END FORM TEMPLATE-->
     </div>
   </div>
 </div>

@@ -4,7 +4,7 @@ import {EnvService} from 'src/app/services/env.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {NgForm} from '@angular/forms';
 
-import {ExpensesConfigService} from '../../config/config.service';
+import {ExpensesConfigService} from '../../services/config.service';
 import * as moment from 'moment';
 
 moment.locale('nl');
@@ -21,6 +21,11 @@ export class FinanceComponent implements OnInit {
   private gridColumnApi;
   public columnDefs;
   public rowSelection;
+  public typeOptions;
+  public formSubmitted;
+  public showErrors;
+  public formErrors;
+  public formResponse;
 
   constructor(
     private httpClient: HttpClient,
@@ -28,53 +33,56 @@ export class FinanceComponent implements OnInit {
     private expenses: ExpensesConfigService,
     private modalService: NgbModal
   ) {
-      this.columnDefs = [
-    {
-      headerName: 'Declaraties Overzicht',
-      children: [
-        {
-          headerName: '',
-          field: 'info',
-          width: 65,
-          cellRenderer: params => {
-            const infoIcon = '<i id="information-icon" class="fa fa-info-circle"></i>';
-            return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
+    this.columnDefs = [
+      {
+        headerName: 'Declaraties Overzicht',
+        children: [
+          {
+            headerName: '',
+            field: 'info',
+            width: 65,
+            cellRenderer: params => {
+              const infoIcon = '<i id="information-icon" class="fa fa-info-circle"></i>';
+              return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
             },
           },
-        {
-          headerName: 'Declaratiedatum',
-          field: 'date_of_claim',
-          sortable: true,
-          filter: true,
-        },
-        {
-          headerName: 'Werknemer', field: 'employee_full_name',
-          sortable: true, filter: true, width: 150
-        },
-        {
-          headerName: 'Kosten', field: 'amount', valueFormatter: FinanceComponent.decimalFormatter,
-          sortable: true, filter: true, width: 150
-        },
-        {
-          headerName: 'Soort', field: 'cost_type',
-          sortable: true, filter: true, resizable: true, width: 300
-        },
-        {
-          headerName: 'Beschrijving', field: 'note', resizable: true
-        },
-        {
-          headerName: 'Verwervingsdatum', field: 'date_of_transaction',
-          sortable: true, filter: true, width: 150
-        },
-        {
-          headerName: 'Status', field: 'status_text',
-          sortable: true, width: 250
-        },
-      ]
-    }
-  ];
-      this.rowSelection = 'single';
-      this.addBooking = {success: false, wrong: false, error: false};
+          {
+            headerName: 'Declaratiedatum',
+            field: 'date_of_claim',
+            sortable: true,
+            filter: true,
+          },
+          {
+            headerName: 'Werknemer', field: 'employee_full_name',
+            sortable: true, filter: true, width: 150
+          },
+          {
+            headerName: 'Kosten', field: 'amount', valueFormatter: FinanceComponent.decimalFormatter,
+            sortable: true, filter: true, width: 150
+          },
+          {
+            headerName: 'Soort', field: 'cost_type',
+            sortable: true, filter: true, resizable: true, width: 300
+          },
+          {
+            headerName: 'Beschrijving', field: 'note', resizable: true
+          },
+          {
+            headerName: 'Verwervingsdatum', field: 'date_of_transaction',
+            sortable: true, filter: true, width: 150
+          },
+          {
+            headerName: 'Status', field: 'status_text',
+            sortable: true, width: 250
+          },
+        ]
+      }
+    ];
+    this.formSubmitted = false;
+    this.showErrors = false;
+    this.formResponse = {};
+    this.rowSelection = 'single';
+    this.addBooking = {success: false, wrong: false, error: false};
   }
   public expenseData: object;
   public addBooking;
@@ -105,6 +113,7 @@ export class FinanceComponent implements OnInit {
   static getUTCOffset(date) {
     return moment(date).utcOffset() / 60;
   }
+
   historyHit(event) {
     if (event.colDef.template === undefined) {
       this.downloadFromHistory(event);
@@ -151,12 +160,18 @@ export class FinanceComponent implements OnInit {
         console.log('No selection') : Object.assign(selectedRowData, selectedRow);
     });
     this.expenseData = selectedRowData;
-    console.log(this.expenseData);
+    this.showErrors = false;
+    this.formErrors = '';
     this.openExpenseDetailModal(content, selectedRowData);
   }
 
   ngOnInit() {
     this.callHistoryRefresh();
+    this.expenses.getCostTypes()
+      .subscribe(
+        val => {
+          this.typeOptions = val;
+        });
   }
 
   callHistoryRefresh() {
@@ -272,8 +287,22 @@ export class FinanceComponent implements OnInit {
         });
   }
 
-  claimUpdateForm(form: NgForm) {
-    console.log(form.value);
+  claimUpdateForm(form: NgForm, expenseId) {
+    console.log(form.value, expenseId, form.valid);
+    const dataVerified = {};
+    const data = form.value;
+    for (const prop in data) {
+      if (data[prop].length !== 0) {
+        dataVerified[prop] = data[prop];
+      }
+    }
+    Object.keys(dataVerified).length !== 0 ?
+      this.expenses.updateExpense(dataVerified, expenseId)
+        .subscribe(
+          result => this.showErrors = false,
+          error => { this.showErrors = true, Object.assign(this.formResponse, JSON.parse(error)); })
+   : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
+    console.log(this.formResponse);
 
-  }
+}
 }
