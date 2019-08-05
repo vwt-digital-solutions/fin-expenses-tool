@@ -19,7 +19,8 @@ moment.locale('nl');
 export class FinanceComponent implements OnInit {
   private gridApi;
   private gridColumnApi;
-  private columnDefs;
+  public columnDefs;
+  public rowSelection;
 
   constructor(
     private httpClient: HttpClient,
@@ -76,7 +77,6 @@ export class FinanceComponent implements OnInit {
       this.addBooking = {success: false, wrong: false, error: false};
   }
   public expenseData: object;
-  private rowSelection;
   public addBooking;
 
   historyColumnDefs = [
