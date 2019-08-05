@@ -1,23 +1,22 @@
 import {Component, OnInit} from '@angular/core';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
-import {ModalDismissReasons, NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgForm} from '@angular/forms';
+
 import {ExpensesConfigService} from '../../config/config.service';
-import {Observable} from 'rxjs';
 import * as moment from 'moment';
+
+moment.locale('nl');
+
 
 @Component({
   selector: 'app-expenses',
   templateUrl: './finance.component.html',
   styleUrls: ['./finance.component.scss']
 })
-export class FinanceComponent implements OnInit {
-  closeResult: string;
-  expensesData: Observable<any>;
 
-  private gridApi;
-  private gridColumnApi;
-  private columnDefs;
+export class FinanceComponent implements OnInit {
 
   constructor(
     private httpClient: HttpClient,
@@ -27,8 +26,17 @@ export class FinanceComponent implements OnInit {
   ) {
       this.columnDefs = [
     {
-      headerName: 'Process Expenses',
+      headerName: 'Declaraties Overzicht',
       children: [
+        {
+          headerName: '',
+          field: 'info',
+          width: 65,
+          cellRenderer: params => {
+            const infoIcon = '<i id="information-icon" class="fa fa-info-circle"></i>';
+            return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
+            },
+          },
         {
           headerName: 'Declaratiedatum',
           field: 'date_of_claim',
@@ -59,22 +67,29 @@ export class FinanceComponent implements OnInit {
           sortable: true, width: 250
         },
       ]
+
     }
   ];
+      this.rowSelection = 'single';
       this.addBooking = {success: false, wrong: false, error: false};
   }
+  public expenseData: object;
+
+  private gridApi;
+  private gridColumnApi;
+  private columnDefs;
+  private rowSelection;
 
   public addBooking;
 
-
   historyColumnDefs = [
     {
-      headerName: 'Grootboekhistorie', field: 'date_exported',
+      headerName: 'Grootboekbestand', field: 'date_exported',
       sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
       suppressMovable: true, width: 215
     },
     {
-      headerName: 'Betaal', field: '', cellStyle: {cursor: 'pointer'},
+      headerName: 'Betaalbestand', field: '', cellStyle: {cursor: 'pointer'},
       template: '<i class="fa fa-file-alt" style="color: #4eb7da; font-size: 20px"></i>'
     }
   ];
@@ -90,6 +105,9 @@ export class FinanceComponent implements OnInit {
     return '€ ' + FinanceComponent.formatNumber(amounts.value);
   }
 
+  static getUTCOffset(date) {
+    return moment(date).utcOffset() / 60;
+  }
   historyHit(event) {
     if (event.colDef.template === undefined) {
       this.downloadFromHistory(event);
@@ -98,20 +116,24 @@ export class FinanceComponent implements OnInit {
     }
   }
 
-  onGridReady(params: any) {
-    this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-    // params.api.sizeColumnsToFit();
+  openExpenseDetailModal(content, data) {
+    this.modalService.open(content, { centered: true });
   }
 
-  ngOnInit() {
+  getNextExpense() {
+    console.log('Next');
+  }
+
+  onGridReady(params: any) {
     const api = [];
-    this.expensesData = this.expenses.getExpenses();
+    this.gridApi = params.api;
+    this.gridColumnApi = params.columnApi;
     this.expenses.getExpenses().subscribe(data => {
-      // console.log('Observable:', data);
       data.map(
         item => api.push({
-          date_of_claim: moment(item.date_of_claim).format('LLL'),
+          info: item.id,
+          date_of_claim: moment(item.date_of_claim).add(
+            FinanceComponent.getUTCOffset(item.date_of_claim), 'hours').format('LLL'),
           employee_full_name: item.employee.full_name,
           amount: item.amount,
           cost_type: item.cost_type,
@@ -122,8 +144,21 @@ export class FinanceComponent implements OnInit {
       );
       this.rowData = api;
     });
+  }
 
-    // this.rowData = api;
+  onSelectionChanged(event, content) {
+    const selectedRows = event.api.getSelectedRows();
+    const selectedRowData = {};
+    selectedRows.map((selectedRow, index) => {
+      index !== 0 ?
+        console.log('No selection') : Object.assign(selectedRowData, selectedRow);
+    });
+    this.expenseData = selectedRowData;
+    console.log(this.expenseData);
+    this.openExpenseDetailModal(content, selectedRowData);
+  }
+
+  ngOnInit() {
     this.callHistoryRefresh();
   }
 
@@ -240,21 +275,8 @@ export class FinanceComponent implements OnInit {
         });
   }
 
-  open(content) {
-    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
-      this.closeResult = `Closed with: ${result}`;
-    }, (reason) => {
-      this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-    });
-  }
+  claimUpdateForm(form: NgForm) {
+    console.log(form.value);
 
-  private getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return `with: ${reason}`;
-    }
   }
 }

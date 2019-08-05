@@ -15,12 +15,16 @@
           <i class="fa fa-exclamation-circle"></i> Er is iets fout gegaan. Probeer het later opnieuw.
         </div>
       </div>
+
       <ag-grid-angular
         style="width: 100%; height: 750px; overflow:hidden;"
         id="expensestable"
         class="ag-theme-material"
         [rowData]="rowData"
         [columnDefs]="columnDefs"
+        [showToolPanel]="true"
+        [rowSelection]="rowSelection"
+        (selectionChanged)="onSelectionChanged($event, expenseContent)"
         (gridReady)="onGridReady($event)"
       >
       </ag-grid-angular>
@@ -38,33 +42,46 @@
         (gridReady)="onGridReady($event)"
       >
       </ag-grid-angular>
-      <ng-template #content let-modal>
+      <ng-template #expenseContent let-modal>
         <div class="modal-header">
-          <h4 class="modal-title" id="modal-basic-title">Profile update</h4>
-          <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <h4 class="modal-title" id="modal-basic-title">Expense Bewerken</h4>
+          <button id="expenseModalClose" type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <form>
+          <code>{{ expenseData.employee_full_name }}</code>
+          <form #expenseUpdateForm="ngForm" (ngSubmit)="claimUpdateForm(expenseUpdateForm)" name="expenseUpdateForm">
             <div class="form-group">
-              <label for="dataofbirth">Date of birth</label>
+              <!-- Form: Costs -->
+              <label for="expenseAmount">Kosten</label>
               <div class="input-group">
-                <input id="dataofbirth" class="form-control" placeholder="yyyy-mm-dd" name="dp" ngbDatepicker #dp="ngbDatepicker">
-                <div class="input-group-append">
-                  <button class="btn btn-outline-secondary calendar" (click)="dp.toggle()" type="button"></button>
-                </div>
+                <input id="expenseAmount" class="form-control" placeholder="'EUR ' + {{ expenseData.amount}}" name="amount">
+              </div>
+              <!-- Form: Status -->
+              <label for="expenseStatus">Status</label>
+              <div class="input-group">
+                <input id="expenseStatus" class="form-control" disabled placeholder="{{ expenseData.status_text  }}" name="status_text">
+              </div>
+             <!-- Form: Cost Type -->
+              <label for="expenseCostType">Kosten Soort</label>
+              <div class="input-group">
+                <input id="expenseCostType" class="form-control" placeholder="{{ expenseData.cost_type  }}" name="cost_type">
+              </div>
+              <!-- Form: Cost Type -->
+              <label for="expenseDateOfTransaction">Verwervingdatum</label>
+              <div class="input-group">
+                <input id="expenseDateOfTransaction" class="form-control" placeholder="{{ expenseData.date_of_transaction  }}" name="date_of_transaction">
               </div>
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline-dark" (click)="modal.close('Save click')">Save</button>
+          <button type="button" class="btn btn-danger" (click)="modal.close('Save click')">Afwijzen</button>
+          <button type="button" class="btn btn-success">Goedkeuren</button>
+          <button type="button" class="btn btn-warning" (click)="getNextExpense()">Volgende</button>
         </div>
       </ng-template>
-      <!--<button class="btn btn-primary" (click)="open(content)">Test Modal No Data</button>-->
-      <hr>
-      <pre>{{closeResult}}</pre>
     </div>
   </div>
 </div>

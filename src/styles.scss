@@ -16,9 +16,8 @@ $fa-font-path: "/assets/fonts/font-awesome";
 
 
 body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  margin-top: 5em;
+  font-family: $vwt_font_family;
+  margin: 5em 0 0;
 }
 h1 {
   font-size: 30px;
@@ -49,4 +48,54 @@ h3 {
     margin: 0 -50% 0 0;
     transform: translate(-50%, -50%);
   }
+}
+
+#information-icon {
+  cursor: pointer;
+}
+
+span.ag-header-group-text {
+  font-size: 3em;
+  font-weight: 300;
+  color: $vwt_color_blue;
+}
+
+// Remove outline on the close icon when modal is clicked
+#expenseModalClose {
+  outline: none;
+}
+
+// Sytle modal header to VWT colors
+.modal-header {
+  background-color: $vwt_color_blue;
+  color: white;
+  border-color: black;
+  border-width: thick;
+}
+  /////////////////////////
+ // OVERRIDES: AG- GRID //
+////////////////////////
+
+.ag-theme-material {
+	.ag-ltr {
+		.ag-has-focus {
+			.ag-cell-focus {
+        // Blind the blue selected border
+				&:not(.ag-cell-range-selected) {
+					border: 0;
+
+				}
+			}
+		}
+	}
+  // Override AG-GRID Header font-family
+  .ag-header {
+    font-family: $vwt_font_family;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+  // Override AG-GRID Selected Row Background
+	.ag-row-selected {
+		background-color: $vwt_mobile_background_color_blue;
+	}
 }
