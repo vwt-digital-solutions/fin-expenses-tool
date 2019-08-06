@@ -66,6 +66,7 @@
             Update is geslaagd!
           </div>
           <form
+            id="expensesUpdateForm"
             #expenseUpdateForm="ngForm"
             (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id)"
             name="expenseUpdateForm">
