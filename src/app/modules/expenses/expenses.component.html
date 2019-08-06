@@ -33,23 +33,28 @@
                      required
                      [(ngModel)]="formAmount"
                      #namount="ngModel">
-              <span class="input-group-addon" onclick="document.getElementById('amountinput').focus()">€ EUR</span>
+              <div class="input-group-append">
+                <span class="input-group-text" onclick="document.getElementById('amountinput').focus()">€ EUR</span>
+              </div>
             </div>
             <div class="fill-text"
                  *ngIf="notFilledClass(namount)">
               <small>Graag een geldig bedrag invullen</small>
             </div>
-
-            <label for="typeinput">Soort kosten:</label>
-            <div class="form-group">
+            <div class="mt-3"></div>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                  <label class="input-group-text" for="typeinput">Soort:</label>
+                </div>
               <select id="typeinput"
                       (change)="expenseType = true"
-                      class="form-control"
+                      class="custom-select"
                       [ngClass]="{notFilled: notFilledClass(ntype)}"
                       [(ngModel)]="formType"
                       name="cost_type"
                       #ntype="ngModel"
                       required>
+                <option value="" disabled selected>Kies een kost type</option>
                 <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">
                   {{t.ctype}}
                 </option>
@@ -71,8 +76,10 @@
                      [(ngModel)]="formTransDate"
                      #ntransdate="ngModel"
                      type="date">
-              <span class="input-group-addon fa fa-calendar-alt"
-                    onclick="document.getElementById('dateinput').focus()"></span>
+              <div class="input-group-append">
+                <span class="input-group-text" onclick="document.getElementById('dateinput').focus()">
+                  <i class=" fa fa-calendar-alt"></i> </span>
+              </div>
             </div>
             <div class="fill-text"
                  *ngIf="notFilledClass(ntransdate)">

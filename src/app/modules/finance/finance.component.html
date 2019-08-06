@@ -62,65 +62,91 @@
           <div id="updateErrors" class="alert alert-danger" role="alert" *ngIf="showErrors">
             {{ formErrors }} {{ formResponse.detail }}
           </div>
+          <div id="updateSuccess" class="alert alert-success" role="alert" *ngIf="formSubmitted">
+            Update is geslaagd!
+          </div>
           <form
             #expenseUpdateForm="ngForm"
-            (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.info)"
+            (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id)"
             name="expenseUpdateForm">
             <div class="form-group">
               <!-- Form: Costs -->
-              <label for="expenseAmount">Kosten</label>
-              <div class="input-group">
+              <label for="expenseAmount">Kosten:</label>
+              <div class="input-group mb-3">
                 <input id="expenseAmount"
                        type="number"
                        class="form-control"
                        placeholder="{{ expenseData.amount | currency: 'EUR' }}"
-                       name="amount" ngModel>
+                       name="amount" #expenseAmount="ngModel" ngModel>
               </div>
-              <!-- Form: Status -->
-              <label for="expenseStatus">Status</label>
-              <div class="input-group">
-                <input id="expenseStatus"
-                       class="form-control"
-                       placeholder="edited_by_creditor"
-                       name="status" ngModel>
+              <div *ngIf="expenseAmount.valid && (expenseAmount.dirty || expenseAmount.touched)" class="alert-danger">
+
               </div>
+              <div class="mt-3"></div>
               <!-- Form: Cost Type -->
-              <label for="expenseCostType">Soort</label>
-              <div class="input-group">
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="expenseCostType">Soort:</label>
+                </div>
                 <select id="expenseCostType"
-                        class="form-control"
+                        class="custom-select"
                         name="cost_type"
                         ngModel>
-                  <option value="" disabled selected><span class="badge badge-secondary">Huidige:</span> {{ expenseData.cost_type.split(':')[0] }}</option>
+                  <option value="" disabled selected><kbd>Huidige:</kbd> {{ expenseData.cost_type.split(':')[0] }}</option>
                   <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">{{t.ctype}}</option>
                 </select>
               </div>
               <!-- Form: Date of Transaction -->
-              <label for="expenseDateOfTransaction">Verwervingdatum</label>
-              <div class="input-group">
+              <label for="expenseDateOfTransaction">Verwervingdatum:</label>
+              <div class="input-group mb-3">
                 <input id="expenseDateOfTransaction"
                        class="form-control"
+                       type="date"
                        placeholder="{{ expenseData.date_of_transaction  }}"
                        name="date_of_transaction" ngModel>
+                <div class="input-group-append">
+                <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
+                  <i class=" fa fa-calendar-alt"></i> </span>
+                </div>
+              </div>
+              <!-- Form: Rejection Note -->
+              <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="expenseRejectionNote">Afgewezen:</label>
+                </div>
+                <select id="expenseRejectionNote"
+                        class="custom-select"
+                        name="finance_note"
+                        ngModel>
+                  <option value="" disabled selected> Kies een reden </option>
+                  <option *ngFor="let t of expenseDataRejection" value="{{t.reason}}">{{t.reason}}</option>
+                </select>
               </div>
               <input type="submit" id="submit-update-form" hidden/>
             </div>
           </form>
         </div>
+        <div>
+          <picture>
+            <source srcset="" type="image/*">
+            <img src="{{ expenseData.attachment[0].url }}" class="img-fluid img-thumbnail" alt="{{ expenseData.note }}">
+          </picture>
+        </div>
+        ​
         <div class="modal-footer">
-          <div class="float-left">Creditor</div>
+          <div id="thumbs-up" class="float-right badge badge-success" (click)="updatingAction('approving')">
+            <label for="submit-update-form">
+              <i id="information-icon" class="fa fa-thumbs-up"></i>
+            </label>
+          </div>
 
-          <div class="btn btn-warning">
-            <label for="submit-update-form" disabled="formSubmitted" [ngClass] = '{disabledbtn: formSubmitted}'>
-              Opslaan <i *ngIf="formSubmitted === true" class="spinner-border text-light"></i>
+          <div id="thumbs-down" class="float-right badge badge-danger" (click)="updatingAction('rejecting')">
+            <label for="submit-update-form">
+              <i id="information-icon-down" class="fa fa-thumbs-down"></i>
             </label>
           </div>
         </div>
         <div class="modal-footer">
-          <div class="float-left">Manager</div>
-
-          <button type="button" class="btn btn-danger" (click)="modal.close('Save click')">Afwijzen</button>
-          <button type="button" class="btn btn-success">Goedkeuren</button>
           <button type="button" class="btn btn-warning" (click)="getNextExpense()">Volgende</button>
         </div>
       </ng-template>

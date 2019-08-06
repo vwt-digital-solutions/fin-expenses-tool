@@ -1,29 +1,36 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import {EnvService} from './env.service';
-import { throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 import {Endpoint} from '../models/endpoint.enum';
 
+interface ExpensesIfc {
+  clone: any;
+  headers: any;
+  status: any;
+  statusText: any;
+  body: any;
+  type: any;
+  ok: any;
+  url: any;
+}
+
 @Injectable()
 export class ExpensesConfigService {
-  public errorsReceived;
   constructor(
     private http: HttpClient,
     private env: EnvService,
   ) {
-    this.errorsReceived = [];
   }
 
-  handleError(error: HttpErrorResponse) {
+  static handleError(error: HttpErrorResponse) {
     const errors = {};
     if (error.error instanceof ErrorEvent) {
       Object.assign(errors, error.error);
-      this.errorsReceived = errors;
       console.error('An error occurred:', error.error.message);
     } else {
       Object.assign(errors, error.error);
-      this.errorsReceived = errors;
       console.error(
         `Backend returned code ${error.status}, ` +
         `body was: ${error.error.detail}`);
@@ -32,26 +39,26 @@ export class ExpensesConfigService {
       `${JSON.stringify(errors)}`);
   }
 
-  public getExpenses() {
-    return this.http.get<any[]>(this.env.apiUrl + Endpoint.finance)
+  public getExpenses(): Observable<HttpResponse<ExpensesIfc>> {
+    return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.finance)
       .pipe(
         retry(2),
-        catchError(this.handleError)
+        catchError(ExpensesConfigService.handleError)
       );
   }
 
-  public getCostTypes() {
-    return this.http.get<any []>(this.env.apiUrl + '/employees/cost-types')
+  public getCostTypes(): Observable<HttpResponse<ExpensesIfc>> {
+    return this.http.get<ExpensesIfc>(this.env.apiUrl + '/employees/cost-types')
       .pipe(
         retry(2),
-        catchError(this.handleError)
+        catchError(ExpensesConfigService.handleError)
       );
   }
 
-  public updateExpense(data, expenseId) {
-    return this.http.post<any []>(this.env.apiUrl + Endpoint.finance + `/${expenseId}`, data)
+  public updateExpense(data, expenseId): Observable<HttpResponse<ExpensesIfc>>  {
+    return this.http.put<ExpensesIfc>(this.env.apiUrl + Endpoint.finance + `/${expenseId}`, data)
       .pipe(
-        catchError(this.handleError)
+        catchError(ExpensesConfigService.handleError)
       );
   }
 }

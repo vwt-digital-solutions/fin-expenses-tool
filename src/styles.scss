@@ -49,8 +49,9 @@ h3 {
   }
 }
 
-#information-icon {
+#information-icon, #verifyIcon, #EditIcon {
   cursor: pointer;
+  width: inherit;
 }
 
 span.ag-header-group-text {

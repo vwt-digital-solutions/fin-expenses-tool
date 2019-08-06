@@ -3,12 +3,17 @@ import {HttpClient} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {NgForm} from '@angular/forms';
+import { OAuthService } from 'angular-oauth2-oidc';
+
 
 import {ExpensesConfigService} from '../../services/config.service';
 import * as moment from 'moment';
 
 moment.locale('nl');
 
+
+interface ExpensesIfc {['body']: any; }
+interface IClaimRoles { roles: any; }
 
 @Component({
   selector: 'app-expenses',
@@ -26,12 +31,17 @@ export class FinanceComponent implements OnInit {
   public showErrors;
   public formErrors;
   public formResponse;
+  private submitingStart: boolean;
+  private action: any;
+  private OurJaneDoeIs: string;
+  private expenseDataRejection: ({ reason: string })[];
 
   constructor(
     private httpClient: HttpClient,
     private env: EnvService,
     private expenses: ExpensesConfigService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private oauthService: OAuthService,
   ) {
     this.columnDefs = [
       {
@@ -39,10 +49,11 @@ export class FinanceComponent implements OnInit {
         children: [
           {
             headerName: '',
-            field: 'info',
+            field: 'id',
             width: 65,
+            colId: 'id',
             cellRenderer: params => {
-              const infoIcon = '<i id="information-icon" class="fa fa-info-circle"></i>';
+              const infoIcon = '<i id="information-icon" class="fa fa-edit"></i>';
               return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
             },
           },
@@ -51,9 +62,13 @@ export class FinanceComponent implements OnInit {
             field: 'date_of_claim',
             sortable: true,
             filter: true,
+            cellRenderer: params => {
+              return moment(params.value).add(
+                FinanceComponent.getUTCOffset(params.value), 'hours').format('LLL');
+            },
           },
           {
-            headerName: 'Werknemer', field: 'employee_full_name',
+            headerName: 'Werknemer', field: 'employee.full_name',
             sortable: true, filter: true, width: 150
           },
           {
@@ -72,12 +87,16 @@ export class FinanceComponent implements OnInit {
             sortable: true, filter: true, width: 150
           },
           {
-            headerName: 'Status', field: 'status_text',
+            headerName: 'Status', field: 'status.text',
             sortable: true, width: 250
           },
         ]
       }
     ];
+    this.expenseDataRejection =  [
+      {reason: 'Niet Duidelijk'},
+      {reason: 'Kan niet uitbetalen'}
+      ];
     this.formSubmitted = false;
     this.showErrors = false;
     this.formResponse = {};
@@ -126,30 +145,22 @@ export class FinanceComponent implements OnInit {
     this.modalService.open(content, { centered: true });
   }
 
+  updatingAction(event) {
+    this.action = event;
+  }
+
   getNextExpense() {
     console.log('Next');
   }
 
   onGridReady(params: any) {
-    const api = [];
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
-    this.expenses.getExpenses().subscribe(data => {
-      data.map(
-        item => api.push({
-          info: item.id,
-          date_of_claim: moment(item.date_of_claim).add(
-            FinanceComponent.getUTCOffset(item.date_of_claim), 'hours').format('LLL'),
-          employee_full_name: item.employee.full_name,
-          amount: item.amount,
-          cost_type: item.cost_type,
-          note: item.note,
-          date_of_transaction: item.date_of_transaction,
-          status_text: item.status.text
-        })
-      );
-      this.rowData = api;
-    });
+    // @ts-ignore
+    this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [ ... data ]);
+    const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
+    this.OurJaneDoeIs = claimJaneDoe.roles.includes('manager.write') ? 'manager' : 'creditor';
+
   }
 
   onSelectionChanged(event, content) {
@@ -160,6 +171,7 @@ export class FinanceComponent implements OnInit {
         console.log('No selection') : Object.assign(selectedRowData, selectedRow);
     });
     this.expenseData = selectedRowData;
+    this.formSubmitted = false;
     this.showErrors = false;
     this.formErrors = '';
     this.openExpenseDetailModal(content, selectedRowData);
@@ -167,6 +179,7 @@ export class FinanceComponent implements OnInit {
 
   ngOnInit() {
     this.callHistoryRefresh();
+    console.warn(this.OurJaneDoeIs);
     this.expenses.getCostTypes()
       .subscribe(
         val => {
@@ -288,7 +301,6 @@ export class FinanceComponent implements OnInit {
   }
 
   claimUpdateForm(form: NgForm, expenseId) {
-    console.log(form.value, expenseId, form.valid);
     const dataVerified = {};
     const data = form.value;
     for (const prop in data) {
@@ -296,13 +308,27 @@ export class FinanceComponent implements OnInit {
         dataVerified[prop] = data[prop];
       }
     }
-    Object.keys(dataVerified).length !== 0 ?
+    const action = this.action;
+    console.log(action);
+    dataVerified[`status`] =  action === 'approving' ? `approved_by_${this.OurJaneDoeIs}` :
+      action === 'rejecting' ? `rejected_by_${this.OurJaneDoeIs}` : null;
+
+    console.log(this.OurJaneDoeIs);
+
+    Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
       this.expenses.updateExpense(dataVerified, expenseId)
         .subscribe(
-          result => this.showErrors = false,
-          error => { this.showErrors = true, Object.assign(this.formResponse, JSON.parse(error)); })
+          result => {
+            // @ts-ignore
+            this.expenses.getExpenses().subscribe((response: ExpensesIfc) => this.rowData = [ ... response ]);
+            this.showErrors = false;
+            this.formSubmitted = !form.ngSubmit.hasError;
+          },
+          error => {
+            this.showErrors = true;
+            Object.assign(this.formResponse, JSON.parse(error));
+          })
    : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
-    console.log(this.formResponse);
 
 }
 }
