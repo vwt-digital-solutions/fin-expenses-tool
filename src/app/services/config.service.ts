@@ -4,6 +4,7 @@ import {EnvService} from './env.service';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 import {Endpoint} from '../models/endpoint.enum';
+import {debug} from 'util';
 
 interface ExpensesIfc {
   clone: any;
@@ -42,7 +43,7 @@ export class ExpensesConfigService {
   public getExpenses(): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.finance)
       .pipe(
-        retry(2),
+        // retry(2),
         catchError(ExpensesConfigService.handleError)
       );
   }
