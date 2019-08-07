@@ -50,7 +50,7 @@ export class ExpensesConfigService {
   public getCostTypes(): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<ExpensesIfc>(this.env.apiUrl + '/employees/cost-types')
       .pipe(
-        retry(2),
+        // retry(2),
         catchError(ExpensesConfigService.handleError)
       );
   }
