@@ -16,13 +16,15 @@ import {EnvServiceProvider} from './services/env.service.provider';
 import {OAuthModule, OAuthService} from 'angular-oauth2-oidc';
 import {AuthComponent} from './auth/auth.component';
 import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
-import {ExpensesConfigService} from "./services/config.service";
+import {ExpensesConfigService} from './services/config.service';
+import { ManagerComponent } from './modules/manager/manager.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
-    AuthComponent
+    AuthComponent,
+    ManagerComponent
   ],
   imports: [
     BrowserModule,

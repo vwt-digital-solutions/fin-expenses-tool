@@ -48,6 +48,14 @@ export class ExpensesConfigService {
       );
   }
 
+  public getExpenseAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
+    return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.finance + '/' + expenseId + '/attachments')
+      .pipe(
+        retry(2),
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
   public getCostTypes(): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<ExpensesIfc>(this.env.apiUrl + '/employees/cost-types')
       .pipe(
