@@ -35,6 +35,7 @@ export class FinanceComponent implements OnInit {
   private action: any;
   private OurJaneDoeIs: string;
   private expenseDataRejection: ({ reason: string })[];
+  private receiptImage: any;
 
   constructor(
     private httpClient: HttpClient,
@@ -42,6 +43,7 @@ export class FinanceComponent implements OnInit {
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
     private oauthService: OAuthService,
+    private routeActivated: ActivatedRoute,
   ) {
     this.columnDefs = [
       {
@@ -68,8 +70,8 @@ export class FinanceComponent implements OnInit {
             },
           },
           {
-            headerName: 'Werknemer', field: 'employee.full_name',
-            sortable: true, filter: true, width: 150
+            headerName: 'Werknemer', field: 'employee',
+            sortable: true, filter: true, width: 200, resizable: true
           },
           {
             headerName: 'Kosten', field: 'amount', valueFormatter: FinanceComponent.decimalFormatter,
@@ -77,13 +79,16 @@ export class FinanceComponent implements OnInit {
           },
           {
             headerName: 'Soort', field: 'cost_type',
-            sortable: true, filter: true, resizable: true, width: 300
+            sortable: true, filter: true, resizable: true, width: 200,
+            cellRenderer: params => {
+              return params.value.split(':')[0];
+            }
           },
           {
             headerName: 'Beschrijving', field: 'note', resizable: true
           },
           {
-            headerName: 'Verwervingsdatum', field: 'date_of_transaction',
+            headerName: 'Bon datum', field: 'date_of_transaction',
             sortable: true, filter: true, width: 150
           },
           {
@@ -165,7 +170,9 @@ export class FinanceComponent implements OnInit {
 
   onSelectionChanged(event, content) {
     const selectedRows = event.api.getSelectedRows();
-    const selectedRowData = {};
+    const selectedRowData = {
+      id: undefined
+    };
     selectedRows.map((selectedRow, index) => {
       index !== 0 ?
         console.log('No selection') : Object.assign(selectedRowData, selectedRow);
@@ -175,6 +182,7 @@ export class FinanceComponent implements OnInit {
     this.showErrors = false;
     this.formErrors = '';
     this.openExpenseDetailModal(content, selectedRowData);
+    this.expenses.getExpenseAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => this.receiptImage = image);
   }
 
   ngOnInit() {

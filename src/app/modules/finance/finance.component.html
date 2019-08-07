@@ -98,7 +98,7 @@
                 </select>
               </div>
               <!-- Form: Date of Transaction -->
-              <label for="expenseDateOfTransaction">Verwervingdatum:</label>
+              <label for="expenseDateOfTransaction">Datum bon:</label>
               <div class="input-group mb-3">
                 <input id="expenseDateOfTransaction"
                        class="form-control"
@@ -130,7 +130,7 @@
         <div>
           <picture>
             <source srcset="" type="image/*">
-            <img src="{{ expenseData.attachment[0].url }}" class="img-fluid img-thumbnail" alt="{{ expenseData.note }}">
+            <img src="{{ receiptImage[0].url | async }}" class="img-fluid img-thumbnail" alt="{{ expenseData.note }}">
           </picture>
         </div>
         ​
