@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {NgForm} from '@angular/forms';
-import { OAuthService } from 'angular-oauth2-oidc';
+import {OAuthService} from 'angular-oauth2-oidc';
 
 
 import {ExpensesConfigService} from '../../services/config.service';
@@ -12,8 +12,13 @@ import * as moment from 'moment';
 moment.locale('nl');
 
 
-interface ExpensesIfc {['body']: any; }
-interface IClaimRoles { roles: any; }
+interface ExpensesIfc {
+  ['body']: any;
+}
+
+interface IClaimRoles {
+  roles: any;
+}
 
 @Component({
   selector: 'app-expenses',
@@ -83,7 +88,7 @@ export class FinanceComponent implements OnInit {
             headerName: 'Beschrijving', field: 'note', resizable: true
           },
           {
-            headerName: 'Verwervingsdatum', field: 'date_of_transaction',
+            headerName: 'Bondatum', field: 'date_of_transaction',
             sortable: true, filter: true, width: 150
           },
           {
@@ -93,28 +98,34 @@ export class FinanceComponent implements OnInit {
         ]
       }
     ];
-    this.expenseDataRejection =  [
+    this.expenseDataRejection = [
       {reason: 'Niet Duidelijk'},
       {reason: 'Kan niet uitbetalen'}
-      ];
+    ];
     this.formSubmitted = false;
     this.showErrors = false;
     this.formResponse = {};
     this.rowSelection = 'single';
     this.addBooking = {success: false, wrong: false, error: false};
   }
+
   public expenseData: object;
   public addBooking;
 
   historyColumnDefs = [
     {
-      headerName: 'Grootboekbestand', field: 'date_exported',
-      sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
-      suppressMovable: true, width: 215
-    },
-    {
-      headerName: 'Betaalbestand', field: '', cellStyle: {cursor: 'pointer'},
-      template: '<i class="fa fa-file-alt" style="color: #4eb7da; font-size: 20px"></i>'
+      headerName: '',
+      children: [
+        {
+          headerName: 'Geschiedenis', field: 'date_exported',
+          sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
+          suppressMovable: true
+        },
+        {
+          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 100,
+          template: '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>'
+        }
+      ]
     }
   ];
 
@@ -142,7 +153,7 @@ export class FinanceComponent implements OnInit {
   }
 
   openExpenseDetailModal(content, data) {
-    this.modalService.open(content, { centered: true });
+    this.modalService.open(content, {centered: true});
   }
 
   updatingAction(event) {
@@ -157,7 +168,7 @@ export class FinanceComponent implements OnInit {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
     // @ts-ignore
-    this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [ ... data ]);
+    this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
     const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
     this.OurJaneDoeIs = claimJaneDoe.roles.includes('manager.write') ? 'manager' : 'creditor';
 
@@ -310,7 +321,7 @@ export class FinanceComponent implements OnInit {
     }
     const action = this.action;
     console.log(action);
-    dataVerified[`status`] =  action === 'approving' ? `approved_by_${this.OurJaneDoeIs}` :
+    dataVerified[`status`] = action === 'approving' ? `approved_by_${this.OurJaneDoeIs}` :
       action === 'rejecting' ? `rejected_by_${this.OurJaneDoeIs}` : null;
 
     console.log(this.OurJaneDoeIs);
@@ -320,7 +331,7 @@ export class FinanceComponent implements OnInit {
         .subscribe(
           result => {
             // @ts-ignore
-            this.expenses.getExpenses().subscribe((response: ExpensesIfc) => this.rowData = [ ... response ]);
+            this.expenses.getExpenses().subscribe((response: ExpensesIfc) => this.rowData = [...response]);
             this.showErrors = false;
             this.formSubmitted = !form.ngSubmit.hasError;
           },
@@ -328,7 +339,7 @@ export class FinanceComponent implements OnInit {
             this.showErrors = true;
             Object.assign(this.formResponse, JSON.parse(error));
           })
-   : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
+      : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
 
-}
+  }
 }
