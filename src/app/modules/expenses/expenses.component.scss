@@ -138,6 +138,24 @@ input, textarea, select {
   }
 }
 
+.success {
+  @include lg-phone-only {
+    background-color: #4BB543!important;
+  }
+}
+
+.wrong {
+  @include lg-phone-only {
+    background-color: #A63232!important;
+  }
+}
+
+.alert {
+  @include lg-phone-only {
+    display: none;
+  }
+}
+
 .row {
   margin-top: 5ex;
 
