@@ -12,19 +12,18 @@ import {AuthGuard} from './auth/auth.guard';
 import {HeaderComponent} from './components/header/header.component';
 import {ExpensesModule} from './modules/expenses/expenses.module';
 import {FinanceModule} from './modules/finance/finance.module';
+import {ManagerModule} from './modules/manager/manager.module';
 import {EnvServiceProvider} from './services/env.service.provider';
 import {OAuthModule, OAuthService} from 'angular-oauth2-oidc';
 import {AuthComponent} from './auth/auth.component';
 import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
 import {ExpensesConfigService} from './services/config.service';
-import { ManagerComponent } from './modules/manager/manager.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HeaderComponent,
     AuthComponent,
-    ManagerComponent
   ],
   imports: [
     BrowserModule,
@@ -33,6 +32,7 @@ import { ManagerComponent } from './modules/manager/manager.component';
     AppRoutingModule,
     ExpensesModule,
     FinanceModule,
+    ManagerModule,
     NgbDropdownModule,
   ],
 

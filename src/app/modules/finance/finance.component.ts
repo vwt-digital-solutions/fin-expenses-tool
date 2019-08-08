@@ -175,7 +175,6 @@ export class FinanceComponent implements OnInit {
     this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [ ... data ]);
     const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
     this.OurJaneDoeIs = claimJaneDoe.roles.includes('manager.write') ? 'manager' : 'creditor';
-
   }
 
   onSelectionChanged(event, content) {
