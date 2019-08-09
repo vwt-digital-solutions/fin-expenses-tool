@@ -52,7 +52,7 @@
       <!-- FORM TEMPLATE -->
       <ng-template #expenseContent let-modal>
         <div class="modal-header">
-          <h4 class="modal-title" id="modal-basic-title">Expense Bewerken</h4>
+          <h4 class="modal-title" id="modal-basic-title">Declaratie Bewerken</h4>
           <button id="expenseModalClose" type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -119,7 +119,7 @@
                 </div>
                 <select id="expenseRejectionNote"
                         class="custom-select"
-                        name="finance_note"
+                        name="creditor_note"
                         ngModel>
                   <option value="" disabled selected> Kies een reden</option>
                   <option *ngFor="let t of expenseDataRejection" value="{{t.reason}}">{{t.reason}}</option>
@@ -127,15 +127,13 @@
               </div>
               <input type="submit" id="submit-update-form" hidden/>
             </div>
+
           </form>
         </div>
-        <div>
-          <picture>
+        <picture>
             <source srcset="" type="image/*">
-            <img src="{{ receiptImage[0].url | async }}" class="img-fluid img-thumbnail" alt="{{ expenseData.note }}">
-          </picture>
-        </div>
-        ​
+            <img src="{{ receiptImage }}" alt="{{ expenseData.note }}" class="img-fluid img-thumbnail">
+        </picture>
         <div class="modal-footer">
           <div id="thumbs-up" class="float-right badge badge-success" (click)="updatingAction('approving')">
             <label for="submit-update-form">

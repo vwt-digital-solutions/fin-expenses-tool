@@ -43,13 +43,21 @@ export class ExpensesConfigService {
   public getExpenses(): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.finance)
       .pipe(
-        // retry(2),
+        retry(2),
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public getDepartmentExpenses(departmentId): Observable<HttpResponse<ExpensesIfc>> {
+    return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.department + '/' + departmentId + '/expenses')
+      .pipe(
+        retry(2),
         catchError(ExpensesConfigService.handleError)
       );
   }
 
   public getExpenseAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
-    return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.finance + '/' + expenseId + '/attachments')
+    return this.http.get<any>(this.env.apiUrl + Endpoint.finance + '/' + expenseId + '/attachments')
       .pipe(
         retry(2),
         catchError(ExpensesConfigService.handleError)

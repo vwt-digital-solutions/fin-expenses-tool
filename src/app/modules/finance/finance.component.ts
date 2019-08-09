@@ -4,8 +4,6 @@ import {EnvService} from 'src/app/services/env.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {NgForm} from '@angular/forms';
 import {OAuthService} from 'angular-oauth2-oidc';
-
-
 import {ExpensesConfigService} from '../../services/config.service';
 import * as moment from 'moment';
 
@@ -157,7 +155,7 @@ export class FinanceComponent implements OnInit {
   }
 
   openExpenseDetailModal(content, data) {
-    this.modalService.open(content, {centered: true});
+    this.modalService.open(content, { centered: true });
   }
 
   updatingAction(event) {
@@ -174,7 +172,7 @@ export class FinanceComponent implements OnInit {
     // @ts-ignore
     this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [ ... data ]);
     const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
-    this.OurJaneDoeIs = claimJaneDoe.roles.includes('manager.write') ? 'manager' : 'creditor';
+    this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
   }
 
   onSelectionChanged(event, content) {
@@ -186,12 +184,14 @@ export class FinanceComponent implements OnInit {
       index !== 0 ?
         console.log('No selection') : Object.assign(selectedRowData, selectedRow);
     });
+    this.expenses.getExpenseAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
+      this.receiptImage = image[0].url;
+    });
     this.expenseData = selectedRowData;
     this.formSubmitted = false;
     this.showErrors = false;
     this.formErrors = '';
     this.openExpenseDetailModal(content, selectedRowData);
-    this.expenses.getExpenseAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => this.receiptImage = image);
   }
 
   ngOnInit() {
@@ -326,11 +326,8 @@ export class FinanceComponent implements OnInit {
       }
     }
     const action = this.action;
-    console.log(action);
     dataVerified[`status`] =  action === 'approving' ? `approved_by_${this.OurJaneDoeIs}` :
       action === 'rejecting' ? `rejected_by_${this.OurJaneDoeIs}` : null;
-
-    console.log(this.OurJaneDoeIs);
 
     Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
       this.expenses.updateExpense(dataVerified, expenseId)

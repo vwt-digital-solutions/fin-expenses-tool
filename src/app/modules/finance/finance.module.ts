@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import {AppRoutingModule} from '../../app-routing.module';
 import {CommonModule} from '@angular/common';
-import { FinanceComponent } from './finance.component';
+import {FinanceComponent} from './finance.component';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {AgGridModule} from 'ag-grid-angular';
@@ -20,7 +20,8 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     HttpClientModule,
     FormsModule,
     AgGridModule.withComponents([]),
-    NgbModule
+    NgbModule,
+
   ],
   exports: [
     CommonModule,

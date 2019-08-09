@@ -14,7 +14,7 @@
   <!-- FORM TEMPLATE -->
   <ng-template #expenseContent let-modal>
     <div class="modal-header">
-      <h4 class="modal-title" id="modal-basic-title">Expense Bewerken</h4>
+      <h4 class="modal-title" id="modal-basic-title">Declaratie Bewerken</h4>
       <button id="expenseModalClose" type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -39,12 +39,10 @@
           <div class="input-group mb-3">
             <input id="expenseAmount"
                    type="number"
+                   readonly
                    class="form-control"
                    placeholder="{{ expenseData.amount | currency: 'EUR' }}"
-                   name="amount" #expenseAmount="ngModel" ngModel>
-          </div>
-          <div *ngIf="expenseAmount.valid && (expenseAmount.dirty || expenseAmount.touched)" class="alert-danger">
-
+                   name="amount">
           </div>
           <div class="mt-3"></div>
           <!-- Form: Cost Type -->
@@ -54,11 +52,8 @@
             </div>
             <select id="expenseCostType"
                     class="custom-select"
-                    name="cost_type"
-                    ngModel>
+                    name="cost_type">
               <option value="" disabled selected><kbd>Huidige:</kbd> {{ expenseData.cost_type.split(':')[0] }}
-              </option>
-              <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">{{t.ctype}}</option>
             </select>
           </div>
           <!-- Form: Date of Transaction -->
@@ -66,9 +61,10 @@
           <div class="input-group mb-3">
             <input id="expenseDateOfTransaction"
                    class="form-control"
-                   type="date"
+                   type="text"
+                   readonly
                    placeholder="{{ expenseData.date_of_transaction  }}"
-                   name="date_of_transaction" ngModel>
+                   name="date_of_transaction">
             <div class="input-group-append">
                 <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
                   <i class=" fa fa-calendar-alt"></i> </span>
@@ -81,7 +77,7 @@
             </div>
             <select id="expenseRejectionNote"
                     class="custom-select"
-                    name="finance_note"
+                    name="manager_note"
                     ngModel>
               <option value="" disabled selected> Kies een reden</option>
               <option *ngFor="let t of expenseDataRejection" value="{{t.reason}}">{{t.reason}}</option>
@@ -94,7 +90,7 @@
     <div>
       <picture>
         <source srcset="" type="image/*">
-        <img src="{{ receiptImage[0].url | async }}" class="img-fluid img-thumbnail" alt="{{ expenseData.note }}">
+        <img src="{{ receiptImage }}" class="img-fluid img-thumbnail" alt="{{ expenseData.note }}">
       </picture>
     </div>
     ​

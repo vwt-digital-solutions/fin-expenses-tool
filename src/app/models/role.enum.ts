@@ -1,5 +1,5 @@
 export enum Role {
-    Employee = 'employee.write',
+    Employee = 'finance.expenses',
     Manager = 'manager.write',
     Creditor = 'creditor.write'
 }
