@@ -45,7 +45,7 @@ export class AuthGuard implements CanActivate {
 
       if (!isAuthorisedRoute) {
         console.log('Requested role not granted');
-        this.router.navigate(['/expenses']);
+        this.router.navigate(['/home']);
         return false;
       }
     }
