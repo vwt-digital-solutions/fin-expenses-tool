@@ -5,9 +5,9 @@ import {AppRoutingModule} from '../../app-routing.module';
 import {CommonModule} from '@angular/common';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
-import {AgGridModule} from 'ag-grid-angular';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {ControllerComponent} from './controller.component';
+import { ChartsModule } from 'ng2-charts';
 
 @NgModule({
   declarations: [
@@ -19,7 +19,7 @@ import {ControllerComponent} from './controller.component';
     CommonModule,
     HttpClientModule,
     FormsModule,
-    AgGridModule.withComponents([]),
+    ChartsModule,
     NgbModule
   ],
   exports: [
