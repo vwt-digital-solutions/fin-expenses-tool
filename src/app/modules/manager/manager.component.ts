@@ -26,10 +26,10 @@ interface IClaimRoles {
 export class ManagerComponent implements OnInit {
   private gridApi;
   private gridColumnApi;
-  private rowData;
-  private columnDefs;
+  public rowData;
+  public columnDefs;
   private expenseData: object;
-  private rowSelection;
+  public rowSelection;
   private formSubmitted;
   private showErrors;
   private formErrors;
