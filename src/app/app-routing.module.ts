@@ -16,7 +16,7 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
-    path: '',
+    path: 'home',
     component: LandingComponent,
     canActivate: [AuthGuard],
   },
@@ -24,7 +24,7 @@ const routes: Routes = [
       path: 'auth/:authBody',
       component: AuthComponent,
   },
-  // { path: '', redirectTo: 'expenses', pathMatch: 'full' },
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
     path: 'expenses/process',
     component: FinanceComponent,
