@@ -301,6 +301,12 @@ export class FinanceComponent implements OnInit {
         });
   }
 
+  dismissExpenseModal() {
+    const api = this.gridApi;
+    api.deselectAll();
+    setTimeout(() => { this.modalService.dismissAll(); }, 200 );
+  }
+
   createPaymentFile(event) {
     this.resetPopups();
     const fileData = event.split('=')[2];

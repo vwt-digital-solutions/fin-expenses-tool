@@ -23,7 +23,7 @@ interface IClaimRoles {
   templateUrl: './manager.component.html',
   styleUrls: ['./manager.component.scss']
 })
-export class ManagerComponent implements OnInit {
+export class ManagerComponent {
   private gridApi;
   private gridColumnApi;
   public rowData;
@@ -138,11 +138,14 @@ export class ManagerComponent implements OnInit {
     this.openExpenseDetailModal(content, selectedRowData);
   }
 
-  ngOnInit() {
+  openExpenseDetailModal(content, data) {
+    this.modalService.open(content, {centered: true, backdrop: 'static', keyboard: false });
   }
 
-  openExpenseDetailModal(content, data) {
-    this.modalService.open(content, {centered: true});
+  dismissExpenseModal() {
+    const api = this.gridApi;
+    api.deselectAll();
+    setTimeout(() => { this.modalService.dismissAll(); }, 200 );
   }
 
   onGridReady(params: any) {
@@ -157,6 +160,10 @@ export class ManagerComponent implements OnInit {
 
   updatingAction(event) {
     this.action = event;
+  }
+
+  getNextExpense() {
+    console.log('Next');
   }
 
   claimUpdateForm(form: NgForm, expenseId) {
