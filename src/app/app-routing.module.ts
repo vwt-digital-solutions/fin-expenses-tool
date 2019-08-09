@@ -4,6 +4,7 @@ import {ExpensesComponent} from './modules/expenses/expenses.component';
 import {ManagerComponent} from './modules/manager/manager.component';
 import {FinanceComponent} from './modules/finance/finance.component';
 import {ControllerComponent} from './modules/controller/controller.component';
+import {LandingComponent} from './modules/landing/landing.component';
 import {Role} from './models/role.enum';
 import {AuthGuard} from './auth/auth.guard';
 import {AuthComponent} from './auth/auth.component';
@@ -15,10 +16,15 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   {
+    path: '',
+    component: LandingComponent,
+    canActivate: [AuthGuard],
+  },
+  {
       path: 'auth/:authBody',
       component: AuthComponent,
   },
-  { path: '', redirectTo: 'expenses', pathMatch: 'full' },
+  // { path: '', redirectTo: 'expenses', pathMatch: 'full' },
   {
     path: 'expenses/process',
     component: FinanceComponent,
