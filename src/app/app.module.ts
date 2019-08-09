@@ -14,6 +14,7 @@ import {ExpensesModule} from './modules/expenses/expenses.module';
 import {FinanceModule} from './modules/finance/finance.module';
 import {ManagerModule} from './modules/manager/manager.module';
 import {ControllerModule} from './modules/controller/controller.module';
+import {LandingModule} from './modules/landing/landing.module';
 import {EnvServiceProvider} from './services/env.service.provider';
 import {OAuthModule, OAuthService} from 'angular-oauth2-oidc';
 import {AuthComponent} from './auth/auth.component';
@@ -35,6 +36,7 @@ import {ExpensesConfigService} from './services/config.service';
     FinanceModule,
     ManagerModule,
     ControllerModule,
+    LandingModule,
     NgbDropdownModule,
   ],
 

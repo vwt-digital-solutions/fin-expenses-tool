@@ -6,12 +6,11 @@ import {CommonModule} from '@angular/common';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {ControllerComponent} from './controller.component';
-import { ChartsModule } from 'ng2-charts';
+import {LandingComponent} from './landing.component';
 
 @NgModule({
   declarations: [
-    ControllerComponent
+    LandingComponent
   ],
   imports: [
     BrowserModule,
@@ -19,14 +18,13 @@ import { ChartsModule } from 'ng2-charts';
     CommonModule,
     HttpClientModule,
     FormsModule,
-    ChartsModule,
     NgbModule
   ],
   exports: [
     CommonModule,
-    ControllerComponent
+    LandingComponent
   ],
   providers: [],
-  bootstrap: [ControllerComponent]
+  bootstrap: [LandingComponent]
 })
-export class ControllerModule { }
+export class LandingModule { }
