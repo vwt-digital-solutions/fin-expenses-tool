@@ -17,6 +17,7 @@ export class LandingComponent implements OnInit {
 
   private OurJaneDoeIs: string;
   private displayPersonName;
+  private personID;
   private declarationData;
 
   constructor(
@@ -26,22 +27,52 @@ export class LandingComponent implements OnInit {
   ) {
   }
 
+  static formatNumber(numb) {
+    return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+  }
+
+  decimalFormatter(amount) {
+    return '€ ' + LandingComponent.formatNumber(amount);
+  }
+
+  dateFormatter(firstDate) {
+    const date = new Date(firstDate);
+    return date.getDate() + '-' + date.getMonth() + '-' + date.getFullYear() + ' ' + date.toLocaleTimeString('nl-NL');
+  }
+
+  statusFormatter(status) {
+    if (status === 'to_be_approved') {
+      return ['In behandeling', 0];
+    } else if (status.includes('rejected')) {
+      return ['Afgekeurd', 1];
+    } else if (status === 'payable') {
+      return ['Goedgekeurd', 2];
+    } else if (status === 'exported') {
+      return ['Betaald', 2];
+    }
+  }
+
   ngOnInit() {
     const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
     // @ts-ignore
     this.displayPersonName = claimJaneDoe.name.split(',');
     this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName [0]).substring(1);
     this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
+    // @ts-ignore
+    this.personID = claimJaneDoe.email.split('@')[0];
     console.log(claimJaneDoe);
     this.declarationCall();
   }
 
   declarationCall() {
     // @ts-ignore
-    this.httpClient.get(this.env.apiUrl + '/employees/' + 'm.vanderweide' + '/expenses')
+    this.httpClient.get(this.env.apiUrl + '/employees/' + this.personID + '/expenses')
       .subscribe(
         val => {
-          console.log(val);
+          this.declarationData = val;
+          console.log('>> GET SUCCESS', val);
+        }, response => {
+          console.error('>> GET FAILED', response.message);
         });
   }
 
