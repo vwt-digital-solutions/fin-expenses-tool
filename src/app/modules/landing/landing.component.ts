@@ -15,7 +15,7 @@ interface IClaimRoles {
 })
 export class LandingComponent implements OnInit {
 
-  private OurJaneDoeIs: string;
+  public OurJaneDoeIs: string;
   public displayPersonName;
   public personID;
   public declarationData;
