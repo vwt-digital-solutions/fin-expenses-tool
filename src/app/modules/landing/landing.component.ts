@@ -37,18 +37,34 @@ export class LandingComponent implements OnInit {
 
   dateFormatter(firstDate) {
     const date = new Date(firstDate);
-    return date.getDate() + '-' + date.getMonth() + '-' + date.getFullYear() + ' ' + date.toLocaleTimeString('nl-NL');
+    return date.getDate() + '-' + (date.getMonth() + 1) + '-' + date.getFullYear() + ' ' + date.toLocaleTimeString('nl-NL');
+  }
+
+  statusClassing(status) {
+    if (status.includes('rejected')) {
+      return 'badge badge-pill badge-warning';
+    } else if (status.includes('cancelled')) {
+      return 'badge badge-pill badge-danger';
+    } else if (status === 'approved') {
+      return 'badge badge-pill badge-success';
+    } else if (status === 'payed') {
+      return 'badge badge-pill badge-success';
+    } else {
+      return 'badge badge-pill badge-info';
+    }
   }
 
   statusFormatter(status) {
-    if (status === 'to_be_approved') {
-      return ['In behandeling', 0];
-    } else if (status.includes('rejected')) {
-      return ['Afgekeurd', 1];
-    } else if (status === 'payable') {
-      return ['Goedgekeurd', 2];
-    } else if (status === 'exported') {
-      return ['Betaald', 2];
+    if (status.includes('rejected')) {
+      return 'Aanpassing vereist';
+    } else if (status.includes('cancelled')) {
+      return 'Geannuleerd';
+    } else if (status === 'approved') {
+      return 'Goedgekeurd';
+    } else if (status === 'payed') {
+      return 'Uitbetaald';
+    } else {
+      return 'In behandeling';
     }
   }
 
@@ -58,6 +74,7 @@ export class LandingComponent implements OnInit {
     this.displayPersonName = claimJaneDoe.name.split(',');
     this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName [0]).substring(1);
     this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
+    console.log(claimJaneDoe);
     // @ts-ignore
     this.personID = claimJaneDoe.email.split('@')[0];
     this.declarationCall();
