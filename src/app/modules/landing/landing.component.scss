@@ -1,3 +1,44 @@
-p {
-  color: red;
+@import "~src/assets/scss/mixins";
+@import "~src/assets/scss/constants";
+
+
+#linestep {
+  border-left: 1px solid #dee2e6;
+  transform: translate(50%, 0);
+  @include lg-phone-only {
+    display: none;
+  }
+}
+
+#pickstep {
+  .btn {
+    margin-bottom: 5px;
+    width: 100%;
+    display: block;
+    padding: 10px;
+  }
+}
+
+
+#stepstep {
+  h1 {
+    font-weight: 300;
+  }
+
+  small {
+    color: darkgrey;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+}
+
+.list-group {
+  max-height: 25vw;
+  margin-bottom: 10px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hidden {
+  display: none!important;
 }
