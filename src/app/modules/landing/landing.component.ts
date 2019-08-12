@@ -16,9 +16,9 @@ interface IClaimRoles {
 export class LandingComponent implements OnInit {
 
   private OurJaneDoeIs: string;
-  private displayPersonName;
-  private personID;
-  private declarationData;
+  public displayPersonName;
+  public personID;
+  public declarationData;
 
   constructor(
     private oauthService: OAuthService,
@@ -60,7 +60,6 @@ export class LandingComponent implements OnInit {
     this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
     // @ts-ignore
     this.personID = claimJaneDoe.email.split('@')[0];
-    console.log(claimJaneDoe);
     this.declarationCall();
   }
 
