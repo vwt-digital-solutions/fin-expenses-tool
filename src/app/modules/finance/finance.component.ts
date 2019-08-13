@@ -39,6 +39,8 @@ export class FinanceComponent implements OnInit {
   private OurJaneDoeIs: string;
   private expenseDataRejection: ({ reason: string })[];
   private receiptImage: any;
+  private receiptFiles;
+  private isRejecting;
 
   constructor(
     private httpClient: HttpClient,
@@ -146,6 +148,10 @@ export class FinanceComponent implements OnInit {
     return moment(date).utcOffset() / 60;
   }
 
+  getFileName(name) {
+    return (name.split('/')).slice(-1)[0];
+  }
+
   historyHit(event) {
     if (event.colDef.template === undefined) {
       this.downloadFromHistory(event);
@@ -155,11 +161,16 @@ export class FinanceComponent implements OnInit {
   }
 
   openExpenseDetailModal(content, data) {
-    this.modalService.open(content, { centered: true });
+    this.receiptFiles = [];
+    this.isRejecting = false;
+    this.modalService.open(content, {centered: true});
   }
 
   updatingAction(event) {
     this.action = event;
+    if (event === 'rejecting') {
+      this.isRejecting = true;
+    }
   }
 
   getNextExpense() {
@@ -170,7 +181,7 @@ export class FinanceComponent implements OnInit {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
     // @ts-ignore
-    this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [ ... data ]);
+    this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
     const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
     this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
   }
@@ -186,6 +197,7 @@ export class FinanceComponent implements OnInit {
     });
     this.expenses.getExpenseAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
       this.receiptImage = image[0].url;
+      this.receiptFiles.push(this.receiptImage);
     });
     this.expenseData = selectedRowData;
     console.log('EXPENSEDATA: ', this.expenseData);
@@ -197,7 +209,6 @@ export class FinanceComponent implements OnInit {
 
   ngOnInit() {
     this.callHistoryRefresh();
-    console.warn(this.OurJaneDoeIs);
     this.expenses.getCostTypes()
       .subscribe(
         val => {
@@ -305,7 +316,9 @@ export class FinanceComponent implements OnInit {
   dismissExpenseModal() {
     const api = this.gridApi;
     api.deselectAll();
-    setTimeout(() => { this.modalService.dismissAll(); }, 200 );
+    setTimeout(() => {
+      this.modalService.dismissAll();
+    }, 200);
   }
 
   createPaymentFile(event) {
@@ -333,7 +346,7 @@ export class FinanceComponent implements OnInit {
       }
     }
     const action = this.action;
-    dataVerified[`status`] =  action === 'approving' ? `approved_by_${this.OurJaneDoeIs}` :
+    dataVerified[`status`] = action === 'approving' ? `approved_by_${this.OurJaneDoeIs}` :
       action === 'rejecting' ? `rejected_by_${this.OurJaneDoeIs}` : null;
 
     Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
@@ -341,7 +354,7 @@ export class FinanceComponent implements OnInit {
         .subscribe(
           result => {
             // @ts-ignore
-            this.expenses.getExpenses().subscribe((response: ExpensesIfc) => this.rowData = [ ... response ]);
+            this.expenses.getExpenses().subscribe((response: ExpensesIfc) => this.rowData = [...response]);
             this.showErrors = false;
             this.formSubmitted = !form.ngSubmit.hasError;
           },

@@ -10,6 +10,23 @@ input {
 .col-9 {
   background-color: #fcfbfb;
 }
+
+.notFilled {
+  border: 1px solid #dc44446b;
+  background-color: #dc44440f;
+}
+
+.fill-text {
+  padding: 0;
+  margin: 0;
+  position: relative;
+  color: #dc4444c2;
+}
+
+.move-18 {
+  bottom: 18px;
+}
+
 #bookinghistory {
   border-bottom: 1px solid $vwt_color_blue_hr;
 }
@@ -104,9 +121,10 @@ input {
 }
 
 .modal-footer {
-  #thumbs-up, #thumbs-down {
-    font-size: larger;
+  #thumbs-up, #thumbs-down, #thumbs-down-rejecting {
+    font-size: large;
   }
+
   #information-icon-down {
     cursor: pointer;
   }
