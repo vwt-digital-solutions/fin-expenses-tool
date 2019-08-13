@@ -22,6 +22,11 @@ input {
   }
 }
 
+#expenseNote {
+  height: 100px;
+  max-height: 250px
+}
+
 #historytable {
   width: 100%;
   height: 50em;

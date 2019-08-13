@@ -111,6 +111,16 @@
                   <i class=" fa fa-calendar-alt"></i> </span>
                 </div>
               </div>
+              <!-- Form No Edit: Note of employee -->
+              <label for="expenseNote">Omschrijving:</label>
+              <div class="input-group mb-3 note-relative">
+                <textarea id="expenseNote"
+                          readonly
+                          class="form-control"
+                          type="text"
+                          [ngModel] ="expenseData.note"
+                          name="note" ngModel></textarea>
+              </div>
               <!-- Form: Rejection Note -->
               <div class="input-group mb-3">
                 <div class="input-group-prepend">
@@ -131,7 +141,7 @@
         </div>
         <picture>
             <source srcset="" type="image/*">
-            <img src="{{ receiptImage }}" alt="{{ expenseData.note }}" class="img-fluid img-thumbnail">
+            <img src="{{ receiptImage }}" alt="{{ expenseData.id + '.file'}}" class="img-fluid img-thumbnail">
         </picture>
         <div class="modal-footer">
           <div id="thumbs-up" class="float-right badge badge-success" (click)="updatingAction('approving')">
