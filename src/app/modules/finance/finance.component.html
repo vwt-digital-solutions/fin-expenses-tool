@@ -78,7 +78,7 @@
                 <input id="expenseAmount"
                        type="number"
                        class="form-control"
-                       placeholder="{{ expenseData.amount | currency: 'EUR' }}"
+                       [ngModel]="this.expenseData.amount"
                        name="amount" #expenseAmount="ngModel" ngModel>
               </div>
               <div *ngIf="expenseAmount.valid && (expenseAmount.dirty || expenseAmount.touched)" class="alert-danger">
@@ -93,9 +93,8 @@
                 <select id="expenseCostType"
                         class="custom-select"
                         name="cost_type"
+                        [ngModel]="expenseData.cost_type"
                         ngModel>
-                  <option value="" disabled selected><kbd>Huidige:</kbd> {{ expenseData.cost_type.split(':')[0] }}
-                  </option>
                   <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">{{t.ctype}}</option>
                 </select>
               </div>
@@ -105,7 +104,7 @@
                 <input id="expenseDateOfTransaction"
                        class="form-control"
                        type="date"
-                       placeholder="{{ expenseData.date_of_transaction  }}"
+                       [ngModel] ="expenseData.date_of_transaction | date:'yyyy-MM-dd'"
                        name="date_of_transaction" ngModel>
                 <div class="input-group-append">
                 <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">

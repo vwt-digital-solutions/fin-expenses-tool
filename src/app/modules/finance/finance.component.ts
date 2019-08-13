@@ -188,6 +188,7 @@ export class FinanceComponent implements OnInit {
       this.receiptImage = image[0].url;
     });
     this.expenseData = selectedRowData;
+    console.log('EXPENSEDATA: ', this.expenseData);
     this.formSubmitted = false;
     this.showErrors = false;
     this.formErrors = '';
