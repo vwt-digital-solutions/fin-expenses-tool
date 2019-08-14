@@ -115,7 +115,7 @@ export class ExpensesComponent {
       // End Check Form Data
       // Format Values
       form.value.amount = Number((form.value.amount).toFixed(2));
-      form.value.date_of_transaction = new Date(form.value.date_of_transaction).getTime() / 1000;
+      form.value.date_of_transaction = (new Date(form.value.date_of_transaction).getTime()) / 1000;
 
       const obj = JSON.parse(JSON.stringify(form.value));
       // End Format Values
