@@ -62,7 +62,7 @@ export class LandingComponent implements OnInit {
     } else if (status === 'approved') {
       return 'Goedgekeurd';
     } else if (status === 'payed') {
-      return 'Uitbetaald';
+      return 'Afgerond';
     } else {
       return 'In behandeling';
     }
@@ -78,6 +78,10 @@ export class LandingComponent implements OnInit {
     // @ts-ignore
     this.personID = claimJaneDoe.email.split('@')[0];
     this.declarationCall();
+  }
+
+  testClicking(event) {
+    console.log(event.path);
   }
 
   declarationCall() {

@@ -23,18 +23,21 @@ interface IClaimRoles {
   templateUrl: './manager.component.html',
   styleUrls: ['./manager.component.scss']
 })
-export class ManagerComponent {
+export class ManagerComponent implements OnInit {
   private gridApi;
   private gridColumnApi;
   public rowData;
   public columnDefs;
   private expenseData: object;
   public rowSelection;
+  public typeOptions;
   private formSubmitted;
   private showErrors;
   private formErrors;
   private expenseDataRejection: ({ reason: string })[];
   private receiptImage: any;
+  private receiptFiles;
+  private isRejecting;
   private departmentId: number;
   private action: any;
   private OurJaneDoeIs: string;
@@ -120,6 +123,18 @@ export class ManagerComponent {
     return moment(date).utcOffset() / 60;
   }
 
+  getFileName(name) {
+    return (name.split('/')).slice(-1)[0];
+  }
+
+  ngOnInit() {
+    this.expenses.getCostTypes()
+      .subscribe(
+        val => {
+          this.typeOptions = val;
+        });
+  }
+
   onSelectionChanged(event, content) {
     const selectedRows = event.api.getSelectedRows();
     const selectedRowData = {
@@ -139,6 +154,8 @@ export class ManagerComponent {
   }
 
   openExpenseDetailModal(content, data) {
+    this.receiptFiles = [];
+    this.isRejecting = false;
     this.modalService.open(content, {centered: true, backdrop: 'static', keyboard: false });
   }
 
@@ -160,6 +177,9 @@ export class ManagerComponent {
 
   updatingAction(event) {
     this.action = event;
+    if (event === 'rejecting') {
+      this.isRejecting = true;
+    }
   }
 
   getNextExpense() {

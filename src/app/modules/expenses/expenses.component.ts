@@ -9,23 +9,6 @@ import {EnvService} from 'src/app/services/env.service';
   styleUrls: ['./expenses.component.scss']
 })
 export class ExpensesComponent {
-  public formNote;
-  public formAmount;
-  public formType;
-  public formTransDate;
-  public formAttachment;
-  public expensesAmount;
-  public expensesNote;
-  public expenseType;
-  public expenseTransDate;
-  public expenseAttachment;
-  public addClaimSuccess;
-  public typeOptions;
-  public today;
-  public notaData;
-  public transdateNotFilledMessage = 'Graag een geldige datum invullen';
-  public locatedFile;
-  public loadingThings;
 
   constructor(
     private httpClient: HttpClient,
@@ -44,6 +27,24 @@ export class ExpensesComponent {
     this.notaData = 'Toevoegen';
     this.loadingThings = false;
   }
+
+  public formNote;
+  public formAmount;
+  public formType;
+  public formTransDate;
+  public formAttachment;
+  public expensesAmount;
+  public expensesNote;
+  public expenseType;
+  public expenseTransDate;
+  public expenseAttachment;
+  public addClaimSuccess;
+  public typeOptions;
+  public today;
+  public notaData;
+  public transdateNotFilledMessage = 'Graag een geldige datum invullen';
+  public locatedFile;
+  public loadingThings;
 
   // Classes Logic
   notFilledClass(setClass) {
@@ -77,13 +78,13 @@ export class ExpensesComponent {
   submitButtonController(nnote, namount, ntype, ntransdate, nattachment) {
     return this.expensesNote === false || this.expensesAmount === false || this.expenseType === false || this.expenseTransDate === false ||
       this.expenseAttachment === false || nnote.invalid || namount.invalid || ntype.invalid || ntransdate.invalid ||
-      nattachment.invalid || this.addClaimSuccess.success === true;
+      nattachment.invalid || this.addClaimSuccess.success === true || this.addClaimSuccess.wrong === true;
   }
 
   // End Classes Logic
 
   onFileInput(file) {
-    if (file[0] === undefined || file[0] === null)  {
+    if (file[0] === undefined || file[0] === null) {
       this.locatedFile = '';
       this.notaData = 'Toevoegen';
     } else {
@@ -110,7 +111,7 @@ export class ExpensesComponent {
       }
     }
     if (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.expenseAttachment
-      && this.addClaimSuccess.success === false) {
+      && this.addClaimSuccess.success === false && this.addClaimSuccess.wrong === false) {
       this.loadingThings = true;
       // End Check Form Data
       // Format Values
