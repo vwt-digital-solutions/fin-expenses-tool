@@ -35,6 +35,7 @@ export class LandingComponent implements OnInit {
   public typeOptions;
   private receiptImage: any;
   private receiptFiles;
+  public today;
 
   constructor(
     private oauthService: OAuthService,
@@ -83,7 +84,7 @@ export class LandingComponent implements OnInit {
       return 'Geannuleerd';
     } else if (status === 'approved') {
       return 'Goedgekeurd';
-    } else if (status === 'payed') {
+    } else if (status === 'exported') {
       return 'Afgerond';
     } else {
       return 'In behandeling';
@@ -99,6 +100,8 @@ export class LandingComponent implements OnInit {
     // @ts-ignore
     this.personID = claimJaneDoe.email.split('@')[0];
     this.declarationCall();
+    this.today = new Date();
+
     this.expenses.getCostTypes()
       .subscribe(
         val => {
@@ -123,15 +126,21 @@ export class LandingComponent implements OnInit {
   }
 
   clickExpense(content, item) {
-    this.expenses.getExpenseAttachment(item.id).subscribe((image: ExpensesIfc) => {
-      this.receiptImage = image[0].url;
-      this.receiptFiles.push(this.receiptImage);
-    });
-    this.formSubmitted = false;
-    this.expenseData = item;
-    this.showErrors = false;
-    this.formErrors = '';
-    this.openExpenseDetailModal(content, item);
+    if (this.isClickable(item)) {
+      this.expenses.getExpenseAttachment(item.id).subscribe((image: ExpensesIfc) => {
+        this.receiptImage = image[0].url;
+        this.receiptFiles.push(this.receiptImage);
+      });
+      this.formSubmitted = false;
+      this.expenseData = item;
+      this.showErrors = false;
+      this.formErrors = '';
+      this.openExpenseDetailModal(content, item);
+    }
+  }
+
+  isClickable(item) {
+    return item.status.text.toString().includes('rejected');
   }
 
   // Modal
@@ -141,32 +150,41 @@ export class LandingComponent implements OnInit {
     }, 200);
   }
 
+  submitButtonController(nnote, namount, ntype, ntransdate) {
+    return nnote.invalid || namount.invalid || ntype.invalid
+      || ntransdate.invalid || (new Date(ntransdate.viewModel)
+        > this.today) || namount.viewModel < 0.01;
+  }
+
   openExpenseDetailModal(content, data) {
     this.receiptFiles = [];
     this.modalService.open(content, {centered: true});
   }
 
-  claimUpdateForm(form: NgForm, expenseId) {
-    const dataVerified = {};
-    const data = form.value;
-    for (const prop in data) {
-      if (data[prop].length !== 0) {
-        dataVerified[prop] = data[prop];
+  claimUpdateForm(form: NgForm, expenseId, instArray) {
+    if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
+      const dataVerified = {};
+      const data = form.value;
+      for (const prop in data) {
+        if (data[prop].length !== 0) {
+          dataVerified[prop] = data[prop];
+        }
       }
+      dataVerified[`status`] = 'to_be_reviewed';
+      Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
+        this.expenses.updateExpense(dataVerified, expenseId)
+          .subscribe(
+            result => {
+              this.showErrors = false;
+              this.formSubmitted = !form.ngSubmit.hasError;
+              this.declarationCall();
+              this.dismissExpenseModal();
+            },
+            error => {
+              this.showErrors = true;
+              Object.assign(this.formResponse, JSON.parse(error));
+            })
+        : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
     }
-    dataVerified[`status`] = 'to_be_reviewed';
-    Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
-      this.expenses.updateExpense(dataVerified, expenseId)
-        .subscribe(
-          result => {
-            this.showErrors = false;
-            this.formSubmitted = !form.ngSubmit.hasError;
-          },
-          error => {
-            this.showErrors = true;
-            Object.assign(this.formResponse, JSON.parse(error));
-          })
-      : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
-
   }
 }

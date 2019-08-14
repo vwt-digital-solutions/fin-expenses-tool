@@ -9,7 +9,8 @@
       <ul class="list-group">
         <li *ngFor="let item of declarationData"
             (click)="clickExpense(expenseContent, item)"
-            class="list-group-item d-flex justify-content-between align-items-center clickable">
+            [ngClass]="{clickable: isClickable(item)}"
+            class="list-group-item d-flex justify-content-between align-items-center">
           <p>{{decimalFormatter(item.amount)}} | {{dateFormatter(item.date_of_claim)}}</p>
           <span class="badge badge-pill"
                 [className]="statusClassing(item.status.text)">
@@ -56,7 +57,7 @@
       <form
         id="expensesUpdateForm"
         #expenseUpdateForm="ngForm"
-        (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id)"
+        (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, [note, namount, ntype, ntransdate])"
         name="expenseUpdateForm">
         <div class="form-group">
           <label for="rejectionNote">Reden voor afkeuring:</label>
@@ -97,7 +98,8 @@
                     class="custom-select"
                     name="cost_type"
                     [ngModel]="expenseData.cost_type"
-                    ngModel>
+                    required
+                    #ntype="ngModel">
               <option value="" disabled><kbd>Huidige:</kbd> {{ expenseData.cost_type.split(':')[0] }}</option>
               <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">{{t.ctype}}</option>
             </select>
@@ -125,10 +127,16 @@
           <label for="expenseNote">Omschrijving:</label>
           <div class="input-group mb-3 note-relative">
                 <textarea id="expenseNote"
+                          [ngClass]="{notFilled: !(note.valid)}"
                           class="form-control"
                           type="text"
+                          required minlength="1"
                           [ngModel]="expenseData.note"
-                          name="note" ngModel></textarea>
+                          name="note" #note="ngModel"></textarea>
+          </div>
+          <div class="fill-text move-18"
+               *ngIf="!(note.valid)">
+            <small>Graag een geldige omschrijving invullen</small>
           </div>
           <label>Bestanden:</label>
           <ul class="list-group">
@@ -142,7 +150,8 @@
       </form>
     </div>
     <div class="modal-footer">
-      <label for="submit-update-form" class="btn btn-warning">Indienen</label>
+      <label for="submit-update-form" class="btn btn-warning"
+             [ngClass]="{disabledbtn: submitButtonController(note, namount, ntype, ntransdate)}">Indienen</label>
     </div>
   </ng-template>
   <!--   END FORM TEMPLATE-->

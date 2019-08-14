@@ -92,3 +92,27 @@
   height: 100px;
   max-height: 250px
 }
+
+.notFilled {
+  border: 1px solid #dc44446b;
+  background-color: #dc44440f;
+}
+
+.fill-text {
+  padding: 0;
+  margin: 0;
+  position: relative;
+  color: #dc4444c2;
+}
+
+.move-18 {
+  bottom: 18px;
+}
+
+.disabledbtn {
+  opacity: .5;
+}
+
+.disabledbtn:hover {
+  cursor: not-allowed;
+}
