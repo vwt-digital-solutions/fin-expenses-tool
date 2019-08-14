@@ -41,6 +41,7 @@ export class FinanceComponent implements OnInit {
   private receiptImage: any;
   private receiptFiles;
   private isRejecting;
+  private monthNames;
 
   constructor(
     private httpClient: HttpClient,
@@ -93,7 +94,10 @@ export class FinanceComponent implements OnInit {
           },
           {
             headerName: 'Bondatum', field: 'date_of_transaction',
-            sortable: true, filter: true, width: 150
+            sortable: true, filter: true, width: 150,
+            cellRenderer: params => {
+              return this.fixDate(params.value);
+            }
           },
           {
             headerName: 'Status', field: 'status.text',
@@ -148,6 +152,11 @@ export class FinanceComponent implements OnInit {
     return moment(date).utcOffset() / 60;
   }
 
+  fixDate(date) {
+    const stepDate = new Date(date);
+    return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth() + 1)] + ' ' + stepDate.getFullYear();
+  }
+
   getFileName(name) {
     return (name.split('/')).slice(-1)[0];
   }
@@ -200,7 +209,6 @@ export class FinanceComponent implements OnInit {
       this.receiptFiles.push(this.receiptImage);
     });
     this.expenseData = selectedRowData;
-    console.log('EXPENSEDATA: ', this.expenseData);
     this.formSubmitted = false;
     this.showErrors = false;
     this.formErrors = '';
@@ -208,6 +216,9 @@ export class FinanceComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
+    ];
     this.callHistoryRefresh();
     this.expenses.getCostTypes()
       .subscribe(
@@ -245,7 +256,6 @@ export class FinanceComponent implements OnInit {
       {responseType: 'blob'})
       .subscribe(
         (response) => {
-          console.log(fileData);
           const blob = new Blob([response], {type: 'application/xml'});
           const a = document.createElement('a');
           document.body.appendChild(a);
@@ -348,7 +358,6 @@ export class FinanceComponent implements OnInit {
     const action = this.action;
     dataVerified[`status`] = action === 'approving' ? `approved_by_${this.OurJaneDoeIs}` :
       action === 'rejecting' ? `rejected_by_${this.OurJaneDoeIs}` : null;
-
     Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
       this.expenses.updateExpense(dataVerified, expenseId)
         .subscribe(
