@@ -1,9 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {ExpensesConfigService} from '../../services/config.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {HttpClient} from '@angular/common/http';
+import {EnvService} from 'src/app/services/env.service';
+import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {NgForm} from '@angular/forms';
 import {OAuthService} from 'angular-oauth2-oidc';
-
+import {ExpensesConfigService} from '../../services/config.service';
 import * as moment from 'moment';
 
 moment.locale('nl');
@@ -19,38 +20,43 @@ interface IClaimRoles {
 }
 
 @Component({
-  selector: 'app-manager',
+  selector: 'app-expenses',
   templateUrl: './manager.component.html',
   styleUrls: ['./manager.component.scss']
 })
+
 export class ManagerComponent implements OnInit {
   private gridApi;
   private gridColumnApi;
-  public rowData;
   public columnDefs;
-  private expenseData: object;
   public rowSelection;
   public typeOptions;
-  private formSubmitted;
-  private showErrors;
-  private formErrors;
+  public formSubmitted;
+  public showErrors;
+  public formErrors;
+  public formResponse;
+  private submitingStart: boolean;
+  private action: any;
+  private departmentId: number;
+  private OurJaneDoeIs: string;
   private expenseDataRejection: ({ reason: string })[];
   private receiptImage: any;
   private receiptFiles;
   private isRejecting;
-  private departmentId: number;
-  private action: any;
-  private OurJaneDoeIs: string;
-  public formResponse;
+  private monthNames;
+  private denySelection;
+  public today;
 
   constructor(
-    private modalService: NgbModal,
+    private httpClient: HttpClient,
+    private env: EnvService,
     private expenses: ExpensesConfigService,
+    private modalService: NgbModal,
     private oauthService: OAuthService,
   ) {
     this.columnDefs = [
       {
-        headerName: 'Afdeling Declaraties Overzicht',
+        headerName: 'Declaraties Overzicht',
         children: [
           {
             headerName: '',
@@ -74,7 +80,7 @@ export class ManagerComponent implements OnInit {
           },
           {
             headerName: 'Werknemer', field: 'employee',
-            sortable: true, filter: true, width: 225, resizable: true
+            sortable: true, filter: true, width: 200, resizable: true
           },
           {
             headerName: 'Kosten', field: 'amount', valueFormatter: ManagerComponent.decimalFormatter,
@@ -82,7 +88,7 @@ export class ManagerComponent implements OnInit {
           },
           {
             headerName: 'Soort', field: 'cost_type',
-            sortable: true, filter: true, resizable: true, width: 250,
+            sortable: true, filter: true, resizable: true, width: 200,
             cellRenderer: params => {
               return params.value.split(':')[0];
             }
@@ -92,24 +98,51 @@ export class ManagerComponent implements OnInit {
           },
           {
             headerName: 'Bondatum', field: 'date_of_transaction',
-            sortable: true, filter: true, width: 150
+            sortable: true, filter: true, width: 150,
+            cellRenderer: params => {
+              return this.fixDate(params.value);
+            }
           },
           {
             headerName: 'Status', field: 'status.text',
-            sortable: true, width: 200
+            sortable: true, width: 250
           },
         ]
       }
     ];
-    this.rowSelection = 'single';
-    this.formResponse = {};
     this.expenseDataRejection = [
       {reason: 'Niet Duidelijk'},
-      {reason: 'Kan niet uitbetalen'},
-      {reason: 'Image kan beter'},
-      {reason: 'Amount klopt niet'}
+      {reason: 'Kan niet uitbetalen'}
     ];
+    this.formSubmitted = false;
+    this.showErrors = false;
+    this.formResponse = {};
+    this.rowSelection = 'single';
+    this.addBooking = {success: false, wrong: false, error: false};
   }
+
+  public expenseData: object;
+  public addBooking;
+
+  historyColumnDefs = [
+    {
+      headerName: '',
+      children: [
+        {
+          headerName: 'Geschiedenis', field: 'date_exported',
+          sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
+          suppressMovable: true
+        },
+        {
+          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 100,
+          template: '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>'
+        }
+      ]
+    }
+  ];
+
+  rowData = null;
+  historyRowData = null;
 
   static formatNumber(numb) {
     return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
@@ -123,56 +156,37 @@ export class ManagerComponent implements OnInit {
     return moment(date).utcOffset() / 60;
   }
 
+  static getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return `with: ${reason}`;
+    }
+  }
+
+  fixDate(date) {
+    const stepDate = new Date(date);
+    return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth() + 1)] + ' ' + stepDate.getFullYear();
+  }
+
   getFileName(name) {
     return (name.split('/')).slice(-1)[0];
   }
 
-  ngOnInit() {
-    this.expenses.getCostTypes()
-      .subscribe(
-        val => {
-          this.typeOptions = val;
-        });
-  }
-
-  onSelectionChanged(event, content) {
-    const selectedRows = event.api.getSelectedRows();
-    const selectedRowData = {
-      id: undefined
-    };
-    selectedRows.map((selectedRow, index) => {
-      index !== 0 ?
-        console.log('No selection') : Object.assign(selectedRowData, selectedRow);
-    });
-    this.expenseData = selectedRowData;
-    this.formSubmitted = false;
-    this.showErrors = false;
-    this.formErrors = '';
-    this.expenses.getExpenseAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) =>
-      this.receiptImage = image[0].url);
-    this.openExpenseDetailModal(content, selectedRowData);
-  }
-
-  openExpenseDetailModal(content, data) {
+  openExpenseDetailModal(content) {
     this.receiptFiles = [];
     this.isRejecting = false;
-    this.modalService.open(content, {centered: true, backdrop: 'static', keyboard: false });
-  }
-
-  dismissExpenseModal() {
-    const api = this.gridApi;
-    api.deselectAll();
-    setTimeout(() => { this.modalService.dismissAll(); }, 200 );
-  }
-
-  onGridReady(params: any) {
-    this.gridApi = params.api;
-    this.gridColumnApi = params.columnApi;
-    const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
-    this.departmentId = claimJaneDoe.oid;
-    this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
-    // @ts-ignore
-    this.expenses.getDepartmentExpenses(this.departmentId).subscribe((data: ExpensesIfc) => this.rowData = [...data]);
+    this.modalService.open(content, {centered: true}).result.then((result) => {
+      this.gridApi.deselectAll();
+      this.denySelection = true;
+      console.log(`Closed with: ${result}`);
+    }, (reason) => {
+      this.gridApi.deselectAll();
+      this.denySelection = true;
+      console.log(`Dismissed ${ManagerComponent.getDismissReason(reason)}`);
+    });
   }
 
   updatingAction(event) {
@@ -183,36 +197,98 @@ export class ManagerComponent implements OnInit {
   }
 
   getNextExpense() {
-    console.log('Next');
+    this.modalService.dismissAll();
   }
 
-  claimUpdateForm(form: NgForm, expenseId) {
-    const dataVerified = {};
-    const data = form.value;
-    for (const prop in data) {
-      if (data[prop].length !== 0) {
-        dataVerified[prop] = data[prop];
-      }
+  onGridReady(params: any) {
+    this.gridColumnApi = params.columnApi;
+    // @ts-ignore
+    const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
+    this.departmentId = claimJaneDoe.oid;
+    this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
+    // @ts-ignore
+    this.expenses.getDepartmentExpenses(this.departmentId).subscribe((data: ExpensesIfc) => this.rowData = [...data]);
+  }
+
+  onSelectionChanged(event, content) {
+    if (!this.denySelection) {
+      this.gridApi = event.api;
+      const selectedRows = event.api.getSelectedRows();
+      const selectedRowData = {
+        id: undefined
+      };
+      selectedRows.map((selectedRow, index) => {
+        index !== 0 ?
+          console.log('No selection') : Object.assign(selectedRowData, selectedRow);
+      });
+      this.expenses.getExpenseAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
+        this.receiptImage = image[0].url;
+        this.receiptFiles.push(this.receiptImage);
+      });
+      this.expenseData = selectedRowData;
+      this.formSubmitted = false;
+      this.showErrors = false;
+      this.formErrors = '';
+      this.openExpenseDetailModal(content);
+    } else {
+      this.denySelection = false;
     }
-    const action = this.action;
-    dataVerified[`status`] = action === 'approving' ? `approved_by_${this.OurJaneDoeIs}` :
-      action === 'rejecting' ? `rejected_by_${this.OurJaneDoeIs}` : null;
-
-    Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
-      this.expenses.updateExpense(dataVerified, expenseId)
-        .subscribe(
-          result => {
-            // @ts-ignore
-            this.expenses.getDepartmentExpenses(this.departmentId).subscribe((response: ExpensesIfc) => this.rowData = [...response]);
-            this.showErrors = false;
-            this.formSubmitted = !form.ngSubmit.hasError;
-          },
-          error => {
-            this.showErrors = true;
-            Object.assign(this.formResponse, JSON.parse(error));
-          })
-      : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
-
   }
 
+  ngOnInit() {
+    this.today = new Date();
+    this.denySelection = false;
+    this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
+    ];
+    this.expenses.getCostTypes()
+      .subscribe(
+        val => {
+          this.typeOptions = val;
+        });
+  }
+
+  submitButtonController(namount, ntype, ntransdate, rejectionNote) {
+    if (this.isRejecting) {
+      return rejectionNote.invalid || namount.invalid || ntype.invalid
+        || ntransdate.invalid || (new Date(ntransdate.viewModel)
+          > this.today) || namount.viewModel < 0.01;
+    } else {
+      return namount.invalid || ntype.invalid
+        || ntransdate.invalid || (new Date(ntransdate.viewModel)
+          > this.today) || namount.viewModel < 0.01;
+    }
+  }
+
+  claimUpdateForm(form: NgForm, expenseId, instArray) {
+    if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
+      const dataVerified = {};
+      const data = form.value;
+      data.amount = Number((data.amount).toFixed(2));
+      for (const prop in data) {
+        if (prop.length !== 0) {
+          dataVerified[prop] = data[prop];
+        }
+      }
+      const action = this.action;
+      dataVerified[`status`] = action === 'approving' ? `approved_by_${this.OurJaneDoeIs}` :
+        action === 'rejecting' ? `rejected_by_${this.OurJaneDoeIs}` : null;
+
+      Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
+        this.expenses.updateExpense(dataVerified, expenseId)
+          .subscribe(
+            result => {
+              this.getNextExpense();
+              // @ts-ignore
+              this.expenses.getDepartmentExpenses(this.departmentId).subscribe((response: ExpensesIfc) => this.rowData = [...response]);
+              this.showErrors = false;
+              this.formSubmitted = !form.ngSubmit.hasError;
+            },
+            error => {
+              this.showErrors = true;
+              Object.assign(this.formResponse, JSON.parse(error));
+            })
+        : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
+    }
+  }
 }

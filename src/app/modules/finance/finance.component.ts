@@ -365,9 +365,9 @@ export class FinanceComponent implements OnInit {
         });
   }
 
-  submitButtonController(namount, ntype, ntransdate, rejection_note) {
+  submitButtonController(namount, ntype, ntransdate, rejectionNote) {
     if (this.isRejecting) {
-      return rejection_note.invalid || namount.invalid || ntype.invalid
+      return rejectionNote.invalid || namount.invalid || ntype.invalid
         || ntransdate.invalid || (new Date(ntransdate.viewModel)
           > this.today) || namount.viewModel < 0.01;
     } else {
@@ -381,6 +381,7 @@ export class FinanceComponent implements OnInit {
     if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
       const dataVerified = {};
       const data = form.value;
+      data.amount = Number((data.amount).toFixed(2));
       for (const prop in data) {
         if (data[prop].length !== 0) {
           dataVerified[prop] = data[prop];
