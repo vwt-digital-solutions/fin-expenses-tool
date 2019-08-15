@@ -40,7 +40,6 @@ export class ManagerComponent implements OnInit {
   private departmentId: number;
   private OurJaneDoeIs: string;
   private expenseDataRejection: ({ reason: string })[];
-  private receiptImage: any;
   private receiptFiles;
   private isRejecting;
   private monthNames;
@@ -168,7 +167,7 @@ export class ManagerComponent implements OnInit {
 
   fixDate(date) {
     const stepDate = new Date(date);
-    return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth() + 1)] + ' ' + stepDate.getFullYear();
+    return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth())] + ' ' + stepDate.getFullYear();
   }
 
   getFileName(name) {
@@ -222,8 +221,11 @@ export class ManagerComponent implements OnInit {
           console.log('No selection') : Object.assign(selectedRowData, selectedRow);
       });
       this.expenses.getExpenseAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
-        this.receiptImage = image[0].url;
-        this.receiptFiles.push(this.receiptImage);
+        // @ts-ignore
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < image.length; i++) {
+          this.receiptFiles.push(image[i].url);
+        }
       });
       this.expenseData = selectedRowData;
       this.formSubmitted = false;
