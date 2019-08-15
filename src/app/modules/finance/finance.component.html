@@ -53,7 +53,8 @@
       <ng-template #expenseContent let-modal>
         <div class="modal-header">
           <h4 class="modal-title" id="modal-basic-title">Declaratie Bewerken</h4>
-          <button id="expenseModalClose" type="button" class="close" aria-label="Close" (click)="dismissExpenseModal()">
+          <button id="expenseModalClose" type="button" class="close" aria-label="Close"
+                  (click)="modal.dismiss('Cross click')">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -69,7 +70,7 @@
           <form
             id="expensesUpdateForm"
             #expenseUpdateForm="ngForm"
-            (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id)"
+            (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, [namount, ntype, ntransdate, rejection_note])"
             name="expenseUpdateForm">
             <div class="form-group">
               <!-- Form: Costs -->
@@ -101,7 +102,7 @@
                         class="custom-select"
                         name="cost_type"
                         [ngModel]="expenseData.cost_type"
-                        ngModel>
+                        #ntype="ngModel">
                   <option value="" disabled><kbd>Huidige:</kbd> {{ expenseData.cost_type.split(':')[0] }}</option>
                   <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">{{t.ctype}}</option>
                 </select>
@@ -143,41 +144,34 @@
                   <a href="{{item}}" target="_blank">View File - {{this.getFileName(item)}}</a>
                 </li>
               </ul>
-              <!-- Form: Rejection Note -->
-              <div *ngIf="this.isRejecting" class="note-relative">
-                <label for="rejectionNote">Reden voor afkeuring:</label>
-                <div class="input-group mb-3">
-                <textarea id="rejectionNote"
+              <!-- Form: Rejection Note | Check submit-update-form label after every change -->
+              <div class="form-group" [ngClass]="{hidden: !this.isRejecting}">
+                <label for="rejection_note">Reden van Afkeuring:</label>
+                <textarea id="rejection_note"
                           class="form-control"
+                          [ngClass]="{notFilled: (rejection_note.invalid && (rejection_note.dirty || rejection_note.touched)),
+                          hidden: !this.isRejecting}"
                           type="text"
-                          name="rejectionNote" ngModel></textarea>
-                </div>
+                          name="rejectionNote"
+                          required minlength="1"
+                          [(ngModel)]="expenseData.status.rejection_note"
+                          #rejection_note="ngModel">
+          </textarea>
               </div>
-              <!--              <div class="input-group mb-3">-->
-              <!--                <div class="input-group-prepend">-->
-              <!--                  <label class="input-group-text" for="expenseRejectionNote">Afgewezen:</label>-->
-              <!--                </div>-->
-              <!--                <select id="expenseRejectionNote"-->
-              <!--                        class="custom-select"-->
-              <!--                        name="creditor_note"-->
-              <!--                        ngModel>-->
-              <!--                  <option value="" disabled selected> Kies een reden</option>-->
-              <!--                  <option *ngFor="let t of expenseDataRejection" value="{{t.reason}}">{{t.reason}}</option>-->
-              <!--                </select>-->
-              <!--              </div>-->
+              <div class="fill-text move-18"
+                   *ngIf="(rejection_note.invalid && (rejection_note.dirty || rejection_note.touched))"
+                   [ngClass]="{hidden: !this.isRejecting}">
+                <small>Graag een geldige reden invullen</small>
+              </div>
               <input type="submit" id="submit-update-form" hidden/>
             </div>
-
           </form>
         </div>
-        <!--        <picture>-->
-        <!--            <source srcset="" type="image/*">-->
-        <!--            <img src="{{ receiptImage }}" alt="{{ expenseData.id + '.file'}}" class="img-fluid img-thumbnail">-->
-        <!--        </picture>-->
         <div class="modal-footer">
           <div *ngIf="!this.isRejecting" id="thumbs-up" class="float-right badge badge-success"
                (click)="updatingAction('approving')">
-            <label for="submit-update-form">
+            <label for="submit-update-form"
+                   [ngClass]="{disabledbtn: submitButtonController(namount, ntype, ntransdate, null)}">
               <a id="information-icon">Goedkeuren</a>
             </label>
           </div>
@@ -190,13 +184,11 @@
           </div>
           <div *ngIf="this.isRejecting" id="thumbs-down-rejecting" class="float-right badge badge-danger"
                (click)="updatingAction('rejecting')">
-            <label for="submit-update-form">
+            <label for="submit-update-form"
+                   [ngClass]="{disabledbtn: submitButtonController(namount, ntype, ntransdate, rejection_note)}">
               <a id="information-icon-down-rejecting">OK</a>
             </label>
           </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-warning" (click)="getNextExpense()">Volgende</button>
         </div>
       </ng-template>
       <!--   END FORM TEMPLATE-->

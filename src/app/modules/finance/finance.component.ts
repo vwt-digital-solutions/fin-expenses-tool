@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {NgForm} from '@angular/forms';
 import {OAuthService} from 'angular-oauth2-oidc';
 import {ExpensesConfigService} from '../../services/config.service';
@@ -42,6 +42,8 @@ export class FinanceComponent implements OnInit {
   private receiptFiles;
   private isRejecting;
   private monthNames;
+  private denySelection;
+  public today;
 
   constructor(
     private httpClient: HttpClient,
@@ -152,6 +154,16 @@ export class FinanceComponent implements OnInit {
     return moment(date).utcOffset() / 60;
   }
 
+  static getDismissReason(reason: any): string {
+    if (reason === ModalDismissReasons.ESC) {
+      return 'by pressing ESC';
+    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+      return 'by clicking on a backdrop';
+    } else {
+      return `with: ${reason}`;
+    }
+  }
+
   fixDate(date) {
     const stepDate = new Date(date);
     return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth() + 1)] + ' ' + stepDate.getFullYear();
@@ -169,10 +181,18 @@ export class FinanceComponent implements OnInit {
     }
   }
 
-  openExpenseDetailModal(content, data) {
+  openExpenseDetailModal(content) {
     this.receiptFiles = [];
     this.isRejecting = false;
-    this.modalService.open(content, {centered: true});
+    this.modalService.open(content, {centered: true}).result.then((result) => {
+      this.gridApi.deselectAll();
+      this.denySelection = true;
+      console.log(`Closed with: ${result}`);
+    }, (reason) => {
+      this.gridApi.deselectAll();
+      this.denySelection = true;
+      console.log(`Dismissed ${FinanceComponent.getDismissReason(reason)}`);
+    });
   }
 
   updatingAction(event) {
@@ -183,11 +203,10 @@ export class FinanceComponent implements OnInit {
   }
 
   getNextExpense() {
-    console.log('Next');
+    this.modalService.dismissAll();
   }
 
   onGridReady(params: any) {
-    this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
     // @ts-ignore
     this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
@@ -196,26 +215,33 @@ export class FinanceComponent implements OnInit {
   }
 
   onSelectionChanged(event, content) {
-    const selectedRows = event.api.getSelectedRows();
-    const selectedRowData = {
-      id: undefined
-    };
-    selectedRows.map((selectedRow, index) => {
-      index !== 0 ?
-        console.log('No selection') : Object.assign(selectedRowData, selectedRow);
-    });
-    this.expenses.getExpenseAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
-      this.receiptImage = image[0].url;
-      this.receiptFiles.push(this.receiptImage);
-    });
-    this.expenseData = selectedRowData;
-    this.formSubmitted = false;
-    this.showErrors = false;
-    this.formErrors = '';
-    this.openExpenseDetailModal(content, selectedRowData);
+    if (!this.denySelection) {
+      this.gridApi = event.api;
+      const selectedRows = event.api.getSelectedRows();
+      const selectedRowData = {
+        id: undefined
+      };
+      selectedRows.map((selectedRow, index) => {
+        index !== 0 ?
+          console.log('No selection') : Object.assign(selectedRowData, selectedRow);
+      });
+      this.expenses.getExpenseAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
+        this.receiptImage = image[0].url;
+        this.receiptFiles.push(this.receiptImage);
+      });
+      this.expenseData = selectedRowData;
+      this.formSubmitted = false;
+      this.showErrors = false;
+      this.formErrors = '';
+      this.openExpenseDetailModal(content);
+    } else {
+      this.denySelection = false;
+    }
   }
 
   ngOnInit() {
+    this.today = new Date();
+    this.denySelection = false;
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];
@@ -323,14 +349,6 @@ export class FinanceComponent implements OnInit {
         });
   }
 
-  dismissExpenseModal() {
-    const api = this.gridApi;
-    api.deselectAll();
-    setTimeout(() => {
-      this.modalService.dismissAll();
-    }, 200);
-  }
-
   createPaymentFile(event) {
     this.resetPopups();
     const fileData = event.split('=')[2];
@@ -347,31 +365,45 @@ export class FinanceComponent implements OnInit {
         });
   }
 
-  claimUpdateForm(form: NgForm, expenseId) {
-    const dataVerified = {};
-    const data = form.value;
-    for (const prop in data) {
-      if (data[prop].length !== 0) {
-        dataVerified[prop] = data[prop];
-      }
+  submitButtonController(namount, ntype, ntransdate, rejection_note) {
+    if (this.isRejecting) {
+      return rejection_note.invalid || namount.invalid || ntype.invalid
+        || ntransdate.invalid || (new Date(ntransdate.viewModel)
+          > this.today) || namount.viewModel < 0.01;
+    } else {
+      return namount.invalid || ntype.invalid
+        || ntransdate.invalid || (new Date(ntransdate.viewModel)
+          > this.today) || namount.viewModel < 0.01;
     }
-    const action = this.action;
-    dataVerified[`status`] = action === 'approving' ? `approved_by_${this.OurJaneDoeIs}` :
-      action === 'rejecting' ? `rejected_by_${this.OurJaneDoeIs}` : null;
-    Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
-      this.expenses.updateExpense(dataVerified, expenseId)
-        .subscribe(
-          result => {
-            // @ts-ignore
-            this.expenses.getExpenses().subscribe((response: ExpensesIfc) => this.rowData = [...response]);
-            this.showErrors = false;
-            this.formSubmitted = !form.ngSubmit.hasError;
-          },
-          error => {
-            this.showErrors = true;
-            Object.assign(this.formResponse, JSON.parse(error));
-          })
-      : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
+  }
 
+  claimUpdateForm(form: NgForm, expenseId, instArray) {
+    if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
+      const dataVerified = {};
+      const data = form.value;
+      for (const prop in data) {
+        if (data[prop].length !== 0) {
+          dataVerified[prop] = data[prop];
+        }
+      }
+      const action = this.action;
+      dataVerified[`status`] = action === 'approving' ? `approved_by_${this.OurJaneDoeIs}` :
+        action === 'rejecting' ? `rejected_by_${this.OurJaneDoeIs}` : null;
+      Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
+        this.expenses.updateExpense(dataVerified, expenseId)
+          .subscribe(
+            result => {
+              this.getNextExpense();
+              // @ts-ignore
+              this.expenses.getExpenses().subscribe((response: ExpensesIfc) => this.rowData = [...response]);
+              this.showErrors = false;
+              this.formSubmitted = !form.ngSubmit.hasError;
+            },
+            error => {
+              this.showErrors = true;
+              Object.assign(this.formResponse, JSON.parse(error));
+            })
+        : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
+    }
   }
 }

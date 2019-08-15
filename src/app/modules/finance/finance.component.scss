@@ -114,18 +114,12 @@ input {
   padding: 0.75rem 1.25rem;
 }
 
-.disabledbtn {
-  opacity: .5;
-  width: 100%;
-  margin-top: 15px;
-}
-
 .modal-footer {
   #thumbs-up, #thumbs-down, #thumbs-down-rejecting {
     font-size: large;
   }
 
-  #information-icon-down {
+  #information-icon-down, #information-icon, #information-icon-down-rejecting {
     cursor: pointer;
   }
 }
@@ -135,4 +129,16 @@ input {
     color: #3f8bb5;
     font-weight: 600;
   }
+}
+
+.disabledbtn {
+  opacity: .5;
+}
+
+.disabledbtn:hover {
+  cursor: not-allowed;
+}
+
+.hidden {
+  display: none;
 }
