@@ -165,6 +165,7 @@ export class LandingComponent implements OnInit {
     if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
       const dataVerified = {};
       const data = form.value;
+      data.amount = Number((data.amount).toFixed(2));
       for (const prop in data) {
         if (data[prop].length !== 0) {
           dataVerified[prop] = data[prop];
