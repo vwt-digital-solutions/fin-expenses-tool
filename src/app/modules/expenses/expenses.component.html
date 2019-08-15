@@ -107,29 +107,45 @@
 
           <div class="col-sm-6">
             <label for="attachmentinput">Bijlage:</label>
-            <input id="attachmentinput"
-                   type="file"
-                   accept="application/pdf,image/*"
-                   name="attachment"
-                   required
-                   (change)="onFileInput(fileInputHidden.files)"
-                   [(ngModel)]="formAttachment"
-                   #nattachment="ngModel"
-                   #fileInputHidden
-                   capture="camera">
-            <button type="button"
-                    #buttonInput
-                    class="btn tall-button"
-                    [ngClass]="{notFilledBtn: notFilledClass(nattachment)}"
-                    [ngStyle]="{background: 'url(' + locatedFile + ')'}"
-                    (click)="expenseAttachment = true; fileInputHidden.click()">{{notaData}}
-            </button>
+            <button type="button" id="toggleAttachment"
+                    (click)="toggleAttachment()">{{ this.wantsList ? 'List' : 'Single' }}</button>
+            <div [ngClass]="{hidden: this.wantsList}">
+              <input id="attachmentinput"
+                     type="file"
+                     accept="application/pdf,image/*"
+                     name="attachment"
+                     required
+                     (change)="onFileInput(fileInputHidden.files)"
+                     [(ngModel)]="formAttachment"
+                     #nattachment="ngModel"
+                     #fileInputHidden
+                     capture="camera">
+              <button type="button"
+                      #buttonInput
+                      class="btn tall-button"
+                      [ngClass]="{notFilledBtn: notFilledClass(nattachment)}"
+                      [ngStyle]="{background: 'url(' + locatedFile + ')'}"
+                      (click)="expenseAttachment = true; fileInputHidden.click()">{{notaData}}
+              </button>
+            </div>
+            <div [ngClass]="{hidden: !this.wantsList}">
+              <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center" (click)="fileInputHidden.click()">
+                  <span class="clickable new-file">Bestand toevoegen</span>
+                </li>
+                <li *ngFor="let item of attachmentList"
+                    class="list-group-item d-flex justify-content-between align-items-center">
+                  {{item[0].name}}
+                  <i class="fa fa-times clickable" (click)="removeFromAttachmentList($event)"></i>
+                </li>
+              </ul>
+            </div>
             <div class="fill-text"
                  *ngIf="notFilledClass(nattachment)">
               <small>Graag een bijlage toevoegen</small>
             </div>
             <p id="statictest">o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o
-              o</p> <!-- Responsive Testing. Will be removed -->
+              o</p> <!-- Width Setting. Will be removed in final. -->
           </div>
 
           <input type="submit" id="submit-form" class="hidden"/>

@@ -128,8 +128,11 @@ export class LandingComponent implements OnInit {
   clickExpense(content, item) {
     if (this.isClickable(item)) {
       this.expenses.getExpenseAttachment(item.id).subscribe((image: ExpensesIfc) => {
-        this.receiptImage = image[0].url;
-        this.receiptFiles.push(this.receiptImage);
+        // @ts-ignore
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < image.length; i++) {
+          this.receiptFiles.push(image[i].url);
+        }
       });
       this.formSubmitted = false;
       this.expenseData = item;

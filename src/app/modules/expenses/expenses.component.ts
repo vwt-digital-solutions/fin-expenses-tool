@@ -26,6 +26,8 @@ export class ExpensesComponent {
     this.today = new Date();
     this.notaData = 'Toevoegen';
     this.loadingThings = false;
+    this.wantsList = true;
+    this.attachmentList = [];
   }
 
   public formNote;
@@ -45,6 +47,8 @@ export class ExpensesComponent {
   public transdateNotFilledMessage = 'Graag een geldige datum invullen';
   public locatedFile;
   public loadingThings;
+  private wantsList;
+  private attachmentList;
 
   // Classes Logic
   notFilledClass(setClass) {
@@ -84,16 +88,20 @@ export class ExpensesComponent {
   // End Classes Logic
 
   onFileInput(file) {
-    if (file[0] === undefined || file[0] === null) {
-      this.locatedFile = '';
-      this.notaData = 'Toevoegen';
+    if (this.wantsList) {
+      this.attachmentList.push(file);
     } else {
-      const reader = new FileReader();
-      reader.readAsDataURL(file[0]);
-      reader.onload = () => {
-        this.locatedFile = reader.result;
-        this.notaData = '';
-      };
+      if (file[0] === undefined || file[0] === null) {
+        this.locatedFile = '';
+        this.notaData = 'Toevoegen';
+      } else {
+        const reader = new FileReader();
+        reader.readAsDataURL(file[0]);
+        reader.onload = () => {
+          this.locatedFile = reader.result;
+          this.notaData = '';
+        };
+      }
     }
   }
 
@@ -134,5 +142,13 @@ export class ExpensesComponent {
             console.error('>> POST FAILED', response.message);
           });
     }
+  }
+
+  toggleAttachment() {
+    return this.wantsList = !this.wantsList;
+  }
+
+  removeFromAttachmentList(item) {
+    this.attachmentList.pop(item);
   }
 }
