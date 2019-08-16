@@ -27,6 +27,7 @@ export class ExpensesComponent {
     this.notaData = 'Toevoegen';
     this.loadingThings = false;
     this.wantsList = true;
+    this.locatedFile = [];
     this.attachmentList = [];
   }
 
@@ -67,6 +68,7 @@ export class ExpensesComponent {
     }
     if (setClass.name === 'attachment') {
       starBool = this.expenseAttachment === false;
+      return starBool;
     }
     return starBool || (setClass.invalid && (setClass.dirty || setClass.touched));
   }
@@ -89,16 +91,24 @@ export class ExpensesComponent {
 
   onFileInput(file) {
     if (this.wantsList) {
-      this.attachmentList.push(file);
+      if (!(file[0] === undefined || file[0] === null)) {
+        this.attachmentList.push(file);
+        const reader = new FileReader();
+        reader.readAsDataURL(file[0]);
+        reader.onload = () => {
+          this.locatedFile.push(reader.result);
+        };
+      }
     } else {
+      this.locatedFile = [];
+      this.attachmentList = [];
       if (file[0] === undefined || file[0] === null) {
-        this.locatedFile = '';
         this.notaData = 'Toevoegen';
       } else {
         const reader = new FileReader();
         reader.readAsDataURL(file[0]);
         reader.onload = () => {
-          this.locatedFile = reader.result;
+          this.locatedFile.push(reader.result);
           this.notaData = '';
         };
       }
@@ -107,12 +117,22 @@ export class ExpensesComponent {
 
   claimForm(form: NgForm) {
     // Check Form Data
-    form.value.attachment = this.locatedFile;
+    let fileString = '';
+    let i;
+    // @ts-ignore
+    for (i = 0; i < this.locatedFile.length; i++) {
+      if (fileString === '') {
+        fileString = this.locatedFile[i];
+      } else {
+        fileString = fileString + '.' + this.locatedFile[i];
+      }
+    }
+    form.value.attachment = fileString;
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
     this.expenseType = !(form.value.cost_type === undefined);
     this.expenseTransDate = !(form.value.date_of_transaction === undefined || new Date(form.value.date_of_transaction) > this.today);
-    this.expenseAttachment = !(form.value.attachment === undefined || form.value.attachment === null);
+    this.expenseAttachment = !(this.locatedFile < 1);
     if (form.value.date_of_transaction !== undefined) {
       if (form.value.date_of_transaction.length > 8) {
         this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de aankoop';
@@ -150,5 +170,7 @@ export class ExpensesComponent {
 
   removeFromAttachmentList(item) {
     this.attachmentList.pop(item);
+    this.locatedFile.pop(item);
+    this.formAttachment = null;
   }
 }
