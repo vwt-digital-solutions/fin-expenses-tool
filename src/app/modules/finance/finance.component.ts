@@ -390,8 +390,8 @@ export class FinanceComponent implements OnInit {
         }
       }
       const action = this.action;
-      dataVerified[`status`] = action === 'approving' ? `approved_by_${this.OurJaneDoeIs}` :
-        action === 'rejecting' ? `rejected_by_${this.OurJaneDoeIs}` : null;
+      dataVerified[`status`] = action === 'approving' ? `approved` :
+        action === 'rejecting' ? `rejected` : null;
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
         this.expenses.updateExpense(dataVerified, expenseId)
           .subscribe(

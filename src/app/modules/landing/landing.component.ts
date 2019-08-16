@@ -174,7 +174,7 @@ export class LandingComponent implements OnInit {
           dataVerified[prop] = data[prop];
         }
       }
-      dataVerified[`status`] = 'to_be_reviewed';
+      dataVerified[`status`] = 'ready_for_manager';
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
         this.expenses.updateExpense(dataVerified, expenseId)
           .subscribe(

@@ -273,8 +273,8 @@ export class ManagerComponent implements OnInit {
         }
       }
       const action = this.action;
-      dataVerified[`status`] = action === 'approving' ? `approved_by_${this.OurJaneDoeIs}` :
-        action === 'rejecting' ? `rejected_by_${this.OurJaneDoeIs}` : null;
+      dataVerified[`status`] = action === 'approving' ? `ready_for_creditor` :
+        action === 'rejecting' ? `rejected` : null;
 
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
         this.expenses.updateExpense(dataVerified, expenseId)
