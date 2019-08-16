@@ -47,8 +47,8 @@ export class ExpensesComponent {
   public transdateNotFilledMessage = 'Graag een geldige datum invullen';
   public locatedFile;
   public loadingThings;
-  private wantsList;
-  private attachmentList;
+  public wantsList;
+  public attachmentList;
 
   // Classes Logic
   notFilledClass(setClass) {
