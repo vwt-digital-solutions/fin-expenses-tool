@@ -169,8 +169,13 @@ export class ExpensesComponent {
   }
 
   removeFromAttachmentList(item) {
-    this.attachmentList.pop(item);
-    this.locatedFile.pop(item);
+    let i;
+    for (i = 0; i < this.attachmentList.length; i++) {
+      if (this.attachmentList[i] === item) {
+        this.attachmentList.splice(i, 1);
+        this.locatedFile.splice(i, 1);
+      }
+    }
     this.formAttachment = null;
   }
 }

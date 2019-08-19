@@ -116,3 +116,12 @@
 .disabledbtn:hover {
   cursor: not-allowed;
 }
+
+.click-stop {
+  cursor: pointer;
+  color: $vwt_color_blue;
+
+  &:hover {
+    opacity: .6;
+  }
+}

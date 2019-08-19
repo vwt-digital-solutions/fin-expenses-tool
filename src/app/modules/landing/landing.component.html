@@ -145,6 +145,7 @@
             <li *ngFor="let item of receiptFiles"
                 class="list-group-item d-flex justify-content-between align-items-center">
               <a href="{{item}}" target="_blank">View File - {{this.getFileName(item)}}</a>
+              <i class="fa fa-times click-stop" (click)="removeFromAttachmentList(item)"></i>
             </li>
           </ul>
           <input type="submit" id="submit-update-form" hidden/>

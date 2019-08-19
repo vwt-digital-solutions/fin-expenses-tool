@@ -158,6 +158,15 @@ export class LandingComponent implements OnInit {
     }, 200);
   }
 
+  removeFromAttachmentList(item) {
+    let i;
+    for (i = 0; i < this.receiptFiles.length; i++) {
+      if (this.receiptFiles[i] === item) {
+        this.receiptFiles.splice(i, 1);
+      }
+    }
+  }
+
   submitButtonController(nnote, namount, ntype, ntransdate) {
     return nnote.invalid || namount.invalid || ntype.invalid
       || ntransdate.invalid || (new Date(ntransdate.viewModel)
@@ -171,29 +180,42 @@ export class LandingComponent implements OnInit {
 
   claimUpdateForm(form: NgForm, expenseId, instArray) {
     if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
+      let fileString = '';
+      let i;
+      // @ts-ignore
+      for (i = 0; i < this.receiptFiles.length; i++) {
+        if (fileString === '') {
+          fileString = this.receiptFiles[i];
+        } else {
+          fileString = fileString + '.' + this.receiptFiles[i];
+        }
+      }
+      form.value.attachment = fileString;
       const dataVerified = {};
       const data = form.value;
       data.amount = Number((data.amount).toFixed(2));
+      data.date_of_transaction = (new Date(data.date_of_transaction).getTime());
       for (const prop in data) {
         if (data[prop].length !== 0) {
           dataVerified[prop] = data[prop];
         }
       }
-      dataVerified[`status`] = 'ready_for_manager';
-      Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
-        this.expenses.updateExpense(dataVerified, expenseId)
-          .subscribe(
-            result => {
-              this.showErrors = false;
-              this.formSubmitted = !form.ngSubmit.hasError;
-              this.declarationCall();
-              this.dismissExpenseModal();
-            },
-            error => {
-              this.showErrors = true;
-              Object.assign(this.formResponse, JSON.parse(error));
-            })
-        : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
+      console.log(dataVerified);
+      // dataVerified[`status`] = 'ready_for_manager';
+      // Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
+      //   this.expenses.updateExpense(dataVerified, expenseId)
+      //     .subscribe(
+      //       result => {
+      //         this.showErrors = false;
+      //         this.formSubmitted = !form.ngSubmit.hasError;
+      //         this.declarationCall();
+      //         this.dismissExpenseModal();
+      //       },
+      //       error => {
+      //         this.showErrors = true;
+      //         Object.assign(this.formResponse, JSON.parse(error));
+      //       })
+      //   : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
     }
   }
 }

@@ -384,6 +384,7 @@ export class FinanceComponent implements OnInit {
       const dataVerified = {};
       const data = form.value;
       data.amount = Number((data.amount).toFixed(2));
+      data.date_of_transaction = (new Date(data.date_of_transaction).getTime());
       for (const prop in data) {
         if (prop.length !== 0) {
           dataVerified[prop] = data[prop];
