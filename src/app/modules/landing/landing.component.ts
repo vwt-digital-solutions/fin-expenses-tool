@@ -200,22 +200,21 @@ export class LandingComponent implements OnInit {
           dataVerified[prop] = data[prop];
         }
       }
-      console.log(dataVerified);
-      // dataVerified[`status`] = 'ready_for_manager';
-      // Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
-      //   this.expenses.updateExpense(dataVerified, expenseId)
-      //     .subscribe(
-      //       result => {
-      //         this.showErrors = false;
-      //         this.formSubmitted = !form.ngSubmit.hasError;
-      //         this.declarationCall();
-      //         this.dismissExpenseModal();
-      //       },
-      //       error => {
-      //         this.showErrors = true;
-      //         Object.assign(this.formResponse, JSON.parse(error));
-      //       })
-      //   : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
+      dataVerified[`status`] = 'ready_for_manager';
+      Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
+        this.expenses.updateExpense(dataVerified, expenseId)
+          .subscribe(
+            result => {
+              this.showErrors = false;
+              this.formSubmitted = !form.ngSubmit.hasError;
+              this.declarationCall();
+              this.dismissExpenseModal();
+            },
+            error => {
+              this.showErrors = true;
+              Object.assign(this.formResponse, JSON.parse(error));
+            })
+        : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
     }
   }
 }
