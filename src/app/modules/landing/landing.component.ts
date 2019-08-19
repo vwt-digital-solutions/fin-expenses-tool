@@ -5,6 +5,7 @@ import {EnvService} from '../../services/env.service';
 import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {isEmpty} from 'rxjs/operators';
 
 
 interface IClaimRoles {
@@ -36,6 +37,7 @@ export class LandingComponent implements OnInit {
   private receiptImage: any;
   private receiptFiles;
   public today;
+  public hasNoExpenses;
 
   constructor(
     private oauthService: OAuthService,
@@ -115,6 +117,9 @@ export class LandingComponent implements OnInit {
       .subscribe(
         val => {
           this.declarationData = val;
+          // @ts-ignore
+          this.hasNoExpenses = (val.length < 1);
+          console.log(this.hasNoExpenses);
           console.log('>> GET SUCCESS', val);
         }, response => {
           console.error('>> GET FAILED', response.message);
