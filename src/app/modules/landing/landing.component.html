@@ -8,7 +8,8 @@
     <div class="col col-sm-8">
       <ul class="list-group">
         <li *ngIf="this.hasNoExpenses" class="list-group-item d-flex justify-content-between align-items-center">
-          Je hebt geen openstaande declaraties</li>
+          Je hebt geen openstaande declaraties
+        </li>
         <li *ngFor="let item of declarationData"
             (click)="clickExpense(expenseContent, item)"
             [ngClass]="{clickable: isClickable(item)}"
@@ -141,7 +142,18 @@
             <small>Graag een geldige omschrijving invullen</small>
           </div>
           <label>Bestanden:</label>
+          <input id="attachmentinput"
+                 type="file"
+                 accept="application/pdf,image/*"
+                 name="attachment"
+                 required
+                 (change)="onFileInput(fileInputHidden.files)"
+                 [ngModel]="receiptFiles"
+                 #nattachment="ngModel"
+                 #fileInputHidden
+                 capture="camera">
           <ul class="list-group">
+            <li class="list-group-item text-center click-stop" (click)="fileInputHidden.click()"><span>Bestand toevoegen (inoperative)</span></li>
             <li *ngFor="let item of receiptFiles"
                 class="list-group-item d-flex justify-content-between align-items-center">
               <a href="{{item}}" target="_blank">View File - {{this.getFileName(item)}}</a>

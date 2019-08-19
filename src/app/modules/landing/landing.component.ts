@@ -178,6 +178,18 @@ export class LandingComponent implements OnInit {
     this.modalService.open(content, {centered: true});
   }
 
+  onFileInput(file) {
+    if (!(file[0] === undefined || file[0] === null)) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file[0]);
+      reader.onload = () => {
+        console.log(this.receiptFiles);
+        this.receiptFiles.push(reader.result);
+        console.log(this.receiptFiles);
+      };
+    }
+  }
+
   claimUpdateForm(form: NgForm, expenseId, instArray) {
     if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
       let fileString = '';
