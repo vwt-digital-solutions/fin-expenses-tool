@@ -367,6 +367,7 @@ export class FinanceComponent implements OnInit {
         });
   }
 
+  // tslint:disable-next-line:variable-name
   submitButtonController(namount, ntype, ntransdate, rejection_note) {
     if (this.isRejecting) {
       return rejection_note.invalid || namount.invalid || ntype.invalid
@@ -392,7 +393,7 @@ export class FinanceComponent implements OnInit {
       }
       const action = this.action;
       dataVerified[`status`] = action === 'approving' ? `approved` :
-        action === 'rejecting' ? `rejected` : null;
+        action === 'rejecting' ? `rejected_by_creditor` : null;
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
         this.expenses.updateExpenseFinance(dataVerified, expenseId)
           .subscribe(
