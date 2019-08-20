@@ -250,9 +250,9 @@ export class ManagerComponent implements OnInit {
         });
   }
 
-  submitButtonController(namount, ntype, ntransdate, rejectionNote) {
+  submitButtonController(namount, ntype, ntransdate, rejection_note) {
     if (this.isRejecting) {
-      return rejectionNote.invalid || namount.invalid || ntype.invalid
+      return rejection_note.invalid || namount.invalid || ntype.invalid
         || ntransdate.invalid || (new Date(ntransdate.viewModel)
           > this.today) || namount.viewModel < 0.01;
     } else {
