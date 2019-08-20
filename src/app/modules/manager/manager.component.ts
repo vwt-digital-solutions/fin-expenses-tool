@@ -278,7 +278,7 @@ export class ManagerComponent implements OnInit {
         action === 'rejecting' ? `rejected` : null;
 
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
-        this.expenses.updateExpense(dataVerified, expenseId)
+        this.expenses.updateExpenseManager(dataVerified, expenseId)
           .subscribe(
             result => {
               this.getNextExpense();

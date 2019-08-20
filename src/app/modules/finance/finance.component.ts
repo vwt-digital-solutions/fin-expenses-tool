@@ -394,7 +394,7 @@ export class FinanceComponent implements OnInit {
       dataVerified[`status`] = action === 'approving' ? `approved` :
         action === 'rejecting' ? `rejected` : null;
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
-        this.expenses.updateExpense(dataVerified, expenseId)
+        this.expenses.updateExpenseFinance(dataVerified, expenseId)
           .subscribe(
             result => {
               this.getNextExpense();
