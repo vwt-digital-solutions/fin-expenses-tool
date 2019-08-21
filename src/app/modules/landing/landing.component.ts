@@ -62,7 +62,7 @@ export class LandingComponent implements OnInit {
   }
 
   getFileName(name) {
-    return (name.split('/')).slice(-1)[0];
+    return (name.split('?')[0]).split('/')[8];
   }
 
   statusClassing(status) {
@@ -119,7 +119,6 @@ export class LandingComponent implements OnInit {
           this.declarationData = val;
           // @ts-ignore
           this.hasNoExpenses = (val.length < 1);
-          console.log(this.hasNoExpenses);
           console.log('>> GET SUCCESS', val);
         }, response => {
           console.error('>> GET FAILED', response.message);
@@ -183,9 +182,7 @@ export class LandingComponent implements OnInit {
       const reader = new FileReader();
       reader.readAsDataURL(file[0]);
       reader.onload = () => {
-        console.log(this.receiptFiles);
         this.receiptFiles.push(reader.result);
-        console.log(this.receiptFiles);
       };
     }
   }
