@@ -152,7 +152,7 @@
                           [ngClass]="{notFilled: (rejection_note.invalid && (rejection_note.dirty || rejection_note.touched)),
                           hidden: !this.isRejecting}"
                           type="text"
-                          name="rejectionNote"
+                          name="rejection_note"
                           required minlength="1"
                           [(ngModel)]="expenseData.status.rejection_note"
                           #rejection_note="ngModel">

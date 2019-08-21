@@ -205,13 +205,13 @@ export class LandingComponent implements OnInit {
       data.amount = Number((data.amount).toFixed(2));
       data.date_of_transaction = (new Date(data.date_of_transaction).getTime());
       for (const prop in data) {
-        if (data[prop].length !== 0) {
+        if (prop.length !== 0) {
           dataVerified[prop] = data[prop];
         }
       }
       dataVerified[`status`] = 'ready_for_manager';
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
-        this.expenses.updateExpense(dataVerified, expenseId)
+        this.expenses.updateExpenseEmployee(dataVerified, expenseId)
           .subscribe(
             result => {
               this.showErrors = false;

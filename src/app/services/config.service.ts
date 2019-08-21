@@ -72,8 +72,22 @@ export class ExpensesConfigService {
       );
   }
 
-  public updateExpense(data, expenseId): Observable<HttpResponse<ExpensesIfc>>  {
+  public updateExpenseFinance(data, expenseId): Observable<HttpResponse<ExpensesIfc>>  {
     return this.http.put<ExpensesIfc>(this.env.apiUrl + Endpoint.finance + `/${expenseId}`, data)
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+    public updateExpenseEmployee(data, expenseId): Observable<HttpResponse<ExpensesIfc>>  {
+    return this.http.put<ExpensesIfc>(this.env.apiUrl + Endpoint.employee + `/${expenseId}`, data)
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+    public updateExpenseManager(data, expenseId): Observable<HttpResponse<ExpensesIfc>>  {
+    return this.http.put<ExpensesIfc>(this.env.apiUrl + Endpoint.manager + `/${expenseId}`, data)
       .pipe(
         catchError(ExpensesConfigService.handleError)
       );

@@ -250,9 +250,9 @@ export class ManagerComponent implements OnInit {
         });
   }
 
-  submitButtonController(namount, ntype, ntransdate, rejectionNote) {
+  submitButtonController(namount, ntype, ntransdate, rejection_note) {
     if (this.isRejecting) {
-      return rejectionNote.invalid || namount.invalid || ntype.invalid
+      return rejection_note.invalid || namount.invalid || ntype.invalid
         || ntransdate.invalid || (new Date(ntransdate.viewModel)
           > this.today) || namount.viewModel < 0.01;
     } else {
@@ -275,10 +275,10 @@ export class ManagerComponent implements OnInit {
       }
       const action = this.action;
       dataVerified[`status`] = action === 'approving' ? `ready_for_creditor` :
-        action === 'rejecting' ? `rejected` : null;
+        action === 'rejecting' ? `rejected_by_manager` : null;
 
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
-        this.expenses.updateExpense(dataVerified, expenseId)
+        this.expenses.updateExpenseManager(dataVerified, expenseId)
           .subscribe(
             result => {
               this.getNextExpense();
