@@ -126,12 +126,15 @@ export class FinanceComponent implements OnInit {
       headerName: '',
       children: [
         {
-          headerName: 'Geschiedenis', field: 'date_exported',
+          headerName: '', field: 'date_exported',
           sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
-          suppressMovable: true
+          suppressMovable: true, width: 180
+        },
+        {headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
+          template: '<i class="fas fa-file-excel" style="color: #4eb7da; font-size: 20px;"></i>'
         },
         {
-          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 100,
+          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
           template: '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>'
         }
       ]
@@ -173,7 +176,7 @@ export class FinanceComponent implements OnInit {
   }
 
   historyHit(event) {
-    if (event.colDef.template === undefined) {
+    if (event.colDef.template !== '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>') {
       this.downloadFromHistory(event);
     } else {
       this.downloadPaymentFile(event);
@@ -340,8 +343,6 @@ export class FinanceComponent implements OnInit {
             a.download = result;
             a.click();
             window.URL.revokeObjectURL(url);
-            this.successfulDownload();
-            this.callHistoryRefresh();
             console.log('>> GET SUCCESS', response);
             this.createPaymentFile(contentDispositionHeader);
           }
@@ -361,6 +362,18 @@ export class FinanceComponent implements OnInit {
     })
       .subscribe(
         (response) => {
+          const contentDispositionHeader = response.headers.get('Content-Disposition');
+          const result = contentDispositionHeader.split('=')[1].split(';')[0];
+          const blob = new Blob([response.body], {type: 'text/xml'});
+          const a = document.createElement('a');
+          document.body.appendChild(a);
+          const url = window.URL.createObjectURL(blob);
+          a.href = url;
+          a.download = result;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          this.successfulDownload();
+          this.callHistoryRefresh();
           console.log('>> GET SUCCESS', response);
         }, response => {
           console.error('>> GET FAILED', response.message);

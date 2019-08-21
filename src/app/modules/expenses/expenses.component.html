@@ -23,7 +23,7 @@
             <label for="amountinput">Bedrag:</label>
             <div class="input-group">
               <input id="amountinput"
-                     (click)="expensesAmount = true"
+                     (click)="expensesAmount = true; this.addClaimSuccess.success = false;"
                      class="form-control"
                      [ngClass]="{notFilled: notFilledClass(namount)}"
                      type="number"
@@ -47,7 +47,7 @@
                 <label class="input-group-text" for="typeinput">Soort:</label>
               </div>
               <select id="typeinput"
-                      (change)="expenseType = true"
+                      (change)="expenseType = true; this.addClaimSuccess.success = false;"
                       class="custom-select"
                       [ngClass]="{notFilled: notFilledClass(ntype)}"
                       [(ngModel)]="formType"
@@ -68,7 +68,7 @@
             <label for="dateinput">Datum bon:</label>
             <div class="input-group">
               <input id="dateinput"
-                     (click)="expenseTransDate = true; transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen'"
+                     (click)="expenseTransDate = true; transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen'; this.addClaimSuccess.success = false;"
                      [ngClass]="{notFilled: notFilledClass(ntransdate)}"
                      name="date_of_transaction"
                      class="form-control"
@@ -89,7 +89,7 @@
             <div class="form-group">
               <label for="noteinput">Omschrijving:</label>
               <textarea id="noteinput"
-                        (click)="expensesNote = true"
+                        (click)="expensesNote = true; this.addClaimSuccess.success = false;"
                         class="form-control"
                         [ngClass]="{notFilled: notFilledClass(nnote)}"
                         type="text"
@@ -131,7 +131,8 @@
             <div [ngClass]="{hidden: !this.wantsList}">
               <ul class="list-group">
                 <li class="list-group-item d-flex justify-content-between align-items-center"
-                    [ngClass]="{notFilledBtn: notFilledClass(nattachment)}" (click)="fileInputHidden.click(); expenseAttachment = true">
+                    [ngClass]="{notFilledBtn: notFilledClass(nattachment)}"
+                    (click)="fileInputHidden.click(); expenseAttachment = true; this.addClaimSuccess.success = false;">
                   <span class="clickable new-file">Bestand toevoegen</span>
                 </li>
                 <li *ngFor="let item of attachmentList"
@@ -150,6 +151,7 @@
           </div>
 
           <input type="submit" id="submit-form" class="hidden"/>
+          <input type="submit" id="submit-form-next" class="hidden"/>
         </div>
       </form>
     </div>
@@ -173,10 +175,19 @@
       <div class="submit_button">
         <label for="submit-form"
                tabindex="0" class="btn btn-default deep_button"
+               (click)="this.wantsNext = 'No'"
+               [ngClass]="{disabledbtn: submitButtonController(nnote, namount, ntype, ntransdate, nattachment),
+                  success : addClaimSuccess.success,
+                  wrong : addClaimSuccess.wrong}">
+          Indienen <i *ngIf="loadingThings && this.wantsNext === 'No'" class="spinner-border text-light"></i>
+        </label>
+        <label for="submit-form-next"
+               tabindex="0" class="btn btn-default deep_button"
+               (click)="this.wantsNext = 'Yes'"
                [ngClass]="{disabledbtn: submitButtonController(nnote, namount, ntype, ntransdate, nattachment),
                   success : addClaimSuccess.success === true,
                   wrong : addClaimSuccess.wrong === true}">
-          Indienen <i *ngIf="loadingThings === true" class="spinner-border text-light"></i>
+          Indienen & Nieuwe<i *ngIf="loadingThings && this.wantsNext === 'Yes'" class="spinner-border text-light"></i>
         </label>
       </div>
     </div>

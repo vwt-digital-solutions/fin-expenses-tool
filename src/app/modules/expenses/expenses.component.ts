@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
+import {__await} from 'tslib';
 
 @Component({
   selector: 'app-expenses',
@@ -50,6 +51,7 @@ export class ExpensesComponent {
   public loadingThings;
   public wantsList;
   public attachmentList;
+  public wantsNext;
 
   // Classes Logic
   notFilledClass(setClass) {
@@ -156,6 +158,16 @@ export class ExpensesComponent {
             this.successfulClaim();
             this.loadingThings = false;
             console.log('>> POST SUCCESS', val);
+            if (this.wantsNext === 'Yes') {
+              form.reset();
+              this.attachmentList = [];
+              this.locatedFile = [];
+            } else {
+              // tslint:disable-next-line:only-arrow-functions
+              setTimeout(function() {
+                window.location.href = window.location.protocol + '//' + window.location.host + '/home';
+              }, 1000);
+            }
           }, response => {
             this.wrongfulClaim();
             this.loadingThings = false;
