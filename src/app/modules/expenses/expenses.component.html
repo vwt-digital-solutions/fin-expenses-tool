@@ -107,8 +107,6 @@
 
           <div class="col-sm-6">
             <label for="attachmentinput">Bijlage:</label>
-            <button type="button" id="toggleAttachment"
-                    (click)="toggleAttachment()">{{ this.wantsList ? 'List' : 'Single' }}</button>
             <div [ngClass]="{hidden: this.wantsList}">
               <input id="attachmentinput"
                      type="file"
@@ -120,13 +118,6 @@
                      #nattachment="ngModel"
                      #fileInputHidden
                      capture="camera">
-              <button type="button"
-                      #buttonInput
-                      class="btn tall-button"
-                      [ngClass]="{notFilledBtn: notFilledClass(nattachment)}"
-                      [ngStyle]="{background: 'url(' + locatedFile + ')'}"
-                      (click)="expenseAttachment = true; fileInputHidden.click()">{{notaData}}
-              </button>
             </div>
             <div [ngClass]="{hidden: !this.wantsList}">
               <ul class="list-group">
