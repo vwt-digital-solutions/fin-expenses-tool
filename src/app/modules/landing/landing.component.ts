@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Pipe, PipeTransform} from '@angular/core';
 import {OAuthService} from 'angular-oauth2-oidc';
 import {HttpClient} from '@angular/common/http';
 import {EnvService} from '../../services/env.service';
@@ -6,6 +6,7 @@ import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {isEmpty} from 'rxjs/operators';
+import {DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser';
 
 
 interface IClaimRoles {
@@ -45,6 +46,7 @@ export class LandingComponent implements OnInit {
     private env: EnvService,
     private modalService: NgbModal,
     private expenses: ExpensesConfigService,
+    private sanitizer: DomSanitizer,
   ) {
   }
 
@@ -62,7 +64,12 @@ export class LandingComponent implements OnInit {
   }
 
   getFileName(name) {
-    return (name.split('?')[0]).split('/')[8];
+    // return (name.split('?')[0]).split('/')[8];
+    return 'hey1';
+  }
+
+  sanitizeFile(type, file) {
+    return this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + file);
   }
 
   statusClassing(status) {
@@ -135,7 +142,7 @@ export class LandingComponent implements OnInit {
         // @ts-ignore
         // tslint:disable-next-line:prefer-for-of
         for (let i = 0; i < image.length; i++) {
-          this.receiptFiles.push(image[i].url);
+          this.receiptFiles.push(image[i]);
         }
       });
       this.formSubmitted = false;
