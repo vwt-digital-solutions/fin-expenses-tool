@@ -118,6 +118,11 @@ export class ExpensesComponent {
     }
   }
 
+  splitCheck() {
+    return (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.expenseAttachment
+      && ((this.addClaimSuccess.success === false && this.addClaimSuccess.wrong === false) || this.wantsNext === 'Yes'));
+  }
+
   claimForm(form: NgForm) {
     // Check Form Data
     let fileString = '';
@@ -141,8 +146,7 @@ export class ExpensesComponent {
         this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de aankoop';
       }
     }
-    if (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.expenseAttachment
-      && ((this.addClaimSuccess.success === false && this.addClaimSuccess.wrong === false) || this.wantsNext === 'Yes')) {
+    if (this.splitCheck()) {
       this.loadingThings = true;
       // End Check Form Data
       // Format Values
