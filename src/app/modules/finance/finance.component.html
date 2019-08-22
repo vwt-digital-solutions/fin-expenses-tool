@@ -70,7 +70,7 @@
           <form
             id="expensesUpdateForm"
             #expenseUpdateForm="ngForm"
-            (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, [namount, ntype, ntransdate, rejection_note])"
+            (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, [namount, ntype, ntransdate, rnote])"
             name="expenseUpdateForm">
             <div class="form-group">
               <!-- Form: Costs -->
@@ -146,20 +146,20 @@
               </ul>
               <!-- Form: Rejection Note | Check submit-update-form label after every change -->
               <div class="form-group" [ngClass]="{hidden: !this.isRejecting}">
-                <label for="rejection_note">Reden van Afkeuring:</label>
-                <textarea id="rejection_note"
+                <label for="rnote">Reden van Afkeuring:</label>
+                <textarea id="rnote"
                           class="form-control"
-                          [ngClass]="{notFilled: (rejection_note.invalid && (rejection_note.dirty || rejection_note.touched)),
+                          [ngClass]="{notFilled: (rnote.invalid && (rnote.dirty || rnote.touched)),
                           hidden: !this.isRejecting}"
                           type="text"
-                          name="rejection_note"
+                          name="rnote"
                           required minlength="1"
-                          [(ngModel)]="expenseData.status.rejection_note"
-                          #rejection_note="ngModel">
+                          [(ngModel)]="expenseData.status.rnote"
+                          #rnote="ngModel">
           </textarea>
               </div>
               <div class="fill-text move-18"
-                   *ngIf="(rejection_note.invalid && (rejection_note.dirty || rejection_note.touched))"
+                   *ngIf="(rnote.invalid && (rnote.dirty || rnote.touched))"
                    [ngClass]="{hidden: !this.isRejecting}">
                 <small>Graag een geldige reden invullen</small>
               </div>
@@ -185,7 +185,7 @@
           <div *ngIf="this.isRejecting" id="thumbs-down-rejecting" class="float-right badge badge-danger"
                (click)="updatingAction('rejecting')">
             <label for="submit-update-form"
-                   [ngClass]="{disabledbtn: submitButtonController(namount, ntype, ntransdate, rejection_note)}">
+                   [ngClass]="{disabledbtn: submitButtonController(namount, ntype, ntransdate, rnote)}">
               <a id="information-icon-down-rejecting">OK</a>
             </label>
           </div>
