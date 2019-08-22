@@ -1,0 +1,41 @@
+<div class="container">
+  <div class="row">
+    <div class="col-2">
+      <div class="list-group">
+        <button class="list-group-item list-group-item-action"
+                name="raw"
+                (click)="setChart($event)">Data</button>
+        <button class="list-group-item list-group-item-action active"
+                name="pie"
+                (click)="setChart($event)">Pie</button>
+        <button class="list-group-item list-group-item-action"
+                name="polarArea"
+                (click)="setChart($event)">Polar</button>
+        <button class="list-group-item list-group-item-action"
+                name="doughnut"
+                (click)="setChart($event)">Doughnut</button>
+        <button class="list-group-item list-group-item-action"
+                name="bar"
+                (click)="setChart($event)">Bar</button>
+        <button class="list-group-item list-group-item-action"
+                name="radar"
+                (click)="setChart($event)">Radar</button>
+      </div>
+    </div>
+    <div class="col-10">
+      <div>
+        <div class="chart">
+          <canvas baseChart
+                  [data]="ChartData"
+                  [labels]="ChartLabels"
+                  [chartType]="ChartType"
+                  [options]="ChartOptions"
+                  [plugins]="ChartPlugins"
+                  [colors]="ChartColors"
+                  [legend]="ChartLegend">
+          </canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

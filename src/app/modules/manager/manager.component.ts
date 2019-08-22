@@ -15,16 +15,17 @@ interface ExpensesIfc {
 }
 
 interface IClaimRoles {
+  oid: any;
   roles: any;
 }
 
 @Component({
   selector: 'app-expenses',
-  templateUrl: './finance.component.html',
-  styleUrls: ['./finance.component.scss']
+  templateUrl: './manager.component.html',
+  styleUrls: ['./manager.component.scss']
 })
 
-export class FinanceComponent implements OnInit {
+export class ManagerComponent implements OnInit {
   private gridApi;
   private gridColumnApi;
   public columnDefs;
@@ -36,6 +37,7 @@ export class FinanceComponent implements OnInit {
   public formResponse;
   private submitingStart: boolean;
   private action: any;
+  private departmentId: number;
   private OurJaneDoeIs: string;
   private expenseDataRejection: ({ reason: string })[];
   private receiptFiles;
@@ -72,7 +74,7 @@ export class FinanceComponent implements OnInit {
             filter: true,
             cellRenderer: params => {
               return moment(params.value).add(
-                FinanceComponent.getUTCOffset(params.value), 'hours').format('LLL');
+                ManagerComponent.getUTCOffset(params.value), 'hours').format('LLL');
             },
           },
           {
@@ -80,7 +82,7 @@ export class FinanceComponent implements OnInit {
             sortable: true, filter: true, width: 200, resizable: true
           },
           {
-            headerName: 'Kosten', field: 'amount', valueFormatter: FinanceComponent.decimalFormatter,
+            headerName: 'Kosten', field: 'amount', valueFormatter: ManagerComponent.decimalFormatter,
             sortable: true, filter: true, width: 150
           },
           {
@@ -126,15 +128,12 @@ export class FinanceComponent implements OnInit {
       headerName: '',
       children: [
         {
-          headerName: '', field: 'date_exported',
+          headerName: 'Geschiedenis', field: 'date_exported',
           sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
-          suppressMovable: true, width: 180
-        },
-        {headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
-          template: '<i class="fas fa-file-excel" style="color: #4eb7da; font-size: 20px;"></i>'
+          suppressMovable: true
         },
         {
-          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
+          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 100,
           template: '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>'
         }
       ]
@@ -149,7 +148,7 @@ export class FinanceComponent implements OnInit {
   }
 
   static decimalFormatter(amounts) {
-    return '€ ' + FinanceComponent.formatNumber(amounts.value);
+    return '€ ' + ManagerComponent.formatNumber(amounts.value);
   }
 
   static getUTCOffset(date) {
@@ -182,14 +181,6 @@ export class FinanceComponent implements OnInit {
     return (name.split('/')).slice(-1)[0];
   }
 
-  historyHit(event) {
-    if (event.colDef.template !== '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>') {
-      this.downloadFromHistory(event);
-    } else {
-      this.downloadPaymentFile(event);
-    }
-  }
-
   openExpenseDetailModal(content) {
     this.receiptFiles = [];
     this.isRejecting = false;
@@ -200,7 +191,7 @@ export class FinanceComponent implements OnInit {
     }, (reason) => {
       this.gridApi.deselectAll();
       this.denySelection = true;
-      console.log(`Dismissed ${FinanceComponent.getDismissReason(reason)}`);
+      console.log(`Dismissed ${ManagerComponent.getDismissReason(reason)}`);
     });
   }
 
@@ -218,9 +209,11 @@ export class FinanceComponent implements OnInit {
   onGridReady(params: any) {
     this.gridColumnApi = params.columnApi;
     // @ts-ignore
-    this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
     const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
+    this.departmentId = claimJaneDoe.oid;
     this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
+    // @ts-ignore
+    this.expenses.getDepartmentExpenses(this.departmentId).subscribe((data: ExpensesIfc) => this.rowData = [...data]);
   }
 
   onSelectionChanged(event, content) {
@@ -257,7 +250,6 @@ export class FinanceComponent implements OnInit {
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];
-    this.callHistoryRefresh();
     this.expenses.getCostTypes()
       .subscribe(
         val => {
@@ -265,129 +257,6 @@ export class FinanceComponent implements OnInit {
         });
   }
 
-  callHistoryRefresh() {
-    this.historyRowData = this.httpClient.get(this.env.apiUrl + '/finances/expenses/booking_file/files');
-  }
-
-  resetPopups() {
-    this.addBooking.success = false;
-    this.addBooking.wrong = false;
-    this.addBooking.error = false;
-  }
-
-  successfulDownload() {
-    return this.addBooking.success = true;
-  }
-
-  noExpenses() {
-    return this.addBooking.wrong = true;
-  }
-
-  errorBooking() {
-    return this.addBooking.error = true;
-  }
-
-  downloadPaymentFile(event) {
-    this.resetPopups();
-    const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5).split('.')[0];
-    this.httpClient.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + '/kinds/payment_file',
-      {responseType: 'blob'})
-      .subscribe(
-        (response) => {
-          const blob = new Blob([response], {type: 'application/xml'});
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          const url = window.URL.createObjectURL(blob);
-          a.href = url;
-          a.download = fileData.split('_')[2] + '.xml';
-          a.click();
-          window.URL.revokeObjectURL(url);
-          console.log('>> GET SUCCESS', response);
-        }, response => {
-          this.errorBooking();
-          console.error('>> GET FAILED', response.message);
-        });
-  }
-
-  downloadFromHistory(event) {
-    this.resetPopups();
-    const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5);
-    this.httpClient.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + '/kinds/booking_file',
-      {responseType: 'blob'})
-      .subscribe(
-        (response) => {
-          const blob = new Blob([response], {type: 'text/csv'});
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          const url = window.URL.createObjectURL(blob);
-          a.href = url;
-          a.download = event.data.date_exported;
-          a.click();
-          window.URL.revokeObjectURL(url);
-          console.log('>> GET SUCCESS', response);
-        }, response => {
-          this.errorBooking();
-          console.error('>> GET FAILED', response.message);
-        });
-  }
-
-  createBookingFile() {
-    this.resetPopups();
-    this.httpClient.post(this.env.apiUrl + '/finances/expenses/booking_file/files', '', {responseType: 'blob', observe: 'response'})
-      .subscribe(
-        (response) => {
-          if (response.body.type === 'application/json') {
-            this.noExpenses();
-            console.log('>> GET EMPTY', response);
-          } else {
-            const contentDispositionHeader = response.headers.get('Content-Disposition');
-            const result = contentDispositionHeader.split('=')[1].split(';')[0];
-            const blob = new Blob([response.body], {type: 'text/csv'});
-            const a = document.createElement('a');
-            document.body.appendChild(a);
-            const url = window.URL.createObjectURL(blob);
-            a.href = url;
-            a.download = result;
-            a.click();
-            window.URL.revokeObjectURL(url);
-            console.log('>> GET SUCCESS', response);
-            this.createPaymentFile(contentDispositionHeader);
-          }
-        }, response => {
-          this.errorBooking();
-          console.error('>> GET FAILED', response.message);
-        });
-  }
-
-  createPaymentFile(event) {
-    this.resetPopups();
-    const fileData = event.split('=')[2];
-    // tslint:disable-next-line:max-line-length
-    this.httpClient.post(this.env.apiUrl + '/finances/expenses/payment_file/files?name=' + fileData, '', {
-      responseType: 'blob',
-      observe: 'response'
-    })
-      .subscribe(
-        (response) => {
-          const contentDispositionHeader = response.headers.get('Content-Disposition');
-          const result = contentDispositionHeader.split('=')[1].split(';')[0];
-          const blob = new Blob([response.body], {type: 'text/xml'});
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          const url = window.URL.createObjectURL(blob);
-          a.href = url;
-          a.download = result;
-          a.click();
-          window.URL.revokeObjectURL(url);
-          this.successfulDownload();
-          this.callHistoryRefresh();
-          console.log('>> GET SUCCESS', response);
-        }, response => {
-          console.error('>> GET FAILED', response.message);
-        });
-  }
-
-  // tslint:disable-next-line:variable-name
   submitButtonController(namount, ntype, ntransdate, rnote) {
     if (this.isRejecting) {
       return rnote.invalid || namount.invalid || ntype.invalid
@@ -412,15 +281,16 @@ export class FinanceComponent implements OnInit {
         }
       }
       const action = this.action;
-      dataVerified[`status`] = action === 'approving' ? `approved` :
-        action === 'rejecting' ? `rejected_by_creditor` : null;
+      dataVerified[`status`] = action === 'approving' ? `ready_for_creditor` :
+        action === 'rejecting' ? `rejected_by_manager` : null;
+
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
-        this.expenses.updateExpenseFinance(dataVerified, expenseId)
+        this.expenses.updateExpenseManager(dataVerified, expenseId)
           .subscribe(
             result => {
               this.getNextExpense();
               // @ts-ignore
-              this.expenses.getExpenses().subscribe((response: ExpensesIfc) => this.rowData = [...response]);
+              this.expenses.getDepartmentExpenses(this.departmentId).subscribe((response: ExpensesIfc) => this.rowData = [...response]);
               this.showErrors = false;
               this.formSubmitted = !form.ngSubmit.hasError;
             },

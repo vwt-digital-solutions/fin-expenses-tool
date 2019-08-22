@@ -1,0 +1,131 @@
+@import "~src/assets/scss/mixins";
+@import "~src/assets/scss/constants";
+
+
+#linestep {
+  border-left: 1px solid #dee2e6;
+  transform: translate(50%, 0);
+  @include lg-phone-only {
+    display: none;
+  }
+}
+
+#pickstep {
+  .btn {
+    margin-bottom: 5px;
+    width: 100%;
+    display: block;
+    padding: 10px;
+  }
+}
+
+.list-group-item {
+  padding: 0 15px;
+}
+
+.clickable {
+  cursor: pointer;
+
+  &:hover {
+    opacity: .6;
+  }
+}
+
+#stepstep {
+  h1 {
+    font-weight: 300;
+  }
+
+  small {
+    color: darkgrey;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+}
+
+.list-group {
+  max-height: 25vw;
+  margin-bottom: 10px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  p {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.hidden {
+  display: none !important;
+}
+
+#updateErrors, #updateSuccess {
+  padding: 0.75rem 1.25rem;
+}
+
+.modal-footer {
+  #thumbs-up, #thumbs-down, #thumbs-down-rejecting {
+    font-size: large;
+  }
+
+  #information-icon-down {
+    cursor: pointer;
+  }
+}
+
+#expensesUpdateForm {
+  label {
+    color: #3f8bb5;
+    font-weight: 600;
+  }
+}
+
+#expensestable {
+  width: 100%;
+  height: 46em;
+  @include md-phone-only {
+    height: 30rem;
+  }
+}
+
+#expenseNote {
+  height: 100px;
+  max-height: 250px
+}
+
+#attachmentinput {
+  display: none;
+}
+
+.notFilled {
+  border: 1px solid #dc44446b;
+  background-color: #dc44440f;
+}
+
+.fill-text {
+  padding: 0;
+  margin: 0;
+  position: relative;
+  color: #dc4444c2;
+}
+
+.move-18 {
+  bottom: 18px;
+}
+
+.disabledbtn {
+  opacity: .5;
+}
+
+.disabledbtn:hover {
+  cursor: not-allowed;
+}
+
+.click-stop {
+  cursor: pointer;
+  color: $vwt_color_blue;
+
+  &:hover {
+    opacity: .6;
+  }
+}

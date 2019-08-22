@@ -42,7 +42,7 @@ export class AuthComponent {
           // SAVE ACCESS TOKEN
           const decodedToken = helper.decodeToken(accessToken);
           this.sessionStorageItems.id_token_claims_obj = decodedToken;
-          (this.sessionStorageItems as any).id_token_claims_obj._roles = ['finance.read'];
+          (this.sessionStorageItems as any).id_token_claims_obj._roles = ['finance.expenses'];
           (this.sessionStorageItems as any).id_token_claims_obj._email = 'opensource@vwt.digital';
           this.sessionStorageItems.access_token = accessToken;
           this.sessionStorageItems.id_token = accessToken;

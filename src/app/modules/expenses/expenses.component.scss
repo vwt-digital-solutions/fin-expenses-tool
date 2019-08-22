@@ -23,7 +23,7 @@ div#landing_page {
 
 label {
   color: #3f8bb5;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 input, textarea, select {
@@ -77,6 +77,7 @@ input, textarea, select {
     max-width: none;
   }
 }
+
 #typeinput {
   max-width: 365px;
   @include lg-phone-only {
@@ -118,9 +119,11 @@ input, textarea, select {
     display: none;
   }
 }
+
 #statictest {
   color: transparent;
 }
+
 #attachmentinput {
   display: none;
 }
@@ -135,6 +138,24 @@ input, textarea, select {
     bottom: 0;
     height: 75px;
     padding: 5px 15px;
+  }
+}
+
+.success {
+  @include lg-phone-only {
+    background-color: #4BB543 !important;
+  }
+}
+
+.wrong {
+  @include lg-phone-only {
+    background-color: #A63232 !important;
+  }
+}
+
+.alert {
+  @include lg-phone-only {
+    display: none;
   }
 }
 
@@ -313,4 +334,33 @@ input, textarea, select {
   max-height: 20px;
   max-width: 20px;
   margin-left: 10px
+}
+
+#toggleAttachment {
+  margin-left: 10px;
+  padding: 0;
+  background-color: #dadada;
+  color: black;
+  border: 0;
+
+  &:hover {
+    opacity: .6;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.clickable {
+  cursor: pointer;
+  color: $vwt_color_blue;
+
+  &:hover {
+    opacity: .6;
+  }
+}
+
+.new-file {
+  color: #6495ed !important; // Override the original Span & Clickable
 }

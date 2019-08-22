@@ -3,15 +3,15 @@ import { NgModule } from '@angular/core';
 
 import {AppRoutingModule} from '../../app-routing.module';
 import {CommonModule} from '@angular/common';
-import {FinanceComponent} from './finance.component';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {AgGridModule} from 'ag-grid-angular';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
+import {ManagerComponent} from './manager.component';
 
 @NgModule({
   declarations: [
-    FinanceComponent
+    ManagerComponent
   ],
   imports: [
     BrowserModule,
@@ -20,14 +20,13 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     HttpClientModule,
     FormsModule,
     AgGridModule.withComponents([]),
-    NgbModule,
-
+    NgbModule
   ],
   exports: [
     CommonModule,
-    FinanceComponent
+    ManagerComponent
   ],
   providers: [],
-  bootstrap: [FinanceComponent]
+  bootstrap: [ManagerComponent]
 })
-export class FinanceModule { }
+export class ManagerModule { }

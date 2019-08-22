@@ -44,22 +44,10 @@ input {
   max-height: 250px
 }
 
-#historytable {
-  width: 100%;
-  height: 50em;
-  @include sm-phone-only {
-    height: 10rem;
-  }
-}
-
 .alert {
   padding: 2px;
   height: auto;
 }
-
-//#historydiv {
-//  background-color: #fcfbfb;
-//}
 
 .fom {
   margin-bottom: 10px;
@@ -93,20 +81,6 @@ input {
   &:hover {
     border: 1px solid $vwt_color_blue_hr;
     opacity: .5;
-  }
-}
-
-#linestep {
-  border-left: 1px solid #80808052;
-  border-image: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(2, 138, 184, 0.4) 48%,
-      rgba(255, 255, 255, 0) 100%);
-  border-image-slice: 1;
-  transform: translate(50%, 0);
-  @include lg-phone-only {
-    display: none;
   }
 }
 
