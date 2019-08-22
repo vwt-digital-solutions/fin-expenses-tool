@@ -28,6 +28,7 @@ export class ExpensesComponent {
     this.notaData = 'Toevoegen';
     this.loadingThings = false;
     this.wantsList = true;
+    this.wantsNext = 'No';
     this.locatedFile = [];
     this.attachmentList = [];
   }
@@ -141,7 +142,7 @@ export class ExpensesComponent {
       }
     }
     if (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.expenseAttachment
-      && this.addClaimSuccess.success === false && this.addClaimSuccess.wrong === false) {
+      && ((this.addClaimSuccess.success === false && this.addClaimSuccess.wrong === false) || this.wantsNext === 'Yes')) {
       this.loadingThings = true;
       // End Check Form Data
       // Format Values
