@@ -156,8 +156,7 @@
             <li class="list-group-item text-center click-stop" (click)="fileInputHidden.click()"><span>Bestand toevoegen (inoperative)</span></li>
             <li *ngFor="let item of receiptFiles"
                 class="list-group-item d-flex justify-content-between align-items-center">
-<!--              <a href="{{this.sanitizeFile(item.content)}}" target="_blank">View File - {{this.getFileName(item)}}</a>-->
-              <img class="-file-image" [src]="sanitizeFile(item.content_type, item.content)" alt="{{this.getFileName(item)}}"/>
+              <span class="click-stop" (click)="this.openSanitizeFile(item.content_type, item.content)">View File - {{item.content_type}}</span>
               <i class="fa fa-times click-stop" (click)="removeFromAttachmentList(item)"></i>
             </li>
           </ul>

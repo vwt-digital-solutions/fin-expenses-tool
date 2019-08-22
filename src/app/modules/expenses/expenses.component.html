@@ -23,7 +23,7 @@
             <label for="amountinput">Bedrag:</label>
             <div class="input-group">
               <input id="amountinput"
-                     (click)="expensesAmount = true; this.addClaimSuccess.success = false;"
+                     (click)="expensesAmount = true; ;"
                      class="form-control"
                      [ngClass]="{notFilled: notFilledClass(namount)}"
                      type="number"
@@ -47,7 +47,7 @@
                 <label class="input-group-text" for="typeinput">Soort:</label>
               </div>
               <select id="typeinput"
-                      (change)="expenseType = true; this.addClaimSuccess.success = false;"
+                      (change)="expenseType = true; ;"
                       class="custom-select"
                       [ngClass]="{notFilled: notFilledClass(ntype)}"
                       [(ngModel)]="formType"
@@ -68,7 +68,7 @@
             <label for="dateinput">Datum bon:</label>
             <div class="input-group">
               <input id="dateinput"
-                     (click)="expenseTransDate = true; transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen'; this.addClaimSuccess.success = false;"
+                     (click)="expenseTransDate = true; transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen'; ;"
                      [ngClass]="{notFilled: notFilledClass(ntransdate)}"
                      name="date_of_transaction"
                      class="form-control"
@@ -89,7 +89,7 @@
             <div class="form-group">
               <label for="noteinput">Omschrijving:</label>
               <textarea id="noteinput"
-                        (click)="expensesNote = true; this.addClaimSuccess.success = false;"
+                        (click)="expensesNote = true; ;"
                         class="form-control"
                         [ngClass]="{notFilled: notFilledClass(nnote)}"
                         type="text"
@@ -132,7 +132,7 @@
               <ul class="list-group">
                 <li class="list-group-item d-flex justify-content-between align-items-center"
                     [ngClass]="{notFilledBtn: notFilledClass(nattachment)}"
-                    (click)="fileInputHidden.click(); expenseAttachment = true; this.addClaimSuccess.success = false;">
+                    (click)="fileInputHidden.click(); expenseAttachment = true;">
                   <span class="clickable new-file">Bestand toevoegen</span>
                 </li>
                 <li *ngFor="let item of attachmentList"

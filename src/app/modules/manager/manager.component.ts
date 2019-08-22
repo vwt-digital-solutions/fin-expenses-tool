@@ -165,6 +165,13 @@ export class ManagerComponent implements OnInit {
     }
   }
 
+  openSanitizeFile(type, file) {
+    const win = window.open();
+    // @ts-ignore
+    // tslint:disable-next-line:max-line-length no-unused-expression
+    win.document.write('<iframe src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity  + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+  }
+
   fixDate(date) {
     const stepDate = new Date(date);
     return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth())] + ' ' + stepDate.getFullYear();
@@ -220,7 +227,7 @@ export class ManagerComponent implements OnInit {
         index !== 0 ?
           console.log('No selection') : Object.assign(selectedRowData, selectedRow);
       });
-      this.expenses.getExpenseAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
+      this.expenses.getFinanceAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
         // @ts-ignore
         // tslint:disable-next-line:prefer-for-of
         for (let i = 0; i < image.length; i++) {
