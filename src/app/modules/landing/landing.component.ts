@@ -100,11 +100,14 @@ export class LandingComponent implements OnInit {
 
   ngOnInit() {
     const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
-    console.log(claimJaneDoe);
     // @ts-ignore
     this.displayPersonName = claimJaneDoe.name.split(',');
     this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName [0]).substring(1);
-    this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
+    try {
+      this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
+    } catch (e) {
+      this.OurJaneDoeIs = 'employee.write';
+    }
     // @ts-ignore
     this.personID = claimJaneDoe.email.split('@')[0];
     this.declarationCall();
