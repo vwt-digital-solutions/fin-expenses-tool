@@ -21,6 +21,7 @@ import {AuthComponent} from './auth/auth.component';
 import {NgbDropdownModule} from '@ng-bootstrap/ng-bootstrap';
 import {ExpensesConfigService} from './services/config.service';
 
+
 @NgModule({
   declarations: [
     AppComponent,

@@ -41,7 +41,7 @@ const routes: Routes = [
     path: 'expenses/controller',
     component: ControllerComponent,
     canActivate: [AuthGuard],
-    data: {roles: [Role.Manager]}
+    data: {roles: [Role.Creditor]}
   }
 ];
 

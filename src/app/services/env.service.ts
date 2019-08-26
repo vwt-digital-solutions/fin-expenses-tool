@@ -12,6 +12,9 @@ export class EnvService {
   // API url
   public apiUrl = '';
 
+  // Ag Grid
+  public agGridKey = '';
+
   constructor() {
   }
 

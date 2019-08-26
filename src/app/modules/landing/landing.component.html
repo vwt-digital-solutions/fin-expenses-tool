@@ -37,6 +37,11 @@
               [ngClass]="{hidden: !(this.OurJaneDoeIs === 'manager')}"
               class="btn btn-primary">Declaraties Beoordelen
       </button>
+      <button name="expenses/controller"
+              (click)="handleLinking($event)"
+              [ngClass]="{hidden: !(this.OurJaneDoeIs === 'creditor')}"
+              class="btn btn-primary">Controller
+      </button>
     </div>
   </div>
 

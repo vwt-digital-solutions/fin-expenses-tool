@@ -1,7 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ChartType, ChartOptions} from 'chart.js';
-import {Label} from 'ng2-charts';
-import * as pluginDataLabels from 'chartjs-plugin-datalabels';
+import * as moment from '../finance/finance.component';
 
 @Component({
   selector: 'app-manager',
@@ -9,41 +7,67 @@ import * as pluginDataLabels from 'chartjs-plugin-datalabels';
   styleUrls: ['./controller.component.scss']
 })
 export class ControllerComponent implements OnInit {
-  public ChartOptions: ChartOptions = {
-    responsive: true,
-    legend: {
-      position: 'top',
-    },
-    plugins: {
-      datalabels: {
-        formatter: (value, ctx) => {
-          const label = ctx.chart.data.labels[ctx.dataIndex];
-          return label;
-        },
-      },
-    }
-  };
-  public ChartLabels: Label[] = ['Benzinekosten', 'Parkeerkosten', 'Reiskosten', 'Overig'];
-  public ChartData: number[] = [220, 200, 136, 130];
-  public ChartType = 'pie';
-  public ChartLegend = true;
-  public ChartPlugins = [pluginDataLabels];
-  public ChartColors = [
-    {
-      backgroundColor: ['rgba(255,0,0,0.3)', 'rgba(247,255,0,0.3)', 'rgba(0,255,222,0.3)', 'rgba(228,0,255,0.3)'],
-    },
-  ];
+  private gridApi;
+  public columnDefs;
 
   constructor() {
+    this.columnDefs = [
+      {
+        headerName: 'Declaraties Overzicht',
+        children: [
+          {
+            headerName: '',
+            field: 'id',
+            width: 65,
+            colId: 'id',
+            cellRenderer: params => {
+              const infoIcon = '<i id="information-icon" class="fa fa-edit"></i>';
+              return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
+            },
+          },
+          {
+            headerName: 'Declaratiedatum',
+            field: 'date_of_claim',
+            sortable: true,
+            filter: true,
+          },
+          {
+            headerName: 'Werknemer', field: 'employee',
+            sortable: true, filter: true, width: 200, resizable: true
+          },
+          {
+            headerName: 'Kosten', field: 'amount',
+            sortable: true, filter: true, width: 150
+          },
+          {
+            headerName: 'Soort', field: 'cost_type',
+            sortable: true, filter: true, resizable: true, width: 200,
+            cellRenderer: params => {
+              return params.value.split(':')[0];
+            }
+          },
+          {
+            headerName: 'Beschrijving', field: 'note', resizable: true
+          },
+          {
+            headerName: 'Bondatum', field: 'date_of_transaction',
+            sortable: true, filter: true, width: 150
+          },
+          {
+            headerName: 'Status', field: 'status.text',
+            sortable: true, width: 250
+          },
+        ]
+      }
+    ];
   }
 
   ngOnInit() {
   }
 
-  setChart(chart) {
-    document.getElementsByClassName('active')[0].classList.remove('active');
-    chart.target.className += ' active';
-    this.ChartType = chart.target.name; // Raw Data will return error
+  onGridReady(params: any) {
+    console.log(params);
+    this.gridApi = params.api;
+    this.gridApi.exportDataAsExcel(params);
   }
-
 }

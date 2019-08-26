@@ -6,7 +6,7 @@ import {NgForm} from '@angular/forms';
 import {OAuthService} from 'angular-oauth2-oidc';
 import {ExpensesConfigService} from '../../services/config.service';
 import * as moment from 'moment';
-import {DomSanitizer} from "@angular/platform-browser";
+import {DomSanitizer} from '@angular/platform-browser';
 
 moment.locale('nl');
 
@@ -38,7 +38,6 @@ export class FinanceComponent implements OnInit {
   private submitingStart: boolean;
   private action: any;
   private OurJaneDoeIs: string;
-  private expenseDataRejection: ({ reason: string })[];
   private receiptFiles;
   private isRejecting;
   private monthNames;
@@ -111,10 +110,6 @@ export class FinanceComponent implements OnInit {
           },
         ]
       }
-    ];
-    this.expenseDataRejection = [
-      {reason: 'Niet Duidelijk'},
-      {reason: 'Kan niet uitbetalen'}
     ];
     this.formSubmitted = false;
     this.showErrors = false;
