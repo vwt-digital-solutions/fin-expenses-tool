@@ -6,6 +6,7 @@ import {NgForm} from '@angular/forms';
 import {OAuthService} from 'angular-oauth2-oidc';
 import {ExpensesConfigService} from '../../services/config.service';
 import * as moment from 'moment';
+import {DomSanitizer} from "@angular/platform-browser";
 
 moment.locale('nl');
 
@@ -50,6 +51,7 @@ export class FinanceComponent implements OnInit {
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
     private oauthService: OAuthService,
+    private sanitizer: DomSanitizer,
   ) {
     this.columnDefs = [
       {
@@ -238,7 +240,7 @@ export class FinanceComponent implements OnInit {
         // @ts-ignore
         // tslint:disable-next-line:prefer-for-of
         for (let i = 0; i < image.length; i++) {
-          this.receiptFiles.push(image[i].url);
+          this.receiptFiles.push(image[i]);
         }
       });
       this.expenseData = selectedRowData;
