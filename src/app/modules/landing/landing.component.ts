@@ -55,7 +55,7 @@ export class LandingComponent implements OnInit {
   }
 
   decimalFormatter(amount) {
-    return '€ ' + LandingComponent.formatNumber(amount);
+    return '€' + LandingComponent.formatNumber(amount);
   }
 
   dateFormatter(firstDate) {

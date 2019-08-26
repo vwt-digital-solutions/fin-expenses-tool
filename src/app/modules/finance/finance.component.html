@@ -145,22 +145,36 @@
                 </li>
               </ul>
               <!-- Form: Rejection Note | Check submit-update-form label after every change -->
-              <div class="form-group" [ngClass]="{hidden: !this.isRejecting}">
+              <div class="input-group mb-3" [ngClass]="{hidden: !this.isRejecting}">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="rnoteselect">Reden:</label>
+                </div>
+                <select  id="rnoteselect"
+                         class="custom-select"
+                         (change)="rejectionHit($event)"
+                         name="rnoteselect">
+                  <option>Deze kosten kun je declareren via Regweb (PSA)</option>
+                  <option>Deze kosten kun je declareren via de leasemaatschappij</option>
+                  <option>Deze kosten zijn al gedeclareerd</option>
+                  <option value="note">Anders, reden:</option>
+                </select>
+              </div>
+              <div class="form-group" [ngClass]="{hidden: !this.wantsRejectionNote}">
                 <label for="rnote">Reden van Afkeuring:</label>
                 <textarea id="rnote"
                           class="form-control"
                           [ngClass]="{notFilled: (rnote.invalid && (rnote.dirty || rnote.touched)),
-                          hidden: !this.isRejecting}"
+                          hidden: !this.wantsRejectionNote}"
                           type="text"
                           name="rnote"
                           required minlength="1"
-                          [(ngModel)]="expenseData.status.rnote"
+                          [(ngModel)]="noteData"
                           #rnote="ngModel">
           </textarea>
               </div>
               <div class="fill-text move-18"
                    *ngIf="(rnote.invalid && (rnote.dirty || rnote.touched))"
-                   [ngClass]="{hidden: !this.isRejecting}">
+                   [ngClass]="{hidden: !this.wantsRejectionNote}">
                 <small>Graag een geldige reden invullen</small>
               </div>
               <input type="submit" id="submit-update-form" hidden/>

@@ -44,6 +44,9 @@ export class FinanceComponent implements OnInit {
   private monthNames;
   private denySelection;
   public today;
+  public wantsRejectionNote;
+  public selectedRejection;
+  public noteData;
 
   constructor(
     private httpClient: HttpClient,
@@ -192,12 +195,19 @@ export class FinanceComponent implements OnInit {
     }
   }
 
+  rejectionHit(event) {
+    this.wantsRejectionNote = (event.target.value === 'note');
+    this.selectedRejection = event.target.value;
+    this.noteData = '';
+  }
+
   openExpenseDetailModal(content) {
     this.receiptFiles = [];
     this.isRejecting = false;
     this.modalService.open(content, {centered: true}).result.then((result) => {
       this.gridApi.deselectAll();
       this.denySelection = true;
+      this.wantsRejectionNote = false;
       console.log(`Closed with: ${result}`);
     }, (reason) => {
       this.gridApi.deselectAll();
@@ -247,6 +257,9 @@ export class FinanceComponent implements OnInit {
       this.formSubmitted = false;
       this.showErrors = false;
       this.formErrors = '';
+      this.isRejecting = false;
+      this.wantsRejectionNote = false;
+      this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
       this.openExpenseDetailModal(content);
     } else {
       this.denySelection = false;
@@ -391,7 +404,7 @@ export class FinanceComponent implements OnInit {
 
   // tslint:disable-next-line:variable-name
   submitButtonController(namount, ntype, ntransdate, rnote) {
-    if (this.isRejecting) {
+    if (this.wantsRejectionNote) {
       return rnote.invalid || namount.invalid || ntype.invalid
         || ntransdate.invalid || (new Date(ntransdate.viewModel)
           > this.today) || namount.viewModel < 0.01;
@@ -408,6 +421,9 @@ export class FinanceComponent implements OnInit {
       const data = form.value;
       data.amount = Number((data.amount).toFixed(2));
       data.date_of_transaction = (new Date(data.date_of_transaction).getTime());
+      if (!(this.wantsRejectionNote)) {
+        data.rnote = this.selectedRejection;
+      }
       for (const prop in data) {
         if (prop.length !== 0) {
           dataVerified[prop] = data[prop];
