@@ -100,6 +100,7 @@ export class LandingComponent implements OnInit {
 
   ngOnInit() {
     const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
+    console.log(claimJaneDoe);
     // @ts-ignore
     this.displayPersonName = claimJaneDoe.name.split(',');
     this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName [0]).substring(1);
