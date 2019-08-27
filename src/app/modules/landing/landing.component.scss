@@ -19,6 +19,12 @@
   }
 }
 
+.row {
+  @include lg-phone-only {
+    flex-direction: column-reverse !important;
+  }
+}
+
 .list-group-item {
   padding: 0 15px;
 }
