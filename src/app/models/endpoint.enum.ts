@@ -3,4 +3,5 @@ export enum Endpoint {
     department = '/finances/department',
     employee = '/employees/expenses',
     manager = '/managers/expenses',
+    controller = '/controllers/expenses',
 }
