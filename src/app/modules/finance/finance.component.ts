@@ -75,8 +75,7 @@ export class FinanceComponent implements OnInit {
             sortable: true,
             filter: true,
             cellRenderer: params => {
-              return moment(params.value).add(
-                FinanceComponent.getUTCOffset(params.value), 'hours').format('LLL');
+              return FinanceComponent.getCorrectDate(params.value);
             },
           },
           {
@@ -152,8 +151,10 @@ export class FinanceComponent implements OnInit {
     return '€ ' + FinanceComponent.formatNumber(amounts.value);
   }
 
-  static getUTCOffset(date) {
-    return moment(date).utcOffset() / 60;
+  static getCorrectDate(date) {
+    const d = new Date(date);
+    return d.getDate()  + '-' + (d.getMonth() + 1) +      '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
+      ('0' + d.getMinutes()).substr(-2) + ':' + ('0' + d.getSeconds()).substr(-2);
   }
 
   static getDismissReason(reason: any): string {
