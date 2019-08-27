@@ -86,10 +86,9 @@ export class ControllerComponent implements OnInit {
   }
 
   onBtExport() {
-    let params1 = {
+    const params1 = {
       allColumns: true,
     };
-    params1.processCellCallback =
     this.gridApi.exportDataAsCsv(params1);
   }
 
