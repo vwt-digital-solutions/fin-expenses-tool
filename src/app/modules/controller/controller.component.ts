@@ -89,7 +89,7 @@ export class ControllerComponent implements OnInit {
     const params1 = {
       allColumns: true,
     };
-    this.gridApi.exportDataAsCsv(params1);
+    this.gridApi.exportDataAsExcel(params1);
   }
 
   fixDate(date) {
