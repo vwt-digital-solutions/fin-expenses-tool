@@ -34,7 +34,7 @@
       float: left;
       text-transform: uppercase;
        @include lg-phone-only {
-          font-size: smaller;
+         display: none;
       }
     }
   }

@@ -35,11 +35,20 @@
   h1 {
     font-weight: 300;
   }
+  @include lg-phone-only {
+    margin-top: 7.5rem!important;
+  }
 
   small {
     color: darkgrey;
     font-weight: 600;
     text-transform: uppercase;
+  }
+}
+
+#liststep {
+  @include lg-phone-only {
+    margin-top: 15px;
   }
 }
 
@@ -52,6 +61,10 @@
   p {
     margin-top: 1rem;
     margin-bottom: 1rem;
+  }
+  @include lg-phone-only {
+    max-height: none;
+    margin-bottom: 0;
   }
 }
 
