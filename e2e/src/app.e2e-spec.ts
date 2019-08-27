@@ -1,12 +1,13 @@
 import { browser, logging, protractor, by, element, Capabilities, Key } from 'protractor';
 import { AppPage } from './app.po';
+import {config} from 'rxjs';
 const request = require('request');
 const fs = require('fs');
 const requestOptions = {
   method: 'GET',
   url: browser.params.login.token,
   headers: {
-    'content-type': 'application/x-www-form-urlencoded'
+    'content-type': 'application/json'
   },
   form: {
     grant_type: 'client_credentials',
@@ -31,8 +32,6 @@ const get = (options: any): any => {
 };
 const EC = protractor.ExpectedConditions;
 
-
-// tslint:disable-next-line:only-arrow-functions
 describe('ExpenseApp:', function() {
   afterEach(() => {
     browser.manage().logs().get('browser').then((messages) => {
@@ -50,6 +49,7 @@ describe('ExpenseApp:', function() {
     const flow = protractor.promise.controlFlow();
     flow.execute(setupCommon).then((response) => {
       const responseBody = JSON.parse((response as any).body);
+      console.log(responseBody);
       browser.get('/auth/' + encodeURI(JSON.stringify(responseBody))).then((() => {
           browser.getPageSource().then((text: string) => {
             fs.writeFile('index.html', text, ((err: any) => {
@@ -62,21 +62,13 @@ describe('ExpenseApp:', function() {
         }));
     });
   });
-
-  it('should have claim heading ', () => {
-    browser.get('/').then((value: any) => {
-      // browser.wait(EC.titleContains('Purchase2Pay'));
-      expect(element(by.cssContainingText('h5', 'Declaratie Indienen ')));
-      browser.getPageSource().then((text: string) => {
-        fs.writeFile('index.html', text, ((err: any) => {
-          if (err) { fail(err); }
-        }));
-        expect(element(by.css('input[name=amount]')));
-      });
-    },
-      (reason: any) => {
-        console.log('Failure');
-        fail(reason);
-      });
+  it('should open the landing header', function() {
+    browser.waitForAngularEnabled(false);
+    expect(element(by.css('h1')).getText()).toEqual('MIJN DECLARATIES');
+  });
+  it('should create an expense', function() {
+    browser.waitForAngularEnabled(false);
+    element(by.name('expenses')).click();
+    browser.sleep(10000);
   });
 });
