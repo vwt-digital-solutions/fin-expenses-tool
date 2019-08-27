@@ -121,18 +121,17 @@ export class LandingComponent implements OnInit {
   }
 
   declarationCall() {
-    this.hasNoExpenses = true;
     // @ts-ignore
-    // this.httpClient.get(this.env.apiUrl + '/employees/' + this.personID + '/expenses')
-    //   .subscribe(
-    //     val => {
-    //       this.declarationData = val;
-    //       // @ts-ignore
-    //       this.hasNoExpenses = (val.length < 1);
-    //       console.log('>> GET SUCCESS', val);
-    //     }, response => {
-    //       console.error('>> GET FAILED', response.message);
-    //     });
+    this.httpClient.get(this.env.apiUrl + '/employees/' + this.personID + '/expenses')
+      .subscribe(
+        val => {
+          this.declarationData = val;
+          // @ts-ignore
+          this.hasNoExpenses = (val.length < 1);
+          console.log('>> GET SUCCESS', val);
+        }, response => {
+          console.error('>> GET FAILED', response.message);
+        });
   }
 
   handleLinking(event) {

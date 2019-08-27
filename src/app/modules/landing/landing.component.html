@@ -10,15 +10,15 @@
         <li *ngIf="this.hasNoExpenses" class="list-group-item d-flex justify-content-between align-items-center">
           Je hebt geen openstaande declaraties
         </li>
-<!--        <li *ngFor="let item of declarationData"-->
-<!--            (click)="clickExpense(expenseContent, item)"-->
-<!--            [ngClass]="{clickable: isClickable(item)}"-->
-<!--            class="list-group-item d-flex justify-content-between align-items-center">-->
-<!--          <p>{{decimalFormatter(item.amount)}} | {{dateFormatter(item.date_of_claim)}}</p>-->
-<!--          <span class="badge badge-pill"-->
-<!--                [className]="statusClassing(item.status.text)">-->
-<!--            {{statusFormatter(item.status.text)}}</span>-->
-<!--        </li>-->
+        <li *ngFor="let item of declarationData"
+            (click)="clickExpense(expenseContent, item)"
+            [ngClass]="{clickable: isClickable(item)}"
+            class="list-group-item d-flex justify-content-between align-items-center">
+          <p>{{decimalFormatter(item.amount)}} | {{dateFormatter(item.date_of_claim)}}</p>
+          <span class="badge badge-pill"
+                [className]="statusClassing(item.status.text)">
+            {{statusFormatter(item.status.text)}}</span>
+        </li>
       </ul>
     </div>
     <div class="col col-sm-1" id="linestep"></div>
