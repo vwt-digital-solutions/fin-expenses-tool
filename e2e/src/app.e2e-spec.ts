@@ -1,6 +1,7 @@
-import { browser, logging, protractor, by, element, Capabilities, Key } from 'protractor';
-import { AppPage } from './app.po';
+import {browser, logging, protractor, by, element, Capabilities, Key} from 'protractor';
+import {AppPage} from './app.po';
 import {config} from 'rxjs';
+
 const request = require('request');
 const fs = require('fs');
 const requestOptions = {
@@ -23,7 +24,7 @@ const get = (options: any): any => {
     console.log(JSON.stringify(error));
     console.log(JSON.stringify(message));
     if (error || message.statusCode >= 400) {
-      defer.reject({ error, message });
+      defer.reject({error, message});
     } else {
       defer.fulfill(message);
     }
@@ -53,7 +54,9 @@ describe('ExpenseApp:', function() {
       browser.get('/auth/' + encodeURI(JSON.stringify(responseBody))).then((() => {
           browser.getPageSource().then((text: string) => {
             fs.writeFile('index.html', text, ((err: any) => {
-              if (err) { fail(err); }
+              if (err) {
+                fail(err);
+              }
             }));
           });
         }),
@@ -62,13 +65,25 @@ describe('ExpenseApp:', function() {
         }));
     });
   });
+
   it('should open the landing header', function() {
     browser.waitForAngularEnabled(false);
     expect(element(by.css('h1')).getText()).toEqual('MIJN DECLARATIES');
   });
-  it('should create an expense', function() {
+
+  it('should get the cost-types', function() {
     browser.waitForAngularEnabled(false);
     element(by.name('expenses')).click();
-    browser.sleep(10000);
+    const typeList = element.all(by.css('option'));
+    expect(typeList.count()).toEqual(29 + 1); // 29 Types + 1 Text
+  });
+
+  it('should create an expense', function() {
+    browser.waitForAngularEnabled(false);
+    element(by.id('amountinput')).sendKeys(Math.floor(Math.random() * 50));
+    element(by.id('dateinput')).sendKeys((new Date()).toDateString());
+    element(by.id('noteinput')).sendKeys('E2E Addition');
+    // @ts-ignore
+    expect(element(by.id('noteinput')).getText()).toEqual('empty');
   });
 });
