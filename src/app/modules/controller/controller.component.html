@@ -1,4 +1,5 @@
 <div class="container-fluid">
+  <button type="button" class="btn btn-primary" (click)="onBtExport()">Export to Excel</button>
   <!-- START AG-GRID EXPENSES -->
   <ag-grid-angular
     style="width: 100%; height: 750px; overflow:hidden;"
@@ -9,5 +10,4 @@
     (gridReady)="onGridReady($event)">
   </ag-grid-angular>
   <!-- END AG-GRID EXPENSES -->
-  <button (click)="onBtExport()">Download</button>
 </div>
