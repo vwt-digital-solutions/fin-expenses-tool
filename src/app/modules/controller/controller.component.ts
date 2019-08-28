@@ -32,9 +32,6 @@ export class ControllerComponent implements OnInit {
             field: 'date_of_claim',
             sortable: true,
             filter: true,
-            cellRenderer: params => {
-              return ControllerComponent.getCorrectDate(params.value);
-            }
           },
           {
             headerName: 'Werknemer', field: 'employee',
@@ -57,9 +54,6 @@ export class ControllerComponent implements OnInit {
           {
             headerName: 'Bondatum', field: 'date_of_transaction',
             sortable: true, filter: true, width: 150,
-            cellRenderer: params => {
-              return this.fixDate(params.value);
-            }
           },
           {
             headerName: 'Status', field: 'status.text',
@@ -73,12 +67,6 @@ export class ControllerComponent implements OnInit {
 
   rowData = null;
 
-  static getCorrectDate(date) {
-    const d = new Date(date);
-    return d.getDate()  + '-' + (d.getMonth() + 1) +      '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
-      ('0' + d.getMinutes()).substr(-2) + ':' + ('0' + d.getSeconds()).substr(-2);
-  }
-
   ngOnInit() {
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
@@ -90,11 +78,6 @@ export class ControllerComponent implements OnInit {
       allColumns: true,
     };
     this.gridApi.exportDataAsExcel(params1);
-  }
-
-  fixDate(date) {
-    const stepDate = new Date(date);
-    return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth())] + ' ' + stepDate.getFullYear();
   }
 
   onGridReady(params: any) {
