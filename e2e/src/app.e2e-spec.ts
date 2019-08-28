@@ -50,7 +50,6 @@ describe('ExpenseApp:', function() {
     const flow = protractor.promise.controlFlow();
     flow.execute(setupCommon).then((response) => {
       const responseBody = JSON.parse((response as any).body);
-      console.log(responseBody);
       browser.get('/auth/' + encodeURI(JSON.stringify(responseBody))).then((() => {
           browser.getPageSource().then((text: string) => {
             fs.writeFile('index.html', text, ((err: any) => {
@@ -66,24 +65,45 @@ describe('ExpenseApp:', function() {
     });
   });
 
-  it('should open the landing header', function() {
+  it('should open the landing page', function() {
     browser.waitForAngularEnabled(false);
     expect(element(by.css('h1')).getText()).toEqual('MIJN DECLARATIES');
+  });
+
+  it('should get the open expenses', function() {
+    browser.waitForAngularEnabled(false);
+    browser.sleep(1000);
+    const expenseList = element.all(by.css('li'));
+    expect(expenseList.count()).toBeGreaterThanOrEqual(1);
   });
 
   it('should get the cost-types', function() {
     browser.waitForAngularEnabled(false);
     element(by.name('expenses')).click();
+    browser.sleep(1000);
     const typeList = element.all(by.css('option'));
-    expect(typeList.count()).toEqual(29 + 1); // 29 Types + 1 Text
+    expect(typeList.count()).toEqual(29 + 1); // 29 Types + 1 Text\
   });
 
   it('should create an expense', function() {
     browser.waitForAngularEnabled(false);
     element(by.id('amountinput')).sendKeys(Math.floor(Math.random() * 50));
+    const typeList = element(by.id('typeinput')).all(by.tagName('option'));
+    typeList.count().then(function(numberOfItems) {
+      return Math.floor(Math.random() * (numberOfItems - 1));
+    }).then(function(randomNumber) {
+      typeList.get(randomNumber + 1).click();
+    });
     element(by.id('dateinput')).sendKeys((new Date()).toDateString());
     element(by.id('noteinput')).sendKeys('E2E Addition');
-    // @ts-ignore
-    expect(element(by.id('noteinput')).getText()).toEqual('empty');
+    const path = require('path');
+    // tslint:disable-next-line:one-variable-per-declaration
+    const file = 'assets/betaald.png',
+      absolutePath = path.resolve(__dirname, file);
+    element(by.id('attachmentinput')).sendKeys(absolutePath);
+    element(by.id('submit-click')).click();
+    const until = protractor.ExpectedConditions;
+    const elem = element(by.id('succes-alert'));
+    expect(browser.wait(until.urlContains('/home'), 10000, 'Expense creation took too long'));
   });
 });

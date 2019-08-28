@@ -41,8 +41,9 @@
   h1 {
     font-weight: 300;
   }
+
   @include lg-phone-only {
-    margin-top: 7.5rem!important;
+    margin-top: 7.5rem !important;
   }
 
   small {
@@ -68,6 +69,7 @@
     margin-top: 1rem;
     margin-bottom: 1rem;
   }
+
   @include lg-phone-only {
     max-height: none;
     margin-bottom: 0;
