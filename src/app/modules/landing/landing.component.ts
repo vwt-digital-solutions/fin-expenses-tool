@@ -25,7 +25,7 @@ interface ExpensesIfc {
 })
 export class LandingComponent implements OnInit {
 
-  public OurJaneDoeIs: string;
+  public OurJaneDoeIs;
   public displayPersonName;
   public personID;
   public declarationData;
@@ -99,8 +99,12 @@ export class LandingComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.OurJaneDoeIs = [];
     const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
-    this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
+    // tslint:disable-next-line:prefer-for-of
+    for (let i = 0; i < claimJaneDoe.roles.length; i++) {
+      this.OurJaneDoeIs.push(claimJaneDoe.roles[i].split('.')[0]);
+    }
     // @ts-ignore
     this.personID = claimJaneDoe.email.split('@')[0];
     // @ts-ignore

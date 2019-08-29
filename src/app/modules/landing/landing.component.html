@@ -29,17 +29,17 @@
       </button>
       <button name="expenses/process"
               (click)="handleLinking($event)"
-              [ngClass]="{hidden: !(this.OurJaneDoeIs === 'creditor')}"
+              [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('creditor'))}"
               class="btn btn-primary">Declaraties Controleren
       </button>
       <button name="expenses/manage"
               (click)="handleLinking($event)"
-              [ngClass]="{hidden: !(this.OurJaneDoeIs === 'manager')}"
+              [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('manager'))}"
               class="btn btn-primary">Declaraties Beoordelen
       </button>
       <button name="expenses/controller"
               (click)="handleLinking($event)"
-              [ngClass]="{hidden: !(this.OurJaneDoeIs === 'creditor')}"
+              [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('controller'))}"
               class="btn btn-primary">Controller
       </button>
     </div>

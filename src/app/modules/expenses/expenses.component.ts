@@ -53,6 +53,7 @@ export class ExpensesComponent {
   public wantsList;
   public attachmentList;
   public wantsNext;
+  public expenseID;
 
   // Classes Logic
   notFilledClass(setClass) {
@@ -163,6 +164,7 @@ export class ExpensesComponent {
             this.successfulClaim();
             this.loadingThings = false;
             console.log('>> POST SUCCESS', val);
+            this.expenseID = val;
             if (this.wantsNext === 'Yes') {
               form.reset();
               this.attachmentList = [];
@@ -171,7 +173,7 @@ export class ExpensesComponent {
               // tslint:disable-next-line:only-arrow-functions
               setTimeout(function() {
                 window.location.href = window.location.protocol + '//' + window.location.host + '/home';
-              }, 1000);
+              }, 2000);
             }
           }, response => {
             this.wrongfulClaim();

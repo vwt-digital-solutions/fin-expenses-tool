@@ -1,6 +1,7 @@
 import {browser, logging, protractor, by, element, Capabilities, Key} from 'protractor';
 import {AppPage} from './app.po';
 import {config} from 'rxjs';
+import {url} from 'inspector';
 
 const request = require('request');
 const fs = require('fs');
@@ -32,6 +33,8 @@ const get = (options: any): any => {
   return defer.promise;
 };
 const EC = protractor.ExpectedConditions;
+const until = protractor.ExpectedConditions;
+let expenseID;
 
 describe('ExpenseApp:', function() {
   afterEach(() => {
@@ -68,6 +71,7 @@ describe('ExpenseApp:', function() {
   it('should open the landing page', function() {
     browser.waitForAngularEnabled(false);
     expect(element(by.css('h1')).getText()).toEqual('MIJN DECLARATIES');
+    browser.sleep(1000);
   });
 
   it('should get the open expenses', function() {
@@ -102,8 +106,37 @@ describe('ExpenseApp:', function() {
       absolutePath = path.resolve(__dirname, file);
     element(by.id('attachmentinput')).sendKeys(absolutePath);
     element(by.id('submit-click')).click();
-    const until = protractor.ExpectedConditions;
     const elem = element(by.id('succes-alert'));
-    expect(browser.wait(until.urlContains('/home'), 10000, 'Expense creation took too long'));
+    browser.wait(until.visibilityOf(elem), 10000, 'Expense creation took too long').then(function() {
+      elem.getText().then(function (text) {
+        expenseID = text.split(' ').slice(-1)[0];
+      });
+    });
+    expect(elem.isDisplayed()).toBe(true);
+  });
+
+  it('should get expenses on process', function() {
+    browser.waitForAngularEnabled(false);
+    expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
+    element(by.name('expenses/process')).click();
+    browser.sleep(1000);
+    const expenseList = element.all(by.id('information-icon'));
+    expect(expenseList.count()).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should get the attachments', function() {
+    browser.waitForAngularEnabled(false);
+    element(by.id(expenseID.toString())).element(by.xpath('ancestor::div')).click();
+    browser.sleep(2000);
+    const attachmentList = element.all(by.css('li'));
+    expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should reject the expense', function() {
+    browser.waitForAngularEnabled(false);
+    element(by.id('thumbs-down')).click();
+    browser.sleep(500);
+    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense approval took too long'));
+    // expect(element(by.css('.modal-content')).isDisplayed()).toBe(false);
   });
 });
