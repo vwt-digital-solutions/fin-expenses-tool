@@ -126,9 +126,9 @@ describe('ExpenseApp:', function() {
 
   it('should get the attachments', function() {
     browser.waitForAngularEnabled(false);
-    element(by.id(expenseID.toString())).element(by.xpath('ancestor::div')).click();
+    element(by.id(expenseID.toString())).element(by.xpath('ancestor::span')).element(by.xpath('ancestor::div')).click();
     browser.sleep(2000);
-    const attachmentList = element.all(by.css('li'));
+    const attachmentList = element.all(by.css('.click-stop'));
     expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
   });
 
@@ -136,6 +136,7 @@ describe('ExpenseApp:', function() {
     browser.waitForAngularEnabled(false);
     element(by.id('thumbs-down')).click();
     browser.sleep(500);
+    element(by.id('thumbs-down-rejecting')).click();
     expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense approval took too long'));
     // expect(element(by.css('.modal-content')).isDisplayed()).toBe(false);
   });

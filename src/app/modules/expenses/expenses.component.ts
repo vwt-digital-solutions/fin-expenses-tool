@@ -173,7 +173,7 @@ export class ExpensesComponent {
               // tslint:disable-next-line:only-arrow-functions
               setTimeout(function() {
                 window.location.href = window.location.protocol + '//' + window.location.host + '/home';
-              }, 2000);
+              }, 1000);
             }
           }, response => {
             this.wrongfulClaim();
