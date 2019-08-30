@@ -126,7 +126,7 @@ describe('ExpenseApp:', function() {
 
   it('should get the attachments', function() {
     browser.waitForAngularEnabled(false);
-    element(by.id(expenseID.toString())).element(by.xpath('ancestor::span')).element(by.xpath('ancestor::div')).click();
+    element(by.id(expenseID.toString())).element(by.xpath('ancestor::div')).click();
     browser.sleep(2000);
     const attachmentList = element.all(by.css('.click-stop'));
     expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
