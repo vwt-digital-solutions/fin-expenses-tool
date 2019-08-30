@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
-import {LZStringService} from 'ng-lz-string';
 import {__await} from 'tslib';
 
 @Component({
@@ -13,7 +12,6 @@ import {__await} from 'tslib';
 export class ExpensesComponent {
 
   constructor(
-    private lz: LZStringService,
     private httpClient: HttpClient,
     private env: EnvService,
   ) {
