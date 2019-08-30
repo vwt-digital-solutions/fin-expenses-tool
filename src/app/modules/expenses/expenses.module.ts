@@ -6,6 +6,7 @@ import {CommonModule} from '@angular/common';
 import {ExpensesComponent} from './expenses.component';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
+import { LZStringModule, LZStringService } from 'ng-lz-string';
 
 @NgModule({
   declarations: [
@@ -16,13 +17,14 @@ import {FormsModule} from '@angular/forms';
     AppRoutingModule,
     CommonModule,
     HttpClientModule,
+    LZStringModule,
     FormsModule
   ],
   exports: [
     CommonModule,
     ExpensesComponent
   ],
-  providers: [],
+  providers: [LZStringService],
   bootstrap: [ExpensesComponent]
 })
 export class ExpensesModule {

@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
+import {LZStringService} from 'ng-lz-string';
 import {__await} from 'tslib';
 
 @Component({
@@ -12,6 +13,7 @@ import {__await} from 'tslib';
 export class ExpensesComponent {
 
   constructor(
+    private lz: LZStringService,
     private httpClient: HttpClient,
     private env: EnvService,
   ) {
@@ -94,28 +96,44 @@ export class ExpensesComponent {
   // End Classes Logic
 
   onFileInput(file) {
-    if (this.wantsList) {
-      if (!(file[0] === undefined || file[0] === null)) {
-        this.attachmentList.push(file);
-        const reader = new FileReader();
-        reader.readAsDataURL(file[0]);
-        reader.onload = () => {
+    if (!(file[0] === undefined || file[0] === null)) {
+      this.attachmentList.push(file);
+      const reader = new FileReader();
+      reader.readAsDataURL(file[0]);
+      reader.onload = () => {
+        if (file[0]. type === 'application/pdf') {
           this.locatedFile.push(reader.result);
-        };
-      }
-    } else {
-      this.locatedFile = [];
-      this.attachmentList = [];
-      if (file[0] === undefined || file[0] === null) {
-        this.notaData = 'Toevoegen';
-      } else {
-        const reader = new FileReader();
-        reader.readAsDataURL(file[0]);
-        reader.onload = () => {
-          this.locatedFile.push(reader.result);
-          this.notaData = '';
-        };
-      }
+        } else if (file[0].type.split('/')[0] === 'image') {
+          const img = new Image();
+          if (typeof reader.result === 'string') {
+            img.src = reader.result;
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              let width;
+              if (img.width > 600) {
+                width = 600;
+              } else {
+                width = img.width;
+              }
+              const scaleFactor = width / img.width;
+              canvas.width = width;
+              canvas.height = img.height * scaleFactor;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+              ctx.canvas.toBlob(blob => {
+                const filla = new File([blob], file[0].name, {
+                  type: file[0].type,
+                  lastModified: this.today
+                });
+                reader.readAsDataURL(filla);
+                reader.onload = () => {
+                  this.locatedFile.push(reader.result);
+                };
+              }, file[0].type, 1);
+            }, reader.onerror = Error => console.log(Error);
+          }
+        }
+      };
     }
   }
 
