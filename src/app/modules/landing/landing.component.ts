@@ -64,10 +64,22 @@ export class LandingComponent implements OnInit {
   }
 
   openSanitizeFile(type, file) {
-    const win = window.open();
-    // @ts-ignore
-    // tslint:disable-next-line:max-line-length no-unused-expression
-    win.document.write('<iframe src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+    const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
+    if (isIEOrEdge) {
+      if (type === 'application/pdf') {
+        alert('Please use Chrome to view this file');
+      } else {
+        const win = window.open();
+        // @ts-ignore
+        // tslint:disable-next-line:max-line-length
+        win.document.write('<img src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" alt="">');
+      }
+    } else {
+      const win = window.open();
+      // @ts-ignore
+      // tslint:disable-next-line:max-line-length no-unused-expression
+      win.document.write('<iframe src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+    }
   }
 
   statusClassing(status) {

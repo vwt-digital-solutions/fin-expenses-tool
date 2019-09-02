@@ -93,6 +93,7 @@ export class ExpensesComponent {
   // End Classes Logic
 
   onFileInput(file) {
+    console.log(file);
     if (!(file[0] === undefined || file[0] === null)) {
       this.attachmentList.push(file);
       const reader = new FileReader();
