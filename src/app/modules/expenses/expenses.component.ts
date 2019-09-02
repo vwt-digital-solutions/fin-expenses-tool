@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
-import {__await} from 'tslib';
 
 @Component({
   selector: 'app-expenses',
@@ -88,7 +87,7 @@ export class ExpensesComponent {
   submitButtonController(nnote, namount, ntype, ntransdate, nattachment) {
     return this.expensesNote === false || this.expensesAmount === false || this.expenseType === false || this.expenseTransDate === false ||
       this.expenseAttachment === false || nnote.invalid || namount.invalid || ntype.invalid || ntransdate.invalid ||
-      nattachment.invalid || this.addClaimSuccess.success === true || this.addClaimSuccess.wrong === true;
+      nattachment.invalid || this.addClaimSuccess.wrong === true;
   }
 
   // End Classes Logic
@@ -137,7 +136,7 @@ export class ExpensesComponent {
 
   splitCheck() {
     return (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.expenseAttachment
-      && ((this.addClaimSuccess.success === false && this.addClaimSuccess.wrong === false) || this.wantsNext === 'Yes'));
+      && this.addClaimSuccess.wrong === false);
   }
 
   claimForm(form: NgForm) {
@@ -197,10 +196,6 @@ export class ExpensesComponent {
             console.error('>> POST FAILED', response.message);
           });
     }
-  }
-
-  toggleAttachment() {
-    return this.wantsList = !this.wantsList;
   }
 
   removeFromAttachmentList(item) {
