@@ -6,6 +6,7 @@ import {NgForm} from '@angular/forms';
 import {OAuthService} from 'angular-oauth2-oidc';
 import {ExpensesConfigService} from '../../services/config.service';
 import * as moment from 'moment';
+import {DomSanitizer} from '@angular/platform-browser';
 
 moment.locale('nl');
 
@@ -52,6 +53,7 @@ export class ManagerComponent implements OnInit {
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
     private oauthService: OAuthService,
+    private sanitizer: DomSanitizer,
   ) {
     this.columnDefs = [
       {

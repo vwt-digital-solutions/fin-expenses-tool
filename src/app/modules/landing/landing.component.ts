@@ -1,12 +1,11 @@
-import {Component, OnInit, Pipe, PipeTransform} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {OAuthService} from 'angular-oauth2-oidc';
 import {HttpClient} from '@angular/common/http';
 import {EnvService} from '../../services/env.service';
 import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {isEmpty} from 'rxjs/operators';
-import {DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser';
+import {DomSanitizer} from '@angular/platform-browser';
 
 
 interface IClaimRoles {
@@ -67,7 +66,11 @@ export class LandingComponent implements OnInit {
     const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
     if (isIEOrEdge) {
       if (type === 'application/pdf') {
-        alert('Please use Chrome to view this file');
+        alert('Please use another browser to view this file');
+        // const win = window.open();
+        // @ts-ignore
+        // tslint:disable-next-line:max-line-length
+        // win.document.write('<a href="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" download="pdf.pdf">Download File</a>');
       } else {
         const win = window.open();
         // @ts-ignore
