@@ -17,9 +17,6 @@ interface ExpensesIfc {
 })
 
 export class ControllerComponent implements OnInit {
-  private monthNames;
-  private gridApi;
-  public columnDefs;
   constructor(
     private expenses: ExpensesConfigService,
   ) {
@@ -38,7 +35,7 @@ export class ControllerComponent implements OnInit {
             sortable: true, filter: true, width: 200, resizable: true
           },
           {
-            headerName: 'Kosten', field: 'amount',
+            headerName: 'Kosten', field: 'amount', valueFormatter: ControllerComponent.decimalFormatter,
             sortable: true, filter: true, width: 150
           },
           {
@@ -63,9 +60,19 @@ export class ControllerComponent implements OnInit {
       }
     ];
   }
-
+  private monthNames;
+  private gridApi;
+  public columnDefs;
 
   rowData = null;
+
+  static formatNumber(numb) {
+    return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+  }
+
+  static decimalFormatter(amounts) {
+    return '€ ' + ControllerComponent.formatNumber(amounts.value);
+  }
 
   ngOnInit() {
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
