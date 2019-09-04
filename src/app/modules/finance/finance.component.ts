@@ -188,7 +188,7 @@ export class FinanceComponent implements OnInit {
         || navigator.userAgent.match(/iPod/i)
         || navigator.userAgent.match(/BlackBerry/i)
         || navigator.userAgent.match(/Windows Phone/i)) {
-        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge of Samsung Mobile Browser.</p>');
+        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge Mobile of Samsung Internet.</p>');
       } else if (!isChrome) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
       }
@@ -256,6 +256,15 @@ export class FinanceComponent implements OnInit {
   }
 
   onSelectionChanged(event, content) {
+    if ( navigator.userAgent.match(/Android/i)
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i)
+      || navigator.userAgent.match(/BlackBerry/i)
+      || navigator.userAgent.match(/Windows Phone/i)) {
+      this.denySelection = false;
+    }
     if (!this.denySelection) {
       this.gridApi = event.api;
       const selectedRows = event.api.getSelectedRows();

@@ -83,7 +83,7 @@ export class LandingComponent implements OnInit {
         || navigator.userAgent.match(/iPod/i)
         || navigator.userAgent.match(/BlackBerry/i)
         || navigator.userAgent.match(/Windows Phone/i)) {
-        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge of Samsung Mobile Browser.</p>');
+        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge Mobile of Samsung Internet.</p>');
       } else if (!isChrome) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
       }
