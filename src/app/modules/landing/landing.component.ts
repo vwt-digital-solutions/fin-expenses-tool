@@ -64,13 +64,10 @@ export class LandingComponent implements OnInit {
 
   openSanitizeFile(type, file) {
     const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
+    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
     if (isIEOrEdge) {
       if (type === 'application/pdf') {
-        alert('Please use another browser to view this file');
-        // const win = window.open();
-        // @ts-ignore
-        // tslint:disable-next-line:max-line-length
-        // win.document.write('<a href="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" download="pdf.pdf">Download File</a>');
+        alert('Please use Chrome or Firefox to view this file');
       } else {
         const win = window.open();
         // @ts-ignore
@@ -79,9 +76,20 @@ export class LandingComponent implements OnInit {
       }
     } else {
       const win = window.open();
+      if ( navigator.userAgent.match(/Android/i)
+        || navigator.userAgent.match(/webOS/i)
+        || navigator.userAgent.match(/iPhone/i)
+        || navigator.userAgent.match(/iPad/i)
+        || navigator.userAgent.match(/iPod/i)
+        || navigator.userAgent.match(/BlackBerry/i)
+        || navigator.userAgent.match(/Windows Phone/i)) {
+        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge of Samsung Mobile Browser.</p>');
+      } else if (!isChrome) {
+        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
+      }
       // @ts-ignore
       // tslint:disable-next-line:max-line-length no-unused-expression
-      win.document.write('<iframe src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+      win.document.write('<iframe src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
     }
   }
 
