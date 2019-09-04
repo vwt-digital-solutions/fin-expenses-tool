@@ -170,9 +170,10 @@ export class ManagerComponent implements OnInit {
 
   openSanitizeFile(type, file) {
     const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
+    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
     if (isIEOrEdge) {
       if (type === 'application/pdf') {
-        alert('Please use Chrome to view this file');
+        alert('Please use Chrome or Firefox to view this file');
       } else {
         const win = window.open();
         // @ts-ignore
@@ -181,7 +182,17 @@ export class ManagerComponent implements OnInit {
       }
     } else {
       const win = window.open();
-      win.document.write('<p>Bij problemen, gebruik een andere browser</p>');
+      if ( navigator.userAgent.match(/Android/i)
+        || navigator.userAgent.match(/webOS/i)
+        || navigator.userAgent.match(/iPhone/i)
+        || navigator.userAgent.match(/iPad/i)
+        || navigator.userAgent.match(/iPod/i)
+        || navigator.userAgent.match(/BlackBerry/i)
+        || navigator.userAgent.match(/Windows Phone/i)) {
+        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge of Samsung Mobile Browser.</p>');
+      } else if (!isChrome) {
+        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
+      }
       // @ts-ignore
       // tslint:disable-next-line:max-line-length no-unused-expression
       win.document.write('<iframe src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
