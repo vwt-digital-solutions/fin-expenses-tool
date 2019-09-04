@@ -108,7 +108,7 @@ describe('ExpenseApp:', function() {
     element(by.id('submit-click')).click();
     const elem = element(by.id('succes-alert'));
     browser.wait(until.visibilityOf(elem), 10000, 'Expense creation took too long').then(function() {
-      elem.getText().then(function (text) {
+      elem.getText().then(function(text) {
         expenseID = text.split(' ').slice(-1)[0];
       });
     });
