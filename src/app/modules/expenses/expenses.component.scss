@@ -52,6 +52,10 @@ input, textarea, select {
   }
 }
 
+.deep_button_new {
+  margin-top: 0!important;
+}
+
 .tall-button {
   color: $vwt_color_blue;
   border: 2px solid $vwt_color_blue_hr;
@@ -103,7 +107,7 @@ input, textarea, select {
     position: absolute;
     width: 100%;
     padding: 1em;
-    margin-bottom: 50px;
+    margin-bottom: 75px;
   }
 }
 
@@ -137,7 +141,7 @@ input, textarea, select {
     background-color: #abdeef;
     position: fixed;
     bottom: 0;
-    height: 120px;
+    height: 110px;
     padding: 0 15px;
     margin: 0;
   }

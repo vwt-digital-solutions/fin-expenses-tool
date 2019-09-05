@@ -85,7 +85,7 @@
             <div class="form-group">
               <label for="noteinput">Omschrijving:</label>
               <textarea id="noteinput"
-                        (click)="expensesNote = true; ;"
+                        (click)="expensesNote = true;"
                         class="form-control"
                         [ngClass]="{notFilled: notFilledClass(nnote)}"
                         type="text"
@@ -171,7 +171,7 @@
           Indienen <i *ngIf="loadingThings && this.wantsNext === 'No'" class="spinner-border text-light"></i>
         </label>
         <label for="submit-form-next"
-               tabindex="0" class="btn btn-default deep_button"
+               tabindex="0" class="btn btn-default deep_button deep_button_new"
                (click)="this.wantsNext = 'Yes'"
                [ngClass]="{disabledbtn: submitButtonController(nnote, namount, ntype, ntransdate, nattachment),
                   success : addClaimSuccess.success === true,
