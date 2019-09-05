@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { OAuthService, AuthConfig } from 'angular-oauth2-oidc';
 import { EnvService } from './services/env.service';
+import {LicenseManager} from 'ag-grid-enterprise';
 
 @Component({
   selector: 'app-root',
@@ -22,6 +23,7 @@ export class AppComponent {
     this.oauthService.configure(config);
     this.oauthService.setupAutomaticSilentRefresh();
     this.oauthService.tryLogin({});
+    LicenseManager.setLicenseKey(this.env.agGridKey);
   }
   get hasValidAccessToken() {
     return this.oauthService.hasValidAccessToken();

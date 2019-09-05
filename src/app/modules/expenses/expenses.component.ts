@@ -2,7 +2,6 @@ import {Component} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
-import {__await} from 'tslib';
 
 @Component({
   selector: 'app-expenses',
@@ -53,6 +52,7 @@ export class ExpensesComponent {
   public wantsList;
   public attachmentList;
   public wantsNext;
+  public expenseID;
 
   // Classes Logic
   notFilledClass(setClass) {
@@ -87,32 +87,53 @@ export class ExpensesComponent {
   submitButtonController(nnote, namount, ntype, ntransdate, nattachment) {
     return this.expensesNote === false || this.expensesAmount === false || this.expenseType === false || this.expenseTransDate === false ||
       this.expenseAttachment === false || nnote.invalid || namount.invalid || ntype.invalid || ntransdate.invalid ||
-      nattachment.invalid || this.addClaimSuccess.success === true || this.addClaimSuccess.wrong === true;
+      nattachment.invalid || this.addClaimSuccess.wrong === true;
   }
 
   // End Classes Logic
 
   onFileInput(file) {
-    if (this.wantsList) {
+    const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
+    if (isIEOrEdge) {
+      alert('Please use Chrome or Firefox to use this ');
+    } else {
       if (!(file[0] === undefined || file[0] === null)) {
         this.attachmentList.push(file);
         const reader = new FileReader();
         reader.readAsDataURL(file[0]);
         reader.onload = () => {
-          this.locatedFile.push(reader.result);
-        };
-      }
-    } else {
-      this.locatedFile = [];
-      this.attachmentList = [];
-      if (file[0] === undefined || file[0] === null) {
-        this.notaData = 'Toevoegen';
-      } else {
-        const reader = new FileReader();
-        reader.readAsDataURL(file[0]);
-        reader.onload = () => {
-          this.locatedFile.push(reader.result);
-          this.notaData = '';
+          if (file[0]. type === 'application/pdf') {
+            this.locatedFile.push(reader.result);
+          } else if (file[0].type.split('/')[0] === 'image') {
+            const img = new Image();
+            if (typeof reader.result === 'string') {
+              img.src = reader.result;
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width;
+                if (img.width > 600) {
+                  width = 600;
+                } else {
+                  width = img.width;
+                }
+                const scaleFactor = width / img.width;
+                canvas.width = width;
+                canvas.height = img.height * scaleFactor;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+                ctx.canvas.toBlob(blob => {
+                  const filla = new File([blob], file[0].name, {
+                    type: file[0].type,
+                    lastModified: this.today
+                  });
+                  reader.readAsDataURL(filla);
+                  reader.onload = () => {
+                    this.locatedFile.push(reader.result);
+                  };
+                }, file[0].type, 1);
+              }, reader.onerror = Error => console.log(Error);
+            }
+          }
         };
       }
     }
@@ -120,7 +141,7 @@ export class ExpensesComponent {
 
   splitCheck() {
     return (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.expenseAttachment
-      && ((this.addClaimSuccess.success === false && this.addClaimSuccess.wrong === false) || this.wantsNext === 'Yes'));
+      && this.addClaimSuccess.wrong === false);
   }
 
   claimForm(form: NgForm) {
@@ -163,6 +184,7 @@ export class ExpensesComponent {
             this.successfulClaim();
             this.loadingThings = false;
             console.log('>> POST SUCCESS', val);
+            this.expenseID = val;
             if (this.wantsNext === 'Yes') {
               form.reset();
               this.attachmentList = [];
@@ -179,10 +201,6 @@ export class ExpensesComponent {
             console.error('>> POST FAILED', response.message);
           });
     }
-  }
-
-  toggleAttachment() {
-    return this.wantsList = !this.wantsList;
   }
 
   removeFromAttachmentList(item) {

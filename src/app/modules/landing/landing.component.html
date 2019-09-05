@@ -5,7 +5,7 @@
   </div>
   <br>
   <div class="row">
-    <div class="col col-sm-8">
+    <div class="col col-sm-8" id="liststep">
       <ul class="list-group">
         <li *ngIf="this.hasNoExpenses" class="list-group-item d-flex justify-content-between align-items-center">
           Je hebt geen openstaande declaraties
@@ -29,13 +29,18 @@
       </button>
       <button name="expenses/process"
               (click)="handleLinking($event)"
-              [ngClass]="{hidden: !(this.OurJaneDoeIs === 'creditor')}"
+              [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('creditor'))}"
               class="btn btn-primary">Declaraties Controleren
       </button>
       <button name="expenses/manage"
               (click)="handleLinking($event)"
-              [ngClass]="{hidden: !(this.OurJaneDoeIs === 'manager')}"
+              [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('manager'))}"
               class="btn btn-primary">Declaraties Beoordelen
+      </button>
+      <button name="expenses/controller"
+              (click)="handleLinking($event)"
+              [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('controller'))}"
+              class="btn btn-primary">Controller
       </button>
     </div>
   </div>
@@ -153,11 +158,12 @@
                  #fileInputHidden
                  capture="camera">
           <ul class="list-group">
-            <li class="list-group-item text-center click-stop" (click)="fileInputHidden.click()"><span>Bestand toevoegen (inoperative)</span></li>
+            <!--            <li class="list-group-item text-center click-stop" (click)="fileInputHidden.click()"><span>Bestand toevoegen (inoperative)</span></li>-->
             <li *ngFor="let item of receiptFiles"
                 class="list-group-item d-flex justify-content-between align-items-center">
-              <span class="click-stop" (click)="this.openSanitizeFile(item.content_type, item.content)">View File - {{item.content_type}}</span>
-              <i class="fa fa-times click-stop" (click)="removeFromAttachmentList(item)"></i>
+              <span class="click-stop"
+                    (click)="this.openSanitizeFile(item.content_type, item.content)">View File - {{item.content_type}}</span>
+              <!--              <i class="fa fa-times click-stop" (click)="removeFromAttachmentList(item)"></i>-->
             </li>
           </ul>
           <input type="submit" id="submit-update-form" hidden/>

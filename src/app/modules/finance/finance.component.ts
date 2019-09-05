@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
@@ -6,6 +6,7 @@ import {NgForm} from '@angular/forms';
 import {OAuthService} from 'angular-oauth2-oidc';
 import {ExpensesConfigService} from '../../services/config.service';
 import * as moment from 'moment';
+import {DomSanitizer} from '@angular/platform-browser';
 
 moment.locale('nl');
 
@@ -37,12 +38,14 @@ export class FinanceComponent implements OnInit {
   private submitingStart: boolean;
   private action: any;
   private OurJaneDoeIs: string;
-  private expenseDataRejection: ({ reason: string })[];
   private receiptFiles;
   private isRejecting;
   private monthNames;
   private denySelection;
   public today;
+  public wantsRejectionNote;
+  public selectedRejection;
+  public noteData;
 
   constructor(
     private httpClient: HttpClient,
@@ -50,6 +53,8 @@ export class FinanceComponent implements OnInit {
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
     private oauthService: OAuthService,
+    private sanitizer: DomSanitizer,
+    private detect: ChangeDetectorRef,
   ) {
     this.columnDefs = [
       {
@@ -71,8 +76,7 @@ export class FinanceComponent implements OnInit {
             sortable: true,
             filter: true,
             cellRenderer: params => {
-              return moment(params.value).add(
-                FinanceComponent.getUTCOffset(params.value), 'hours').format('LLL');
+              return FinanceComponent.getCorrectDate(params.value);
             },
           },
           {
@@ -106,10 +110,6 @@ export class FinanceComponent implements OnInit {
           },
         ]
       }
-    ];
-    this.expenseDataRejection = [
-      {reason: 'Niet Duidelijk'},
-      {reason: 'Kan niet uitbetalen'}
     ];
     this.formSubmitted = false;
     this.showErrors = false;
@@ -152,8 +152,10 @@ export class FinanceComponent implements OnInit {
     return '€ ' + FinanceComponent.formatNumber(amounts.value);
   }
 
-  static getUTCOffset(date) {
-    return moment(date).utcOffset() / 60;
+  static getCorrectDate(date) {
+    const d = new Date(date);
+    return d.getDate()  + '-' + (d.getMonth() + 1) +      '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
+      ('0' + d.getMinutes()).substr(-2) + ':' + ('0' + d.getSeconds()).substr(-2);
   }
 
   static getDismissReason(reason: any): string {
@@ -167,10 +169,34 @@ export class FinanceComponent implements OnInit {
   }
 
   openSanitizeFile(type, file) {
-    const win = window.open();
-    // @ts-ignore
-    // tslint:disable-next-line:max-line-length no-unused-expression
-    win.document.write('<iframe src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity  + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+    const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
+    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+    if (isIEOrEdge) {
+      if (type === 'application/pdf') {
+        alert('Please use Chrome or Firefox to view this file');
+      } else {
+        const win = window.open();
+        // @ts-ignore
+        // tslint:disable-next-line:max-line-length
+        win.document.write('<img src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" alt="">');
+      }
+    } else {
+      const win = window.open();
+      if ( navigator.userAgent.match(/Android/i)
+        || navigator.userAgent.match(/webOS/i)
+        || navigator.userAgent.match(/iPhone/i)
+        || navigator.userAgent.match(/iPad/i)
+        || navigator.userAgent.match(/iPod/i)
+        || navigator.userAgent.match(/BlackBerry/i)
+        || navigator.userAgent.match(/Windows Phone/i)) {
+        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge Mobile of Samsung Internet.</p>');
+      } else if (!isChrome) {
+        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
+      }
+      // @ts-ignore
+      // tslint:disable-next-line:max-line-length no-unused-expression
+      win.document.write('<iframe src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
+    }
   }
 
   fixDate(date) {
@@ -190,12 +216,19 @@ export class FinanceComponent implements OnInit {
     }
   }
 
+  rejectionHit(event) {
+    this.wantsRejectionNote = (event.target.value === 'note');
+    this.selectedRejection = event.target.value;
+    this.noteData = '';
+  }
+
   openExpenseDetailModal(content) {
     this.receiptFiles = [];
     this.isRejecting = false;
     this.modalService.open(content, {centered: true}).result.then((result) => {
       this.gridApi.deselectAll();
       this.denySelection = true;
+      this.wantsRejectionNote = false;
       console.log(`Closed with: ${result}`);
     }, (reason) => {
       this.gridApi.deselectAll();
@@ -238,13 +271,18 @@ export class FinanceComponent implements OnInit {
         // @ts-ignore
         // tslint:disable-next-line:prefer-for-of
         for (let i = 0; i < image.length; i++) {
-          this.receiptFiles.push(image[i].url);
+          this.receiptFiles.push(image[i]);
         }
+        this.detect.markForCheck();
+        this.detect.detectChanges();
       });
       this.expenseData = selectedRowData;
       this.formSubmitted = false;
       this.showErrors = false;
       this.formErrors = '';
+      this.isRejecting = false;
+      this.wantsRejectionNote = false;
+      this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
       this.openExpenseDetailModal(content);
     } else {
       this.denySelection = false;
@@ -389,7 +427,7 @@ export class FinanceComponent implements OnInit {
 
   // tslint:disable-next-line:variable-name
   submitButtonController(namount, ntype, ntransdate, rnote) {
-    if (this.isRejecting) {
+    if (this.wantsRejectionNote) {
       return rnote.invalid || namount.invalid || ntype.invalid
         || ntransdate.invalid || (new Date(ntransdate.viewModel)
           > this.today) || namount.viewModel < 0.01;
@@ -406,6 +444,9 @@ export class FinanceComponent implements OnInit {
       const data = form.value;
       data.amount = Number((data.amount).toFixed(2));
       data.date_of_transaction = (new Date(data.date_of_transaction).getTime());
+      if (!(this.wantsRejectionNote)) {
+        data.rnote = this.selectedRejection;
+      }
       for (const prop in data) {
         if (prop.length !== 0) {
           dataVerified[prop] = data[prop];

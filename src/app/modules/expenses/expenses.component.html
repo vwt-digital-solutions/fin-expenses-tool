@@ -5,8 +5,8 @@
         <h5> Declaratie indienen </h5>
         <hr class="add">
       </div>
-      <div class="alert alert-success" role="alert" *ngIf="addClaimSuccess.success === true">
-        Declaratie is successvol ingediend
+      <div class="alert alert-success" role="alert" id="succes-alert" *ngIf="addClaimSuccess.success === true">
+        Declaratie is successvol ingediend {{this.expenseID}}
       </div>
       <div class="alert alert-danger" role="alert" *ngIf="addClaimSuccess.wrong === true">
         Er is iets fout gegaan. Probeer het later opnieuw
@@ -14,10 +14,6 @@
 
       <form (change)="addClaimSuccess.wrong = false" name="expenseForm" #expenseForm="ngForm"
             (ngSubmit)="claimForm(expenseForm)">
-        <!--        <div class="custom-file">-->
-        <!--          <input type="file" class="custom-file-input" id="customFileInput" required>-->
-        <!--          <label class="custom-file-label" for="customFileInput">$filename</label>-->
-        <!--        </div>-->
         <div class="row">
           <div class="col-sm-6">
             <label for="amountinput">Bedrag:</label>
@@ -110,7 +106,7 @@
             <div [ngClass]="{hidden: this.wantsList}">
               <input id="attachmentinput"
                      type="file"
-                     accept="application/pdf,image/*"
+                     accept="application/pdf,image/png,image/jpeg,image/jpg"
                      name="attachment"
                      required
                      (change)="onFileInput(fileInputHidden.files)"
@@ -122,6 +118,7 @@
             <div [ngClass]="{hidden: !this.wantsList}">
               <ul class="list-group">
                 <li class="list-group-item d-flex justify-content-between align-items-center"
+                    id="upload"
                     [ngClass]="{notFilledBtn: notFilledClass(nattachment)}"
                     (click)="fileInputHidden.click(); expenseAttachment = true;">
                   <span class="clickable new-file">Bestand toevoegen</span>
@@ -166,6 +163,7 @@
       <div class="submit_button">
         <label for="submit-form"
                tabindex="0" class="btn btn-default deep_button"
+               id="submit-click"
                (click)="this.wantsNext = 'No'"
                [ngClass]="{disabledbtn: submitButtonController(nnote, namount, ntype, ntransdate, nattachment),
                   success : addClaimSuccess.success,
@@ -175,7 +173,7 @@
         <label for="submit-form-next"
                tabindex="0" class="btn btn-default deep_button"
                (click)="this.wantsNext = 'Yes'"
-               [ngClass]="{disabledbtn: submitButtonController(nnote, namount, ntype, ntransdate, nattachment) && this.wantsNext === 'No',
+               [ngClass]="{disabledbtn: submitButtonController(nnote, namount, ntype, ntransdate, nattachment),
                   success : addClaimSuccess.success === true,
                   wrong : addClaimSuccess.wrong === true}">
           Indienen & Nieuwe<i *ngIf="loadingThings && this.wantsNext === 'Yes'" class="spinner-border text-light"></i>

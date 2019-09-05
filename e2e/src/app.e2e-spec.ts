@@ -1,12 +1,15 @@
-import { browser, logging, protractor, by, element, Capabilities, Key } from 'protractor';
-import { AppPage } from './app.po';
+import {browser, logging, protractor, by, element, Capabilities, Key} from 'protractor';
+import {AppPage} from './app.po';
+import {config} from 'rxjs';
+import {url} from 'inspector';
+
 const request = require('request');
 const fs = require('fs');
 const requestOptions = {
   method: 'GET',
   url: browser.params.login.token,
   headers: {
-    'content-type': 'application/x-www-form-urlencoded'
+    'content-type': 'application/json'
   },
   form: {
     grant_type: 'client_credentials',
@@ -22,7 +25,7 @@ const get = (options: any): any => {
     console.log(JSON.stringify(error));
     console.log(JSON.stringify(message));
     if (error || message.statusCode >= 400) {
-      defer.reject({ error, message });
+      defer.reject({error, message});
     } else {
       defer.fulfill(message);
     }
@@ -30,10 +33,10 @@ const get = (options: any): any => {
   return defer.promise;
 };
 const EC = protractor.ExpectedConditions;
+const until = protractor.ExpectedConditions;
+let expenseID;
 
-
-// tslint:disable-next-line:only-arrow-functions
-describe('ExpenseApp:', function() {
+describe('ExpenseApp:', () => {
   afterEach(() => {
     browser.manage().logs().get('browser').then((messages) => {
       messages.forEach((message) => {
@@ -53,7 +56,9 @@ describe('ExpenseApp:', function() {
       browser.get('/auth/' + encodeURI(JSON.stringify(responseBody))).then((() => {
           browser.getPageSource().then((text: string) => {
             fs.writeFile('index.html', text, ((err: any) => {
-              if (err) { fail(err); }
+              if (err) {
+                fail(err);
+              }
             }));
           });
         }),
@@ -63,20 +68,74 @@ describe('ExpenseApp:', function() {
     });
   });
 
-  it('should have claim heading ', () => {
-    browser.get('/').then((value: any) => {
-      // browser.wait(EC.titleContains('Purchase2Pay'));
-      expect(element(by.cssContainingText('h5', 'Declaratie Indienen ')));
-      browser.getPageSource().then((text: string) => {
-        fs.writeFile('index.html', text, ((err: any) => {
-          if (err) { fail(err); }
-        }));
-        expect(element(by.css('input[name=amount]')));
+  it('should open the landing page', () => {
+    browser.waitForAngularEnabled(false);
+    expect(element(by.css('h1')).getText()).toEqual('MIJN DECLARATIES');
+    browser.sleep(1000);
+  });
+
+  it('should get the open expenses', () => {
+    browser.waitForAngularEnabled(false);
+    browser.sleep(1000);
+    const expenseList = element.all(by.css('li'));
+    expect(expenseList.count()).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should get the cost-types', () => {
+    browser.waitForAngularEnabled(false);
+    element(by.name('expenses')).click();
+    browser.sleep(1000);
+    const typeList = element.all(by.css('option'));
+    expect(typeList.count()).toEqual(29 + 1); // 29 Types + 1 Text
+  });
+
+  it('should create an expense', () => {
+    browser.waitForAngularEnabled(false);
+    element(by.id('amountinput')).sendKeys(Math.floor(Math.random() * 50));
+    const typeList = element(by.id('typeinput')).all(by.tagName('option'));
+    typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
+      typeList.get(randomNumber + 1).click();
+    });
+    element(by.id('dateinput')).sendKeys(new Date().toDateString());
+    element(by.id('noteinput')).sendKeys('E2E Addition');
+    const path = require('path');
+    // tslint:disable-next-line:one-variable-per-declaration
+    const file = 'assets/betaald.png',
+      absolutePath = path.resolve(__dirname, file);
+    element(by.id('attachmentinput')).sendKeys(absolutePath);
+    element(by.id('submit-click')).click();
+    const elem = element(by.id('succes-alert'));
+    browser.wait(until.visibilityOf(elem), 10000, 'Expense creation took too long').then(() => {
+      elem.getText().then(text => {
+        expenseID = text.split(' ').slice(-1)[0];
       });
-    },
-      (reason: any) => {
-        console.log('Failure');
-        fail(reason);
-      });
+    });
+    expect(elem.isDisplayed()).toBe(true);
+  });
+
+  it('should get expenses on process', () => {
+    browser.waitForAngularEnabled(false);
+    expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
+    element(by.name('expenses/process')).click();
+    browser.sleep(1000);
+    const expenseList = element.all(by.id('information-icon'));
+    expect(expenseList.count()).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should get the attachments', () => {
+    browser.waitForAngularEnabled(false);
+    element(by.id(expenseID.toString())).element(by.xpath('ancestor::div')).click();
+    browser.sleep(2000);
+    const attachmentList = element.all(by.css('.click-stop'));
+    expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should reject the expense', () => {
+    browser.waitForAngularEnabled(false);
+    element(by.id('thumbs-down')).click();
+    browser.sleep(500);
+    element(by.id('thumbs-down-rejecting')).click();
+    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense approval took too long'));
+    // expect(element(by.css('.modal-content')).isDisplayed()).toBe(false);
   });
 });

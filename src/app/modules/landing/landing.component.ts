@@ -1,12 +1,11 @@
-import {Component, OnInit, Pipe, PipeTransform} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {OAuthService} from 'angular-oauth2-oidc';
 import {HttpClient} from '@angular/common/http';
 import {EnvService} from '../../services/env.service';
 import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {isEmpty} from 'rxjs/operators';
-import {DomSanitizer, SafeResourceUrl, SafeUrl} from '@angular/platform-browser';
+import {DomSanitizer} from '@angular/platform-browser';
 
 
 interface IClaimRoles {
@@ -25,7 +24,7 @@ interface ExpensesIfc {
 })
 export class LandingComponent implements OnInit {
 
-  public OurJaneDoeIs: string;
+  public OurJaneDoeIs;
   public displayPersonName;
   public personID;
   public declarationData;
@@ -55,7 +54,7 @@ export class LandingComponent implements OnInit {
   }
 
   decimalFormatter(amount) {
-    return '€ ' + LandingComponent.formatNumber(amount);
+    return '€' + LandingComponent.formatNumber(amount);
   }
 
   dateFormatter(firstDate) {
@@ -64,10 +63,34 @@ export class LandingComponent implements OnInit {
   }
 
   openSanitizeFile(type, file) {
-    const win = window.open();
-    // @ts-ignore
-    // tslint:disable-next-line:max-line-length no-unused-expression
-    win.document.write('<iframe src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity  + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+    const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
+    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+    if (isIEOrEdge) {
+      if (type === 'application/pdf') {
+        alert('Please use Chrome or Firefox to view this file');
+      } else {
+        const win = window.open();
+        // @ts-ignore
+        // tslint:disable-next-line:max-line-length
+        win.document.write('<img src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" alt="">');
+      }
+    } else {
+      const win = window.open();
+      if ( navigator.userAgent.match(/Android/i)
+        || navigator.userAgent.match(/webOS/i)
+        || navigator.userAgent.match(/iPhone/i)
+        || navigator.userAgent.match(/iPad/i)
+        || navigator.userAgent.match(/iPod/i)
+        || navigator.userAgent.match(/BlackBerry/i)
+        || navigator.userAgent.match(/Windows Phone/i)) {
+        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge Mobile of Samsung Internet.</p>');
+      } else if (!isChrome) {
+        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
+      }
+      // @ts-ignore
+      // tslint:disable-next-line:max-line-length no-unused-expression
+      win.document.write('<iframe src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
+    }
   }
 
   statusClassing(status) {
@@ -99,13 +122,17 @@ export class LandingComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.OurJaneDoeIs = [];
     const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
+    // tslint:disable-next-line:prefer-for-of
+    for (let i = 0; i < claimJaneDoe.roles.length; i++) {
+      this.OurJaneDoeIs.push(claimJaneDoe.roles[i].split('.')[0]);
+    }
+    // @ts-ignore
+    this.personID = claimJaneDoe.email.split('@')[0];
     // @ts-ignore
     this.displayPersonName = claimJaneDoe.name.split(',');
     this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName [0]).substring(1);
-    this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
-    // @ts-ignore
-    this.personID = claimJaneDoe.email.split('@')[0];
     this.declarationCall();
     this.today = new Date();
 
