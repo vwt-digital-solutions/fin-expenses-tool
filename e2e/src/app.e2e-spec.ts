@@ -86,7 +86,7 @@ describe('ExpenseApp:', () => {
     element(by.name('expenses')).click();
     browser.sleep(1000);
     const typeList = element.all(by.css('option'));
-    expect(typeList.count()).toEqual(29 + 1); // 29 Types + 1 Text\
+    expect(typeList.count()).toEqual(29 + 1); // 29 Types + 1 Text
   });
 
   it('should create an expense', () => {
