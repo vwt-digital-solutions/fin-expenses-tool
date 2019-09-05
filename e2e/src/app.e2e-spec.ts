@@ -96,7 +96,7 @@ describe('ExpenseApp:', () => {
     typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
       typeList.get(randomNumber + 1).click();
     });
-    element(by.id('dateinput')).sendKeys((new Date()).toDateString());
+    element(by.id('dateinput')).sendKeys(new Date().toDateString());
     element(by.id('noteinput')).sendKeys('E2E Addition');
     const path = require('path');
     // tslint:disable-next-line:one-variable-per-declaration

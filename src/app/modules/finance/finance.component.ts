@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
@@ -54,6 +54,7 @@ export class FinanceComponent implements OnInit {
     private modalService: NgbModal,
     private oauthService: OAuthService,
     private sanitizer: DomSanitizer,
+    private detect: ChangeDetectorRef,
   ) {
     this.columnDefs = [
       {
@@ -256,15 +257,6 @@ export class FinanceComponent implements OnInit {
   }
 
   onSelectionChanged(event, content) {
-    if ( navigator.userAgent.match(/Android/i)
-      || navigator.userAgent.match(/webOS/i)
-      || navigator.userAgent.match(/iPhone/i)
-      || navigator.userAgent.match(/iPad/i)
-      || navigator.userAgent.match(/iPod/i)
-      || navigator.userAgent.match(/BlackBerry/i)
-      || navigator.userAgent.match(/Windows Phone/i)) {
-      this.denySelection = false;
-    }
     if (!this.denySelection) {
       this.gridApi = event.api;
       const selectedRows = event.api.getSelectedRows();
@@ -281,6 +273,8 @@ export class FinanceComponent implements OnInit {
         for (let i = 0; i < image.length; i++) {
           this.receiptFiles.push(image[i]);
         }
+        this.detect.detectChanges();
+        this.detect.markForCheck();
       });
       this.expenseData = selectedRowData;
       this.formSubmitted = false;
