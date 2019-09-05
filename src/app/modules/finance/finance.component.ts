@@ -273,8 +273,8 @@ export class FinanceComponent implements OnInit {
         for (let i = 0; i < image.length; i++) {
           this.receiptFiles.push(image[i]);
         }
-        this.detect.detectChanges();
         this.detect.markForCheck();
+        this.detect.detectChanges();
       });
       this.expenseData = selectedRowData;
       this.formSubmitted = false;
