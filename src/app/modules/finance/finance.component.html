@@ -25,9 +25,8 @@
         [rowData]="rowData"
         [columnDefs]="columnDefs"
         [rowSelection]="rowSelection"
-        (selectionChanged)="onSelectionChanged($event, expenseContent)"
-        (gridReady)="onGridReady($event)"
-      >
+        (rowClicked)="onRowClicked($event, expenseContent)"
+        (gridReady)="onGridReady($event)">
       </ag-grid-angular>
       <!-- END AG-GRID EXPENSES -->
     </div>

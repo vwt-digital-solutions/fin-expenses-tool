@@ -44,8 +44,10 @@ export class ManagerComponent implements OnInit {
   private receiptFiles;
   private isRejecting;
   private monthNames;
-  private denySelection;
+  public wantsRejectionNote;
+  public selectedRejection;
   public today;
+  public noteData;
 
   constructor(
     private httpClient: HttpClient,
@@ -154,7 +156,7 @@ export class ManagerComponent implements OnInit {
 
   static getCorrectDate(date) {
     const d = new Date(date);
-    return d.getDate()  + '-' + (d.getMonth() + 1) +      '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
+    return d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
       ('0' + d.getMinutes()).substr(-2) + ':' + ('0' + d.getSeconds()).substr(-2);
   }
 
@@ -182,7 +184,7 @@ export class ManagerComponent implements OnInit {
       }
     } else {
       const win = window.open();
-      if ( navigator.userAgent.match(/Android/i)
+      if (navigator.userAgent.match(/Android/i)
         || navigator.userAgent.match(/webOS/i)
         || navigator.userAgent.match(/iPhone/i)
         || navigator.userAgent.match(/iPad/i)
@@ -208,17 +210,37 @@ export class ManagerComponent implements OnInit {
     return (name.split('/')).slice(-1)[0];
   }
 
-  openExpenseDetailModal(content) {
+  onRowClicked(event, content) {
+    this.gridApi = event.api;
+    this.receiptFiles = [];
+    this.formSubmitted = false;
+    this.showErrors = false;
+    this.formErrors = '';
     this.isRejecting = false;
-    this.modalService.open(content, {centered: true}).result.then((result) => {
-      this.gridApi.deselectAll();
-      this.denySelection = true;
-      console.log(`Closed with: ${result}`);
-    }, (reason) => {
-      this.gridApi.deselectAll();
-      this.denySelection = true;
-      console.log(`Dismissed ${ManagerComponent.getDismissReason(reason)}`);
+    this.wantsRejectionNote = false;
+    this.expenseData = event.data;
+    this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
+    this.expenses.getFinanceAttachment(event.data.id).subscribe((image: ExpensesIfc) => {
+      // @ts-ignore
+      // tslint:disable-next-line:prefer-for-of
+      for (let i = 0; i < image.length; i++) {
+        this.receiptFiles.push(image[i]);
+      }
+      this.modalService.open(content, {centered: true}).result.then((result) => {
+        this.gridApi.deselectAll();
+        this.wantsRejectionNote = false;
+        console.log(`Closed with: ${result}`);
+      }, (reason) => {
+        this.gridApi.deselectAll();
+        console.log(`Dismissed ${ManagerComponent.getDismissReason(reason)}`);
+      });
     });
+  }
+
+  rejectionHit(event) {
+    this.wantsRejectionNote = (event.target.value === 'note');
+    this.selectedRejection = event.target.value;
+    this.noteData = '';
   }
 
   updatingAction(event) {
@@ -242,38 +264,8 @@ export class ManagerComponent implements OnInit {
     this.expenses.getDepartmentExpenses(this.departmentId).subscribe((data: ExpensesIfc) => this.rowData = [...data]);
   }
 
-  onSelectionChanged(event, content) {
-    if (!this.denySelection) {
-      this.gridApi = event.api;
-      const selectedRows = event.api.getSelectedRows();
-      const selectedRowData = {
-        id: undefined
-      };
-      selectedRows.map((selectedRow, index) => {
-        index !== 0 ?
-          console.log('No selection') : Object.assign(selectedRowData, selectedRow);
-      });
-      this.receiptFiles = [];
-      this.expenses.getFinanceAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
-        // @ts-ignore
-        // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < image.length; i++) {
-          this.receiptFiles.push(image[i].url);
-        }
-      });
-      this.expenseData = selectedRowData;
-      this.formSubmitted = false;
-      this.showErrors = false;
-      this.formErrors = '';
-      this.openExpenseDetailModal(content);
-    } else {
-      this.denySelection = false;
-    }
-  }
-
   ngOnInit() {
     this.today = new Date();
-    this.denySelection = false;
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];

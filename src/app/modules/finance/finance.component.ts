@@ -130,7 +130,8 @@ export class FinanceComponent implements OnInit {
           sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
           suppressMovable: true, width: 180
         },
-        {headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
+        {
+          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
           template: '<i class="fas fa-file-excel" style="color: #4eb7da; font-size: 20px;"></i>'
         },
         {
@@ -154,7 +155,7 @@ export class FinanceComponent implements OnInit {
 
   static getCorrectDate(date) {
     const d = new Date(date);
-    return d.getDate()  + '-' + (d.getMonth() + 1) +      '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
+    return d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
       ('0' + d.getMinutes()).substr(-2) + ':' + ('0' + d.getSeconds()).substr(-2);
   }
 
@@ -182,7 +183,7 @@ export class FinanceComponent implements OnInit {
       }
     } else {
       const win = window.open();
-      if ( navigator.userAgent.match(/Android/i)
+      if (navigator.userAgent.match(/Android/i)
         || navigator.userAgent.match(/webOS/i)
         || navigator.userAgent.match(/iPhone/i)
         || navigator.userAgent.match(/iPad/i)
@@ -216,24 +217,39 @@ export class FinanceComponent implements OnInit {
     }
   }
 
+  onRowClicked(event, content) {
+    this.gridApi = event.api;
+    this.receiptFiles = [];
+    this.formSubmitted = false;
+    this.showErrors = false;
+    this.formErrors = '';
+    this.isRejecting = false;
+    this.wantsRejectionNote = false;
+    this.expenseData = event.data;
+    this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
+    this.expenses.getFinanceAttachment(event.data.id).subscribe((image: ExpensesIfc) => {
+      // @ts-ignore
+      // tslint:disable-next-line:prefer-for-of
+      for (let i = 0; i < image.length; i++) {
+        this.receiptFiles.push(image[i]);
+      }
+      this.modalService.open(content, {centered: true}).result.then((result) => {
+        this.gridApi.deselectAll();
+        this.denySelection = true;
+        this.wantsRejectionNote = false;
+        console.log(`Closed with: ${result}`);
+      }, (reason) => {
+        this.gridApi.deselectAll();
+        this.denySelection = true;
+        console.log(`Dismissed ${FinanceComponent.getDismissReason(reason)}`);
+      });
+    });
+  }
+
   rejectionHit(event) {
     this.wantsRejectionNote = (event.target.value === 'note');
     this.selectedRejection = event.target.value;
     this.noteData = '';
-  }
-
-  openExpenseDetailModal(content) {
-    this.isRejecting = false;
-    this.modalService.open(content, {centered: true}).result.then((result) => {
-      this.gridApi.deselectAll();
-      this.denySelection = true;
-      this.wantsRejectionNote = false;
-      console.log(`Closed with: ${result}`);
-    }, (reason) => {
-      this.gridApi.deselectAll();
-      this.denySelection = true;
-      console.log(`Dismissed ${FinanceComponent.getDismissReason(reason)}`);
-    });
   }
 
   updatingAction(event) {
@@ -253,40 +269,6 @@ export class FinanceComponent implements OnInit {
     this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
     const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
     this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
-  }
-
-  onSelectionChanged(event, content) {
-    if (!this.denySelection) {
-      this.gridApi = event.api;
-      const selectedRows = event.api.getSelectedRows();
-      const selectedRowData = {
-        id: undefined
-      };
-      selectedRows.map((selectedRow, index) => {
-        index !== 0 ?
-          console.log('No selection') : Object.assign(selectedRowData, selectedRow);
-      });
-      this.receiptFiles = [];
-      this.expenseData = selectedRowData;
-      this.formSubmitted = false;
-      this.showErrors = false;
-      this.formErrors = '';
-      this.isRejecting = false;
-      this.wantsRejectionNote = false;
-      this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
-      this.expenses.getFinanceAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
-        // @ts-ignore
-        // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < image.length; i++) {
-          this.receiptFiles.push(image[i]);
-        }
-        this.detect.markForCheck();
-        this.detect.detectChanges();
-      });
-      this.openExpenseDetailModal(content);
-    } else {
-      this.denySelection = false;
-    }
   }
 
   ngOnInit() {
