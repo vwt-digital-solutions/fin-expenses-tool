@@ -267,6 +267,8 @@ export class FinanceComponent implements OnInit {
         index !== 0 ?
           console.log('No selection') : Object.assign(selectedRowData, selectedRow);
       });
+      // @ts-ignore
+      this.expenses.getFinanceAttachment(selectedRowData.id).subscribe((data: ExpensesIfc) => this.receiptFiles = [...data]);
       this.expenseData = selectedRowData;
       this.formSubmitted = false;
       this.showErrors = false;
@@ -275,15 +277,6 @@ export class FinanceComponent implements OnInit {
       this.wantsRejectionNote = false;
       this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
       this.openExpenseDetailModal(content);
-      this.expenses.getFinanceAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
-        // @ts-ignore
-        // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < image.length; i++) {
-          this.receiptFiles.push(image[i]);
-        }
-        this.detect.markForCheck();
-        this.detect.detectChanges();
-      });
     } else {
       this.denySelection = false;
     }

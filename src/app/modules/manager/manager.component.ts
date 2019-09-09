@@ -254,13 +254,8 @@ export class ManagerComponent implements OnInit {
         index !== 0 ?
           console.log('No selection') : Object.assign(selectedRowData, selectedRow);
       });
-      this.expenses.getFinanceAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
-        // @ts-ignore
-        // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < image.length; i++) {
-          this.receiptFiles.push(image[i].url);
-        }
-      });
+      // @ts-ignore
+      this.expenses.getFinanceAttachment(selectedRowData.id).subscribe((data: ExpensesIfc) => this.receiptFiles = [...data]);
       this.expenseData = selectedRowData;
       this.formSubmitted = false;
       this.showErrors = false;
