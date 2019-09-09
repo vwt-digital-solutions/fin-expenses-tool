@@ -96,7 +96,8 @@ describe('ExpenseApp:', () => {
     typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
       typeList.get(randomNumber + 1).click();
     });
-    element(by.id('dateinput')).sendKeys(new Date().toDateString());
+    const today = new Date();
+    element(by.id('dateinput')).sendKeys(today.getDate(), today.getMonth(), today.getFullYear());
     element(by.id('noteinput')).sendKeys('E2E Addition');
     const path = require('path');
     // tslint:disable-next-line:one-variable-per-declaration
@@ -135,7 +136,7 @@ describe('ExpenseApp:', () => {
     element(by.id('thumbs-down')).click();
     browser.sleep(500);
     element(by.id('thumbs-down-rejecting')).click();
-    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense approval took too long'));
+    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense rejection took too long'));
     // expect(element(by.css('.modal-content')).isDisplayed()).toBe(false);
   });
 });
