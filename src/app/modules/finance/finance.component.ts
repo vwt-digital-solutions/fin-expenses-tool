@@ -85,7 +85,7 @@ export class FinanceComponent implements OnInit {
           },
           {
             headerName: 'Kosten', field: 'amount', valueFormatter: FinanceComponent.decimalFormatter,
-            sortable: true, filter: true, width: 150
+            sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
           },
           {
             headerName: 'Soort', field: 'cost_type',
@@ -267,6 +267,14 @@ export class FinanceComponent implements OnInit {
         index !== 0 ?
           console.log('No selection') : Object.assign(selectedRowData, selectedRow);
       });
+      this.expenseData = selectedRowData;
+      this.formSubmitted = false;
+      this.showErrors = false;
+      this.formErrors = '';
+      this.isRejecting = false;
+      this.wantsRejectionNote = false;
+      this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
+      this.openExpenseDetailModal(content);
       this.expenses.getFinanceAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
         // @ts-ignore
         // tslint:disable-next-line:prefer-for-of
@@ -276,14 +284,6 @@ export class FinanceComponent implements OnInit {
         this.detect.markForCheck();
         this.detect.detectChanges();
       });
-      this.expenseData = selectedRowData;
-      this.formSubmitted = false;
-      this.showErrors = false;
-      this.formErrors = '';
-      this.isRejecting = false;
-      this.wantsRejectionNote = false;
-      this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
-      this.openExpenseDetailModal(content);
     } else {
       this.denySelection = false;
     }

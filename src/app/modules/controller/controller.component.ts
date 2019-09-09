@@ -36,7 +36,7 @@ export class ControllerComponent implements OnInit {
           },
           {
             headerName: 'Kosten', field: 'amount', valueFormatter: ControllerComponent.decimalFormatter,
-            sortable: true, filter: true, width: 150
+            sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
           },
           {
             headerName: 'Soort', field: 'cost_type',

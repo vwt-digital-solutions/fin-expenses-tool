@@ -84,7 +84,7 @@ export class ManagerComponent implements OnInit {
           },
           {
             headerName: 'Kosten', field: 'amount', valueFormatter: ManagerComponent.decimalFormatter,
-            sortable: true, filter: true, width: 150
+            sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
           },
           {
             headerName: 'Soort', field: 'cost_type',
