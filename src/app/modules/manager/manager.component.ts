@@ -212,32 +212,36 @@ export class ManagerComponent implements OnInit {
   }
 
   onRowClicked(event, content) {
-    this.isLoading = true;
-    this.gridApi = event.api;
-    this.receiptFiles = [];
-    this.formSubmitted = false;
-    this.showErrors = false;
-    this.formErrors = '';
-    this.isRejecting = false;
-    this.wantsRejectionNote = false;
-    this.expenseData = event.data;
-    this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
-    this.expenses.getFinanceAttachment(event.data.id).subscribe((image: ExpensesIfc) => {
-      // @ts-ignore
-      // tslint:disable-next-line:prefer-for-of
-      for (let i = 0; i < image.length; i++) {
-        this.receiptFiles.push(image[i]);
-      }
-      this.isLoading = false;
-      this.modalService.open(content, {centered: true}).result.then((result) => {
-        this.gridApi.deselectAll();
-        this.wantsRejectionNote = false;
-        console.log(`Closed with: ${result}`);
-      }, (reason) => {
-        this.gridApi.deselectAll();
-        console.log(`Dismissed ${ManagerComponent.getDismissReason(reason)}`);
+    if (!this.isLoading) { // Stalls click spam
+      this.isLoading = true;
+      this.gridApi = event.api;
+      this.formSubmitted = false;
+      this.showErrors = false;
+      this.formErrors = '';
+      this.isRejecting = false;
+      this.wantsRejectionNote = false;
+      this.expenseData = event.data;
+      this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
+      this.expenses.getFinanceAttachment(event.data.id).subscribe((image: ExpensesIfc) => {
+        this.receiptFiles = [];
+        // @ts-ignore
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < image.length; i++) {
+          if (!(this.receiptFiles.includes(image[i]))) { // Stalls multiple attachments on mobile
+            this.receiptFiles.push(image[i]);
+          }
+        }
+        this.isLoading = false;
+        this.modalService.open(content, {centered: true}).result.then((result) => {
+          this.gridApi.deselectAll();
+          this.wantsRejectionNote = false;
+          console.log(`Closed with: ${result}`);
+        }, (reason) => {
+          this.gridApi.deselectAll();
+          console.log(`Dismissed ${ManagerComponent.getDismissReason(reason)}`);
+        });
       });
-    });
+    }
   }
 
   rejectionHit(event) {

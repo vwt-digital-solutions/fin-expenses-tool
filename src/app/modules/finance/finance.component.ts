@@ -241,12 +241,10 @@ export class FinanceComponent implements OnInit {
         this.isLoading = false;
         this.modalService.open(content, {centered: true}).result.then((result) => {
           this.gridApi.deselectAll();
-          this.denySelection = true;
           this.wantsRejectionNote = false;
           console.log(`Closed with: ${result}`);
         }, (reason) => {
           this.gridApi.deselectAll();
-          this.denySelection = true;
           console.log(`Dismissed ${FinanceComponent.getDismissReason(reason)}`);
         });
       });
