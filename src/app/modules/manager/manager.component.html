@@ -110,7 +110,8 @@
         <ul class="list-group">
           <li *ngFor="let item of receiptFiles"
               class="list-group-item d-flex justify-content-between align-items-center">
-            <span class="click-stop" (click)="this.openSanitizeFile(item.content_type, item.content)">View File - {{item.content_type}}</span>
+            <span class="click-stop"
+                  (click)="this.openSanitizeFile(item.content_type, item.content)">View File - {{item.content_type}}</span>
           </li>
         </ul>
         <!-- Form: Rejection Note | Check submit-update-form label after every change -->
@@ -118,27 +119,28 @@
           <div class="input-group-prepend">
             <label class="input-group-text" for="rnoteselect">Reden:</label>
           </div>
-          <select  id="rnoteselect"
-                   class="custom-select"
-                   (change)="rejectionHit($event)"
-                   name="rnoteselect">
+          <select id="rnoteselect"
+                  class="custom-select"
+                  (change)="rejectionHit($event)"
+                  name="rnoteselect">
             <option>Deze kosten kun je declareren via Regweb (PSA)</option>
             <option>Deze kosten kun je declareren via de leasemaatschappij</option>
             <option>Deze kosten zijn al gedeclareerd</option>
             <option value="note">Anders, reden:</option>
           </select>
         </div>
-        <div class="form-group" [ngClass]="{hidden: !this.wantsRejectionNote}">
+        <div class="form-group"
+             style="visibility: hidden; display: none;"
+             id="rejection-note-group">
                 <textarea id="rnote"
                           class="form-control"
-                          [ngClass]="{notFilled: (rnote.invalid && (rnote.dirty || rnote.touched)),
-                          hidden: !this.wantsRejectionNote}"
+                          [ngClass]="{notFilled: (rnote.invalid && (rnote.dirty || rnote.touched))}"
                           type="text"
                           name="rnote"
                           required minlength="1"
                           [(ngModel)]="noteData"
                           #rnote="ngModel">
-          </textarea>
+                </textarea>
         </div>
         <div class="fill-text move-18"
              *ngIf="(rnote.invalid && (rnote.dirty || rnote.touched))"
