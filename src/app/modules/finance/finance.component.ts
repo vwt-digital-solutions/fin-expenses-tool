@@ -255,6 +255,13 @@ export class FinanceComponent implements OnInit {
     this.wantsRejectionNote = (event.target.value === 'note');
     this.selectedRejection = event.target.value;
     this.noteData = '';
+    if (this.wantsRejectionNote) {
+      document.getElementById('rejection-note-group').style.visibility = 'visible';
+      document.getElementById('rejection-note-group').style.display = 'block';
+    } else {
+      document.getElementById('rejection-note-group').style.visibility = 'hidden';
+      document.getElementById('rejection-note-group').style.display = 'none';
+    }
   }
 
   updatingAction(event) {

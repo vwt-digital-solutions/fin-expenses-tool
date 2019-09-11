@@ -164,8 +164,8 @@
                 </select>
               </div>
               <div class="form-group"
-                   [style.display]="this.wantsRejectionNote ? 'block' : 'none'"
-                   [style.visibility]="this.wantsRejectionNote ? 'visible' : 'hidden'">
+                   style="visibility: hidden; display: none;"
+                   id="rejection-note-group">
                 <textarea id="rnote"
                           class="form-control"
                           [ngClass]="{notFilled: (rnote.invalid && (rnote.dirty || rnote.touched))}"
