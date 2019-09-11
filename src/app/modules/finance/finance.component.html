@@ -47,6 +47,9 @@
       </ag-grid-angular>
       <!-- END AG-GRID HISTORY -->
 
+      <!-- START LOADER -->
+      <app-loader *ngIf="this.isLoading"></app-loader>
+      <!-- END LOADER-->
 
       <!-- FORM TEMPLATE -->
       <ng-template #expenseContent let-modal>

@@ -48,6 +48,7 @@ export class ManagerComponent implements OnInit {
   public selectedRejection;
   public today;
   public noteData;
+  public isLoading;
 
   constructor(
     private httpClient: HttpClient,
@@ -211,6 +212,7 @@ export class ManagerComponent implements OnInit {
   }
 
   onRowClicked(event, content) {
+    this.isLoading = true;
     this.gridApi = event.api;
     this.receiptFiles = [];
     this.formSubmitted = false;
@@ -226,6 +228,7 @@ export class ManagerComponent implements OnInit {
       for (let i = 0; i < image.length; i++) {
         this.receiptFiles.push(image[i]);
       }
+      this.isLoading = false;
       this.modalService.open(content, {centered: true}).result.then((result) => {
         this.gridApi.deselectAll();
         this.wantsRejectionNote = false;

@@ -46,6 +46,7 @@ export class FinanceComponent implements OnInit {
   public wantsRejectionNote;
   public selectedRejection;
   public noteData;
+  public isLoading;
 
   constructor(
     private httpClient: HttpClient,
@@ -218,6 +219,7 @@ export class FinanceComponent implements OnInit {
   }
 
   onRowClicked(event, content) {
+    this.isLoading = true;
     this.gridApi = event.api;
     this.receiptFiles = [];
     this.formSubmitted = false;
@@ -233,6 +235,7 @@ export class FinanceComponent implements OnInit {
       for (let i = 0; i < image.length; i++) {
         this.receiptFiles.push(image[i]);
       }
+      this.isLoading = false;
       this.modalService.open(content, {centered: true}).result.then((result) => {
         this.gridApi.deselectAll();
         this.denySelection = true;
