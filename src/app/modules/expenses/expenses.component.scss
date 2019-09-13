@@ -53,7 +53,7 @@ input, textarea, select {
 }
 
 .deep_button_new {
-  margin-top: 0!important;
+  margin-top: 0 !important;
 }
 
 .tall-button {
@@ -104,10 +104,8 @@ input, textarea, select {
   background-color: #fcfbfb;
   padding: 2em;
   @include lg-phone-only {
-    position: absolute;
     width: 100%;
     padding: 1em;
-    margin-bottom: 75px;
   }
 }
 
@@ -139,11 +137,8 @@ input, textarea, select {
 
   @include lg-phone-only {
     background-color: #abdeef;
-    position: fixed;
-    bottom: 0;
-    height: 110px;
+    width: 100%;
     padding: 0 15px;
-    margin: 0;
   }
 }
 
