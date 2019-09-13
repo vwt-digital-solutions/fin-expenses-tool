@@ -93,6 +93,13 @@ export class ExpensesComponent {
   // End Classes Logic
 
   onFileInput(file) {
+    console.log(file[0].type.split('/')[0]);
+    if (file[0].type.split('/')[0] !== 'image') {
+      if (file[0].type !== 'application/pdf') {
+        alert('Graag alleen een pdf of afbeelding toevoegen');
+        return;
+      }
+    }
     const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
     if (isIEOrEdge) {
       alert('Please use Chrome or Firefox to use this ');
