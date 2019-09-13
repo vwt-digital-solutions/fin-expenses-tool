@@ -185,7 +185,7 @@ input, textarea, select {
   }
 
   @include lg-phone-only {
-    display: inline-block;
+    display: block;
     vertical-align: middle;
     float: none;
     margin-top: 0;
