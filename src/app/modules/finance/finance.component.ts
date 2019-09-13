@@ -47,6 +47,7 @@ export class FinanceComponent implements OnInit {
   public selectedRejection;
   public noteData;
   public isLoading;
+  public isMobile;
 
   constructor(
     private httpClient: HttpClient,
@@ -284,6 +285,13 @@ export class FinanceComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.isMobile = (navigator.userAgent.match(/Android/i)
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i)
+      || navigator.userAgent.match(/BlackBerry/i)
+      || navigator.userAgent.match(/Windows Phone/i));
     this.today = new Date();
     this.denySelection = false;
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
