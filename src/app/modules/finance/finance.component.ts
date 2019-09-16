@@ -455,24 +455,14 @@ export class FinanceComponent implements OnInit {
   }
 
   // tslint:disable-next-line:variable-name
-  submitButtonController(namount, ntype, ntransdate, rnote) {
-    if (this.wantsRejectionNote) {
-      return rnote.invalid || namount.invalid || ntype.invalid
-        || ntransdate.invalid || (new Date(ntransdate.viewModel)
-          > this.today) || namount.viewModel < 0.01;
-    } else {
-      return namount.invalid || ntype.invalid
-        || ntransdate.invalid || (new Date(ntransdate.viewModel)
-          > this.today) || namount.viewModel < 0.01;
-    }
+  submitButtonController(ntype) {
+    return ntype.invalid;
   }
 
-  claimUpdateForm(form: NgForm, expenseId, instArray) {
-    if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
+  claimUpdateForm(form: NgForm, expenseId, type) {
+    if (!this.submitButtonController(type)) {
       const dataVerified = {};
       const data = form.value;
-      data.amount = Number((data.amount).toFixed(2));
-      data.date_of_transaction = (new Date(data.date_of_transaction).getTime());
       if (!(this.wantsRejectionNote)) {
         data.rnote = this.selectedRejection;
       }
