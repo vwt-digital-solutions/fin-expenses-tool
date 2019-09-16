@@ -234,8 +234,12 @@ export class FinanceComponent implements OnInit {
   }
 
   regOff() {
-    document.getElementById('mobile-loader-button').style.visibility = 'hidden';
-    document.getElementById('mobile-loader').style.visibility = 'hidden';
+    if (this.isMobile) {
+      document.getElementById('mobile-loader-button').style.visibility = 'hidden';
+      document.getElementById('mobile-loader').style.visibility = 'hidden';
+    } else {
+      return;
+    }
   }
 
   onRowClicked(event, content) {
@@ -262,10 +266,12 @@ export class FinanceComponent implements OnInit {
         this.isLoading = false;
         this.toggleMobile();
         this.modalService.open(content, {centered: true}).result.then((result) => {
+          this.regOff();
           this.gridApi.deselectAll();
           this.wantsRejectionNote = false;
           console.log(`Closed with: ${result}`);
         }, (reason) => {
+          this.regOff();
           this.gridApi.deselectAll();
           console.log(`Dismissed ${FinanceComponent.getDismissReason(reason)}`);
         });

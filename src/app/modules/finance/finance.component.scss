@@ -138,11 +138,20 @@ input {
   top: 50%;
   padding: 0;
   position: fixed;
-  width: 10em;
-  height: 5em;
-  z-index: 9999999999;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  opacity: .8;
+  background: transparent;
+  button {
+    left: 50%;
+    margin: 0 -50% 0 0;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    padding: 0;
+    position: fixed;
+    width: 10em;
+    height: 5em;
+  }
 }
 
 .disabledbtn {
