@@ -212,6 +212,29 @@ export class ManagerComponent implements OnInit {
     return (name.split('/')).slice(-1)[0];
   }
 
+  toggleMobile() {
+    if (this.isMobile) {
+      if (this.isLoading) {
+        document.getElementById('mobile-loader').style.visibility = 'visible';
+        document.getElementById('mobile-loader-button').style.visibility = 'hidden';
+      } else {
+        document.getElementById('mobile-loader').style.visibility = 'hidden';
+        document.getElementById('mobile-loader-button').style.visibility = 'visible';
+      }
+    } else {
+      return;
+    }
+  }
+
+  regOff() {
+    if (this.isMobile) {
+      document.getElementById('mobile-loader-button').style.visibility = 'hidden';
+      document.getElementById('mobile-loader').style.visibility = 'hidden';
+    } else {
+      return;
+    }
+  }
+
   onRowClicked(event, content) {
     if (!this.isLoading) { // Stalls click spam
       this.isLoading = true;
@@ -236,10 +259,12 @@ export class ManagerComponent implements OnInit {
         this.isLoading = false;
         this.toggleMobile();
         this.modalService.open(content, {centered: true}).result.then((result) => {
+          this.regOff();
           this.gridApi.deselectAll();
           this.wantsRejectionNote = false;
           console.log(`Closed with: ${result}`);
         }, (reason) => {
+          this.regOff();
           this.gridApi.deselectAll();
           console.log(`Dismissed ${ManagerComponent.getDismissReason(reason)}`);
         });
@@ -310,25 +335,6 @@ export class ManagerComponent implements OnInit {
         || ntransdate.invalid || (new Date(ntransdate.viewModel)
           > this.today) || namount.viewModel < 0.01;
     }
-  }
-
-  toggleMobile() {
-    if (this.isMobile) {
-      if (this.isLoading) {
-        document.getElementById('mobile-loader').style.visibility = 'visible';
-        document.getElementById('mobile-loader-button').style.visibility = 'hidden';
-      } else {
-        document.getElementById('mobile-loader').style.visibility = 'hidden';
-        document.getElementById('mobile-loader-button').style.visibility = 'visible';
-      }
-    } else {
-      return;
-    }
-  }
-
-  regOff() {
-    document.getElementById('mobile-loader-button').style.visibility = 'hidden';
-    document.getElementById('mobile-loader').style.visibility = 'hidden';
   }
 
   claimUpdateForm(form: NgForm, expenseId, instArray) {
