@@ -34,7 +34,7 @@ export class LandingComponent implements OnInit {
   public formResponse;
   public formSubmitted;
   public typeOptions;
-  private receiptImage: any;
+  public attachmentList;
   private receiptFiles;
   public today;
   public hasNoExpenses;
@@ -196,6 +196,11 @@ export class LandingComponent implements OnInit {
         this.receiptFiles.splice(i, 1);
       }
     }
+    for (i = 0; i < this.attachmentList().length; i++) {
+      if (this.attachmentList[i] === item) {
+        this.attachmentList.splice(i, 1);
+      }
+    }
   }
 
   submitButtonController(nnote, namount, ntype, ntransdate) {
@@ -206,21 +211,65 @@ export class LandingComponent implements OnInit {
 
   openExpenseDetailModal(content, data) {
     this.receiptFiles = [];
+    this.attachmentList = [];
     this.modalService.open(content, {centered: true});
   }
 
   onFileInput(file) {
-    if (!(file[0] === undefined || file[0] === null)) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file[0]);
-      reader.onload = () => {
-        this.receiptFiles.push(reader.result);
-      };
+    console.log(file[0].type.split('/')[0]);
+    if (file[0].type.split('/')[0] !== 'image' && file[0].type !== 'application/pdf') {
+      alert('Graag alleen een pdf of afbeelding toevoegen');
+      return;
+    }
+    const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
+    if (isIEOrEdge) {
+      alert('Please use Chrome or Firefox to use this ');
+    } else {
+      if (!(file[0] === undefined || file[0] === null)) {
+        this.attachmentList.push(file);
+        const reader = new FileReader();
+        reader.readAsDataURL(file[0]);
+        reader.onload = () => {
+          if (file[0]. type === 'application/pdf') {
+            this.receiptFiles.push(reader.result);
+          } else if (file[0].type.split('/')[0] === 'image') {
+            const img = new Image();
+            if (typeof reader.result === 'string') {
+              img.src = reader.result;
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width;
+                if (img.width > 600) {
+                  width = 600;
+                } else {
+                  width = img.width;
+                }
+                const scaleFactor = width / img.width;
+                canvas.width = width;
+                canvas.height = img.height * scaleFactor;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+                ctx.canvas.toBlob(blob => {
+                  const filla = new File([blob], file[0].name, {
+                    type: file[0].type,
+                    lastModified: this.today
+                  });
+                  reader.readAsDataURL(filla);
+                  reader.onload = () => {
+                    this.receiptFiles.push(reader.result);
+                  };
+                }, file[0].type, 1);
+              }, reader.onerror = Error => console.log(Error);
+            }
+          }
+        };
+      }
     }
   }
 
   claimUpdateForm(form: NgForm, expenseId, instArray) {
     if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
+      // Check Form Data
       let fileString = '';
       let i;
       // @ts-ignore
@@ -241,7 +290,7 @@ export class LandingComponent implements OnInit {
           dataVerified[prop] = data[prop];
         }
       }
-      dataVerified[`status`] = 'ready_for_manager';
+      dataVerified[`status`] = 'ready_for_manager'; // This needs to be done on the backend
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
         this.expenses.updateExpenseEmployee(dataVerified, expenseId)
           .subscribe(
