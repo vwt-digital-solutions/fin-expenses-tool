@@ -49,6 +49,7 @@ export class ManagerComponent implements OnInit {
   public today;
   public noteData;
   public isLoading;
+  public isMobile;
 
   constructor(
     private httpClient: HttpClient,
@@ -214,6 +215,7 @@ export class ManagerComponent implements OnInit {
   onRowClicked(event, content) {
     if (!this.isLoading) { // Stalls click spam
       this.isLoading = true;
+      this.toggleMobile();
       this.gridApi = event.api;
       this.formSubmitted = false;
       this.showErrors = false;
@@ -222,7 +224,7 @@ export class ManagerComponent implements OnInit {
       this.wantsRejectionNote = false;
       this.expenseData = event.data;
       this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
-      this.expenses.getManagerAttachment(event.data.id).subscribe((image: ExpensesIfc) => {
+      this.expenses.getFinanceAttachment(event.data.id).subscribe((image: ExpensesIfc) => {
         this.receiptFiles = [];
         // @ts-ignore
         // tslint:disable-next-line:prefer-for-of
@@ -232,6 +234,7 @@ export class ManagerComponent implements OnInit {
           }
         }
         this.isLoading = false;
+        this.toggleMobile();
         this.modalService.open(content, {centered: true}).result.then((result) => {
           this.gridApi.deselectAll();
           this.wantsRejectionNote = false;
@@ -279,6 +282,13 @@ export class ManagerComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.isMobile = (navigator.userAgent.match(/Android/i)
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i)
+      || navigator.userAgent.match(/BlackBerry/i)
+      || navigator.userAgent.match(/Windows Phone/i));
     this.today = new Date();
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
@@ -300,6 +310,25 @@ export class ManagerComponent implements OnInit {
         || ntransdate.invalid || (new Date(ntransdate.viewModel)
           > this.today) || namount.viewModel < 0.01;
     }
+  }
+
+  toggleMobile() {
+    if (this.isMobile) {
+      if (this.isLoading) {
+        document.getElementById('mobile-loader').style.visibility = 'visible';
+        document.getElementById('mobile-loader-button').style.visibility = 'hidden';
+      } else {
+        document.getElementById('mobile-loader').style.visibility = 'hidden';
+        document.getElementById('mobile-loader-button').style.visibility = 'visible';
+      }
+    } else {
+      return;
+    }
+  }
+
+  regOff() {
+    document.getElementById('mobile-loader-button').style.visibility = 'hidden';
+    document.getElementById('mobile-loader').style.visibility = 'hidden';
   }
 
   claimUpdateForm(form: NgForm, expenseId, instArray) {

@@ -219,9 +219,29 @@ export class FinanceComponent implements OnInit {
     }
   }
 
+  toggleMobile() {
+    if (this.isMobile) {
+      if (this.isLoading) {
+        document.getElementById('mobile-loader').style.visibility = 'visible';
+        document.getElementById('mobile-loader-button').style.visibility = 'hidden';
+      } else {
+        document.getElementById('mobile-loader').style.visibility = 'hidden';
+        document.getElementById('mobile-loader-button').style.visibility = 'visible';
+      }
+    } else {
+      return;
+    }
+  }
+
+  regOff() {
+    document.getElementById('mobile-loader-button').style.visibility = 'hidden';
+    document.getElementById('mobile-loader').style.visibility = 'hidden';
+  }
+
   onRowClicked(event, content) {
     if (!this.isLoading) { // Stalls click spam
       this.isLoading = true;
+      this.toggleMobile();
       this.gridApi = event.api;
       this.formSubmitted = false;
       this.showErrors = false;
@@ -240,6 +260,7 @@ export class FinanceComponent implements OnInit {
           }
         }
         this.isLoading = false;
+        this.toggleMobile();
         this.modalService.open(content, {centered: true}).result.then((result) => {
           this.gridApi.deselectAll();
           this.wantsRejectionNote = false;

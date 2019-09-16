@@ -50,6 +50,8 @@
 
       <!-- START LOADER -->
       <app-loader *ngIf="this.isLoading && !this.isMobile"></app-loader>
+      <app-loader *ngIf="this.isMobile" id="mobile-loader" style="visibility: hidden"></app-loader>
+      <button *ngIf="this.isMobile" class="btn btn-primary" id="mobile-loader-button" style="visibility: hidden" (click)="regOff()">Click to open Expense</button>
       <!-- END LOADER-->
 
       <!-- FORM TEMPLATE -->
