@@ -17,7 +17,7 @@
 <!-- START LOADER -->
 <app-loader *ngIf="this.isLoading && !this.isMobile"></app-loader>
 <app-loader *ngIf="this.isMobile" id="mobile-loader" style="visibility: hidden"></app-loader>
-<div *ngIf="this.isMobile" id="mobile-loader-button" style="visibility: hidden" (click)="regOff()"><button  class="btn btn-primary" (click)="regOff()">Klik om te openen</button></div>
+<button  class="btn btn-primary" id="mobile-loader-button" style="visibility: hidden" (click)="regOff()"><span class="badge badge-pill badge-info">Klik om te openen</span></button>
 <!-- END LOADER-->
 
 <!-- FORM TEMPLATE -->
