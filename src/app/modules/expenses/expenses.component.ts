@@ -30,11 +30,13 @@ export class ExpensesComponent {
     this.wantsNext = 'No';
     this.locatedFile = [];
     this.attachmentList = [];
+    this.formError = 'Er is iets fout gegaan. Probeer het later opnieuw.';
   }
 
   public formNote;
   public formAmount;
   public formType;
+  public formError;
   public formTransDate;
   public formAttachment;
   public expensesAmount;
@@ -80,7 +82,10 @@ export class ExpensesComponent {
     return this.addClaimSuccess.success = true;
   }
 
-  wrongfulClaim() {
+  wrongfulClaim(text = null) {
+    if (text !== null) {
+      this.formError = text;
+    }
     return this.addClaimSuccess.wrong = true;
   }
 
@@ -201,7 +206,11 @@ export class ExpensesComponent {
               }, 1000);
             }
           }, response => {
-            this.wrongfulClaim();
+            if (response.status === 403) {
+              this.wrongfulClaim('Je bent niet bekend bij ons. Neem contact op met een beheerder.');
+            } else {
+              this.wrongfulClaim();
+            }
             this.loadingThings = false;
             console.error('>> POST FAILED', response.message);
           });

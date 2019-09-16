@@ -9,7 +9,7 @@
         Declaratie is successvol ingediend {{this.expenseID}}
       </div>
       <div class="alert alert-danger" role="alert" *ngIf="addClaimSuccess.wrong === true">
-        Er is iets fout gegaan. Probeer het later opnieuw
+        {{this.formError}}
       </div>
 
       <form (change)="addClaimSuccess.wrong = false" name="expenseForm" #expenseForm="ngForm"
