@@ -307,4 +307,24 @@ export class LandingComponent implements OnInit {
         : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
     }
   }
+
+    cancelExpense() {
+      const dataVerified = {};
+      // @ts-ignore
+      const expenseId = this.expenseData.id;
+
+      dataVerified[`status`] = 'cancelled';
+
+      this.expenses.updateExpenseEmployee(dataVerified, expenseId)
+        .subscribe(
+            result => {
+              this.showErrors = false;
+              this.declarationCall();
+              this.dismissExpenseModal();
+            },
+            error => {
+              this.showErrors = true;
+              Object.assign(this.formResponse, JSON.parse(error));
+            });
+  }
 }

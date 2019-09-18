@@ -172,6 +172,7 @@
       </form>
     </div>
     <div class="modal-footer">
+      <label (click)="cancelExpense()" class="btn btn-danger">Cancel Declaratie</label>
       <label for="submit-update-form" class="btn btn-warning"
              [ngClass]="{disabledbtn: submitButtonController(note, namount, ntype, ntransdate)}">Indienen</label>
     </div>
