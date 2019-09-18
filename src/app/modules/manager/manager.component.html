@@ -41,7 +41,7 @@
     <form
       id="expensesUpdateForm"
       #expenseUpdateForm="ngForm"
-      (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, [namount, ntype, ntransdate, rnote])"
+      (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, [ntype])"
       name="expenseUpdateForm">
       <div class="form-group">
         <!-- Form: Costs -->
@@ -54,14 +54,10 @@
                  step="0.01"
                  min="0.01"
                  name="amount"
-                 required
+                 readonly
                  placeholder="{{expenseData.amount | currency: 'EUR' }}"
                  [ngModel]="this.expenseData.amount"
                  #namount="ngModel">
-        </div>
-        <div class="fill-text move-18"
-             *ngIf="!(namount.valid)">
-          <small>Graag een geldig bedrag invullen</small>
         </div>
         <div class="mt-3"></div>
         <!-- Form: Cost Type -->
@@ -85,7 +81,7 @@
                  [ngClass]="{notFilled: !(ntransdate.valid)}"
                  name="date_of_transaction"
                  class="form-control"
-                 required
+                 readonly
                  [ngModel]="expenseData.date_of_transaction | date:'yyyy-MM-dd'"
                  #ntransdate="ngModel"
                  type="date">
@@ -93,10 +89,6 @@
                 <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
                   <i class=" fa fa-calendar-alt"></i> </span>
           </div>
-        </div>
-        <div class="fill-text move-18"
-             *ngIf="!(ntransdate.valid)">
-          <small>Graag een geldige datum invullen</small>
         </div>
         <!-- Form No Edit: Note of employee -->
         <label for="expenseNote">Omschrijving:</label>
@@ -157,7 +149,7 @@
     <div *ngIf="!this.isRejecting" id="thumbs-up" class="float-right badge badge-success"
          (click)="updatingAction('approving')">
       <label for="submit-update-form"
-             [ngClass]="{disabledbtn: submitButtonController(namount, ntype, ntransdate, null)}">
+             [ngClass]="{disabledbtn: submitButtonController(ntype)}">
         <a id="information-icon">Goedkeuren</a>
       </label>
     </div>
@@ -171,7 +163,7 @@
     <div *ngIf="this.isRejecting" id="thumbs-down-rejecting" class="float-right badge badge-danger"
          (click)="updatingAction('rejecting')">
       <label for="submit-update-form"
-             [ngClass]="{disabledbtn: submitButtonController(namount, ntype, ntransdate, rnote)}">
+             [ngClass]="{disabledbtn: submitButtonController(ntype)}">
         <a id="information-icon-down-rejecting">OK</a>
       </label>
     </div>
