@@ -306,9 +306,6 @@ export class FinanceComponent implements OnInit {
   onGridReady(params: any) {
     this.gridColumnApi = params.columnApi;
     // @ts-ignore
-    this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
-    const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
-    this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
   }
 
   ngOnInit() {
@@ -330,6 +327,10 @@ export class FinanceComponent implements OnInit {
         val => {
           this.typeOptions = val;
         });
+    // @ts-ignore
+    this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
+    const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
+    this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
   }
 
   callHistoryRefresh() {
