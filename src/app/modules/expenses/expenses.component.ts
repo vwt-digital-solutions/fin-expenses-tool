@@ -208,6 +208,15 @@ export class ExpensesComponent {
           }, response => {
             if (response.status === 404) {
               this.wrongfulClaim('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
+              if (navigator.userAgent.match(/Android/i)
+                || navigator.userAgent.match(/webOS/i)
+                || navigator.userAgent.match(/iPhone/i)
+                || navigator.userAgent.match(/iPad/i)
+                || navigator.userAgent.match(/iPod/i)
+                || navigator.userAgent.match(/BlackBerry/i)
+                || navigator.userAgent.match(/Windows Phone/i)) {
+                alert('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
+              }
             } else {
               this.wrongfulClaim();
             }
