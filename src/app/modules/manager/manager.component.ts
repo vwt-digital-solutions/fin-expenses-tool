@@ -325,41 +325,35 @@ export class ManagerComponent implements OnInit {
         });
   }
 
-  submitButtonController(ntype) {
-    return ntype.invalid;
-  }
-
-  claimUpdateForm(form: NgForm, expenseId, type) {
-    if (!this.submitButtonController(type)) {
-      const dataVerified = {};
-      const data = form.value;
-      if (!(this.wantsRejectionNote)) {
-        data.rnote = this.selectedRejection;
-      }
-      for (const prop in data) {
-        if (prop.length !== 0) {
-          dataVerified[prop] = data[prop];
-        }
-      }
-      const action = this.action;
-      dataVerified[`status`] = action === 'approving' ? `ready_for_creditor` :
-        action === 'rejecting' ? `rejected_by_manager` : null;
-
-      Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
-        this.expenses.updateExpenseManager(dataVerified, expenseId)
-          .subscribe(
-            result => {
-              this.getNextExpense();
-              // @ts-ignore
-              this.expenses.getDepartmentExpenses(this.departmentId).subscribe((response: ExpensesIfc) => this.rowData = [...response]);
-              this.showErrors = false;
-              this.formSubmitted = !form.ngSubmit.hasError;
-            },
-            error => {
-              this.showErrors = true;
-              Object.assign(this.formResponse, JSON.parse(error));
-            })
-        : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
+  claimUpdateForm(form: NgForm, expenseId) {
+    const dataVerified = {};
+    const data = form.value;
+    if (!(this.wantsRejectionNote)) {
+      data.rnote = this.selectedRejection;
     }
+    for (const prop in data) {
+      if (prop.length !== 0) {
+        dataVerified[prop] = data[prop];
+      }
+    }
+    const action = this.action;
+    dataVerified[`status`] = action === 'approving' ? `ready_for_creditor` :
+      action === 'rejecting' ? `rejected_by_manager` : null;
+
+    Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
+      this.expenses.updateExpenseManager(dataVerified, expenseId)
+        .subscribe(
+          result => {
+            this.getNextExpense();
+            // @ts-ignore
+            this.expenses.getDepartmentExpenses(this.departmentId).subscribe((response: ExpensesIfc) => this.rowData = [...response]);
+            this.showErrors = false;
+            this.formSubmitted = !form.ngSubmit.hasError;
+          },
+          error => {
+            this.showErrors = true;
+            Object.assign(this.formResponse, JSON.parse(error));
+          })
+      : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
   }
 }

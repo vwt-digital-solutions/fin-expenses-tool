@@ -41,7 +41,7 @@
     <form
       id="expensesUpdateForm"
       #expenseUpdateForm="ngForm"
-      (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, [ntype])"
+      (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id)"
       name="expenseUpdateForm">
       <div class="form-group">
         <!-- Form: Costs -->
@@ -61,18 +61,17 @@
         </div>
         <div class="mt-3"></div>
         <!-- Form: Cost Type -->
-        <div class="input-group mb-3">
-          <div class="input-group-prepend">
-            <label class="input-group-text" for="expenseCostType">Soort:</label>
+        <div class="form-group">
+          <!-- Form: Costs -->
+          <label for="expenseCostType">Soort:</label>
+          <div class="input-group mb-3">
+            <input id="expenseCostType"
+                   class="form-control"
+                   type="text"
+                   name="cost_type"
+                   readonly
+                   value="{{expenseData.cost_type.split(':')[0]}}">
           </div>
-          <select id="expenseCostType"
-                  class="custom-select"
-                  name="cost_type"
-                  [ngModel]="expenseData.cost_type"
-                  #ntype="ngModel">
-            <option value="" disabled><kbd>Huidige:</kbd> {{ expenseData.cost_type.split(':')[0] }}</option>
-            <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">{{t.ctype}}</option>
-          </select>
         </div>
         <!-- Form: Date of Transaction -->
         <label for="expenseDateOfTransaction">Datum bon:</label>
@@ -148,8 +147,7 @@
   <div class="modal-footer">
     <div *ngIf="!this.isRejecting" id="thumbs-up" class="float-right badge badge-success"
          (click)="updatingAction('approving')">
-      <label for="submit-update-form"
-             [ngClass]="{disabledbtn: submitButtonController(ntype)}">
+      <label for="submit-update-form">
         <a id="information-icon">Goedkeuren</a>
       </label>
     </div>
@@ -162,8 +160,7 @@
     </div>
     <div *ngIf="this.isRejecting" id="thumbs-down-rejecting" class="float-right badge badge-danger"
          (click)="updatingAction('rejecting')">
-      <label for="submit-update-form"
-             [ngClass]="{disabledbtn: submitButtonController(ntype)}">
+      <label for="submit-update-form">
         <a id="information-icon-down-rejecting">OK</a>
       </label>
     </div>
