@@ -3,6 +3,7 @@ import {ExpensesConfigService} from '../../services/config.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {OAuthService} from 'angular-oauth2-oidc';
 import {DomSanitizer} from '@angular/platform-browser';
+import {ManagerComponent} from '../manager/manager.component';
 
 interface ExpensesIfc {
   ['body']: any;
@@ -23,20 +24,33 @@ export class ControllerComponent implements OnInit {
   ) {
     this.columnDefs = [
       {
-        headerName: 'Overzicht',
+        headerName: 'Declaraties Overzicht',
         children: [
+          {
+            headerName: '',
+            field: 'id',
+            width: 65,
+            colId: 'id',
+            cellRenderer: params => {
+              const infoIcon = '<i id="information-icon" class="fa fa-edit"></i>';
+              return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
+            },
+          },
           {
             headerName: 'Declaratiedatum',
             field: 'date_of_claim',
             sortable: true,
             filter: true,
+            cellRenderer: params => {
+              return ManagerComponent.getCorrectDate(params.value);
+            },
           },
           {
             headerName: 'Werknemer', field: 'employee',
             sortable: true, filter: true, width: 200, resizable: true
           },
           {
-            headerName: 'Kosten', field: 'amount', valueFormatter: ControllerComponent.decimalFormatter,
+            headerName: 'Kosten', field: 'amount', valueFormatter: ManagerComponent.decimalFormatter,
             sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
           },
           {
@@ -52,6 +66,9 @@ export class ControllerComponent implements OnInit {
           {
             headerName: 'Bondatum', field: 'date_of_transaction',
             sortable: true, filter: true, width: 150,
+            cellRenderer: params => {
+              return this.fixDate(params.value);
+            }
           },
           {
             headerName: 'Status', field: 'status.text',
@@ -85,6 +102,11 @@ export class ControllerComponent implements OnInit {
     const d = new Date(date);
     return d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
       ('0' + d.getMinutes()).substr(-2) + ':' + ('0' + d.getSeconds()).substr(-2);
+  }
+
+  fixDate(date) {
+    const stepDate = new Date(date);
+    return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth())] + ' ' + stepDate.getFullYear();
   }
 
   openSanitizeFile(type, file) {

@@ -35,6 +35,7 @@ const get = (options: any): any => {
 const EC = protractor.ExpectedConditions;
 const until = protractor.ExpectedConditions;
 let expenseID;
+let e2eID;
 
 describe('ExpenseApp:', () => {
   afterEach(() => {
@@ -103,7 +104,8 @@ describe('ExpenseApp:', () => {
       .sendKeys(today.getMonth(),
         today.getDate(),
         today.getFullYear() - 1); // - 1 Resolves the "USA / The rest of the world" issue
-    element(by.id('noteinput')).sendKeys('E2E Addition');
+    e2eID = Math.random() * 100;
+    element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     const path = require('path');
     // tslint:disable-next-line:one-variable-per-declaration
     const file = 'assets/betaald.png',
@@ -130,7 +132,7 @@ describe('ExpenseApp:', () => {
 
   it('should get the attachments', () => {
     browser.waitForAngularEnabled(false);
-    element(by.id(expenseID.toString())).element(by.xpath('ancestor::div')).click();
+    element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
     browser.sleep(2000);
     const attachmentList = element.all(by.css('.click-stop'));
     expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
@@ -139,19 +141,27 @@ describe('ExpenseApp:', () => {
   it('should reject the expense', () => {
     browser.waitForAngularEnabled(false);
     element(by.id('thumbs-down')).click();
-    browser.sleep(500);
-    element(by.id('thumbs-down-rejecting')).click();
+    const elem = element(by.id('thumbs-down-rejecting'));
+    browser.wait(until.visibilityOf(elem), 10000, 'Expense rejection form took too long to load').then(() => {
+      elem.click();
+    });
     expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense rejection took too long'));
     // expect(element(by.css('.modal-content')).isDisplayed()).toBe(false);
   });
 
-  it('should see the expense on the controller page', () => {
+  it('should get expenses on controller page', () => {
     browser.waitForAngularEnabled(false);
     element(by.id('home-button')).click();
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
     element(by.name('expenses/controller')).click();
     browser.sleep(1200);
-    element(by.id(expenseID.toString())).element(by.xpath('ancestor::div')).click();
+    const expenseList = element.all(by.css('.ag-cell'));
+    expect(expenseList.count()).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should see the expense on the controller page', () => {
+    browser.waitForAngularEnabled(false);
+    element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
     browser.sleep(2000);
     expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 10000, 'Expense modal didn\'t open'));
   });
