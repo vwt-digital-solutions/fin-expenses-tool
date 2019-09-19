@@ -27,16 +27,6 @@ export class ControllerComponent implements OnInit {
         headerName: 'Declaraties Overzicht',
         children: [
           {
-            headerName: '',
-            field: 'id',
-            width: 65,
-            colId: 'id',
-            cellRenderer: params => {
-              const infoIcon = '<i id="information-icon" class="fa fa-edit"></i>';
-              return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
-            },
-          },
-          {
             headerName: 'Declaratiedatum',
             field: 'date_of_claim',
             sortable: true,
