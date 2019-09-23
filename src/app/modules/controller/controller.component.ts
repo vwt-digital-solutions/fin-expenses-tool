@@ -5,6 +5,7 @@ import { OAuthService } from 'angular-oauth2-oidc';
 import { DomSanitizer } from '@angular/platform-browser';
 import { ManagerComponent } from '../manager/manager.component';
 import { IdentityService } from 'src/app/services/identity.service';
+import { retry } from 'rxjs/operators';
 
 interface ExpensesIfc {
   ['body']: any;
@@ -41,8 +42,15 @@ export class ControllerComponent implements OnInit {
             sortable: true, filter: true, width: 200, resizable: true
           },
           {
-            headerName: 'Kosten', field: 'amount', valueFormatter: ManagerComponent.decimalFormatter,
+            headerName: 'Kosten', field: 'amount', valueFormatter: ControllerComponent.decimalFormatter,
             sortable: true, filter: true, width: 150, cellStyle: { 'text-align': 'right' }
+          },
+          {
+            headerName: 'SoortGL', field: 'cost_type',
+            sortable: true, filter: true, resizable: true, width: 100,
+            cellRenderer: params => {
+              return params.value.split(':')[1];
+            }
           },
           {
             headerName: 'Soort', field: 'cost_type',
@@ -80,17 +88,28 @@ export class ControllerComponent implements OnInit {
   rowData = null;
 
   static formatNumber(numb) {
-    return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+    return (numb).toLocaleString('nl-NL',
+      { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'EUR' })
+      .replace(',', ';').replace(/\./g, ',').replace(';', '.');
+    // return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
   }
 
   static decimalFormatter(amounts) {
-    return '€ ' + ControllerComponent.formatNumber(amounts.value);
+    return ControllerComponent.formatNumber(amounts.value);
   }
 
   static getCorrectDate(date) {
     const d = new Date(date);
     return d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
       ('0' + d.getMinutes()).substr(-2) + ':' + ('0' + d.getSeconds()).substr(-2);
+  }
+
+  processExcelCellCallback(param) {
+    if (param.column.colDef.cellRenderer) {
+      return (param.column.colDef.cellRenderer(param));
+    } else {
+      return param.value;
+    }
   }
 
   fixDate(date) {
@@ -141,6 +160,7 @@ export class ControllerComponent implements OnInit {
   onBtExport() {
     const params1 = {
       allColumns: true,
+      processCellCallback: this.processExcelCellCallback.bind(this)
     };
     this.gridApi.exportDataAsExcel(params1);
   }

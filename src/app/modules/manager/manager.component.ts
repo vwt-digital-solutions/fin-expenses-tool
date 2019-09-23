@@ -148,11 +148,14 @@ export class ManagerComponent implements OnInit {
   historyRowData = null;
 
   static formatNumber(numb) {
-    return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+    return (numb).toLocaleString('nl-NL',
+      { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'EUR' })
+      .replace(',', ';').replace(/\./g, ',').replace(';', '.');
+    // return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
   }
 
   static decimalFormatter(amounts) {
-    return '€ ' + ManagerComponent.formatNumber(amounts.value);
+    return ManagerComponent.formatNumber(amounts.value);
   }
 
   static getCorrectDate(date) {
