@@ -206,7 +206,7 @@ export class ExpensesComponent {
               }, 1000);
             }
           }, response => {
-            if (response.status === 404) {
+            if (response.status === 403) {
               this.wrongfulClaim('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
               if (navigator.userAgent.match(/Android/i)
                 || navigator.userAgent.match(/webOS/i)
