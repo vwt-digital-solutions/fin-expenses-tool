@@ -1,9 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {ExpensesConfigService} from '../../services/config.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {OAuthService} from 'angular-oauth2-oidc';
-import {DomSanitizer} from '@angular/platform-browser';
-import {ManagerComponent} from '../manager/manager.component';
+import { Component, OnInit } from '@angular/core';
+import { ExpensesConfigService } from '../../services/config.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { OAuthService } from 'angular-oauth2-oidc';
+import { DomSanitizer } from '@angular/platform-browser';
+import { ManagerComponent } from '../manager/manager.component';
+import { IdentityService } from 'src/app/services/identity.service';
 
 interface ExpensesIfc {
   ['body']: any;
@@ -19,7 +20,7 @@ export class ControllerComponent implements OnInit {
   constructor(
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
-    private oauthService: OAuthService,
+    private identityService: IdentityService,
     private sanitizer: DomSanitizer,
   ) {
     this.columnDefs = [
@@ -41,7 +42,7 @@ export class ControllerComponent implements OnInit {
           },
           {
             headerName: 'Kosten', field: 'amount', valueFormatter: ManagerComponent.decimalFormatter,
-            sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
+            sortable: true, filter: true, width: 150, cellStyle: { 'text-align': 'right' }
           },
           {
             headerName: 'Soort', field: 'cost_type',
@@ -71,10 +72,8 @@ export class ControllerComponent implements OnInit {
   private monthNames;
   private gridApi;
   public columnDefs;
-  public isMobile;
   public today;
   public denySelection;
-  public isLoading;
   public expenseData: object;
   private receiptFiles;
 
@@ -131,20 +130,12 @@ export class ControllerComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.isMobile = (navigator.userAgent.match(/Android/i)
-      || navigator.userAgent.match(/webOS/i)
-      || navigator.userAgent.match(/iPhone/i)
-      || navigator.userAgent.match(/iPad/i)
-      || navigator.userAgent.match(/iPod/i)
-      || navigator.userAgent.match(/BlackBerry/i)
-      || navigator.userAgent.match(/Windows Phone/i));
     this.today = new Date();
     this.denySelection = false;
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];
-    // const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
-    // this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
+    const OurJaneDoeIs = this.identityService.whoAmI();
   }
 
   onBtExport() {
@@ -161,54 +152,21 @@ export class ControllerComponent implements OnInit {
     this.expenses.getControllerExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
   }
 
-  toggleMobile() {
-    if (this.isMobile) {
-      if (this.isLoading) {
-        document.getElementById('mobile-loader').style.visibility = 'visible';
-        document.getElementById('mobile-loader-button').style.visibility = 'hidden';
-      } else {
-        document.getElementById('mobile-loader').style.visibility = 'hidden';
-        document.getElementById('mobile-loader-button').style.visibility = 'visible';
-      }
-    } else {
-      return;
-    }
-  }
-
-  regOff() {
-    if (this.isMobile) {
-      document.getElementById('mobile-loader-button').style.visibility = 'hidden';
-      document.getElementById('mobile-loader').style.visibility = 'hidden';
-    } else {
-      return;
-    }
-  }
-
   onRowClicked(event, content) {
-    if (!this.isLoading) { // Stalls click spam
-      this.isLoading = true;
-      this.toggleMobile();
-      this.gridApi = event.api;
-      this.expenseData = event.data;
-      this.expenses.getFinanceAttachment(event.data.id).subscribe((image: ExpensesIfc) => { // CHANGE TO CONTROLLER
-        this.receiptFiles = [];
-        // @ts-ignore
-        // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < image.length; i++) {
-          if (!(this.receiptFiles.includes(image[i]))) { // Stalls multiple attachments on mobile
-            this.receiptFiles.push(image[i]);
-          }
+    this.gridApi = event.api;
+    this.expenseData = event.data;
+    this.expenses.getFinanceAttachment(event.data.id).subscribe((image: any) => { // CHANGE TO CONTROLLER
+      this.receiptFiles = [];
+      for (const img of image) {
+        if (!(this.receiptFiles.includes(img))) {
+          this.receiptFiles.push(img);
         }
-        this.isLoading = false;
-        this.toggleMobile();
-        this.modalService.open(content, {centered: true}).result.then((result) => {
-          this.regOff();
-          this.gridApi.deselectAll();
-        }, (reason) => {
-          this.regOff();
-          this.gridApi.deselectAll();
-        });
+      }
+      this.modalService.open(content, { centered: true }).result.then((result) => {
+        this.gridApi.deselectAll();
+      }, (reason) => {
+        this.gridApi.deselectAll();
       });
-    }
+    });
   }
 }

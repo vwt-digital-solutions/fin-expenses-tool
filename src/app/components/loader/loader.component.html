@@ -1,4 +1,4 @@
-<div class="d-flex justify-content-center" id="spinner-holder">
+<div *ngIf="isLoading" class="overlay" id="spinner-holder">
   <div class="spinner-border text-primary" role="status">
     <span class="sr-only">Loading...</span>
   </div>

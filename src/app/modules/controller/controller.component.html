@@ -12,13 +12,6 @@
   </ag-grid-angular>
   <!-- END AG-GRID EXPENSES -->
 
-  <!-- START LOADER -->
-  <app-loader *ngIf="this.isLoading && !this.isMobile"></app-loader>
-  <app-loader *ngIf="this.isMobile" id="mobile-loader" style="visibility: hidden"></app-loader>
-  <button class="btn btn-primary" id="mobile-loader-button" style="visibility: hidden" (click)="regOff()"><span
-    class="badge badge-pill badge-info">Klik om te openen</span></button>
-  <!-- END LOADER-->
-
   <!-- FORM TEMPLATE -->
   <ng-template #expenseContent let-modal>
     <div class="modal-header">

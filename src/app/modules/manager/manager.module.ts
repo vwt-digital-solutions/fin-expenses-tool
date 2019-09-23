@@ -1,14 +1,13 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-import {AppRoutingModule} from '../../app-routing.module';
-import {CommonModule} from '@angular/common';
-import {HttpClientModule} from '@angular/common/http';
-import {FormsModule} from '@angular/forms';
-import {AgGridModule} from 'ag-grid-angular';
-import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {ManagerComponent} from './manager.component';
-import {LoaderModule} from '../../components/loader/loader.module';
+import { AppRoutingModule } from '../../app-routing.module';
+import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { AgGridModule } from 'ag-grid-angular';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ManagerComponent } from './manager.component';
 
 @NgModule({
   declarations: [
@@ -22,12 +21,10 @@ import {LoaderModule} from '../../components/loader/loader.module';
     FormsModule,
     AgGridModule.withComponents([]),
     NgbModule,
-    LoaderModule
   ],
   exports: [
     CommonModule,
     ManagerComponent,
-    LoaderModule
   ],
   providers: [],
   bootstrap: [ManagerComponent]

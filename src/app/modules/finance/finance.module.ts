@@ -8,7 +8,6 @@ import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {AgGridModule} from 'ag-grid-angular';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
-import {LoaderModule} from '../../components/loader/loader.module';
 
 @NgModule({
   declarations: [
@@ -22,12 +21,10 @@ import {LoaderModule} from '../../components/loader/loader.module';
     FormsModule,
     AgGridModule.withComponents([]),
     NgbModule,
-    LoaderModule
   ],
   exports: [
     CommonModule,
     FinanceComponent,
-    LoaderModule
   ],
   providers: [],
   bootstrap: [FinanceComponent]

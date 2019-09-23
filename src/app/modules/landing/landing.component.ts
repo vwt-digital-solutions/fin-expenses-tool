@@ -6,6 +6,7 @@ import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DomSanitizer} from '@angular/platform-browser';
+import { IdentityService } from 'src/app/services/identity.service';
 
 
 interface IClaimRoles {
@@ -40,7 +41,7 @@ export class LandingComponent implements OnInit {
   public hasNoExpenses;
 
   constructor(
-    private oauthService: OAuthService,
+    private identityService: IdentityService,
     private httpClient: HttpClient,
     private env: EnvService,
     private modalService: NgbModal,
@@ -123,7 +124,7 @@ export class LandingComponent implements OnInit {
 
   ngOnInit() {
     this.OurJaneDoeIs = [];
-    const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
+    const claimJaneDoe = this.identityService.allClaims();
     // tslint:disable-next-line:prefer-for-of
     for (let i = 0; i < claimJaneDoe.roles.length; i++) {
       this.OurJaneDoeIs.push(claimJaneDoe.roles[i].split('.')[0]);

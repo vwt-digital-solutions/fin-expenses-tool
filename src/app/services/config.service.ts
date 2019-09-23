@@ -84,7 +84,7 @@ export class ExpensesConfigService {
       );
   }
 
-  public getFinanceAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
+  public getFinanceAttachment(expenseId): Observable<HttpResponse<any[]>> {
     return this.http.get<any>(this.env.apiUrl + Endpoint.finance + '/' + expenseId + '/attachments')
       .pipe(
         ExpensesConfigService.retry(2),
