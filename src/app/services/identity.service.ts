@@ -22,6 +22,11 @@ export class IdentityService {
   }
 
   allClaims(): IClaimRoles {
-    return this.oauthService.getIdentityClaims() as IClaimRoles;
+    const claims = this.oauthService.getIdentityClaims() as IClaimRoles;
+    // handle non-privileged employee => roles array is absent
+    if (!claims.roles) {
+      claims.roles = ['.'];
+    }
+    return claims;
   }
 }

@@ -9,15 +9,6 @@ import {DomSanitizer} from '@angular/platform-browser';
 import { IdentityService } from 'src/app/services/identity.service';
 
 
-interface IClaimRoles {
-  oid: any;
-  roles: any;
-}
-
-interface ExpensesIfc {
-  ['body']: any;
-}
-
 @Component({
   selector: 'app-manager',
   templateUrl: './landing.component.html',
@@ -34,7 +25,6 @@ export class LandingComponent implements OnInit {
   public formErrors;
   public formResponse;
   public formSubmitted;
-  public typeOptions;
   public attachmentList;
   private receiptFiles;
   public today;
@@ -125,23 +115,15 @@ export class LandingComponent implements OnInit {
   ngOnInit() {
     this.OurJaneDoeIs = [];
     const claimJaneDoe = this.identityService.allClaims();
-    // tslint:disable-next-line:prefer-for-of
-    for (let i = 0; i < claimJaneDoe.roles.length; i++) {
-      this.OurJaneDoeIs.push(claimJaneDoe.roles[i].split('.')[0]);
+    for (const role of claimJaneDoe.roles) {
+      this.OurJaneDoeIs.push(role.split('.')[0]);
     }
-    // @ts-ignore
-    this.personID = claimJaneDoe.email.split('@')[0];
-    // @ts-ignore
-    this.displayPersonName = claimJaneDoe.name.split(',');
+    this.personID = claimJaneDoe.email ? claimJaneDoe.email.split('@')[0] : 'UNDEFINED';
+    this.displayPersonName = claimJaneDoe.name ? claimJaneDoe.name.split(',') : ['UNDEFINED', 'UNDEFINED'];
     this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName [0]).substring(1);
     this.declarationCall();
     this.today = new Date();
 
-    this.expenses.getCostTypes()
-      .subscribe(
-        val => {
-          this.typeOptions = val;
-        });
   }
 
   declarationCall() {
@@ -164,11 +146,9 @@ export class LandingComponent implements OnInit {
 
   clickExpense(content, item) {
     if (this.isClickable(item)) {
-      this.expenses.getExpenseAttachment(item.id).subscribe((image: ExpensesIfc) => {
-        // @ts-ignore
-        // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < image.length; i++) {
-          this.receiptFiles.push(image[i]);
+      this.expenses.getExpenseAttachment(item.id).subscribe((image: any) => {
+        for (const img of image) {
+          this.receiptFiles.push(img);
         }
       });
       this.formSubmitted = false;
