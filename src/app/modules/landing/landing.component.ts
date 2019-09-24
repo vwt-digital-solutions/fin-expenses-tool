@@ -272,13 +272,12 @@ export class LandingComponent implements OnInit {
     if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
       // Check Form Data
       let fileString = '';
-      let i;
       // @ts-ignore
-      for (i = 0; i < this.receiptFiles.length; i++) {
+      for (const recFile of this.receiptFiles) {
         if (fileString === '') {
-          fileString = this.receiptFiles[i];
+          fileString = recFile;
         } else {
-          fileString = fileString + '.' + this.receiptFiles[i];
+          fileString = fileString + '.' + recFile;
         }
       }
       form.value.attachment = fileString;

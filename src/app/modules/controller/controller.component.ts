@@ -1,11 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ExpensesConfigService } from '../../services/config.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { OAuthService } from 'angular-oauth2-oidc';
 import { DomSanitizer } from '@angular/platform-browser';
-import { ManagerComponent } from '../manager/manager.component';
 import { IdentityService } from 'src/app/services/identity.service';
-import { retry } from 'rxjs/operators';
+import { FormaterService } from 'src/app/services/formater.service';
 
 interface ExpensesIfc {
   ['body']: any;
@@ -34,7 +32,7 @@ export class ControllerComponent implements OnInit {
             sortable: true,
             filter: true,
             cellRenderer: params => {
-              return ManagerComponent.getCorrectDate(params.value);
+              return FormaterService.getCorrectDate(params.value);
             },
           },
           {
@@ -42,7 +40,7 @@ export class ControllerComponent implements OnInit {
             sortable: true, filter: true, width: 200, resizable: true
           },
           {
-            headerName: 'Kosten', field: 'amount', valueFormatter: ControllerComponent.decimalFormatter,
+            headerName: 'Kosten', field: 'amount', valueFormatter: FormaterService.decimalFormatter,
             sortable: true, filter: true, width: 150, cellStyle: { 'text-align': 'right' }
           },
           {
@@ -86,23 +84,6 @@ export class ControllerComponent implements OnInit {
   private receiptFiles;
 
   rowData = null;
-
-  static formatNumber(numb) {
-    return (numb).toLocaleString('nl-NL',
-      { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'EUR' })
-      .replace(',', ';').replace(/\./g, ',').replace(';', '.');
-    // return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-  }
-
-  static decimalFormatter(amounts) {
-    return ControllerComponent.formatNumber(amounts.value);
-  }
-
-  static getCorrectDate(date) {
-    const d = new Date(date);
-    return d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
-      ('0' + d.getMinutes()).substr(-2) + ':' + ('0' + d.getSeconds()).substr(-2);
-  }
 
   processExcelCellCallback(param) {
     if (param.column.colDef.cellRenderer) {

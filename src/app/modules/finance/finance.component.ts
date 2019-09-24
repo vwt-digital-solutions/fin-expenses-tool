@@ -8,6 +8,7 @@ import { ExpensesConfigService } from '../../services/config.service';
 import * as moment from 'moment';
 import { DomSanitizer } from '@angular/platform-browser';
 import { IdentityService } from 'src/app/services/identity.service';
+import { FormaterService } from 'src/app/services/formater.service';
 
 moment.locale('nl');
 
@@ -77,7 +78,7 @@ export class FinanceComponent implements OnInit {
             sortable: true,
             filter: true,
             cellRenderer: params => {
-              return FinanceComponent.getCorrectDate(params.value);
+              return FormaterService.getCorrectDate(params.value);
             },
           },
           {
@@ -85,7 +86,7 @@ export class FinanceComponent implements OnInit {
             sortable: true, filter: true, width: 200, resizable: true
           },
           {
-            headerName: 'Kosten', field: 'amount', valueFormatter: FinanceComponent.decimalFormatter,
+            headerName: 'Kosten', field: 'amount', valueFormatter: FormaterService.decimalFormatter,
             sortable: true, filter: true, width: 150, cellStyle: { 'text-align': 'right' }
           },
           {
@@ -146,24 +147,7 @@ export class FinanceComponent implements OnInit {
   rowData = null;
   historyRowData = null;
 
-  static formatNumber(numb) {
-    return (numb).toLocaleString('nl-NL',
-      { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'EUR' })
-      .replace(',', ';').replace(/\./g, ',').replace(';', '.');
-    // return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-  }
-
-  static decimalFormatter(amounts) {
-    return FinanceComponent.formatNumber(amounts.value);
-  }
-
-  static getCorrectDate(date) {
-    const d = new Date(date);
-    return d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
-      ('0' + d.getMinutes()).substr(-2) + ':' + ('0' + d.getSeconds()).substr(-2);
-  }
-
-  static getDismissReason(reason: any): string {
+  getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
       return 'by pressing ESC';
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
@@ -243,7 +227,7 @@ export class FinanceComponent implements OnInit {
         console.log(`Closed with: ${result}`);
       }, (reason) => {
         this.gridApi.deselectAll();
-        console.log(`Dismissed ${FinanceComponent.getDismissReason(reason)}`);
+        console.log(`Dismissed ${this.getDismissReason(reason)}`);
       });
     });
   }

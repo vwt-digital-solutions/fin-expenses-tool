@@ -157,13 +157,11 @@ export class ExpensesComponent {
   claimForm(form: NgForm) {
     // Check Form Data
     let fileString = '';
-    let i;
-    // @ts-ignore
-    for (i = 0; i < this.locatedFile.length; i++) {
+    for (const locFile of this.locatedFile) {
       if (fileString === '') {
-        fileString = this.locatedFile[i];
+        fileString = locFile;
       } else {
-        fileString = fileString + '.' + this.locatedFile[i];
+        fileString = fileString + '.' + locFile;
       }
     }
     form.value.attachment = fileString;
