@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
-import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { TokenInterceptor } from './auth/token.interceptor';
 
@@ -49,7 +49,8 @@ import { AgGridModule } from 'ag-grid-angular';
     OAuthModule.forRoot(),
     AppRoutingModule,
     AgGridModule.withComponents([]),
-    NgbDropdownModule
+    NgbDropdownModule,
+    NgbModule
   ],
 
   exports: [
