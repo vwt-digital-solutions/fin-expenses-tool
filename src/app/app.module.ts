@@ -54,8 +54,6 @@ import { AgGridModule } from 'ag-grid-angular';
   ],
 
   exports: [
-    HeaderComponent,
-    LandingComponent
   ],
   providers: [
     EnvServiceProvider,
