@@ -12,8 +12,28 @@ import { AuthComponent } from './auth/auth.component';
 const routes: Routes = [
   {
     path: 'expenses',
-    component: ExpensesComponent,
     canActivate: [AuthGuard],
+    children: [
+      {
+        path: 'employee',
+        component: ExpensesComponent,
+      },
+      {
+        path: 'process',
+        component: FinanceComponent,
+        data: { roles: [Role.Creditor] }
+      },
+      {
+        path: 'manage',
+        component: ManagerComponent,
+        data: { roles: [Role.Manager] }
+      },
+      {
+        path: 'controller',
+        component: ControllerComponent,
+        data: { roles: [Role.Controller] }
+      }
+    ]
   },
   {
     path: 'home',
@@ -24,25 +44,7 @@ const routes: Routes = [
     path: 'auth/:authBody',
     component: AuthComponent,
   },
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  {
-    path: 'expenses/process',
-    component: FinanceComponent,
-    canActivate: [AuthGuard],
-    data: { roles: [Role.Creditor] }
-  },
-  {
-    path: 'expenses/manage',
-    component: ManagerComponent,
-    canActivate: [AuthGuard],
-    data: { roles: [Role.Manager] }
-  },
-  {
-    path: 'expenses/controller',
-    component: ControllerComponent,
-    canActivate: [AuthGuard],
-    data: { roles: [Role.Controller] }
-  }
+  { path: '', redirectTo: 'home', pathMatch: 'full' }
 ];
 
 @NgModule({
