@@ -139,10 +139,6 @@ export class LandingComponent implements OnInit {
         });
   }
 
-  handleLinking(event) {
-    window.location.href = window.location.protocol + '//' + window.location.host + '/' + event.target.name;
-  }
-
   clickExpense(content, item) {
     if (this.isClickable(item)) {
       this.expenses.getExpenseAttachment(item.id).subscribe((image: any) => {

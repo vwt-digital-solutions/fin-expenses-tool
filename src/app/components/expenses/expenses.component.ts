@@ -1,7 +1,8 @@
-import {Component} from '@angular/core';
-import {NgForm} from '@angular/forms';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {EnvService} from 'src/app/services/env.service';
+import { Component } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { EnvService } from 'src/app/services/env.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-expenses',
@@ -13,6 +14,7 @@ export class ExpensesComponent {
   constructor(
     private httpClient: HttpClient,
     private env: EnvService,
+    private router: Router
   ) {
     this.httpClient.get(this.env.apiUrl + '/employees/cost-types')
       .subscribe(
@@ -22,7 +24,7 @@ export class ExpensesComponent {
         }, response => {
           console.error('>> GET FAILED', response.message);
         });
-    this.addClaimSuccess = {success: false, wrong: false};
+    this.addClaimSuccess = { success: false, wrong: false };
     this.today = new Date();
     this.notaData = 'Toevoegen';
     this.loadingThings = false;
@@ -112,7 +114,7 @@ export class ExpensesComponent {
         const reader = new FileReader();
         reader.readAsDataURL(file[0]);
         reader.onload = () => {
-          if (file[0]. type === 'application/pdf') {
+          if (file[0].type === 'application/pdf') {
             this.locatedFile.push(reader.result);
           } else if (file[0].type.split('/')[0] === 'image') {
             const img = new Image();
@@ -198,9 +200,10 @@ export class ExpensesComponent {
               this.attachmentList = [];
               this.locatedFile = [];
             } else {
-              // tslint:disable-next-line:only-arrow-functions
-              setTimeout(function() {
-                window.location.href = window.location.protocol + '//' + window.location.host + '/home';
+              const that = this;
+              setTimeout(() => {
+                that.router.navigate(['/']);
+                // window.location.href = window.location.protocol + '//' + window.location.host + '/home';
               }, 1000);
             }
           }, response => {
