@@ -135,7 +135,6 @@ export class ControllerComponent implements OnInit {
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];
-    const OurJaneDoeIs = this.identityService.whoAmI();
   }
 
   onBtExport() {

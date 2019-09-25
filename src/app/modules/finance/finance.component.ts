@@ -13,14 +13,6 @@ import { FormaterService } from 'src/app/services/formater.service';
 moment.locale('nl');
 
 
-interface ExpensesIfc {
-  ['body']: any;
-}
-
-interface IClaimRoles {
-  roles: any;
-}
-
 @Component({
   selector: 'app-expenses',
   templateUrl: './finance.component.html',
@@ -273,9 +265,7 @@ export class FinanceComponent implements OnInit {
         val => {
           this.typeOptions = val;
         });
-    // @ts-ignore
-    this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
-    this.OurJaneDoeIs = this.identityService.whoAmI();
+    this.expenses.getExpenses().subscribe((data: any) => this.rowData = [...data]);
   }
 
   callHistoryRefresh() {
