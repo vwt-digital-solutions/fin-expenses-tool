@@ -11,7 +11,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
-    FinanceComponent
+    FinanceComponent,
   ],
   imports: [
     BrowserModule,
@@ -21,11 +21,10 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     FormsModule,
     AgGridModule.withComponents([]),
     NgbModule,
-
   ],
   exports: [
     CommonModule,
-    FinanceComponent
+    FinanceComponent,
   ],
   providers: [],
   bootstrap: [FinanceComponent]

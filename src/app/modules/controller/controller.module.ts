@@ -20,11 +20,11 @@ import {AgGridModule} from 'ag-grid-angular';
     HttpClientModule,
     FormsModule,
     AgGridModule.withComponents([]),
-    NgbModule
+    NgbModule,
   ],
   exports: [
     CommonModule,
-    ControllerComponent
+    ControllerComponent,
   ],
   providers: [],
   bootstrap: [ControllerComponent]

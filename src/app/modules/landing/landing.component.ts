@@ -6,16 +6,8 @@ import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DomSanitizer} from '@angular/platform-browser';
+import { IdentityService } from 'src/app/services/identity.service';
 
-
-interface IClaimRoles {
-  oid: any;
-  roles: any;
-}
-
-interface ExpensesIfc {
-  ['body']: any;
-}
 
 @Component({
   selector: 'app-manager',
@@ -33,14 +25,13 @@ export class LandingComponent implements OnInit {
   public formErrors;
   public formResponse;
   public formSubmitted;
-  public typeOptions;
-  private receiptImage: any;
+  public attachmentList;
   private receiptFiles;
   public today;
   public hasNoExpenses;
 
   constructor(
-    private oauthService: OAuthService,
+    private identityService: IdentityService,
     private httpClient: HttpClient,
     private env: EnvService,
     private modalService: NgbModal,
@@ -123,24 +114,16 @@ export class LandingComponent implements OnInit {
 
   ngOnInit() {
     this.OurJaneDoeIs = [];
-    const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
-    // tslint:disable-next-line:prefer-for-of
-    for (let i = 0; i < claimJaneDoe.roles.length; i++) {
-      this.OurJaneDoeIs.push(claimJaneDoe.roles[i].split('.')[0]);
+    const claimJaneDoe = this.identityService.allClaims();
+    for (const role of claimJaneDoe.roles) {
+      this.OurJaneDoeIs.push(role.split('.')[0]);
     }
-    // @ts-ignore
-    this.personID = claimJaneDoe.email.split('@')[0];
-    // @ts-ignore
-    this.displayPersonName = claimJaneDoe.name.split(',');
+    this.personID = claimJaneDoe.email ? claimJaneDoe.email.split('@')[0] : 'UNDEFINED';
+    this.displayPersonName = claimJaneDoe.name ? claimJaneDoe.name.split(',') : ['UNDEFINED', 'UNDEFINED'];
     this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName [0]).substring(1);
     this.declarationCall();
     this.today = new Date();
 
-    this.expenses.getCostTypes()
-      .subscribe(
-        val => {
-          this.typeOptions = val;
-        });
   }
 
   declarationCall() {
@@ -163,11 +146,9 @@ export class LandingComponent implements OnInit {
 
   clickExpense(content, item) {
     if (this.isClickable(item)) {
-      this.expenses.getExpenseAttachment(item.id).subscribe((image: ExpensesIfc) => {
-        // @ts-ignore
-        // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < image.length; i++) {
-          this.receiptFiles.push(image[i]);
+      this.expenses.getExpenseAttachment(item.id).subscribe((image: any) => {
+        for (const img of image) {
+          this.receiptFiles.push(img);
         }
       });
       this.formSubmitted = false;
@@ -196,6 +177,11 @@ export class LandingComponent implements OnInit {
         this.receiptFiles.splice(i, 1);
       }
     }
+    for (i = 0; i < this.attachmentList().length; i++) {
+      if (this.attachmentList[i] === item) {
+        this.attachmentList.splice(i, 1);
+      }
+    }
   }
 
   submitButtonController(nnote, namount, ntype, ntransdate) {
@@ -206,29 +192,72 @@ export class LandingComponent implements OnInit {
 
   openExpenseDetailModal(content, data) {
     this.receiptFiles = [];
+    this.attachmentList = [];
     this.modalService.open(content, {centered: true});
   }
 
   onFileInput(file) {
-    if (!(file[0] === undefined || file[0] === null)) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file[0]);
-      reader.onload = () => {
-        this.receiptFiles.push(reader.result);
-      };
+    console.log(file[0].type.split('/')[0]);
+    if (file[0].type.split('/')[0] !== 'image' && file[0].type !== 'application/pdf') {
+      alert('Graag alleen een pdf of afbeelding toevoegen');
+      return;
+    }
+    const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
+    if (isIEOrEdge) {
+      alert('Please use Chrome or Firefox to use this ');
+    } else {
+      if (!(file[0] === undefined || file[0] === null)) {
+        this.attachmentList.push(file);
+        const reader = new FileReader();
+        reader.readAsDataURL(file[0]);
+        reader.onload = () => {
+          if (file[0]. type === 'application/pdf') {
+            this.receiptFiles.push(reader.result);
+          } else if (file[0].type.split('/')[0] === 'image') {
+            const img = new Image();
+            if (typeof reader.result === 'string') {
+              img.src = reader.result;
+              img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width;
+                if (img.width > 600) {
+                  width = 600;
+                } else {
+                  width = img.width;
+                }
+                const scaleFactor = width / img.width;
+                canvas.width = width;
+                canvas.height = img.height * scaleFactor;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
+                ctx.canvas.toBlob(blob => {
+                  const filla = new File([blob], file[0].name, {
+                    type: file[0].type,
+                    lastModified: this.today
+                  });
+                  reader.readAsDataURL(filla);
+                  reader.onload = () => {
+                    this.receiptFiles.push(reader.result);
+                  };
+                }, file[0].type, 1);
+              }, reader.onerror = Error => console.log(Error);
+            }
+          }
+        };
+      }
     }
   }
 
   claimUpdateForm(form: NgForm, expenseId, instArray) {
     if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
+      // Check Form Data
       let fileString = '';
-      let i;
       // @ts-ignore
-      for (i = 0; i < this.receiptFiles.length; i++) {
+      for (const recFile of this.receiptFiles) {
         if (fileString === '') {
-          fileString = this.receiptFiles[i];
+          fileString = recFile;
         } else {
-          fileString = fileString + '.' + this.receiptFiles[i];
+          fileString = fileString + '.' + recFile;
         }
       }
       form.value.attachment = fileString;
@@ -241,7 +270,7 @@ export class LandingComponent implements OnInit {
           dataVerified[prop] = data[prop];
         }
       }
-      dataVerified[`status`] = 'ready_for_manager';
+      dataVerified[`status`] = 'ready_for_manager'; // This needs to be done on the backend
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
         this.expenses.updateExpenseEmployee(dataVerified, expenseId)
           .subscribe(
@@ -257,5 +286,25 @@ export class LandingComponent implements OnInit {
             })
         : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
     }
+  }
+
+    cancelExpense() {
+      const dataVerified = {};
+      // @ts-ignore
+      const expenseId = this.expenseData.id;
+
+      dataVerified[`status`] = 'cancelled';
+
+      this.expenses.updateExpenseEmployee(dataVerified, expenseId)
+        .subscribe(
+            result => {
+              this.showErrors = false;
+              this.declarationCall();
+              this.dismissExpenseModal();
+            },
+            error => {
+              this.showErrors = true;
+              Object.assign(this.formResponse, JSON.parse(error));
+            });
   }
 }

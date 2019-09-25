@@ -1,12 +1,14 @@
-import {Component, OnInit} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {EnvService} from 'src/app/services/env.service';
-import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
-import {NgForm} from '@angular/forms';
-import {OAuthService} from 'angular-oauth2-oidc';
-import {ExpensesConfigService} from '../../services/config.service';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { EnvService } from 'src/app/services/env.service';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { NgForm } from '@angular/forms';
+import { OAuthService } from 'angular-oauth2-oidc';
+import { ExpensesConfigService } from '../../services/config.service';
 import * as moment from 'moment';
-import {DomSanitizer} from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
+import { IdentityService } from 'src/app/services/identity.service';
+import { FormaterService } from 'src/app/services/formater.service';
 
 moment.locale('nl');
 
@@ -27,32 +29,13 @@ interface IClaimRoles {
 })
 
 export class ManagerComponent implements OnInit {
-  private gridApi;
-  private gridColumnApi;
-  public columnDefs;
-  public rowSelection;
-  public typeOptions;
-  public formSubmitted;
-  public showErrors;
-  public formErrors;
-  public formResponse;
-  private submitingStart: boolean;
-  private action: any;
-  private departmentId: number;
-  private OurJaneDoeIs: string;
-  private expenseDataRejection: ({ reason: string })[];
-  private receiptFiles;
-  private isRejecting;
-  private monthNames;
-  private denySelection;
-  public today;
 
   constructor(
     private httpClient: HttpClient,
     private env: EnvService,
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
-    private oauthService: OAuthService,
+    private identityService: IdentityService,
     private sanitizer: DomSanitizer,
   ) {
     this.columnDefs = [
@@ -75,7 +58,7 @@ export class ManagerComponent implements OnInit {
             sortable: true,
             filter: true,
             cellRenderer: params => {
-              return ManagerComponent.getCorrectDate(params.value);
+              return FormaterService.getCorrectDate(params.value);
             },
           },
           {
@@ -83,8 +66,8 @@ export class ManagerComponent implements OnInit {
             sortable: true, filter: true, width: 200, resizable: true
           },
           {
-            headerName: 'Kosten', field: 'amount', valueFormatter: ManagerComponent.decimalFormatter,
-            sortable: true, filter: true, width: 150
+            headerName: 'Kosten', field: 'amount', valueFormatter: FormaterService.decimalFormatter,
+            sortable: true, filter: true, width: 150, cellStyle: { 'text-align': 'right' }
           },
           {
             headerName: 'Soort', field: 'cost_type',
@@ -111,15 +94,36 @@ export class ManagerComponent implements OnInit {
       }
     ];
     this.expenseDataRejection = [
-      {reason: 'Niet Duidelijk'},
-      {reason: 'Kan niet uitbetalen'}
+      { reason: 'Niet Duidelijk' },
+      { reason: 'Kan niet uitbetalen' }
     ];
     this.formSubmitted = false;
     this.showErrors = false;
     this.formResponse = {};
     this.rowSelection = 'single';
-    this.addBooking = {success: false, wrong: false, error: false};
+    this.addBooking = { success: false, wrong: false, error: false };
   }
+  private gridApi;
+  private gridColumnApi;
+  public columnDefs;
+  public rowSelection;
+  public typeOptions;
+  public formSubmitted;
+  public showErrors;
+  public formErrors;
+  public formResponse;
+  private submitingStart: boolean;
+  private action: any;
+  private departmentId: number;
+  private OurJaneDoeIs: string;
+  private expenseDataRejection: ({ reason: string })[];
+  private receiptFiles;
+  private isRejecting;
+  private monthNames;
+  public wantsRejectionNote;
+  public selectedRejection;
+  public today;
+  public noteData;
 
   public expenseData: object;
   public addBooking;
@@ -130,11 +134,11 @@ export class ManagerComponent implements OnInit {
       children: [
         {
           headerName: 'Geschiedenis', field: 'date_exported',
-          sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
+          sortable: true, filter: true, cellStyle: { cursor: 'pointer' },
           suppressMovable: true
         },
         {
-          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 100,
+          headerName: '', field: '', cellStyle: { cursor: 'pointer' }, width: 100,
           template: '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>'
         }
       ]
@@ -144,21 +148,7 @@ export class ManagerComponent implements OnInit {
   rowData = null;
   historyRowData = null;
 
-  static formatNumber(numb) {
-    return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-  }
-
-  static decimalFormatter(amounts) {
-    return '€ ' + ManagerComponent.formatNumber(amounts.value);
-  }
-
-  static getCorrectDate(date) {
-    const d = new Date(date);
-    return d.getDate()  + '-' + (d.getMonth() + 1) +      '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
-      ('0' + d.getMinutes()).substr(-2) + ':' + ('0' + d.getSeconds()).substr(-2);
-  }
-
-  static getDismissReason(reason: any): string {
+  getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
       return 'by pressing ESC';
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
@@ -182,7 +172,7 @@ export class ManagerComponent implements OnInit {
       }
     } else {
       const win = window.open();
-      if ( navigator.userAgent.match(/Android/i)
+      if (navigator.userAgent.match(/Android/i)
         || navigator.userAgent.match(/webOS/i)
         || navigator.userAgent.match(/iPhone/i)
         || navigator.userAgent.match(/iPad/i)
@@ -208,18 +198,44 @@ export class ManagerComponent implements OnInit {
     return (name.split('/')).slice(-1)[0];
   }
 
-  openExpenseDetailModal(content) {
-    this.receiptFiles = [];
+  onRowClicked(event, content) {
+    this.gridApi = event.api;
+    this.formSubmitted = false;
+    this.showErrors = false;
+    this.formErrors = '';
     this.isRejecting = false;
-    this.modalService.open(content, {centered: true}).result.then((result) => {
-      this.gridApi.deselectAll();
-      this.denySelection = true;
-      console.log(`Closed with: ${result}`);
-    }, (reason) => {
-      this.gridApi.deselectAll();
-      this.denySelection = true;
-      console.log(`Dismissed ${ManagerComponent.getDismissReason(reason)}`);
+    this.wantsRejectionNote = false;
+    this.expenseData = event.data;
+    this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
+    this.expenses.getFinanceAttachment(event.data.id).subscribe((image: any) => {
+      this.receiptFiles = [];
+      for (const img of image) {
+        if (!(this.receiptFiles.includes(img))) {
+          this.receiptFiles.push(img);
+        }
+      }
+      this.modalService.open(content, { centered: true }).result.then((result) => {
+        this.gridApi.deselectAll();
+        this.wantsRejectionNote = false;
+        console.log(`Closed with: ${result}`);
+      }, (reason) => {
+        this.gridApi.deselectAll();
+        console.log(`Dismissed ${this.getDismissReason(reason)}`);
+      });
     });
+  }
+
+  rejectionHit(event) {
+    this.wantsRejectionNote = (event.target.value === 'note');
+    this.selectedRejection = event.target.value;
+    this.noteData = '';
+    if (this.wantsRejectionNote) {
+      document.getElementById('rejection-note-group').style.visibility = 'visible';
+      document.getElementById('rejection-note-group').style.display = 'block';
+    } else {
+      document.getElementById('rejection-note-group').style.visibility = 'hidden';
+      document.getElementById('rejection-note-group').style.display = 'none';
+    }
   }
 
   updatingAction(event) {
@@ -236,44 +252,15 @@ export class ManagerComponent implements OnInit {
   onGridReady(params: any) {
     this.gridColumnApi = params.columnApi;
     // @ts-ignore
-    const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
+    const claimJaneDoe = this.identityService.allClaims();
     this.departmentId = claimJaneDoe.oid;
     this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
     // @ts-ignore
     this.expenses.getDepartmentExpenses(this.departmentId).subscribe((data: ExpensesIfc) => this.rowData = [...data]);
   }
 
-  onSelectionChanged(event, content) {
-    if (!this.denySelection) {
-      this.gridApi = event.api;
-      const selectedRows = event.api.getSelectedRows();
-      const selectedRowData = {
-        id: undefined
-      };
-      selectedRows.map((selectedRow, index) => {
-        index !== 0 ?
-          console.log('No selection') : Object.assign(selectedRowData, selectedRow);
-      });
-      this.expenses.getFinanceAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
-        // @ts-ignore
-        // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < image.length; i++) {
-          this.receiptFiles.push(image[i].url);
-        }
-      });
-      this.expenseData = selectedRowData;
-      this.formSubmitted = false;
-      this.showErrors = false;
-      this.formErrors = '';
-      this.openExpenseDetailModal(content);
-    } else {
-      this.denySelection = false;
-    }
-  }
-
   ngOnInit() {
     this.today = new Date();
-    this.denySelection = false;
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];
@@ -284,48 +271,35 @@ export class ManagerComponent implements OnInit {
         });
   }
 
-  submitButtonController(namount, ntype, ntransdate, rnote) {
-    if (this.isRejecting) {
-      return rnote.invalid || namount.invalid || ntype.invalid
-        || ntransdate.invalid || (new Date(ntransdate.viewModel)
-          > this.today) || namount.viewModel < 0.01;
-    } else {
-      return namount.invalid || ntype.invalid
-        || ntransdate.invalid || (new Date(ntransdate.viewModel)
-          > this.today) || namount.viewModel < 0.01;
+  claimUpdateForm(form: NgForm, expenseId) {
+    const dataVerified = {};
+    const data = form.value;
+    if (!(this.wantsRejectionNote)) {
+      data.rnote = this.selectedRejection;
     }
-  }
-
-  claimUpdateForm(form: NgForm, expenseId, instArray) {
-    if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
-      const dataVerified = {};
-      const data = form.value;
-      data.amount = Number((data.amount).toFixed(2));
-      data.date_of_transaction = (new Date(data.date_of_transaction).getTime());
-      for (const prop in data) {
-        if (prop.length !== 0) {
-          dataVerified[prop] = data[prop];
-        }
+    for (const prop in data) {
+      if (prop.length !== 0) {
+        dataVerified[prop] = data[prop];
       }
-      const action = this.action;
-      dataVerified[`status`] = action === 'approving' ? `ready_for_creditor` :
-        action === 'rejecting' ? `rejected_by_manager` : null;
-
-      Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
-        this.expenses.updateExpenseManager(dataVerified, expenseId)
-          .subscribe(
-            result => {
-              this.getNextExpense();
-              // @ts-ignore
-              this.expenses.getDepartmentExpenses(this.departmentId).subscribe((response: ExpensesIfc) => this.rowData = [...response]);
-              this.showErrors = false;
-              this.formSubmitted = !form.ngSubmit.hasError;
-            },
-            error => {
-              this.showErrors = true;
-              Object.assign(this.formResponse, JSON.parse(error));
-            })
-        : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
     }
+    const action = this.action;
+    dataVerified[`status`] = action === 'approving' ? `ready_for_creditor` :
+      action === 'rejecting' ? `rejected_by_manager` : null;
+
+    Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
+      this.expenses.updateExpenseManager(dataVerified, expenseId)
+        .subscribe(
+          result => {
+            this.getNextExpense();
+            // @ts-ignore
+            this.expenses.getDepartmentExpenses(this.departmentId).subscribe((response: ExpensesIfc) => this.rowData = [...response]);
+            this.showErrors = false;
+            this.formSubmitted = !form.ngSubmit.hasError;
+          },
+          error => {
+            this.showErrors = true;
+            Object.assign(this.formResponse, JSON.parse(error));
+          })
+      : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
   }
 }

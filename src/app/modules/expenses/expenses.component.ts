@@ -30,11 +30,13 @@ export class ExpensesComponent {
     this.wantsNext = 'No';
     this.locatedFile = [];
     this.attachmentList = [];
+    this.formError = 'Er is iets fout gegaan. Probeer het later opnieuw.';
   }
 
   public formNote;
   public formAmount;
   public formType;
+  public formError;
   public formTransDate;
   public formAttachment;
   public expensesAmount;
@@ -80,7 +82,10 @@ export class ExpensesComponent {
     return this.addClaimSuccess.success = true;
   }
 
-  wrongfulClaim() {
+  wrongfulClaim(text = null) {
+    if (text !== null) {
+      this.formError = text;
+    }
     return this.addClaimSuccess.wrong = true;
   }
 
@@ -93,6 +98,11 @@ export class ExpensesComponent {
   // End Classes Logic
 
   onFileInput(file) {
+    console.log(file[0].type.split('/')[0]);
+    if (file[0].type.split('/')[0] !== 'image' && file[0].type !== 'application/pdf') {
+      alert('Graag alleen een pdf of afbeelding toevoegen');
+      return;
+    }
     const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
     if (isIEOrEdge) {
       alert('Please use Chrome or Firefox to use this ');
@@ -147,13 +157,11 @@ export class ExpensesComponent {
   claimForm(form: NgForm) {
     // Check Form Data
     let fileString = '';
-    let i;
-    // @ts-ignore
-    for (i = 0; i < this.locatedFile.length; i++) {
+    for (const locFile of this.locatedFile) {
       if (fileString === '') {
-        fileString = this.locatedFile[i];
+        fileString = locFile;
       } else {
-        fileString = fileString + '.' + this.locatedFile[i];
+        fileString = fileString + '.' + locFile;
       }
     }
     form.value.attachment = fileString;
@@ -196,7 +204,20 @@ export class ExpensesComponent {
               }, 1000);
             }
           }, response => {
-            this.wrongfulClaim();
+            if (response.status === 403) {
+              this.wrongfulClaim('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
+              if (navigator.userAgent.match(/Android/i)
+                || navigator.userAgent.match(/webOS/i)
+                || navigator.userAgent.match(/iPhone/i)
+                || navigator.userAgent.match(/iPad/i)
+                || navigator.userAgent.match(/iPod/i)
+                || navigator.userAgent.match(/BlackBerry/i)
+                || navigator.userAgent.match(/Windows Phone/i)) {
+                alert('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
+              }
+            } else {
+              this.wrongfulClaim();
+            }
             this.loadingThings = false;
             console.error('>> POST FAILED', response.message);
           });

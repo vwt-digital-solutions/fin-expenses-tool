@@ -1,12 +1,14 @@
-import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {EnvService} from 'src/app/services/env.service';
-import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
-import {NgForm} from '@angular/forms';
-import {OAuthService} from 'angular-oauth2-oidc';
-import {ExpensesConfigService} from '../../services/config.service';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { EnvService } from 'src/app/services/env.service';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
+import { NgForm } from '@angular/forms';
+import { OAuthService } from 'angular-oauth2-oidc';
+import { ExpensesConfigService } from '../../services/config.service';
 import * as moment from 'moment';
-import {DomSanitizer} from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
+import { IdentityService } from 'src/app/services/identity.service';
+import { FormaterService } from 'src/app/services/formater.service';
 
 moment.locale('nl');
 
@@ -52,7 +54,7 @@ export class FinanceComponent implements OnInit {
     private env: EnvService,
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
-    private oauthService: OAuthService,
+    private identityService: IdentityService,
     private sanitizer: DomSanitizer,
     private detect: ChangeDetectorRef,
   ) {
@@ -76,7 +78,7 @@ export class FinanceComponent implements OnInit {
             sortable: true,
             filter: true,
             cellRenderer: params => {
-              return FinanceComponent.getCorrectDate(params.value);
+              return FormaterService.getCorrectDate(params.value);
             },
           },
           {
@@ -84,8 +86,8 @@ export class FinanceComponent implements OnInit {
             sortable: true, filter: true, width: 200, resizable: true
           },
           {
-            headerName: 'Kosten', field: 'amount', valueFormatter: FinanceComponent.decimalFormatter,
-            sortable: true, filter: true, width: 150
+            headerName: 'Kosten', field: 'amount', valueFormatter: FormaterService.decimalFormatter,
+            sortable: true, filter: true, width: 150, cellStyle: { 'text-align': 'right' }
           },
           {
             headerName: 'Soort', field: 'cost_type',
@@ -115,7 +117,7 @@ export class FinanceComponent implements OnInit {
     this.showErrors = false;
     this.formResponse = {};
     this.rowSelection = 'single';
-    this.addBooking = {success: false, wrong: false, error: false};
+    this.addBooking = { success: false, wrong: false, error: false };
   }
 
   public expenseData: object;
@@ -127,14 +129,15 @@ export class FinanceComponent implements OnInit {
       children: [
         {
           headerName: '', field: 'date_exported',
-          sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
+          sortable: true, filter: true, cellStyle: { cursor: 'pointer' },
           suppressMovable: true, width: 180
         },
-        {headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
+        {
+          headerName: '', field: '', cellStyle: { cursor: 'pointer' }, width: 65,
           template: '<i class="fas fa-file-excel" style="color: #4eb7da; font-size: 20px;"></i>'
         },
         {
-          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
+          headerName: '', field: '', cellStyle: { cursor: 'pointer' }, width: 65,
           template: '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>'
         }
       ]
@@ -144,21 +147,7 @@ export class FinanceComponent implements OnInit {
   rowData = null;
   historyRowData = null;
 
-  static formatNumber(numb) {
-    return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
-  }
-
-  static decimalFormatter(amounts) {
-    return '€ ' + FinanceComponent.formatNumber(amounts.value);
-  }
-
-  static getCorrectDate(date) {
-    const d = new Date(date);
-    return d.getDate()  + '-' + (d.getMonth() + 1) +      '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
-      ('0' + d.getMinutes()).substr(-2) + ':' + ('0' + d.getSeconds()).substr(-2);
-  }
-
-  static getDismissReason(reason: any): string {
+  getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
       return 'by pressing ESC';
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
@@ -182,7 +171,7 @@ export class FinanceComponent implements OnInit {
       }
     } else {
       const win = window.open();
-      if ( navigator.userAgent.match(/Android/i)
+      if (navigator.userAgent.match(/Android/i)
         || navigator.userAgent.match(/webOS/i)
         || navigator.userAgent.match(/iPhone/i)
         || navigator.userAgent.match(/iPad/i)
@@ -216,25 +205,44 @@ export class FinanceComponent implements OnInit {
     }
   }
 
+  onRowClicked(event, content) {
+    this.gridApi = event.api;
+    this.formSubmitted = false;
+    this.showErrors = false;
+    this.formErrors = '';
+    this.isRejecting = false;
+    this.wantsRejectionNote = false;
+    this.expenseData = event.data;
+    this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
+    this.expenses.getFinanceAttachment(event.data.id).subscribe((image: any) => {
+      this.receiptFiles = [];
+      for (const img of image) {
+        if (!(this.receiptFiles.includes(img))) {
+          this.receiptFiles.push(img);
+        }
+      }
+      this.modalService.open(content, { centered: true }).result.then((result) => {
+        this.gridApi.deselectAll();
+        this.wantsRejectionNote = false;
+        console.log(`Closed with: ${result}`);
+      }, (reason) => {
+        this.gridApi.deselectAll();
+        console.log(`Dismissed ${this.getDismissReason(reason)}`);
+      });
+    });
+  }
+
   rejectionHit(event) {
     this.wantsRejectionNote = (event.target.value === 'note');
     this.selectedRejection = event.target.value;
     this.noteData = '';
-  }
-
-  openExpenseDetailModal(content) {
-    this.receiptFiles = [];
-    this.isRejecting = false;
-    this.modalService.open(content, {centered: true}).result.then((result) => {
-      this.gridApi.deselectAll();
-      this.denySelection = true;
-      this.wantsRejectionNote = false;
-      console.log(`Closed with: ${result}`);
-    }, (reason) => {
-      this.gridApi.deselectAll();
-      this.denySelection = true;
-      console.log(`Dismissed ${FinanceComponent.getDismissReason(reason)}`);
-    });
+    if (this.wantsRejectionNote) {
+      document.getElementById('rejection-note-group').style.visibility = 'visible';
+      document.getElementById('rejection-note-group').style.display = 'block';
+    } else {
+      document.getElementById('rejection-note-group').style.visibility = 'hidden';
+      document.getElementById('rejection-note-group').style.display = 'none';
+    }
   }
 
   updatingAction(event) {
@@ -251,42 +259,6 @@ export class FinanceComponent implements OnInit {
   onGridReady(params: any) {
     this.gridColumnApi = params.columnApi;
     // @ts-ignore
-    this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
-    const claimJaneDoe = this.oauthService.getIdentityClaims() as IClaimRoles;
-    this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
-  }
-
-  onSelectionChanged(event, content) {
-    if (!this.denySelection) {
-      this.gridApi = event.api;
-      const selectedRows = event.api.getSelectedRows();
-      const selectedRowData = {
-        id: undefined
-      };
-      selectedRows.map((selectedRow, index) => {
-        index !== 0 ?
-          console.log('No selection') : Object.assign(selectedRowData, selectedRow);
-      });
-      this.expenses.getFinanceAttachment(selectedRowData.id).subscribe((image: ExpensesIfc) => {
-        // @ts-ignore
-        // tslint:disable-next-line:prefer-for-of
-        for (let i = 0; i < image.length; i++) {
-          this.receiptFiles.push(image[i]);
-        }
-        this.detect.markForCheck();
-        this.detect.detectChanges();
-      });
-      this.expenseData = selectedRowData;
-      this.formSubmitted = false;
-      this.showErrors = false;
-      this.formErrors = '';
-      this.isRejecting = false;
-      this.wantsRejectionNote = false;
-      this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
-      this.openExpenseDetailModal(content);
-    } else {
-      this.denySelection = false;
-    }
   }
 
   ngOnInit() {
@@ -301,6 +273,9 @@ export class FinanceComponent implements OnInit {
         val => {
           this.typeOptions = val;
         });
+    // @ts-ignore
+    this.expenses.getExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
+    this.OurJaneDoeIs = this.identityService.whoAmI();
   }
 
   callHistoryRefresh() {
@@ -329,10 +304,10 @@ export class FinanceComponent implements OnInit {
     this.resetPopups();
     const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5).split('.')[0];
     this.httpClient.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + '/kinds/payment_file',
-      {responseType: 'blob'})
+      { responseType: 'blob' })
       .subscribe(
         (response) => {
-          const blob = new Blob([response], {type: 'application/xml'});
+          const blob = new Blob([response], { type: 'application/xml' });
           const a = document.createElement('a');
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
@@ -351,10 +326,10 @@ export class FinanceComponent implements OnInit {
     this.resetPopups();
     const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5);
     this.httpClient.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + '/kinds/booking_file',
-      {responseType: 'blob'})
+      { responseType: 'blob' })
       .subscribe(
         (response) => {
-          const blob = new Blob([response], {type: 'text/csv'});
+          const blob = new Blob([response], { type: 'text/csv' });
           const a = document.createElement('a');
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
@@ -371,7 +346,7 @@ export class FinanceComponent implements OnInit {
 
   createBookingFile() {
     this.resetPopups();
-    this.httpClient.post(this.env.apiUrl + '/finances/expenses/booking_file/files', '', {responseType: 'blob', observe: 'response'})
+    this.httpClient.post(this.env.apiUrl + '/finances/expenses/booking_file/files', '', { responseType: 'blob', observe: 'response' })
       .subscribe(
         (response) => {
           if (response.body.type === 'application/json') {
@@ -380,7 +355,7 @@ export class FinanceComponent implements OnInit {
           } else {
             const contentDispositionHeader = response.headers.get('Content-Disposition');
             const result = contentDispositionHeader.split('=')[1].split(';')[0];
-            const blob = new Blob([response.body], {type: 'text/csv'});
+            const blob = new Blob([response.body], { type: 'text/csv' });
             const a = document.createElement('a');
             document.body.appendChild(a);
             const url = window.URL.createObjectURL(blob);
@@ -409,7 +384,7 @@ export class FinanceComponent implements OnInit {
         (response) => {
           const contentDispositionHeader = response.headers.get('Content-Disposition');
           const result = contentDispositionHeader.split('=')[1].split(';')[0];
-          const blob = new Blob([response.body], {type: 'text/xml'});
+          const blob = new Blob([response.body], { type: 'text/xml' });
           const a = document.createElement('a');
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
@@ -426,24 +401,14 @@ export class FinanceComponent implements OnInit {
   }
 
   // tslint:disable-next-line:variable-name
-  submitButtonController(namount, ntype, ntransdate, rnote) {
-    if (this.wantsRejectionNote) {
-      return rnote.invalid || namount.invalid || ntype.invalid
-        || ntransdate.invalid || (new Date(ntransdate.viewModel)
-          > this.today) || namount.viewModel < 0.01;
-    } else {
-      return namount.invalid || ntype.invalid
-        || ntransdate.invalid || (new Date(ntransdate.viewModel)
-          > this.today) || namount.viewModel < 0.01;
-    }
+  submitButtonController(ntype) {
+    return ntype.invalid;
   }
 
-  claimUpdateForm(form: NgForm, expenseId, instArray) {
-    if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
+  claimUpdateForm(form: NgForm, expenseId, type) {
+    if (!this.submitButtonController(type)) {
       const dataVerified = {};
       const data = form.value;
-      data.amount = Number((data.amount).toFixed(2));
-      data.date_of_transaction = (new Date(data.date_of_transaction).getTime());
       if (!(this.wantsRejectionNote)) {
         data.rnote = this.selectedRejection;
       }

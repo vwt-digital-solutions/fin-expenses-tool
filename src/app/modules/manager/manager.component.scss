@@ -105,6 +105,22 @@ input {
   }
 }
 
+#mobile-loader-button {
+  left: 50%;
+  margin: 0 -50% 0 0;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  padding: 0;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  span {
+    padding: 10px;
+  }
+}
+
 .disabledbtn {
   opacity: .5;
 }
@@ -115,4 +131,13 @@ input {
 
 .hidden {
   display: none;
+}
+
+.click-stop {
+  cursor: pointer;
+  color: $vwt_color_blue;
+
+  &:hover {
+    opacity: .6;
+  }
 }

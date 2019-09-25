@@ -9,7 +9,7 @@
         Declaratie is successvol ingediend {{this.expenseID}}
       </div>
       <div class="alert alert-danger" role="alert" *ngIf="addClaimSuccess.wrong === true">
-        Er is iets fout gegaan. Probeer het later opnieuw
+        {{this.formError}}
       </div>
 
       <form (change)="addClaimSuccess.wrong = false" name="expenseForm" #expenseForm="ngForm"
@@ -50,7 +50,7 @@
                       name="cost_type"
                       #ntype="ngModel"
                       required>
-                <option value="" disabled selected>Kies een kost type</option>
+                <option value="" selected>Kies een kost type</option>
                 <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">
                   {{t.ctype}}
                 </option>
@@ -85,7 +85,7 @@
             <div class="form-group">
               <label for="noteinput">Omschrijving:</label>
               <textarea id="noteinput"
-                        (click)="expensesNote = true; ;"
+                        (click)="expensesNote = true;"
                         class="form-control"
                         [ngClass]="{notFilled: notFilledClass(nnote)}"
                         type="text"
@@ -112,8 +112,7 @@
                      (change)="onFileInput(fileInputHidden.files)"
                      [(ngModel)]="formAttachment"
                      #nattachment="ngModel"
-                     #fileInputHidden
-                     capture="camera">
+                     #fileInputHidden>
             </div>
             <div [ngClass]="{hidden: !this.wantsList}">
               <ul class="list-group">
@@ -134,8 +133,6 @@
                  *ngIf="notFilledClass(nattachment)">
               <small>Graag een bijlage toevoegen</small>
             </div>
-            <p id="statictest">o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o o
-              o</p> <!-- Width Setting. Will be removed in final. -->
           </div>
 
           <input type="submit" id="submit-form" class="hidden"/>
@@ -171,7 +168,7 @@
           Indienen <i *ngIf="loadingThings && this.wantsNext === 'No'" class="spinner-border text-light"></i>
         </label>
         <label for="submit-form-next"
-               tabindex="0" class="btn btn-default deep_button"
+               tabindex="0" class="btn btn-default deep_button deep_button_new"
                (click)="this.wantsNext = 'Yes'"
                [ngClass]="{disabledbtn: submitButtonController(nnote, namount, ntype, ntransdate, nattachment),
                   success : addClaimSuccess.success === true,
