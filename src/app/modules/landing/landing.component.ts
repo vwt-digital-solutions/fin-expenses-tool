@@ -1,11 +1,10 @@
-import {Component, OnInit} from '@angular/core';
-import {OAuthService} from 'angular-oauth2-oidc';
-import {HttpClient} from '@angular/common/http';
-import {EnvService} from '../../services/env.service';
-import {NgForm} from '@angular/forms';
-import {ExpensesConfigService} from '../../services/config.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {DomSanitizer} from '@angular/platform-browser';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { EnvService } from '../../services/env.service';
+import { NgForm } from '@angular/forms';
+import { ExpensesConfigService } from '../../services/config.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { DomSanitizer } from '@angular/platform-browser';
 import { IdentityService } from 'src/app/services/identity.service';
 
 
@@ -67,7 +66,7 @@ export class LandingComponent implements OnInit {
       }
     } else {
       const win = window.open();
-      if ( navigator.userAgent.match(/Android/i)
+      if (navigator.userAgent.match(/Android/i)
         || navigator.userAgent.match(/webOS/i)
         || navigator.userAgent.match(/iPhone/i)
         || navigator.userAgent.match(/iPad/i)
@@ -120,7 +119,7 @@ export class LandingComponent implements OnInit {
     }
     this.personID = claimJaneDoe.email ? claimJaneDoe.email.split('@')[0] : 'UNDEFINED';
     this.displayPersonName = claimJaneDoe.name ? claimJaneDoe.name.split(',') : ['UNDEFINED', 'UNDEFINED'];
-    this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName [0]).substring(1);
+    this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName[0]).substring(1);
     this.declarationCall();
     this.today = new Date();
 
@@ -193,7 +192,7 @@ export class LandingComponent implements OnInit {
   openExpenseDetailModal(content, data) {
     this.receiptFiles = [];
     this.attachmentList = [];
-    this.modalService.open(content, {centered: true});
+    this.modalService.open(content, { centered: true });
   }
 
   onFileInput(file) {
@@ -211,7 +210,7 @@ export class LandingComponent implements OnInit {
         const reader = new FileReader();
         reader.readAsDataURL(file[0]);
         reader.onload = () => {
-          if (file[0]. type === 'application/pdf') {
+          if (file[0].type === 'application/pdf') {
             this.receiptFiles.push(reader.result);
           } else if (file[0].type.split('/')[0] === 'image') {
             const img = new Image();
@@ -288,23 +287,23 @@ export class LandingComponent implements OnInit {
     }
   }
 
-    cancelExpense() {
-      const dataVerified = {};
-      // @ts-ignore
-      const expenseId = this.expenseData.id;
+  cancelExpense() {
+    const dataVerified = {};
+    // @ts-ignore
+    const expenseId = this.expenseData.id;
 
-      dataVerified[`status`] = 'cancelled';
+    dataVerified[`status`] = 'cancelled';
 
-      this.expenses.updateExpenseEmployee(dataVerified, expenseId)
-        .subscribe(
-            result => {
-              this.showErrors = false;
-              this.declarationCall();
-              this.dismissExpenseModal();
-            },
-            error => {
-              this.showErrors = true;
-              Object.assign(this.formResponse, JSON.parse(error));
-            });
+    this.expenses.updateExpenseEmployee(dataVerified, expenseId)
+      .subscribe(
+        result => {
+          this.showErrors = false;
+          this.declarationCall();
+          this.dismissExpenseModal();
+        },
+        error => {
+          this.showErrors = true;
+          Object.assign(this.formResponse, JSON.parse(error));
+        });
   }
 }

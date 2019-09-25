@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { EnvService } from 'src/app/services/env.service';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { NgForm } from '@angular/forms';
-import { OAuthService } from 'angular-oauth2-oidc';
 import { ExpensesConfigService } from '../../services/config.service';
 import * as moment from 'moment';
 import { DomSanitizer } from '@angular/platform-browser';
