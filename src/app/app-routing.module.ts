@@ -8,6 +8,7 @@ import { LandingComponent } from './components/landing/landing.component';
 import { Role } from './models/role.enum';
 import { AuthGuard } from './auth/auth.guard';
 import { AuthComponent } from './auth/auth.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 
 const routes: Routes = [
   {
@@ -44,7 +45,11 @@ const routes: Routes = [
     path: 'auth/:authBody',
     component: AuthComponent,
   },
-  { path: '', redirectTo: 'home', pathMatch: 'full' }
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  {
+    path: '**',
+    component: NotFoundComponent
+  }
 ];
 
 @NgModule({

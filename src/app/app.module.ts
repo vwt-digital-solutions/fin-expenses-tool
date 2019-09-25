@@ -27,6 +27,7 @@ import { ManagerComponent } from './components/manager/manager.component';
 import { ExpensesComponent } from './components/expenses/expenses.component';
 import { CommonModule } from '@angular/common';
 import { AgGridModule } from 'ag-grid-angular';
+import { NotFoundComponent } from './components/not-found/not-found.component';
 
 
 @NgModule({
@@ -39,7 +40,8 @@ import { AgGridModule } from 'ag-grid-angular';
     FinanceComponent,
     ControllerComponent,
     ManagerComponent,
-    ExpensesComponent
+    ExpensesComponent,
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,
@@ -54,7 +56,7 @@ import { AgGridModule } from 'ag-grid-angular';
   ],
 
   exports: [
-  ],
+  NotFoundComponent],
   providers: [
     EnvServiceProvider,
     ExpensesConfigService,
