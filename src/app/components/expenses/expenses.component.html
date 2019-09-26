@@ -6,7 +6,8 @@
         <hr class="add">
       </div>
       <div class="alert alert-success" role="alert" id="succes-alert" *ngIf="addClaimSuccess.success === true">
-        Declaratie is successvol ingediend {{this.expenseID}}
+        Declaratie is successvol ingediend {{this.expenseID}}<br>
+        Attachments to upload: {{this.locatedFile.lenght}}
       </div>
       <div class="alert alert-danger" role="alert" *ngIf="addClaimSuccess.wrong === true">
         {{this.formError}}

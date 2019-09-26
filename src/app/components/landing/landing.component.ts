@@ -6,6 +6,7 @@ import { ExpensesConfigService } from '../../services/config.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DomSanitizer } from '@angular/platform-browser';
 import { IdentityService } from 'src/app/services/identity.service';
+import { catchError } from 'rxjs/operators';
 
 
 @Component({
@@ -15,19 +16,19 @@ import { IdentityService } from 'src/app/services/identity.service';
 })
 export class LandingComponent implements OnInit {
 
-  public OurJaneDoeIs;
-  public displayPersonName;
-  public personID;
-  public declarationData;
+  public OurJaneDoeIs: any[] | string[];
+  public displayPersonName: string | string[];
+  public personID: string;
+  public declarationData: any;
   public expenseData: object;
-  public showErrors;
-  public formErrors;
-  public formResponse;
-  public formSubmitted;
-  public attachmentList;
-  private receiptFiles;
-  public today;
-  public hasNoExpenses;
+  public showErrors: boolean;
+  public formErrors: string;
+  public formResponse: any;
+  public formSubmitted: boolean;
+  public attachmentList: any[];
+  private receiptFiles: any[];
+  public today: Date;
+  public hasNoExpenses: boolean;
 
   constructor(
     private identityService: IdentityService,
@@ -39,20 +40,20 @@ export class LandingComponent implements OnInit {
   ) {
   }
 
-  static formatNumber(numb) {
+  static formatNumber(numb: any) {
     return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
   }
 
-  decimalFormatter(amount) {
+  decimalFormatter(amount: any) {
     return '€' + LandingComponent.formatNumber(amount);
   }
 
-  dateFormatter(firstDate) {
+  dateFormatter(firstDate: string | number | Date) {
     const date = new Date(firstDate);
     return date.getDate() + '-' + (date.getMonth() + 1) + '-' + date.getFullYear() + ' ' + date.toLocaleTimeString('nl-NL');
   }
 
-  openSanitizeFile(type, file) {
+  openSanitizeFile(type: string, file: string) {
     const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
     const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
     if (isIEOrEdge) {
@@ -83,7 +84,7 @@ export class LandingComponent implements OnInit {
     }
   }
 
-  statusClassing(status) {
+  statusClassing(status: string) {
     if (status.includes('rejected')) {
       return 'badge badge-pill badge-warning';
     } else if (status.includes('cancelled')) {
@@ -97,7 +98,7 @@ export class LandingComponent implements OnInit {
     }
   }
 
-  statusFormatter(status) {
+  statusFormatter(status: string) {
     if (status.includes('rejected')) {
       return 'Aanpassing vereist';
     } else if (status.includes('cancelled')) {
@@ -139,11 +140,11 @@ export class LandingComponent implements OnInit {
         });
   }
 
-  clickExpense(content, item) {
+  clickExpense(content: any, item: any) {
     if (this.isClickable(item)) {
       this.expenses.getExpenseAttachment(item.id).subscribe((image: any) => {
-        for (const img of image) {
-          this.receiptFiles.push(img);
+        for (const img of image) {// data:image/png;base64,
+          this.receiptFiles.push(`data:${img.content_type};base64,${img.content}`);
         }
       });
       this.formSubmitted = false;
@@ -165,33 +166,36 @@ export class LandingComponent implements OnInit {
     }, 200);
   }
 
-  removeFromAttachmentList(item) {
-    let i;
+  removeFromAttachmentList(item: any) {
+    let i: number;
     for (i = 0; i < this.receiptFiles.length; i++) {
       if (this.receiptFiles[i] === item) {
         this.receiptFiles.splice(i, 1);
       }
     }
-    for (i = 0; i < this.attachmentList().length; i++) {
+    for (i = 0; i < this.attachmentList.length; i++) {
       if (this.attachmentList[i] === item) {
         this.attachmentList.splice(i, 1);
       }
     }
   }
 
-  submitButtonController(nnote, namount, ntype, ntransdate) {
+  submitButtonController(nnote: { invalid: any; },
+                         namount: { invalid: any; viewModel: number; },
+                         ntype: { invalid: any; },
+                         ntransdate: { invalid: any; viewModel: string | number | Date; }) {
     return nnote.invalid || namount.invalid || ntype.invalid
       || ntransdate.invalid || (new Date(ntransdate.viewModel)
         > this.today) || namount.viewModel < 0.01;
   }
 
-  openExpenseDetailModal(content, data) {
+  openExpenseDetailModal(content: any, data: any) {
     this.receiptFiles = [];
     this.attachmentList = [];
     this.modalService.open(content, { centered: true });
   }
 
-  onFileInput(file) {
+  onFileInput(file: any[]) {
     console.log(file[0].type.split('/')[0]);
     if (file[0].type.split('/')[0] !== 'image' && file[0].type !== 'application/pdf') {
       alert('Graag alleen een pdf of afbeelding toevoegen');
@@ -214,7 +218,7 @@ export class LandingComponent implements OnInit {
               img.src = reader.result;
               img.onload = () => {
                 const canvas = document.createElement('canvas');
-                let width;
+                let width: number;
                 if (img.width > 600) {
                   width = 600;
                 } else {
@@ -228,7 +232,7 @@ export class LandingComponent implements OnInit {
                 ctx.canvas.toBlob(blob => {
                   const filla = new File([blob], file[0].name, {
                     type: file[0].type,
-                    lastModified: this.today
+                    lastModified: this.today.getTime()
                   });
                   reader.readAsDataURL(filla);
                   reader.onload = () => {
@@ -243,19 +247,9 @@ export class LandingComponent implements OnInit {
     }
   }
 
-  claimUpdateForm(form: NgForm, expenseId, instArray) {
+  claimUpdateForm(form: NgForm, expenseId: any, instArray: any[]) {
     if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
       // Check Form Data
-      let fileString = '';
-      // @ts-ignore
-      for (const recFile of this.receiptFiles) {
-        if (fileString === '') {
-          fileString = recFile;
-        } else {
-          fileString = fileString + '.' + recFile;
-        }
-      }
-      form.value.attachment = fileString;
       const dataVerified = {};
       const data = form.value;
       data.amount = Number((data.amount).toFixed(2));
@@ -271,6 +265,7 @@ export class LandingComponent implements OnInit {
           .subscribe(
             result => {
               this.showErrors = false;
+              this.uploadSingleAttachment(expenseId);
               this.formSubmitted = !form.ngSubmit.hasError;
               this.declarationCall();
               this.dismissExpenseModal();
@@ -301,5 +296,18 @@ export class LandingComponent implements OnInit {
           this.showErrors = true;
           Object.assign(this.formResponse, JSON.parse(error));
         });
+  }
+
+  private uploadSingleAttachment(expenseId: any) {
+    if (this.receiptFiles.length > 0) {
+      const file = this.receiptFiles.splice(0, 1)[0];
+      this.httpClient.post(this.env.apiUrl + `/employees/expenses/${expenseId}/attachments`, {
+        name: '' + this.receiptFiles.length,
+        content: file
+      }).pipe(catchError(ExpensesConfigService.handleError))
+        .subscribe(() => {
+          this.uploadSingleAttachment(expenseId);
+        });
+    }
   }
 }

@@ -8,6 +8,8 @@ import * as moment from 'moment';
 import { DomSanitizer } from '@angular/platform-browser';
 import { IdentityService } from 'src/app/services/identity.service';
 import { FormaterService } from 'src/app/services/formater.service';
+import { ActivatedRoute } from '@angular/router';
+import { map } from 'rxjs/operators';
 
 moment.locale('nl');
 
@@ -42,9 +44,8 @@ export class FinanceComponent implements OnInit {
     private env: EnvService,
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
-    private identityService: IdentityService,
     private sanitizer: DomSanitizer,
-    private detect: ChangeDetectorRef,
+    private route: ActivatedRoute
   ) {
     this.columnDefs = [
       {
@@ -254,11 +255,9 @@ export class FinanceComponent implements OnInit {
       'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];
     this.callHistoryRefresh();
-    this.expenses.getCostTypes()
-      .subscribe(
-        val => {
-          this.typeOptions = val;
-        });
+    this.route.data.pipe(
+      map(data => data.costTypes)
+    ).subscribe(costTypes => this.typeOptions = [...costTypes]);
     this.expenses.getExpenses().subscribe((data: any) => this.rowData = [...data]);
   }
 

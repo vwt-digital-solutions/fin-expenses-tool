@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { EnvService } from 'src/app/services/env.service';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { NgForm } from '@angular/forms';
 import { ExpensesConfigService } from '../../services/config.service';
@@ -8,6 +6,8 @@ import * as moment from 'moment';
 import { DomSanitizer } from '@angular/platform-browser';
 import { IdentityService } from 'src/app/services/identity.service';
 import { FormaterService } from 'src/app/services/formater.service';
+import { ActivatedRoute } from '@angular/router';
+import { map } from 'rxjs/operators';
 
 moment.locale('nl');
 
@@ -30,12 +30,11 @@ interface IClaimRoles {
 export class ManagerComponent implements OnInit {
 
   constructor(
-    private httpClient: HttpClient,
-    private env: EnvService,
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
     private identityService: IdentityService,
     private sanitizer: DomSanitizer,
+    private route: ActivatedRoute
   ) {
     this.columnDefs = [
       {
@@ -263,11 +262,9 @@ export class ManagerComponent implements OnInit {
     this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
       'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
     ];
-    this.expenses.getCostTypes()
-      .subscribe(
-        val => {
-          this.typeOptions = val;
-        });
+    this.route.data.pipe(
+      map(data => data.costTypes)
+    ).subscribe(costTypes => this.typeOptions = [...costTypes]);
   }
 
   claimUpdateForm(form: NgForm, expenseId) {

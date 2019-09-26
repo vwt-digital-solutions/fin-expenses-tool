@@ -9,30 +9,36 @@ import { Role } from './models/role.enum';
 import { AuthGuard } from './auth/auth.guard';
 import { AuthComponent } from './auth/auth.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { CostTypesResolver } from './services/cost-types.resolver';
 
 const routes: Routes = [
   {
     path: 'expenses',
     canActivate: [AuthGuard],
+    resolve: { costTypes: CostTypesResolver },
     children: [
       {
         path: 'employee',
         component: ExpensesComponent,
+        resolve: { costTypes: CostTypesResolver },
       },
       {
         path: 'process',
         component: FinanceComponent,
-        data: { roles: [Role.Creditor] }
+        data: { roles: [Role.Creditor] },
+        resolve: { costTypes: CostTypesResolver },
       },
       {
         path: 'manage',
         component: ManagerComponent,
-        data: { roles: [Role.Manager] }
+        data: { roles: [Role.Manager] },
+        resolve: { costTypes: CostTypesResolver },
       },
       {
         path: 'controller',
         component: ControllerComponent,
-        data: { roles: [Role.Controller] }
+        data: { roles: [Role.Controller] },
+        resolve: { costTypes: CostTypesResolver },
       }
     ]
   },
@@ -54,6 +60,9 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
+  providers: [
+    CostTypesResolver
+  ]
 })
 export class AppRoutingModule { }
