@@ -25,7 +25,6 @@ export class LandingComponent implements OnInit {
   public formErrors: string;
   public formResponse: any;
   public formSubmitted: boolean;
-  public attachmentList: any[];
   private receiptFiles: any[];
   public today: Date;
   public hasNoExpenses: boolean;
@@ -127,12 +126,10 @@ export class LandingComponent implements OnInit {
   }
 
   declarationCall() {
-    // @ts-ignore
-    this.httpClient.get(this.env.apiUrl + '/employees/' + this.personID + '/expenses')
+    this.httpClient.get<any>(this.env.apiUrl + '/employees/' + this.personID + '/expenses')
       .subscribe(
         val => {
           this.declarationData = val;
-          // @ts-ignore
           this.hasNoExpenses = (val.length < 1);
           console.log('>> GET SUCCESS', val);
         }, response => {
@@ -144,7 +141,13 @@ export class LandingComponent implements OnInit {
     if (this.isClickable(item)) {
       this.expenses.getExpenseAttachment(item.id).subscribe((image: any) => {
         for (const img of image) {// data:image/png;base64,
-          this.receiptFiles.push(`data:${img.content_type};base64,${img.content}`);
+          this.receiptFiles.push({
+            content: `data:${img.content_type};base64,${img.content}`,
+            content_type: img.content_type,
+            from_db: true,
+            db_name: img.name,
+            expense_id: item.id
+          });
         }
       });
       this.formSubmitted = false;
@@ -167,15 +170,16 @@ export class LandingComponent implements OnInit {
   }
 
   removeFromAttachmentList(item: any) {
-    let i: number;
-    for (i = 0; i < this.receiptFiles.length; i++) {
+    for (let i = 0; i < this.receiptFiles.length; i++) {
       if (this.receiptFiles[i] === item) {
-        this.receiptFiles.splice(i, 1);
-      }
-    }
-    for (i = 0; i < this.attachmentList.length; i++) {
-      if (this.attachmentList[i] === item) {
-        this.attachmentList.splice(i, 1);
+        if (item.from_db) {
+          this.httpClient.delete(`${this.env.apiUrl}/employees/expenses/${item.expense_id}/attachments/${item.db_name}`)
+          .subscribe(() => {
+            this.receiptFiles.splice(i, 1);
+          });
+        } else {
+          this.receiptFiles.splice(i, 1);
+        }
       }
     }
   }
@@ -191,7 +195,6 @@ export class LandingComponent implements OnInit {
 
   openExpenseDetailModal(content: any, data: any) {
     this.receiptFiles = [];
-    this.attachmentList = [];
     this.modalService.open(content, { centered: true });
   }
 
@@ -206,12 +209,15 @@ export class LandingComponent implements OnInit {
       alert('Please use Chrome or Firefox to use this ');
     } else {
       if (!(file[0] === undefined || file[0] === null)) {
-        this.attachmentList.push(file);
         const reader = new FileReader();
         reader.readAsDataURL(file[0]);
         reader.onload = () => {
           if (file[0].type === 'application/pdf') {
-            this.receiptFiles.push(reader.result);
+            this.receiptFiles.push({
+              content: reader.result,
+              content_type: 'application/pdf',
+              from_db: false
+            });
           } else if (file[0].type.split('/')[0] === 'image') {
             const img = new Image();
             if (typeof reader.result === 'string') {
@@ -236,8 +242,12 @@ export class LandingComponent implements OnInit {
                   });
                   reader.readAsDataURL(filla);
                   reader.onload = () => {
-                    this.receiptFiles.push(reader.result);
-                  };
+                    this.receiptFiles.push({
+                      content: reader.result,
+                      content_type: 'application/pdf',
+                      from_db: false
+                    });
+                          };
                 }, file[0].type, 1);
               }, reader.onerror = Error => console.log(Error);
             }
@@ -301,13 +311,17 @@ export class LandingComponent implements OnInit {
   private uploadSingleAttachment(expenseId: any) {
     if (this.receiptFiles.length > 0) {
       const file = this.receiptFiles.splice(0, 1)[0];
-      this.httpClient.post(this.env.apiUrl + `/employees/expenses/${expenseId}/attachments`, {
-        name: '' + this.receiptFiles.length,
-        content: file
-      }).pipe(catchError(ExpensesConfigService.handleError))
-        .subscribe(() => {
-          this.uploadSingleAttachment(expenseId);
-        });
+      if (!file.from_db) {
+        this.httpClient.post(this.env.apiUrl + `/employees/expenses/${expenseId}/attachments`, {
+          name: '' + this.receiptFiles.length,
+          content: file
+        }).pipe(catchError(ExpensesConfigService.handleError))
+          .subscribe(() => {
+            this.uploadSingleAttachment(expenseId);
+          });
+      } else {
+        this.uploadSingleAttachment(expenseId);
+      }
     }
   }
 }
