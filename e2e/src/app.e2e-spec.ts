@@ -126,7 +126,7 @@ describe('ExpenseApp:', () => {
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
     browser.sleep(1000);
     element(by.name('expenses/manage')).click();
-    browser.sleep(1200);
+    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
     const expenseList = element.all(by.id('information-icon'));
     expect(expenseList.count()).toBeGreaterThanOrEqual(1);
   });
@@ -151,10 +151,14 @@ describe('ExpenseApp:', () => {
 
   it('should get expenses on process', () => {
     browser.waitForAngularEnabled(false);
+    browser.sleep(1000);
     element(by.id('home-button')).click();
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
+    browser.sleep(1000);
     element(by.name('expenses/process')).click();
-    browser.sleep(1200);
+    browser.sleep(30000);
+    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 22000, 'The loader is showing too long'));
+    expect(browser.wait(until.visibilityOf(element(by.id('information-icon'))), 22000, 'The expenses loading took too long'));
     const expenseList = element.all(by.id('information-icon'));
     expect(expenseList.count()).toBeGreaterThanOrEqual(1);
   });
@@ -180,10 +184,12 @@ describe('ExpenseApp:', () => {
 
   it('should get expenses on controller page', () => {
     browser.waitForAngularEnabled(false);
+    browser.sleep(1000);
     element(by.id('home-button')).click();
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
+    browser.sleep(1000);
     element(by.name('expenses/controller')).click();
-    browser.sleep(1200);
+    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
     const expenseList = element.all(by.css('.ag-cell'));
     expect(expenseList.count()).toBeGreaterThanOrEqual(1);
   });
@@ -191,7 +197,6 @@ describe('ExpenseApp:', () => {
   it('should see the expense on the controller page', () => {
     browser.waitForAngularEnabled(false);
     element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
-    browser.sleep(2000);
-    expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 10000, 'Expense modal didn\'t open'));
+    expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));
   });
 });
