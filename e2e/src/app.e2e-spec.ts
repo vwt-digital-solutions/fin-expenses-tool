@@ -94,7 +94,7 @@ describe('ExpenseApp:', () => {
 
   it('should create an expense', () => {
     browser.waitForAngularEnabled(false);
-    element(by.id('amountinput')).sendKeys(Math.floor(Math.random() * 50));
+    element(by.id('amountinput')).sendKeys(100); // Math.floor(Math.random() * 50)
     const typeList = element(by.id('typeinput')).all(by.tagName('option'));
     typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
       typeList.get(randomNumber + 1).click();
@@ -121,8 +121,37 @@ describe('ExpenseApp:', () => {
     expect(elem.isDisplayed()).toBe(true);
   });
 
+  it('should get expenses on manager page', () => {
+    browser.waitForAngularEnabled(false);
+    expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
+    browser.sleep(1000);
+    element(by.name('expenses/manage')).click();
+    browser.sleep(1200);
+    const expenseList = element.all(by.id('information-icon'));
+    expect(expenseList.count()).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should get the attachments', () => {
+    browser.waitForAngularEnabled(false);
+    element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
+    browser.sleep(2000);
+    const attachmentList = element.all(by.css('.click-stop'));
+    expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should approve the expense', () => {
+    browser.waitForAngularEnabled(false);
+    const elem = element(by.id('thumbs-up'));
+    browser.wait(until.visibilityOf(elem), 10000, 'Expense approval form took too long to load').then(() => {
+      elem.click();
+    });
+    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense approval took too long'));
+    // expect(element(by.css('.modal-content')).isDisplayed()).toBe(false);
+  });
+
   it('should get expenses on process', () => {
     browser.waitForAngularEnabled(false);
+    element(by.id('home-button')).click();
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
     element(by.name('expenses/process')).click();
     browser.sleep(1200);
