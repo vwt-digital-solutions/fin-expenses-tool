@@ -248,7 +248,7 @@ export class LandingComponent implements OnInit {
                   reader.onload = () => {
                     this.receiptFiles.push({
                       content: reader.result,
-                      content_type: 'application/pdf',
+                      content_type: file[0].type,
                       from_db: false
                     });
                   };
@@ -318,7 +318,7 @@ export class LandingComponent implements OnInit {
       if (!file.from_db) {
         this.expenses.uploadSingleAttachment(expenseId, {
           name: '' + this.receiptFiles.length,
-          content: file
+          content: file.content
         }).pipe(catchError(ExpensesConfigService.handleError))
           .subscribe(() => {
             this.uploadSingleAttachment(expenseId);
