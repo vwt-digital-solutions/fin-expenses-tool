@@ -46,6 +46,7 @@ const routes: Routes = [
     path: 'home',
     component: LandingComponent,
     canActivate: [AuthGuard],
+    resolve: { costTypes: CostTypesResolver },
   },
   {
     path: 'auth/:authBody',

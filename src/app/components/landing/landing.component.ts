@@ -5,8 +5,9 @@ import { Expense } from '../../models/expense';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DomSanitizer } from '@angular/platform-browser';
 import { IdentityService } from 'src/app/services/identity.service';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { Attachment } from 'src/app/models/attachment';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -28,12 +29,14 @@ export class LandingComponent implements OnInit {
   private receiptFiles: Attachment[];
   public today: Date;
   public hasNoExpenses: boolean;
+  public typeOptions: Expense[];
 
   constructor(
     private identityService: IdentityService,
     private modalService: NgbModal,
     private expenses: ExpensesConfigService,
     private sanitizer: DomSanitizer,
+    private route: ActivatedRoute
   ) {
   }
 
@@ -118,6 +121,9 @@ export class LandingComponent implements OnInit {
     this.personID = claimJaneDoe.email ? claimJaneDoe.email.split('@')[0] : 'UNDEFINED';
     this.displayPersonName = claimJaneDoe.name ? claimJaneDoe.name.split(',') : ['UNDEFINED', 'UNDEFINED'];
     this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName[0]).substring(1);
+    this.route.data.pipe(
+      map(data => data.costTypes)
+    ).subscribe(costTypes => this.typeOptions = [...costTypes]);
     this.declarationCall();
     this.today = new Date();
 
