@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { EnvService } from '../../services/env.service';
 import { NgForm } from '@angular/forms';
 import { ExpensesConfigService } from '../../services/config.service';
+import { Expense } from '../../models/expense';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DomSanitizer } from '@angular/platform-browser';
 import { IdentityService } from 'src/app/services/identity.service';
 import { catchError } from 'rxjs/operators';
+import { Attachment } from 'src/app/models/attachment';
 
 
 @Component({
@@ -19,20 +19,18 @@ export class LandingComponent implements OnInit {
   public OurJaneDoeIs: any[] | string[];
   public displayPersonName: string | string[];
   public personID: string;
-  public declarationData: any;
-  public expenseData: object;
+  public declarationData: Expense[];
+  public expenseData: Expense;
   public showErrors: boolean;
   public formErrors: string;
   public formResponse: any;
   public formSubmitted: boolean;
-  private receiptFiles: any[];
+  private receiptFiles: Attachment[];
   public today: Date;
   public hasNoExpenses: boolean;
 
   constructor(
     private identityService: IdentityService,
-    private httpClient: HttpClient,
-    private env: EnvService,
     private modalService: NgbModal,
     private expenses: ExpensesConfigService,
     private sanitizer: DomSanitizer,
@@ -126,7 +124,7 @@ export class LandingComponent implements OnInit {
   }
 
   declarationCall() {
-    this.httpClient.get<any>(this.env.apiUrl + '/employees/' + this.personID + '/expenses')
+    this.expenses.getEmployeeExpenses(this.personID)
       .subscribe(
         val => {
           this.declarationData = val;
@@ -173,10 +171,10 @@ export class LandingComponent implements OnInit {
     for (let i = 0; i < this.receiptFiles.length; i++) {
       if (this.receiptFiles[i] === item) {
         if (item.from_db) {
-          this.httpClient.delete(`${this.env.apiUrl}/employees/expenses/${item.expense_id}/attachments/${item.db_name}`)
-          .subscribe(() => {
-            this.receiptFiles.splice(i, 1);
-          });
+          this.expenses.deleteAttachment(item)
+            .subscribe(() => {
+              this.receiptFiles.splice(i, 1);
+            });
         } else {
           this.receiptFiles.splice(i, 1);
         }
@@ -247,7 +245,7 @@ export class LandingComponent implements OnInit {
                       content_type: 'application/pdf',
                       from_db: false
                     });
-                          };
+                  };
                 }, file[0].type, 1);
               }, reader.onerror = Error => console.log(Error);
             }
@@ -312,7 +310,7 @@ export class LandingComponent implements OnInit {
     if (this.receiptFiles.length > 0) {
       const file = this.receiptFiles.splice(0, 1)[0];
       if (!file.from_db) {
-        this.httpClient.post(this.env.apiUrl + `/employees/expenses/${expenseId}/attachments`, {
+        this.expenses.uploadSingleAttachment(expenseId, {
           name: '' + this.receiptFiles.length,
           content: file
         }).pipe(catchError(ExpensesConfigService.handleError))
