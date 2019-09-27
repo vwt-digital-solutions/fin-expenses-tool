@@ -53,6 +53,7 @@ describe('ExpenseApp:', () => {
   beforeEach(() => {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
+    browser.manage().window().setSize(1600, 1000);
   });
 
   it('should login and authenticate', () => {
@@ -136,7 +137,7 @@ describe('ExpenseApp:', () => {
     browser.sleep(1000);
     element(by.name('expenses/manage')).click();
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
-    const expenseList = element.all(by.css('.ag-cell'));
+    const expenseList = element.all(by.css('.ag-row'));
     expect(expenseList.count()).toBeGreaterThanOrEqual(1);
   });
 
@@ -165,14 +166,18 @@ describe('ExpenseApp:', () => {
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
     browser.sleep(1000);
     element(by.name('expenses/process')).click();
-    browser.sleep(30000);
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
-    const expenseList = element.all(by.css('.ag-cell'));
+    const expenseList = element.all(by.css('.ag-row'));
     expect(expenseList.count()).toBeGreaterThanOrEqual(1);
   });
 
   it('should get the attachments', () => {
     browser.waitForAngularEnabled(false);
+    browser.sleep(1000);
+    element(by.css('div[col-id=date_of_claim]')).click();
+    browser.sleep(500);
+    element(by.css('div[col-id=date_of_claim]')).click();
+    browser.sleep(500);
     element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
     browser.sleep(2000);
     const attachmentList = element.all(by.css('.click-stop'));
@@ -198,12 +203,13 @@ describe('ExpenseApp:', () => {
     browser.sleep(1000);
     element(by.name('expenses/controller')).click();
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
-    const expenseList = element.all(by.css('.ag-cell'));
+    const expenseList = element.all(by.css('.ag-row'));
     expect(expenseList.count()).toBeGreaterThanOrEqual(1);
   });
 
   it('should see the expense on the controller page', () => {
     browser.waitForAngularEnabled(false);
+    browser.sleep(1000);
     element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
     expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));
   });
