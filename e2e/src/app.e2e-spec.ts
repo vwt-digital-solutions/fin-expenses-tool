@@ -38,12 +38,21 @@ let expenseID;
 let e2eID;
 
 describe('ExpenseApp:', () => {
+  let originalTimeout;
+
   afterEach(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+
     browser.manage().logs().get('browser').then((messages) => {
       messages.forEach((message) => {
         console.log(JSON.stringify(message));
       });
     });
+  });
+
+  beforeEach(() => {
+    originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
   });
 
   it('should login and authenticate', () => {
@@ -127,7 +136,7 @@ describe('ExpenseApp:', () => {
     browser.sleep(1000);
     element(by.name('expenses/manage')).click();
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
-    const expenseList = element.all(by.id('information-icon'));
+    const expenseList = element.all(by.css('.ag-cell'));
     expect(expenseList.count()).toBeGreaterThanOrEqual(1);
   });
 
@@ -157,9 +166,8 @@ describe('ExpenseApp:', () => {
     browser.sleep(1000);
     element(by.name('expenses/process')).click();
     browser.sleep(30000);
-    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 22000, 'The loader is showing too long'));
-    expect(browser.wait(until.visibilityOf(element(by.id('information-icon'))), 22000, 'The expenses loading took too long'));
-    const expenseList = element.all(by.id('information-icon'));
+    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
+    const expenseList = element.all(by.css('.ag-cell'));
     expect(expenseList.count()).toBeGreaterThanOrEqual(1);
   });
 
