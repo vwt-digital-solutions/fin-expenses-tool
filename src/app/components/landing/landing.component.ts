@@ -319,8 +319,7 @@ export class LandingComponent implements OnInit {
         this.expenses.uploadSingleAttachment(expenseId, {
           name: '' + this.receiptFiles.length,
           content: file.content
-        }).pipe(catchError(ExpensesConfigService.handleError))
-          .subscribe(() => {
+        }).subscribe(() => {
             this.uploadSingleAttachment(expenseId);
           });
       } else {
