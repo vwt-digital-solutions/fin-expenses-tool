@@ -159,6 +159,32 @@ describe('ExpenseApp:', () => {
     // expect(element(by.css('.modal-content')).isDisplayed()).toBe(false);
   });
 
+  it('should get expenses on controller page', () => {
+    browser.waitForAngularEnabled(false);
+    browser.sleep(1000);
+    element(by.id('home-button')).click();
+    expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
+    browser.sleep(1000);
+    element(by.name('expenses/controller')).click();
+    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
+    browser.sleep(1000);
+    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
+    const expenseList = element.all(by.css('.ag-row'));
+    expect(expenseList.count()).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should see the expense on the controller page', () => {
+    browser.waitForAngularEnabled(false);
+    browser.sleep(1000);
+    element(by.css('div[col-id=date_of_claim]')).click(); // Once
+    browser.sleep(500);
+    element(by.css('div[col-id=date_of_claim]')).click(); // Twice
+    browser.sleep(500);
+    element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
+    expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));
+    element(by.id('expenseModalClose')).click();
+  });
+
   it('should get expenses on process', () => {
     browser.waitForAngularEnabled(false);
     browser.sleep(1000);
@@ -174,11 +200,12 @@ describe('ExpenseApp:', () => {
   it('should get the attachments', () => {
     browser.waitForAngularEnabled(false);
     browser.sleep(1000);
-    element(by.css('div[col-id=date_of_claim]')).click();
+    element(by.css('div[col-id=date_of_claim]')).click(); // Once
     browser.sleep(500);
-    element(by.css('div[col-id=date_of_claim]')).click();
+    element(by.css('div[col-id=date_of_claim]')).click(); // Twice
     browser.sleep(500);
     element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
+    expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));
     browser.sleep(2000);
     const attachmentList = element.all(by.css('.click-stop'));
     expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
@@ -191,26 +218,6 @@ describe('ExpenseApp:', () => {
     browser.wait(until.visibilityOf(elem), 10000, 'Expense rejection form took too long to load').then(() => {
       elem.click();
     });
-    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense rejection took too long'));
-    // expect(element(by.css('.modal-content')).isDisplayed()).toBe(false);
-  });
-
-  it('should get expenses on controller page', () => {
-    browser.waitForAngularEnabled(false);
-    browser.sleep(1000);
-    element(by.id('home-button')).click();
-    expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
-    browser.sleep(1000);
-    element(by.name('expenses/controller')).click();
-    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
-    const expenseList = element.all(by.css('.ag-row'));
-    expect(expenseList.count()).toBeGreaterThanOrEqual(1);
-  });
-
-  it('should see the expense on the controller page', () => {
-    browser.waitForAngularEnabled(false);
-    browser.sleep(1000);
-    element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
-    expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));
+    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense rejection took too long'));;
   });
 });
