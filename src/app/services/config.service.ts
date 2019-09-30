@@ -151,4 +151,33 @@ export class ExpensesConfigService {
         catchError(ExpensesConfigService.handleError)
       );
   }
+
+  public createPaymentFile(fileData: any, options: any): Observable<HttpResponse<any> | ArrayBuffer> {
+    return this.http.post(this.env.apiUrl + '/finances/expenses/payment_file/files?name=' + fileData, '', options)
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public createBookingFile(options: any): Observable<HttpResponse<any> | ArrayBuffer> {
+    return this.http.post(this.env.apiUrl + '/finances/expenses/booking_file/files', '', options)
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public getPaymentFilesList() {
+    return this.http.get<any>(this.env.apiUrl + '/finances/expenses/booking_file/files')
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public downloadGeneratedFile(fileData: any, dataKind: string) {
+    return this.http.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + dataKind,
+      { responseType: 'blob' })
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
 }

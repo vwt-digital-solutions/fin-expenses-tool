@@ -41,7 +41,7 @@
         (cellClicked)="historyHit($event)"
         id="historytable"
         class="ag-theme-material"
-        [rowData]="historyRowData | async"
+        [rowData]="historyRowData"
         [columnDefs]="historyColumnDefs"
         (gridReady)="onGridReady($event)"
       >

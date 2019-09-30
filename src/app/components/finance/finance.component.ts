@@ -1,12 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { EnvService } from 'src/app/services/env.service';
+import { HttpResponse } from '@angular/common/http';
 import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import { NgForm } from '@angular/forms';
 import { ExpensesConfigService } from '../../services/config.service';
 import * as moment from 'moment';
 import { DomSanitizer } from '@angular/platform-browser';
-import { IdentityService } from 'src/app/services/identity.service';
 import { FormaterService } from 'src/app/services/formater.service';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs/operators';
@@ -40,8 +38,6 @@ export class FinanceComponent implements OnInit {
   public noteData;
 
   constructor(
-    private httpClient: HttpClient,
-    private env: EnvService,
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
     private sanitizer: DomSanitizer,
@@ -171,9 +167,11 @@ export class FinanceComponent implements OnInit {
       } else if (!isChrome) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
       }
-      // @ts-ignore
+      // const sanitizedExpr = this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,'
+      //  + encodeURI(file)).changingThisBreaksApplicationSecurity;
+      const sanitizedExpr = 'data:' + type + ';base64,' + encodeURI(file);
       // tslint:disable-next-line:max-line-length no-unused-expression
-      win.document.write('<iframe src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
+      win.document.write('<iframe src="' +  sanitizedExpr + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
     }
   }
 
@@ -262,7 +260,8 @@ export class FinanceComponent implements OnInit {
   }
 
   callHistoryRefresh() {
-    this.historyRowData = this.httpClient.get(this.env.apiUrl + '/finances/expenses/booking_file/files');
+    this.expenses.getPaymentFilesList()
+      .subscribe(result => this.historyRowData = [...result]);
   }
 
   resetPopups() {
@@ -286,8 +285,7 @@ export class FinanceComponent implements OnInit {
   downloadPaymentFile(event) {
     this.resetPopups();
     const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5).split('.')[0];
-    this.httpClient.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + '/kinds/payment_file',
-      { responseType: 'blob' })
+    this.expenses.downloadGeneratedFile(fileData, '/kinds/payment_file')
       .subscribe(
         (response) => {
           const blob = new Blob([response], { type: 'application/xml' });
@@ -308,8 +306,7 @@ export class FinanceComponent implements OnInit {
   downloadFromHistory(event) {
     this.resetPopups();
     const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5);
-    this.httpClient.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + '/kinds/booking_file',
-      { responseType: 'blob' })
+    this.expenses.downloadGeneratedFile(fileData, '/kinds/booking_file')
       .subscribe(
         (response) => {
           const blob = new Blob([response], { type: 'text/csv' });
@@ -329,9 +326,9 @@ export class FinanceComponent implements OnInit {
 
   createBookingFile() {
     this.resetPopups();
-    this.httpClient.post(this.env.apiUrl + '/finances/expenses/booking_file/files', '', { responseType: 'blob', observe: 'response' })
+    this.expenses.createBookingFile({ responseType: 'blob', observe: 'response' })
       .subscribe(
-        (response) => {
+        (response: HttpResponse<any>) => {
           if (response.body.type === 'application/json') {
             this.noExpenses();
             console.log('>> GET EMPTY', response);
@@ -358,13 +355,12 @@ export class FinanceComponent implements OnInit {
   createPaymentFile(event) {
     this.resetPopups();
     const fileData = event.split('=')[2];
-    // tslint:disable-next-line:max-line-length
-    this.httpClient.post(this.env.apiUrl + '/finances/expenses/payment_file/files?name=' + fileData, '', {
+    this.expenses.createPaymentFile(fileData, {
       responseType: 'blob',
       observe: 'response'
     })
       .subscribe(
-        (response) => {
+        (response: HttpResponse<any>) => {
           const contentDispositionHeader = response.headers.get('Content-Disposition');
           const result = contentDispositionHeader.split('=')[1].split(';')[0];
           const blob = new Blob([response.body], { type: 'text/xml' });
@@ -376,6 +372,7 @@ export class FinanceComponent implements OnInit {
           a.click();
           window.URL.revokeObjectURL(url);
           this.successfulDownload();
+          this.expenses.getExpenses().subscribe((response1: any) => this.rowData = [...response1]);
           this.callHistoryRefresh();
           console.log('>> GET SUCCESS', response);
         }, response => {
@@ -383,8 +380,7 @@ export class FinanceComponent implements OnInit {
         });
   }
 
-  // tslint:disable-next-line:variable-name
-  submitButtonController(ntype) {
+  submitButtonController(ntype: { invalid: boolean }) {
     return ntype.invalid;
   }
 
@@ -408,8 +404,7 @@ export class FinanceComponent implements OnInit {
           .subscribe(
             result => {
               this.getNextExpense();
-              // @ts-ignore
-              this.expenses.getExpenses().subscribe((response: ExpensesIfc) => this.rowData = [...response]);
+              this.expenses.getExpenses().subscribe((response: any) => this.rowData = [...response]);
               this.showErrors = false;
               this.formSubmitted = !form.ngSubmit.hasError;
             },
