@@ -1,12 +1,13 @@
-import {Component, OnInit} from '@angular/core';
-import {OAuthService} from 'angular-oauth2-oidc';
-import {HttpClient} from '@angular/common/http';
-import {EnvService} from '../../services/env.service';
-import {NgForm} from '@angular/forms';
-import {ExpensesConfigService} from '../../services/config.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {DomSanitizer} from '@angular/platform-browser';
+import { Component, OnInit } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { ExpensesConfigService } from '../../services/config.service';
+import { Expense } from '../../models/expense';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { DomSanitizer } from '@angular/platform-browser';
 import { IdentityService } from 'src/app/services/identity.service';
+import { catchError, map } from 'rxjs/operators';
+import { Attachment } from 'src/app/models/attachment';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -16,44 +17,43 @@ import { IdentityService } from 'src/app/services/identity.service';
 })
 export class LandingComponent implements OnInit {
 
-  public OurJaneDoeIs;
-  public displayPersonName;
-  public personID;
-  public declarationData;
-  public expenseData: object;
-  public showErrors;
-  public formErrors;
-  public formResponse;
-  public formSubmitted;
-  public attachmentList;
-  private receiptFiles;
-  public today;
-  public hasNoExpenses;
+  public OurJaneDoeIs: any[] | string[];
+  public displayPersonName: string | string[];
+  public personID: string;
+  public declarationData: Expense[];
+  public expenseData: Expense;
+  public showErrors: boolean;
+  public formErrors: string;
+  public formResponse: any;
+  public formSubmitted: boolean;
+  private receiptFiles: Attachment[];
+  public today: Date;
+  public hasNoExpenses: boolean;
+  public typeOptions: Expense[];
 
   constructor(
     private identityService: IdentityService,
-    private httpClient: HttpClient,
-    private env: EnvService,
     private modalService: NgbModal,
     private expenses: ExpensesConfigService,
     private sanitizer: DomSanitizer,
+    private route: ActivatedRoute
   ) {
   }
 
-  static formatNumber(numb) {
+  static formatNumber(numb: any) {
     return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
   }
 
-  decimalFormatter(amount) {
+  decimalFormatter(amount: any) {
     return '€' + LandingComponent.formatNumber(amount);
   }
 
-  dateFormatter(firstDate) {
+  dateFormatter(firstDate: string | number | Date) {
     const date = new Date(firstDate);
     return date.getDate() + '-' + (date.getMonth() + 1) + '-' + date.getFullYear() + ' ' + date.toLocaleTimeString('nl-NL');
   }
 
-  openSanitizeFile(type, file) {
+  openSanitizeFile(type: string, file: string) {
     const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
     const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
     if (isIEOrEdge) {
@@ -67,7 +67,7 @@ export class LandingComponent implements OnInit {
       }
     } else {
       const win = window.open();
-      if ( navigator.userAgent.match(/Android/i)
+      if (navigator.userAgent.match(/Android/i)
         || navigator.userAgent.match(/webOS/i)
         || navigator.userAgent.match(/iPhone/i)
         || navigator.userAgent.match(/iPad/i)
@@ -78,13 +78,13 @@ export class LandingComponent implements OnInit {
       } else if (!isChrome) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
       }
-      // @ts-ignore
+      const dataContent = 'data:' + type + ';base64,' + encodeURI(file);
       // tslint:disable-next-line:max-line-length no-unused-expression
-      win.document.write('<iframe src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
+      win.document.write('<iframe src="' + dataContent + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
     }
   }
 
-  statusClassing(status) {
+  statusClassing(status: string) {
     if (status.includes('rejected')) {
       return 'badge badge-pill badge-warning';
     } else if (status.includes('cancelled')) {
@@ -98,7 +98,7 @@ export class LandingComponent implements OnInit {
     }
   }
 
-  statusFormatter(status) {
+  statusFormatter(status: string) {
     if (status.includes('rejected')) {
       return 'Aanpassing vereist';
     } else if (status.includes('cancelled')) {
@@ -120,19 +120,20 @@ export class LandingComponent implements OnInit {
     }
     this.personID = claimJaneDoe.email ? claimJaneDoe.email.split('@')[0] : 'UNDEFINED';
     this.displayPersonName = claimJaneDoe.name ? claimJaneDoe.name.split(',') : ['UNDEFINED', 'UNDEFINED'];
-    this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName [0]).substring(1);
+    this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName[0]).substring(1);
+    this.route.data.pipe(
+      map(data => data.costTypes)
+    ).subscribe(costTypes => this.typeOptions = [...costTypes]);
     this.declarationCall();
     this.today = new Date();
 
   }
 
   declarationCall() {
-    // @ts-ignore
-    this.httpClient.get(this.env.apiUrl + '/employees/' + this.personID + '/expenses')
+    this.expenses.getEmployeeExpenses(this.personID)
       .subscribe(
         val => {
           this.declarationData = val;
-          // @ts-ignore
           this.hasNoExpenses = (val.length < 1);
           console.log('>> GET SUCCESS', val);
         }, response => {
@@ -140,15 +141,17 @@ export class LandingComponent implements OnInit {
         });
   }
 
-  handleLinking(event) {
-    window.location.href = window.location.protocol + '//' + window.location.host + '/' + event.target.name;
-  }
-
-  clickExpense(content, item) {
+  clickExpense(content: any, item: any) {
     if (this.isClickable(item)) {
       this.expenses.getExpenseAttachment(item.id).subscribe((image: any) => {
-        for (const img of image) {
-          this.receiptFiles.push(img);
+        for (const img of image) {// data:image/png;base64,
+          this.receiptFiles.push({
+            content: `data:${img.content_type};base64,${img.content}`,
+            content_type: img.content_type,
+            from_db: true,
+            db_name: img.name,
+            expense_id: item.id
+          });
         }
       });
       this.formSubmitted = false;
@@ -170,33 +173,36 @@ export class LandingComponent implements OnInit {
     }, 200);
   }
 
-  removeFromAttachmentList(item) {
-    let i;
-    for (i = 0; i < this.receiptFiles.length; i++) {
+  removeFromAttachmentList(item: any) {
+    for (let i = 0; i < this.receiptFiles.length; i++) {
       if (this.receiptFiles[i] === item) {
-        this.receiptFiles.splice(i, 1);
-      }
-    }
-    for (i = 0; i < this.attachmentList().length; i++) {
-      if (this.attachmentList[i] === item) {
-        this.attachmentList.splice(i, 1);
+        if (item.from_db) {
+          this.expenses.deleteAttachment(item)
+            .subscribe(() => {
+              this.receiptFiles.splice(i, 1);
+            });
+        } else {
+          this.receiptFiles.splice(i, 1);
+        }
       }
     }
   }
 
-  submitButtonController(nnote, namount, ntype, ntransdate) {
+  submitButtonController(nnote: { invalid: any; },
+                         namount: { invalid: any; viewModel: number; },
+                         ntype: { invalid: any; },
+                         ntransdate: { invalid: any; viewModel: string | number | Date; }) {
     return nnote.invalid || namount.invalid || ntype.invalid
       || ntransdate.invalid || (new Date(ntransdate.viewModel)
         > this.today) || namount.viewModel < 0.01;
   }
 
-  openExpenseDetailModal(content, data) {
+  openExpenseDetailModal(content: any, data: any) {
     this.receiptFiles = [];
-    this.attachmentList = [];
-    this.modalService.open(content, {centered: true});
+    this.modalService.open(content, { centered: true });
   }
 
-  onFileInput(file) {
+  onFileInput(file: any[]) {
     console.log(file[0].type.split('/')[0]);
     if (file[0].type.split('/')[0] !== 'image' && file[0].type !== 'application/pdf') {
       alert('Graag alleen een pdf of afbeelding toevoegen');
@@ -207,19 +213,22 @@ export class LandingComponent implements OnInit {
       alert('Please use Chrome or Firefox to use this ');
     } else {
       if (!(file[0] === undefined || file[0] === null)) {
-        this.attachmentList.push(file);
         const reader = new FileReader();
         reader.readAsDataURL(file[0]);
         reader.onload = () => {
-          if (file[0]. type === 'application/pdf') {
-            this.receiptFiles.push(reader.result);
+          if (file[0].type === 'application/pdf') {
+            this.receiptFiles.push({
+              content: reader.result,
+              content_type: 'application/pdf',
+              from_db: false
+            });
           } else if (file[0].type.split('/')[0] === 'image') {
             const img = new Image();
             if (typeof reader.result === 'string') {
               img.src = reader.result;
               img.onload = () => {
                 const canvas = document.createElement('canvas');
-                let width;
+                let width: number;
                 if (img.width > 600) {
                   width = 600;
                 } else {
@@ -233,11 +242,15 @@ export class LandingComponent implements OnInit {
                 ctx.canvas.toBlob(blob => {
                   const filla = new File([blob], file[0].name, {
                     type: file[0].type,
-                    lastModified: this.today
+                    lastModified: this.today.getTime()
                   });
                   reader.readAsDataURL(filla);
                   reader.onload = () => {
-                    this.receiptFiles.push(reader.result);
+                    this.receiptFiles.push({
+                      content: reader.result,
+                      content_type: file[0].type,
+                      from_db: false
+                    });
                   };
                 }, file[0].type, 1);
               }, reader.onerror = Error => console.log(Error);
@@ -248,19 +261,9 @@ export class LandingComponent implements OnInit {
     }
   }
 
-  claimUpdateForm(form: NgForm, expenseId, instArray) {
+  claimUpdateForm(form: NgForm, expenseId: any, instArray: any[]) {
     if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
       // Check Form Data
-      let fileString = '';
-      // @ts-ignore
-      for (const recFile of this.receiptFiles) {
-        if (fileString === '') {
-          fileString = recFile;
-        } else {
-          fileString = fileString + '.' + recFile;
-        }
-      }
-      form.value.attachment = fileString;
       const dataVerified = {};
       const data = form.value;
       data.amount = Number((data.amount).toFixed(2));
@@ -276,6 +279,7 @@ export class LandingComponent implements OnInit {
           .subscribe(
             result => {
               this.showErrors = false;
+              this.uploadSingleAttachment(expenseId);
               this.formSubmitted = !form.ngSubmit.hasError;
               this.declarationCall();
               this.dismissExpenseModal();
@@ -288,23 +292,39 @@ export class LandingComponent implements OnInit {
     }
   }
 
-    cancelExpense() {
-      const dataVerified = {};
-      // @ts-ignore
-      const expenseId = this.expenseData.id;
+  cancelExpense() {
+    const dataVerified = {};
+    // @ts-ignore
+    const expenseId = this.expenseData.id;
 
-      dataVerified[`status`] = 'cancelled';
+    dataVerified[`status`] = 'cancelled';
 
-      this.expenses.updateExpenseEmployee(dataVerified, expenseId)
-        .subscribe(
-            result => {
-              this.showErrors = false;
-              this.declarationCall();
-              this.dismissExpenseModal();
-            },
-            error => {
-              this.showErrors = true;
-              Object.assign(this.formResponse, JSON.parse(error));
-            });
+    this.expenses.updateExpenseEmployee(dataVerified, expenseId)
+      .subscribe(
+        result => {
+          this.showErrors = false;
+          this.declarationCall();
+          this.dismissExpenseModal();
+        },
+        error => {
+          this.showErrors = true;
+          Object.assign(this.formResponse, JSON.parse(error));
+        });
+  }
+
+  private uploadSingleAttachment(expenseId: any) {
+    if (this.receiptFiles.length > 0) {
+      const file = this.receiptFiles.splice(0, 1)[0];
+      if (!file.from_db) {
+        this.expenses.uploadSingleAttachment(expenseId, {
+          name: '' + this.receiptFiles.length,
+          content: file.content
+        }).subscribe(() => {
+            this.uploadSingleAttachment(expenseId);
+          });
+      } else {
+        this.uploadSingleAttachment(expenseId);
+      }
+    }
   }
 }

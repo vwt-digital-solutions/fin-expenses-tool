@@ -1,10 +1,12 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpErrorResponse, HttpResponse} from '@angular/common/http';
-import {EnvService} from './env.service';
-import {Observable, throwError, interval, of} from 'rxjs';
-import {catchError, retry, retryWhen, flatMap, count} from 'rxjs/operators';
-import {Endpoint} from '../models/endpoint.enum';
-import {debug} from 'util';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { EnvService } from './env.service';
+import { Observable, throwError, interval, of } from 'rxjs';
+import { catchError, retry, retryWhen, flatMap, count } from 'rxjs/operators';
+import { Endpoint } from '../models/endpoint.enum';
+import { debug } from 'util';
+import { Expense } from '../models/expense';
+import { Attachment } from '../models/attachment';
 
 interface ExpensesIfc {
   clone: any;
@@ -68,7 +70,7 @@ export class ExpensesConfigService {
       );
   }
 
-    public getControllerExpenses(): Observable<HttpResponse<ExpensesIfc>> {
+  public getControllerExpenses(): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.controller)
       .pipe(
         ExpensesConfigService.retry(2),
@@ -92,7 +94,7 @@ export class ExpensesConfigService {
       );
   }
 
-    public getManagerAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
+  public getManagerAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<any>(this.env.apiUrl + Endpoint.manager + '/' + expenseId + '/attachments')
       .pipe(
         ExpensesConfigService.retry(2),
@@ -124,6 +126,56 @@ export class ExpensesConfigService {
 
   public updateExpenseManager(data, expenseId): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.put<ExpensesIfc>(this.env.apiUrl + Endpoint.manager + `/${expenseId}`, data)
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public getEmployeeExpenses(employeeId): Observable<Expense[]> {
+    return this.http.get<Expense[]>(this.env.apiUrl + '/employees/' + employeeId + '/expenses')
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public deleteAttachment(item: Attachment): Observable<any> {
+    return this.http.delete(`${this.env.apiUrl}/employees/expenses/${item.expense_id}/attachments/${item.db_name}`)
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public uploadSingleAttachment(expenseId, data: { name: string; content: any }): Observable<any> {
+    return this.http.post(this.env.apiUrl + `/employees/expenses/${expenseId}/attachments`, data)
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public createPaymentFile(fileData: any, options: any): Observable<HttpResponse<any> | ArrayBuffer> {
+    return this.http.post(this.env.apiUrl + '/finances/expenses/payment_file/files?name=' + fileData, '', options)
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public createBookingFile(options: any): Observable<HttpResponse<any> | ArrayBuffer> {
+    return this.http.post(this.env.apiUrl + '/finances/expenses/booking_file/files', '', options)
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public getPaymentFilesList() {
+    return this.http.get<any>(this.env.apiUrl + '/finances/expenses/booking_file/files')
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public downloadGeneratedFile(fileData: any, dataKind: string) {
+    return this.http.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + dataKind,
+      { responseType: 'blob' })
       .pipe(
         catchError(ExpensesConfigService.handleError)
       );
