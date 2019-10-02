@@ -218,6 +218,6 @@ describe('ExpenseApp:', () => {
     browser.wait(until.visibilityOf(elem), 10000, 'Expense rejection form took too long to load').then(() => {
       elem.click();
     });
-    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense rejection took too long'));;
+    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense rejection took too long'));
   });
 });
