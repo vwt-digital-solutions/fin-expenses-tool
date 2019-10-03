@@ -109,11 +109,8 @@ describe('ExpenseApp:', () => {
     typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
       typeList.get(randomNumber + 1).click();
     });
-    const today = new Date();
     element(by.id('dateinput'))
-      .sendKeys(today.getMonth(),
-        today.getDate(),
-        today.getFullYear() - 1); // - 1 Resolves the "USA / The rest of the world" issue
+      .sendKeys('01-01-2019'); // To counter the unstable date input on chrome, the value of date is hardcoded
     e2eID = Math.random() * 100;
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     const path = require('path');
@@ -218,6 +215,6 @@ describe('ExpenseApp:', () => {
     browser.wait(until.visibilityOf(elem), 10000, 'Expense rejection form took too long to load').then(() => {
       elem.click();
     });
-    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense rejection took too long'));;
+    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense rejection took too long'));
   });
 });
