@@ -110,7 +110,6 @@ export class ManagerComponent implements OnInit {
   public showErrors;
   public formErrors;
   public formResponse;
-  private submitingStart: boolean;
   private action: any;
   private departmentId: number;
   private OurJaneDoeIs: string;
@@ -146,7 +145,7 @@ export class ManagerComponent implements OnInit {
   rowData = null;
   historyRowData = null;
 
-  getDismissReason(reason: any): string {
+  static getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
       return 'by pressing ESC';
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
@@ -192,10 +191,6 @@ export class ManagerComponent implements OnInit {
     return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth())] + ' ' + stepDate.getFullYear();
   }
 
-  getFileName(name) {
-    return (name.split('/')).slice(-1)[0];
-  }
-
   onRowClicked(event, content) {
     this.gridApi = event.api;
     this.formSubmitted = false;
@@ -218,7 +213,7 @@ export class ManagerComponent implements OnInit {
         console.log(`Closed with: ${result}`);
       }, (reason) => {
         this.gridApi.deselectAll();
-        console.log(`Dismissed ${this.getDismissReason(reason)}`);
+        console.log(`Dismissed ${ManagerComponent.getDismissReason(reason)}`);
       });
     });
   }

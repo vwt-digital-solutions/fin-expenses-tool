@@ -109,8 +109,9 @@ describe('ExpenseApp:', () => {
     typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
       typeList.get(randomNumber + 1).click();
     });
+    const today = new Date();
     element(by.id('dateinput'))
-      .sendKeys('01-01-2019'); // To counter the unstable date input on chrome, the value of date is hardcoded
+      .sendKeys(today.toLocaleTimeString());
     e2eID = Math.random() * 100;
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     const path = require('path');

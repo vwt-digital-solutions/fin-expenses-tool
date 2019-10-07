@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { EnvService } from 'src/app/services/env.service';
-import { Router, ActivatedRoute } from '@angular/router';
-import { map, catchError } from 'rxjs/operators';
-import { ExpensesConfigService } from 'src/app/services/config.service';
+import {Component, OnInit} from '@angular/core';
+import {NgForm} from '@angular/forms';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {EnvService} from 'src/app/services/env.service';
+import {Router, ActivatedRoute} from '@angular/router';
+import {map, catchError} from 'rxjs/operators';
+import {ExpensesConfigService} from 'src/app/services/config.service';
 
 @Component({
   selector: 'app-expenses',
@@ -19,7 +19,7 @@ export class ExpensesComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    this.addClaimSuccess = { success: false, wrong: false };
+    this.addClaimSuccess = {success: false, wrong: false};
     this.today = new Date();
     this.notaData = 'Toevoegen';
     this.loadingThings = false;
@@ -105,7 +105,6 @@ export class ExpensesComponent implements OnInit {
   // End Classes Logic
 
   onFileInput(file: any[]) {
-    console.log(file[0].type.split('/')[0]);
     if (file[0].type.split('/')[0] !== 'image' && file[0].type !== 'application/pdf') {
       alert('Graag alleen een pdf of afbeelding toevoegen');
       return;
@@ -174,10 +173,10 @@ export class ExpensesComponent implements OnInit {
     }
     if (this.splitCheck()) {
       this.loadingThings = true;
-      // End Check Form Data
       // Format Values
       form.value.amount = Number((form.value.amount).toFixed(2));
       form.value.date_of_transaction = (new Date(form.value.date_of_transaction).getTime());
+      form.value.transaction_date = new Date(form.value.date_of_transaction).toISOString();
 
       const obj = JSON.parse(JSON.stringify(form.value));
       // End Format Values
@@ -212,8 +211,7 @@ export class ExpensesComponent implements OnInit {
   }
 
   removeFromAttachmentList(item: any) {
-    let i: number;
-    for (i = 0; i < this.attachmentList.length; i++) {
+    for (let i = 0; i < this.attachmentList.length; i++) {
       if (this.attachmentList[i] === item) {
         this.attachmentList.splice(i, 1);
         this.locatedFile.splice(i, 1);
