@@ -156,7 +156,7 @@ export class ControllerComponent implements OnInit {
   onRowClicked(event, content) {
     this.gridApi = event.api;
     this.expenseData = event.data;
-    this.expenses.getFinanceAttachment(event.data.id).subscribe((image: any) => { // CHANGE TO CONTROLLER
+    this.expenses.getControllerAttachment(event.data.id).subscribe((image: any) => { // CHANGE TO CONTROLLER
       this.receiptFiles = [];
       for (const img of image) {
         if (!(this.receiptFiles.includes(img))) {

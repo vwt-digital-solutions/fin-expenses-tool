@@ -94,6 +94,14 @@ export class ExpensesConfigService {
       );
   }
 
+  public getControllerAttachment(expenseId): Observable<HttpResponse<any[]>> {
+    return this.http.get<any>(this.env.apiUrl + Endpoint.controller + '/' + expenseId + '/attachments')
+      .pipe(
+        ExpensesConfigService.retry(2),
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
   // public getManagerAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
   //   return this.http.get<any>(this.env.apiUrl + Endpoint.manager + '/' + expenseId + '/attachments')
   //     .pipe(
