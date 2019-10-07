@@ -94,13 +94,13 @@ export class ExpensesConfigService {
       );
   }
 
-  public getManagerAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
-    return this.http.get<any>(this.env.apiUrl + Endpoint.manager + '/' + expenseId + '/attachments')
-      .pipe(
-        ExpensesConfigService.retry(2),
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
+  // public getManagerAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
+  //   return this.http.get<any>(this.env.apiUrl + Endpoint.manager + '/' + expenseId + '/attachments')
+  //     .pipe(
+  //       ExpensesConfigService.retry(2),
+  //       catchError(ExpensesConfigService.handleError)
+  //     );
+  // }
 
   public getCostTypes(): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<ExpensesIfc>(this.env.apiUrl + '/employees/cost-types')

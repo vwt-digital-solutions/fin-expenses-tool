@@ -200,7 +200,7 @@ export class ManagerComponent implements OnInit {
     this.wantsRejectionNote = false;
     this.expenseData = event.data;
     this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
-    this.expenses.getFinanceAttachment(event.data.id).subscribe((image: any) => {
+    this.expenses.getExpenseAttachment(event.data.id).subscribe((image: any) => {
       this.receiptFiles = [];
       for (const img of image) {
         if (!(this.receiptFiles.includes(img))) {
