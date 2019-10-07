@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {NgForm} from '@angular/forms';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
 import {Router, ActivatedRoute} from '@angular/router';
 import {map, catchError} from 'rxjs/operators';
@@ -180,7 +180,6 @@ export class ExpensesComponent implements OnInit {
 
       const obj = JSON.parse(JSON.stringify(form.value));
       // End Format Values
-      // Send Claim
       this.httpClient.post<string>(this.env.apiUrl + '/employees/expenses', obj)
         .subscribe(
           (val) => {

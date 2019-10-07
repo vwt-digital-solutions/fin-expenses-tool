@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { NgForm } from '@angular/forms';
-import { ExpensesConfigService } from '../../services/config.service';
+import {Component, OnInit} from '@angular/core';
+import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import {NgForm} from '@angular/forms';
+import {ExpensesConfigService} from '../../services/config.service';
 import * as moment from 'moment';
-import { DomSanitizer } from '@angular/platform-browser';
-import { IdentityService } from 'src/app/services/identity.service';
-import { FormaterService } from 'src/app/services/formater.service';
-import { ActivatedRoute } from '@angular/router';
-import { map } from 'rxjs/operators';
+import {DomSanitizer} from '@angular/platform-browser';
+import {IdentityService} from 'src/app/services/identity.service';
+import {FormaterService} from 'src/app/services/formater.service';
+import {ActivatedRoute} from '@angular/router';
+import {map} from 'rxjs/operators';
 
 moment.locale('nl');
 
@@ -65,7 +65,7 @@ export class ManagerComponent implements OnInit {
           },
           {
             headerName: 'Kosten', field: 'amount', valueFormatter: FormaterService.decimalFormatter,
-            sortable: true, filter: true, width: 150, cellStyle: { 'text-align': 'right' }
+            sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
           },
           {
             headerName: 'Soort', field: 'cost_type',
@@ -92,15 +92,16 @@ export class ManagerComponent implements OnInit {
       }
     ];
     this.expenseDataRejection = [
-      { reason: 'Niet Duidelijk' },
-      { reason: 'Kan niet uitbetalen' }
+      {reason: 'Niet Duidelijk'},
+      {reason: 'Kan niet uitbetalen'}
     ];
     this.formSubmitted = false;
     this.showErrors = false;
     this.formResponse = {};
     this.rowSelection = 'single';
-    this.addBooking = { success: false, wrong: false, error: false };
+    this.addBooking = {success: false, wrong: false, error: false};
   }
+
   private gridApi;
   private gridColumnApi;
   public columnDefs;
@@ -131,11 +132,11 @@ export class ManagerComponent implements OnInit {
       children: [
         {
           headerName: 'Geschiedenis', field: 'date_exported',
-          sortable: true, filter: true, cellStyle: { cursor: 'pointer' },
+          sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
           suppressMovable: true
         },
         {
-          headerName: '', field: '', cellStyle: { cursor: 'pointer' }, width: 100,
+          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 100,
           template: '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>'
         }
       ]
@@ -200,14 +201,14 @@ export class ManagerComponent implements OnInit {
     this.wantsRejectionNote = false;
     this.expenseData = event.data;
     this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
-    this.expenses.getExpenseAttachment(event.data.id).subscribe((image: any) => {
+    this.expenses.getManagerAttachment(event.data.id).subscribe((image: any) => {
       this.receiptFiles = [];
       for (const img of image) {
         if (!(this.receiptFiles.includes(img))) {
           this.receiptFiles.push(img);
         }
       }
-      this.modalService.open(content, { centered: true }).result.then((result) => {
+      this.modalService.open(content, {centered: true}).result.then((result) => {
         this.gridApi.deselectAll();
         this.wantsRejectionNote = false;
         console.log(`Closed with: ${result}`);

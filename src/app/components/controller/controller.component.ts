@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { ExpensesConfigService } from '../../services/config.service';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { DomSanitizer } from '@angular/platform-browser';
-import { IdentityService } from 'src/app/services/identity.service';
-import { FormaterService } from 'src/app/services/formater.service';
-import { ActivatedRoute } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {ExpensesConfigService} from '../../services/config.service';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {DomSanitizer} from '@angular/platform-browser';
+import {IdentityService} from 'src/app/services/identity.service';
+import {FormaterService} from 'src/app/services/formater.service';
+import {ActivatedRoute} from '@angular/router';
 
 interface ExpensesIfc {
   ['body']: any;
@@ -42,7 +42,7 @@ export class ControllerComponent implements OnInit {
           },
           {
             headerName: 'Kosten', field: 'amount', valueFormatter: FormaterService.decimalFormatter,
-            sortable: true, filter: true, width: 150, cellStyle: { 'text-align': 'right' }
+            sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
           },
           {
             headerName: 'SoortGL', field: 'cost_type',
@@ -76,6 +76,7 @@ export class ControllerComponent implements OnInit {
       }
     ];
   }
+
   private monthNames;
   private gridApi;
   public columnDefs;
@@ -86,7 +87,7 @@ export class ControllerComponent implements OnInit {
 
   rowData = null;
 
-  processExcelCellCallback(param) {
+  static processExcelCellCallback(param) {
     if (param.column.colDef.cellRenderer) {
       return (param.column.colDef.cellRenderer(param));
     } else {
@@ -141,7 +142,7 @@ export class ControllerComponent implements OnInit {
   onBtExport() {
     const params1 = {
       allColumns: true,
-      processCellCallback: this.processExcelCellCallback.bind(this)
+      processCellCallback: ControllerComponent.processExcelCellCallback.bind(this)
     };
     this.gridApi.exportDataAsExcel(params1);
   }
@@ -156,14 +157,14 @@ export class ControllerComponent implements OnInit {
   onRowClicked(event, content) {
     this.gridApi = event.api;
     this.expenseData = event.data;
-    this.expenses.getControllerAttachment(event.data.id).subscribe((image: any) => { // CHANGE TO CONTROLLER
+    this.expenses.getControllerAttachment(event.data.id).subscribe((image: any) => {
       this.receiptFiles = [];
       for (const img of image) {
         if (!(this.receiptFiles.includes(img))) {
           this.receiptFiles.push(img);
         }
       }
-      this.modalService.open(content, { centered: true }).result.then((result) => {
+      this.modalService.open(content, {centered: true}).result.then((result) => {
         this.gridApi.deselectAll();
       }, (reason) => {
         this.gridApi.deselectAll();

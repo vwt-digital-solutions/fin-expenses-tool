@@ -1,12 +1,11 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { EnvService } from './env.service';
-import { Observable, throwError, interval, of } from 'rxjs';
-import { catchError, retry, retryWhen, flatMap, count } from 'rxjs/operators';
-import { Endpoint } from '../models/endpoint.enum';
-import { debug } from 'util';
-import { Expense } from '../models/expense';
-import { Attachment } from '../models/attachment';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpErrorResponse, HttpResponse} from '@angular/common/http';
+import {EnvService} from './env.service';
+import {Observable, throwError, interval, of} from 'rxjs';
+import {catchError, retryWhen, flatMap, count} from 'rxjs/operators';
+import {Endpoint} from '../models/endpoint.enum';
+import {Expense} from '../models/expense';
+import {Attachment} from '../models/attachment';
 
 interface ExpensesIfc {
   clone: any;
@@ -102,13 +101,13 @@ export class ExpensesConfigService {
       );
   }
 
-  // public getManagerAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
-  //   return this.http.get<any>(this.env.apiUrl + Endpoint.manager + '/' + expenseId + '/attachments')
-  //     .pipe(
-  //       ExpensesConfigService.retry(2),
-  //       catchError(ExpensesConfigService.handleError)
-  //     );
-  // }
+  public getManagerAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
+    return this.http.get<any>(this.env.apiUrl + Endpoint.manager + '/' + expenseId + '/attachments')
+      .pipe(
+        ExpensesConfigService.retry(2),
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
 
   public getCostTypes(): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<ExpensesIfc>(this.env.apiUrl + '/employees/cost-types')
@@ -169,7 +168,7 @@ export class ExpensesConfigService {
 
   public downloadGeneratedFile(fileData, dataKind) {
     return this.http.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + '/kinds/' + dataKind,
-      { responseType: 'blob' })
+      {responseType: 'blob'})
       .pipe(
         catchError(ExpensesConfigService.handleError)
       );

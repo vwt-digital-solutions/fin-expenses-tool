@@ -1,7 +1,4 @@
-import {browser, logging, protractor, by, element, Capabilities, Key} from 'protractor/built';
-import {AppPage} from './app.po';
-import {config} from 'rxjs';
-import {url} from 'inspector';
+import {browser, protractor, by, element} from 'protractor/built';
 
 const request = require('request');
 const fs = require('fs');

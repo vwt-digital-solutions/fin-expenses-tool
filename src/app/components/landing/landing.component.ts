@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { ExpensesConfigService } from '../../services/config.service';
-import { Expense } from '../../models/expense';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { DomSanitizer } from '@angular/platform-browser';
-import { IdentityService } from 'src/app/services/identity.service';
-import { catchError, map } from 'rxjs/operators';
-import { Attachment } from 'src/app/models/attachment';
-import { ActivatedRoute } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {NgForm} from '@angular/forms';
+import {ExpensesConfigService} from '../../services/config.service';
+import {Expense} from '../../models/expense';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {DomSanitizer} from '@angular/platform-browser';
+import {IdentityService} from 'src/app/services/identity.service';
+import {catchError, map} from 'rxjs/operators';
+import {Attachment} from 'src/app/models/attachment';
+import {ActivatedRoute} from '@angular/router';
 
 
 @Component({
@@ -199,7 +199,7 @@ export class LandingComponent implements OnInit {
 
   openExpenseDetailModal(content: any, data: any) {
     this.receiptFiles = [];
-    this.modalService.open(content, { centered: true });
+    this.modalService.open(content, {centered: true});
   }
 
   onFileInput(file) {
@@ -319,8 +319,8 @@ export class LandingComponent implements OnInit {
           name: '' + this.receiptFiles.length,
           content: file.content
         }).subscribe(() => {
-            this.uploadSingleAttachment(expenseId);
-          });
+          this.uploadSingleAttachment(expenseId);
+        });
       } else {
         this.uploadSingleAttachment(expenseId);
       }

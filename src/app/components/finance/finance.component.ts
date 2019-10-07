@@ -1,4 +1,4 @@
-import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {HttpResponse} from '@angular/common/http';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {NgForm} from '@angular/forms';
@@ -373,10 +373,12 @@ export class FinanceComponent implements OnInit {
               this.expenses.getExpenses().subscribe((response: any) => this.rowData = [...response]);
               this.showErrors = false;
               this.formSubmitted = !form.ngSubmit.hasError;
+              console.log('>> PUT SUCCESS', result);
             },
             error => {
               this.showErrors = true;
               Object.assign(this.formResponse, JSON.parse(error));
+              console.error('>> PUT FAILED', error.message);
             })
         : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
     }
