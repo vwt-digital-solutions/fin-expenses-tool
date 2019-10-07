@@ -250,7 +250,7 @@ export class ManagerComponent implements OnInit {
     this.departmentId = claimJaneDoe.oid;
     this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
     // @ts-ignore
-    this.expenses.getDepartmentExpenses(this.departmentId).subscribe((data: ExpensesIfc) => this.rowData = [...data]);
+    this.expenses.getManagerExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
   }
 
   ngOnInit() {
@@ -284,7 +284,7 @@ export class ManagerComponent implements OnInit {
           result => {
             this.getNextExpense();
             // @ts-ignore
-            this.expenses.getDepartmentExpenses(this.departmentId).subscribe((response: ExpensesIfc) => this.rowData = [...response]);
+            this.expenses.getManagerExpenses().subscribe((response: ExpensesIfc) => this.rowData = [...response]);
             this.showErrors = false;
             this.formSubmitted = !form.ngSubmit.hasError;
           },

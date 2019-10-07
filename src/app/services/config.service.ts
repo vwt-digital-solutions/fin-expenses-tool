@@ -61,8 +61,8 @@ export class ExpensesConfigService {
       );
   }
 
-  public getDepartmentExpenses(departmentId): Observable<HttpResponse<ExpensesIfc>> {
-    return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.department + '/' + departmentId + '/expenses')
+  public getManagerExpenses(): Observable<HttpResponse<ExpensesIfc>> {
+    return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.manager)
       .pipe(
         ExpensesConfigService.retry(2),
         catchError(ExpensesConfigService.handleError)
