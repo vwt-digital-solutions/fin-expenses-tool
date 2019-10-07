@@ -126,7 +126,17 @@ export class LandingComponent implements OnInit {
     ).subscribe(costTypes => this.typeOptions = [...costTypes]);
     this.declarationCall();
     this.today = new Date();
+  }
 
+  getManagerExpensesList() {
+    this.expenses.getManagerExpenses()
+      .subscribe(
+        result => {
+          console.log(result);
+        },
+        error => {
+          console.error('>> GET FAILED', error.message);
+        });
   }
 
   declarationCall() {
@@ -272,7 +282,7 @@ export class LandingComponent implements OnInit {
           dataVerified[prop] = data[prop];
         }
       }
-      dataVerified[`status`] = ''; // This needs to be done on the backend
+      dataVerified[`status`] = 'ready_for_manager'; // This needs to be done on the backend
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
         this.expenses.updateExpenseEmployee(dataVerified, expenseId)
           .subscribe(
