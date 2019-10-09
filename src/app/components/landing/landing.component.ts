@@ -30,6 +30,7 @@ export class LandingComponent implements OnInit {
   public today: Date;
   public hasNoExpenses: boolean;
   public typeOptions: Expense[];
+  public wantsManager: boolean;
 
   constructor(
     private identityService: IdentityService,
@@ -124,19 +125,10 @@ export class LandingComponent implements OnInit {
     this.route.data.pipe(
       map(data => data.costTypes)
     ).subscribe(costTypes => this.typeOptions = [...costTypes]);
+    // @ts-ignore
+    this.expenses.getManagerExpenses().subscribe(val => {this.wantsManager = (val.length > 0); }); // Check if user has manager role
     this.declarationCall();
     this.today = new Date();
-  }
-
-  getManagerExpensesList() {
-    this.expenses.getManagerExpenses()
-      .subscribe(
-        result => {
-          console.log(result);
-        },
-        error => {
-          console.error('>> GET FAILED', error.message);
-        });
   }
 
   declarationCall() {

@@ -32,7 +32,7 @@
       </button>
       <button name="expenses/manage"
         [routerLink]="['/expenses/manage']"
-        [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('manager'))}" class="btn btn-primary">Declaraties Beoordelen
+        [ngClass]="{hidden: !(this.wantsManager)}" class="btn btn-primary">Declaraties Beoordelen
       </button>
       <button name="expenses/controller"
         [routerLink]="['/expenses/controller']"
@@ -103,6 +103,28 @@
           <div class="fill-text move-18" *ngIf="!(ntransdate.valid)">
             <small>Graag een geldige datum invullen</small>
           </div>
+
+          <label for="expenseTransactionDate">Transaction Date:</label>
+          <div class="input-group mb-3">
+            <input id="expenseTransactionDate" name="transaction_date"
+                   class="form-control" required [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"type="date">
+            <div class="input-group-append">
+              <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
+                <i class=" fa fa-calendar-alt"></i> </span>
+            </div>
+          </div>
+
+          <label for="expenseClaimDate">Claim Date:</label>
+          <div class="input-group mb-3">
+            <input id="expenseClaimDate" name="claim_date"
+                   class="form-control" required [ngModel]="expenseData.claim_date | date:'yyyy-MM-dd'"type="date">
+            <div class="input-group-append">
+              <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
+                <i class=" fa fa-calendar-alt"></i> </span>
+            </div>
+          </div>
+
+
           <label for="expenseNote">Omschrijving:</label>
           <div class="input-group mb-3 note-relative">
             <textarea id="expenseNote" [ngClass]="{notFilled: !(note.valid)}" class="form-control" type="text" required
