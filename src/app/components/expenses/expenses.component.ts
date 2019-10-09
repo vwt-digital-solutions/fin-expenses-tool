@@ -71,7 +71,7 @@ export class ExpensesComponent implements OnInit {
     if (setClass.name === 'cost_type') {
       starBool = this.expenseType === false;
     }
-    if (setClass.name === 'date_of_transaction') {
+    if (setClass.name === 'transaction_date') {
       starBool = this.expenseTransDate === false;
     }
     if (setClass.name === 'attachment') {
@@ -164,10 +164,10 @@ export class ExpensesComponent implements OnInit {
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
     this.expenseType = !(form.value.cost_type === undefined);
-    this.expenseTransDate = !(form.value.date_of_transaction === undefined || new Date(form.value.date_of_transaction) > this.today);
+    this.expenseTransDate = !(form.value.transaction_date === undefined || new Date(form.value.transaction_date) > this.today);
     this.expenseAttachment = !(this.locatedFile.length < 1);
-    if (form.value.date_of_transaction !== undefined) {
-      if (form.value.date_of_transaction.length > 8) {
+    if (form.value.transaction_date !== undefined) {
+      if (form.value.transaction_date.length > 8) {
         this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de aankoop';
       }
     }
@@ -175,8 +175,8 @@ export class ExpensesComponent implements OnInit {
       this.loadingThings = true;
       // Format Values
       form.value.amount = Number((form.value.amount).toFixed(2));
-      form.value.date_of_transaction = (new Date(form.value.date_of_transaction).getTime());
-      form.value.transaction_date = new Date(form.value.date_of_transaction).toISOString();
+      form.value.transaction_date = (new Date(form.value.transaction_date).getTime());
+      form.value.transaction_date = new Date(form.value.transaction_date).toISOString();
 
       const obj = JSON.parse(JSON.stringify(form.value));
       // End Format Values

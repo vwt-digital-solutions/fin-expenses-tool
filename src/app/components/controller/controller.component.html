@@ -63,10 +63,10 @@
           <div class="input-group mb-3">
             <input id="expenseDateOfTransaction"
                    [ngClass]="{notFilled: !(ntransdate.valid)}"
-                   name="date_of_transaction"
+                   name="transaction_date"
                    class="form-control"
                    readonly
-                   [ngModel]="expenseData.date_of_transaction | date:'yyyy-MM-dd'"
+                   [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"
                    #ntransdate="ngModel"
                    type="date">
             <div class="input-group-append">

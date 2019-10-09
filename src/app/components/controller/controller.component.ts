@@ -29,7 +29,7 @@ export class ControllerComponent implements OnInit {
         children: [
           {
             headerName: 'Declaratiedatum',
-            field: 'date_of_claim',
+            field: 'claim_date',
             sortable: true,
             filter: true,
             cellRenderer: params => {

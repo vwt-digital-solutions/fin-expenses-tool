@@ -67,7 +67,7 @@
               <input id="dateinput"
                      (click)="expenseTransDate = true; transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen'; ;"
                      [ngClass]="{notFilled: notFilledClass(ntransdate)}"
-                     name="date_of_transaction"
+                     name="transaction_date"
                      class="form-control"
                      required
                      [(ngModel)]="formTransDate"

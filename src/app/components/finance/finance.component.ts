@@ -59,7 +59,7 @@ export class FinanceComponent implements OnInit {
           },
           {
             headerName: 'Declaratiedatum',
-            field: 'date_of_claim',
+            field: 'claim_date',
             sortable: true,
             filter: true,
             cellRenderer: params => {
@@ -85,7 +85,7 @@ export class FinanceComponent implements OnInit {
             headerName: 'Beschrijving', field: 'note', resizable: true
           },
           {
-            headerName: 'Bondatum', field: 'date_of_transaction',
+            headerName: 'Bondatum', field: 'transaction_date',
             sortable: true, filter: true, width: 150,
             cellRenderer: params => {
               return this.fixDate(params.value);
@@ -300,6 +300,7 @@ export class FinanceComponent implements OnInit {
   downloadFromHistory(event) {
     this.resetPopups();
     const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5);
+    console.log(fileData);
     this.expenses.downloadGeneratedFile(fileData, 'booking_file')
       .subscribe(
         (response) => {
