@@ -107,8 +107,9 @@ describe('ExpenseApp:', () => {
       typeList.get(randomNumber + 1).click();
     });
     const today = new Date();
+    console.log(today.getUTCFullYear());
     element(by.id('dateinput'))
-      .sendKeys(today.toLocaleTimeString());
+      .sendKeys(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
     e2eID = Math.random() * 100;
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     const path = require('path');

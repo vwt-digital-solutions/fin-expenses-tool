@@ -89,7 +89,7 @@
               <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">{{t.ctype}}</option>
             </select>
           </div>
-          <!-- Form: Date of Transaction -->
+          <!-- Form: Transaction Date -->
           <label for="expenseDateOfTransaction">Datum bon:</label>
           <div class="input-group mb-3">
             <input id="expenseDateOfTransaction" [ngClass]="{notFilled: !(ntransdate.valid)}" name="transaction_date"
