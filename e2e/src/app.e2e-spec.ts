@@ -100,8 +100,7 @@ describe('ExpenseApp:', () => {
   });
 
   it('should create an expense', () => {
-    console.log('START');
-    browser.sleep(3000);
+    browser.sleep(5000);
     browser.waitForAngularEnabled(false);
     element(by.id('amountinput')).sendKeys(100.99);
     const typeList = element(by.id('typeinput')).all(by.tagName('option'));
