@@ -29,7 +29,6 @@ const get = (options: any): any => {
   });
   return defer.promise;
 };
-const EC = protractor.ExpectedConditions;
 const until = protractor.ExpectedConditions;
 let expenseID;
 let e2eID;
@@ -78,6 +77,7 @@ describe('ExpenseApp:', () => {
 
   it('should open the landing page', () => {
     browser.waitForAngularEnabled(false);
+    browser.sleep(1000);
     expect(element(by.css('h1')).getText()).toEqual('MIJN DECLARATIES');
     browser.sleep(1000);
   });
@@ -94,20 +94,21 @@ describe('ExpenseApp:', () => {
   it('should get the cost-types', () => {
     browser.waitForAngularEnabled(false);
     element(by.name('expenses')).click();
-    browser.sleep(1200); // Should be just enough
+    browser.sleep(1200);
     const typeList = element.all(by.css('option'));
     expect(typeList.count()).toEqual(29 + 1); // 29 Types + 1 Text
   });
 
   it('should create an expense', () => {
+    console.log('START');
+    browser.sleep(3000);
     browser.waitForAngularEnabled(false);
-    element(by.id('amountinput')).sendKeys(100); // Math.floor(Math.random() * 50)
+    element(by.id('amountinput')).sendKeys(100.99);
     const typeList = element(by.id('typeinput')).all(by.tagName('option'));
     typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
       typeList.get(randomNumber + 1).click();
     });
     const today = new Date();
-    console.log(today.getUTCFullYear());
     element(by.id('dateinput'))
       .sendKeys(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
     e2eID = Math.random() * 100;
@@ -119,12 +120,15 @@ describe('ExpenseApp:', () => {
     element(by.id('attachmentinput')).sendKeys(absolutePath);
     element(by.id('submit-click')).click();
     const elem = element(by.id('succes-alert'));
+    console.log('WAIT');
     browser.wait(until.visibilityOf(elem), 10000, 'Expense creation took too long').then(() => {
       elem.getText().then(text => {
         expenseID = text.split(' ').slice(-1)[0];
       });
     });
+    console.log('WAIT OVER');
     expect(elem.isDisplayed()).toBe(true);
+    console.log('DONE');
   });
 
   it('should get expenses on manager page', () => {
