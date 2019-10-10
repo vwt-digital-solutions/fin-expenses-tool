@@ -110,6 +110,7 @@ describe('ExpenseApp:', () => {
     const today = new Date();
     element(by.id('dateinput'))
       .sendKeys(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
+    console.log(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
     e2eID = Math.random() * 100;
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     const path = require('path');
@@ -117,6 +118,7 @@ describe('ExpenseApp:', () => {
     const file = 'assets/betaald.png',
       absolutePath = path.resolve(__dirname, file);
     element(by.id('attachmentinput')).sendKeys(absolutePath);
+    console.log(absolutePath);
     element(by.id('submit-click')).click();
     const elem = element(by.id('succes-alert'));
     browser.wait(until.visibilityOf(elem), 10000, 'Expense creation took too long').then(() => {
