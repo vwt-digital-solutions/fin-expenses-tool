@@ -172,9 +172,9 @@ describe('ExpenseApp:', () => {
   it('should see the expense on the controller page', () => {
     browser.waitForAngularEnabled(false);
     browser.sleep(1000);
-    element(by.css('div[col-id=date_of_claim]')).click(); // Once
+    element(by.css('div[col-id=claim_date]')).click(); // Once
     browser.sleep(500);
-    element(by.css('div[col-id=date_of_claim]')).click(); // Twice
+    element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(500);
     element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
     expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));
@@ -196,9 +196,9 @@ describe('ExpenseApp:', () => {
   it('should get the attachments', () => {
     browser.waitForAngularEnabled(false);
     browser.sleep(1000);
-    element(by.css('div[col-id=date_of_claim]')).click(); // Once
+    element(by.css('div[col-id=claim_date]')).click(); // Once
     browser.sleep(500);
-    element(by.css('div[col-id=date_of_claim]')).click(); // Twice
+    element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(500);
     element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
     expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));

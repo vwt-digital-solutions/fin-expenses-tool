@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import {Component} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
 
-import { OAuthService } from 'angular-oauth2-oidc';
-import { JwtHelperService } from '@auth0/angular-jwt';
+import {OAuthService} from 'angular-oauth2-oidc';
+import {JwtHelperService} from '@auth0/angular-jwt';
 
 @Component({
   selector: 'app-auth',
@@ -40,8 +40,7 @@ export class AuthComponent {
           const expiresIn = authBody.expires_in;
 
           // SAVE ACCESS TOKEN
-          const decodedToken = helper.decodeToken(accessToken);
-          this.sessionStorageItems.id_token_claims_obj = decodedToken;
+          this.sessionStorageItems.id_token_claims_obj = helper.decodeToken(accessToken);
           (this.sessionStorageItems as any).id_token_claims_obj.roles = ['creditor.write', 'manager.write', 'controller.write'];
           (this.sessionStorageItems as any).id_token_claims_obj.email = 'opensource.e2e@vwtelecom.com';
           (this.sessionStorageItems as any).id_token_claims_obj.name = 'E2E, Opensource';
