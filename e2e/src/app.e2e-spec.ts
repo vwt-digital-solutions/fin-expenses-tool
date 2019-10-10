@@ -31,7 +31,7 @@ const get = (options: any): any => {
 };
 const until = protractor.ExpectedConditions;
 let expenseID;
-let e2eID;
+let e2eID = 34522;
 
 describe('ExpenseApp:', () => {
   let originalTimeout;
@@ -110,7 +110,7 @@ describe('ExpenseApp:', () => {
     const today = new Date();
     element(by.id('dateinput'))
       .sendKeys(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
-    e2eID = Math.random() * 100;
+    // e2eID = Math.random() * 100;
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     const path = require('path');
     // tslint:disable-next-line:one-variable-per-declaration
