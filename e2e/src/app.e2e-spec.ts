@@ -120,15 +120,12 @@ describe('ExpenseApp:', () => {
     element(by.id('attachmentinput')).sendKeys(absolutePath);
     element(by.id('submit-click')).click();
     const elem = element(by.id('succes-alert'));
-    console.log('WAIT');
     browser.wait(until.visibilityOf(elem), 10000, 'Expense creation took too long').then(() => {
       elem.getText().then(text => {
         expenseID = text.split(' ').slice(-1)[0];
       });
     });
-    console.log('WAIT OVER');
     expect(elem.isDisplayed()).toBe(true);
-    console.log('DONE');
   });
 
   it('should get expenses on manager page', () => {
@@ -143,6 +140,7 @@ describe('ExpenseApp:', () => {
 
   it('should get the attachments', () => {
     browser.waitForAngularEnabled(false);
+    browser.sleep(3000);
     element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
     browser.sleep(2000);
     const attachmentList = element.all(by.css('.click-stop'));
@@ -151,6 +149,7 @@ describe('ExpenseApp:', () => {
 
   it('should approve the expense', () => {
     browser.waitForAngularEnabled(false);
+    browser.sleep(1000);
     const elem = element(by.id('thumbs-up'));
     browser.wait(until.visibilityOf(elem), 10000, 'Expense approval form took too long to load').then(() => {
       elem.click();
@@ -164,7 +163,7 @@ describe('ExpenseApp:', () => {
     browser.sleep(1000);
     element(by.id('home-button')).click();
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
-    browser.sleep(1000);
+    browser.sleep(3000);
     element(by.name('expenses/controller')).click();
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
     browser.sleep(1000);
@@ -203,7 +202,7 @@ describe('ExpenseApp:', () => {
     element(by.css('div[col-id=claim_date]')).click(); // Once
     browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
-    browser.sleep(500);
+    browser.sleep(1000);
     element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
     expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));
     browser.sleep(2000);
