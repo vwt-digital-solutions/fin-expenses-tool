@@ -100,26 +100,33 @@ describe('ExpenseApp:', () => {
   });
 
   it('should create an expense', () => {
-    browser.sleep(5000);
     browser.waitForAngularEnabled(false);
     element(by.id('amountinput')).sendKeys(100.99);
+    console.log('Added Amount');
     const typeList = element(by.id('typeinput')).all(by.tagName('option'));
     typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
       typeList.get(randomNumber + 1).click();
+      console.log(randomNumber + 1);
     });
+    console.log('Random type filled ^');
     const today = new Date();
     element(by.id('dateinput'))
       .sendKeys(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
     console.log(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
+    console.log('Date filled ^');
     e2eID = Math.random() * 100;
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
+    console.log(e2eID);
+    console.log('Random e2e number filled ^');
     const path = require('path');
     // tslint:disable-next-line:one-variable-per-declaration
     const file = 'assets/betaald.png',
       absolutePath = path.resolve(__dirname, file);
     element(by.id('attachmentinput')).sendKeys(absolutePath);
     console.log(absolutePath);
+    console.log('File filled^');
     element(by.id('submit-click')).click();
+    console.log('Submit clicked');
     const elem = element(by.id('succes-alert'));
     browser.wait(until.visibilityOf(elem), 10000, 'Expense creation took too long').then(() => {
       elem.getText().then(text => {
