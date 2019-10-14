@@ -48,16 +48,16 @@ export class FinanceComponent implements OnInit {
       {
         headerName: 'Declaraties Overzicht',
         children: [
-          {
-            headerName: '',
-            field: 'id',
-            width: 65,
-            colId: 'id',
-            cellRenderer: params => {
-              const infoIcon = '<i id="information-icon" class="fa fa-edit"></i>';
-              return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
-            },
-          },
+          // {
+          //   headerName: '',
+          //   field: 'id',
+          //   width: 65,
+          //   colId: 'id',
+          //   cellRenderer: params => {
+          //     const infoIcon = '<i id="information-icon" class="fa fa-edit"></i>';
+          //     return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
+          //   },
+          // },
           {
             headerName: 'Declaratiedatum',
             field: 'claim_date',
@@ -69,11 +69,11 @@ export class FinanceComponent implements OnInit {
           },
           {
             headerName: 'Werknemer', field: 'employee',
-            sortable: true, filter: true, width: 200, resizable: true
+            sortable: true, filter: true, width: 180, resizable: true
           },
           {
             headerName: 'Kosten', field: 'amount', valueFormatter: FormaterService.decimalFormatter,
-            sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
+            sortable: true, filter: true, width: 120, cellStyle: {'text-align': 'right'}
           },
           {
             headerName: 'Soort', field: 'cost_type',
@@ -94,7 +94,7 @@ export class FinanceComponent implements OnInit {
           },
           {
             headerName: 'Status', field: 'status.text',
-            sortable: true, width: 250
+            sortable: true, width: 180
           },
         ]
       }
@@ -116,18 +116,18 @@ export class FinanceComponent implements OnInit {
         {
           headerName: '', field: 'export_date',
           sortable: true, filter: true,
-          suppressMovable: true, width: 180,
+          suppressMovable: true, width: 170,
           cellRenderer: params => {
             return FormaterService.getCorrectDate(params.value);
           }
         },
         {
-          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
-          template: '<i class="fas fa-file-excel" style="color: #4eb7da; font-size: 20px;"></i>'
+          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 75,
+          template: '<i class="fas fa-book" style="color: #4eb7da; font-size: 20px;"></i>'
         },
         {
-          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
-          template: '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>'
+          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 75,
+          template: '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>'
         }
       ]
     }
