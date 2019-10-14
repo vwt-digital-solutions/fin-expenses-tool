@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {HttpResponse} from '@angular/common/http';
+import {HttpClient, HttpResponse} from '@angular/common/http';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
@@ -41,7 +41,8 @@ export class FinanceComponent implements OnInit {
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
     private sanitizer: DomSanitizer,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private http: HttpClient
   ) {
     this.columnDefs = [
       {
@@ -113,7 +114,7 @@ export class FinanceComponent implements OnInit {
       headerName: '',
       children: [
         {
-          headerName: '', field: 'date_exported',
+          headerName: '', field: 'export_date',
           sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
           suppressMovable: true, width: 180
         },
@@ -179,11 +180,32 @@ export class FinanceComponent implements OnInit {
   }
 
   historyHit(event) {
+    let blobType = 'application/xml';
+    let downloadType = '.xml';
+    let eventType = event.data.payment_file;
     if (event.colDef.template !== '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>') {
-      this.downloadFromHistory(event);
-    } else {
-      this.downloadPaymentFile(event);
+      blobType = 'text/csv';
+      downloadType = '.csv';
+      eventType = event.data.booking_file;
     }
+    this.resetPopups();
+    this.http.get(eventType, {responseType: 'text'})
+      .subscribe(
+        (response) => {
+          console.log(response);
+          const blob = new Blob([response], {type: blobType});
+          const a = document.createElement('a');
+          document.body.appendChild(a);
+          const url = window.URL.createObjectURL(blob);
+          a.href = url;
+          a.download = event.data.export_date + downloadType;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          console.log('>> GET SUCCESS', response);
+        }, response => {
+          this.errorBooking();
+          console.error('>> GET FAILED', response.message);
+        });
   }
 
   onRowClicked(event, content) {
@@ -264,7 +286,7 @@ export class FinanceComponent implements OnInit {
     this.addBooking.error = false;
   }
 
-  successfullDownload() {
+  successfulDownload() {
     return this.addBooking.success = true;
   }
 
@@ -274,49 +296,6 @@ export class FinanceComponent implements OnInit {
 
   errorBooking() {
     return this.addBooking.error = true;
-  }
-
-  downloadPaymentFile(event) {
-    this.resetPopups();
-    const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5).split('.')[0];
-    this.expenses.downloadGeneratedFile(fileData, 'payment_file')
-      .subscribe(
-        (response) => {
-          const blob = new Blob([response], {type: 'application/xml'});
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          const url = window.URL.createObjectURL(blob);
-          a.href = url;
-          a.download = fileData.split('_')[2] + '.xml';
-          a.click();
-          window.URL.revokeObjectURL(url);
-          console.log('>> GET SUCCESS', response);
-        }, response => {
-          this.errorBooking();
-          console.error('>> GET FAILED', response.message);
-        });
-  }
-
-  downloadFromHistory(event) {
-    this.resetPopups();
-    const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5);
-    console.log(fileData);
-    this.expenses.downloadGeneratedFile(fileData, 'booking_file')
-      .subscribe(
-        (response) => {
-          const blob = new Blob([response], {type: 'text/csv'});
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          const url = window.URL.createObjectURL(blob);
-          a.href = url;
-          a.download = event.data.date_exported;
-          a.click();
-          window.URL.revokeObjectURL(url);
-          console.log('>> GET SUCCESS', response);
-        }, response => {
-          this.errorBooking();
-          console.error('>> GET FAILED', response.message);
-        });
   }
 
   createBookingFile() {
@@ -339,7 +318,7 @@ export class FinanceComponent implements OnInit {
             a.click();
             window.URL.revokeObjectURL(url);
             console.log('>> GET SUCCESS', response);
-            // this.createPaymentFile(contentDispositionHeader);
+            this.successfulDownload();
           }
         }, response => {
           this.errorBooking();
