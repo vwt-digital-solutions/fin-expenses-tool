@@ -11,9 +11,9 @@
           Je hebt geen openstaande declaraties
         </li>
         <li *ngFor="let item of declarationData"
-          (click)="clickExpense(expenseContent, item)"
-          [ngClass]="{clickable: isClickable(item)}"
-          class="list-group-item d-flex justify-content-between align-items-center">
+            (click)="clickExpense(expenseContent, item)"
+            [ngClass]="{clickable: isClickable(item)}"
+            class="list-group-item d-flex justify-content-between align-items-center">
           <p>{{decimalFormatter(item.amount)}} | {{dateFormatter(item.claim_date)}}</p>
           <span class="badge badge-pill" [className]="statusClassing(item.status.text)">
             {{statusFormatter(item.status.text)}}</span>
@@ -23,20 +23,22 @@
     <div class="col col-sm-1" id="linestep"></div>
     <div class="col col-sm-3" id="pickstep">
       <button name="expenses"
-        [routerLink]="['/expenses/employee']"
-        class="btn btn-primary">Nieuwe Declaratie
+              [routerLink]="['/expenses/employee']"
+              class="btn btn-primary">Nieuwe Declaratie
       </button>
-      <button name="expenses/process" 
-        [routerLink]="['/expenses/process']"
-        [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('creditor'))}" class="btn btn-primary">Declaraties Controleren
+      <button name="expenses/process"
+              [routerLink]="['/expenses/process']"
+              [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('creditor'))}" class="btn btn-primary">Declaraties
+        Controleren
       </button>
       <button name="expenses/manage"
-        [routerLink]="['/expenses/manage']"
-        [ngClass]="{hidden: !(this.wantsManager)}" class="btn btn-primary">Declaraties Beoordelen
+              [routerLink]="['/expenses/manage']"
+              [ngClass]="{hidden: !(this.managerAmount > 0)}" class="btn btn-primary">Declaraties Beoordelen
+        ({{this.managerAmount}})
       </button>
       <button name="expenses/controller"
-        [routerLink]="['/expenses/controller']"
-        [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('controller'))}" class="btn btn-primary">Controller
+              [routerLink]="['/expenses/controller']"
+              [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('controller'))}" class="btn btn-primary">Controller
       </button>
     </div>
   </div>
@@ -59,20 +61,20 @@
         Update is geslaagd!
       </div>
       <form id="expensesUpdateForm" #expenseUpdateForm="ngForm"
-        (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, [note, namount, ntype, ntransdate])"
-        name="expenseUpdateForm">
+            (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, [note, namount, ntype, ntransdate])"
+            name="expenseUpdateForm">
         <div class="form-group">
           <label for="rejectionNote">Reden voor afkeuring:</label>
           <div class="input-group mb-3 note-relative">
             <textarea id="rejectionNote" readonly class="form-control" type="text" [ngModel]="expenseData.status.rnote"
-              name="rnote" ngModel></textarea>
+                      name="rnote" ngModel></textarea>
           </div>
           <!-- Form: Costs -->
           <label for="expenseAmount">Kosten:</label>
           <div class="input-group mb-3">
             <input id="expenseAmount" class="form-control" [ngClass]="{notFilled: !(namount.valid)}" type="number"
-              step="0.01" min="0.01" name="amount" required placeholder="{{expenseData.amount | currency: 'EUR' }}"
-              [ngModel]="this.expenseData.amount" #namount="ngModel">
+                   step="0.01" min="0.01" name="amount" required placeholder="{{expenseData.amount | currency: 'EUR' }}"
+                   [ngModel]="this.expenseData.amount" #namount="ngModel">
           </div>
           <div class="fill-text move-18" *ngIf="!(namount.valid)">
             <small>Graag een geldig bedrag invullen</small>
@@ -84,7 +86,7 @@
               <label class="input-group-text" for="expenseCostType">Soort:</label>
             </div>
             <select id="expenseCostType" class="custom-select" name="cost_type" [ngModel]="expenseData.cost_type"
-              required #ntype="ngModel">
+                    required #ntype="ngModel">
               <option value="" disabled><kbd>Huidige:</kbd> {{ expenseData.cost_type.split(':')[0] }}</option>
               <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">{{t.ctype}}</option>
             </select>
@@ -93,8 +95,8 @@
           <label for="expenseDateOfTransaction">Datum bon:</label>
           <div class="input-group mb-3">
             <input id="expenseDateOfTransaction" [ngClass]="{notFilled: !(ntransdate.valid)}" name="transaction_date"
-              class="form-control" required [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"
-              #ntransdate="ngModel" type="date">
+                   class="form-control" required [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"
+                   #ntransdate="ngModel" type="date">
             <div class="input-group-append">
               <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
                 <i class=" fa fa-calendar-alt"></i> </span>
@@ -107,34 +109,36 @@
           <label for="expenseNote">Omschrijving:</label>
           <div class="input-group mb-3 note-relative">
             <textarea id="expenseNote" [ngClass]="{notFilled: !(note.valid)}" class="form-control" type="text" required
-              minlength="1" [ngModel]="expenseData.note" name="note" #note="ngModel"></textarea>
+                      minlength="1" [ngModel]="expenseData.note" name="note" #note="ngModel"></textarea>
           </div>
           <div class="fill-text move-18" *ngIf="!(note.valid)">
             <small>Graag een geldige omschrijving invullen</small>
           </div>
           <label>Bestanden:</label>
           <input id="attachmentinput" type="file" accept="application/pdf,image/*" name="attachment" required
-            (change)="onFileInput(fileInputHidden.files)" [ngModel]="receiptFiles" #nattachment="ngModel"
-            #fileInputHidden capture="camera">
+                 (change)="onFileInput(fileInputHidden.files)" [ngModel]="receiptFiles" #nattachment="ngModel"
+                 #fileInputHidden capture="camera">
           <ul class="list-group">
-            <li class="list-group-item text-center click-stop" (click)="fileInputHidden.click()"><span>Bestand toevoegen</span>
+            <li class="list-group-item text-center click-stop" (click)="fileInputHidden.click()">
+              <span>Bestand toevoegen</span>
             </li>
             <li *ngFor="let item of receiptFiles"
-              class="list-group-item d-flex justify-content-between align-items-center">
+                class="list-group-item d-flex justify-content-between align-items-center">
               <span class="click-stop" (click)="this.openSanitizeFile(item.content_type, item.content)">View File -
                 {{item.content_type}}</span>
               <i class="fa fa-times click-stop" (click)="removeFromAttachmentList(item)"></i>
             </li>
           </ul>
-          <input type="submit" id="submit-update-form" hidden />
+          <input type="submit" id="submit-update-form" hidden/>
         </div>
       </form>
     </div>
     <div class="modal-footer">
       <button type="button" (click)="cancelExpense()" class="btn btn-danger">Annuleer Declaratie</button>
       <button type="button" for="submit-update-form" class="btn btn-warning"
-        (click)="claimUpdateForm(expenseUpdateForm, expenseData.id, [note, namount, ntype, ntransdate])"
-        [ngClass]="{disabledbtn: submitButtonController(note, namount, ntype, ntransdate)}">Indienen</button>
+              (click)="claimUpdateForm(expenseUpdateForm, expenseData.id, [note, namount, ntype, ntransdate])"
+              [ngClass]="{disabledbtn: submitButtonController(note, namount, ntype, ntransdate)}">Indienen
+      </button>
     </div>
   </ng-template>
   <!--   END FORM TEMPLATE-->

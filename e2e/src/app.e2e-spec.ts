@@ -30,7 +30,6 @@ const get = (options: any): any => {
   return defer.promise;
 };
 const until = protractor.ExpectedConditions;
-let expenseID;
 let e2eID;
 
 describe('ExpenseApp:', () => {
@@ -83,56 +82,47 @@ describe('ExpenseApp:', () => {
   });
 
   it('should get the open expenses', () => {
+    browser.sleep(1000);
     browser.waitForAngularEnabled(false);
-    const elem = element(by.css('li'));
-    browser.wait(until.visibilityOf(elem), 20000, 'The API took too long to respond').then(() => {
+    browser.wait(until.visibilityOf(element(by.css('li'))), 20000, 'The API took too long to respond').then(() => {
       const expenseList = element.all(by.css('li'));
       expect(expenseList.count()).toBeGreaterThanOrEqual(1);
     });
   });
 
   it('should get the cost-types', () => {
+    browser.sleep(1000);
     browser.waitForAngularEnabled(false);
     element(by.name('expenses')).click();
-    browser.sleep(1200);
-    const typeList = element.all(by.css('option'));
-    expect(typeList.count()).toEqual(29 + 1); // 29 Types + 1 Text
+    browser.sleep(1000);
+    expect(element.all(by.css('option')).count()).toEqual(30);
   });
 
   it('should create an expense', () => {
     browser.waitForAngularEnabled(false);
     element(by.id('amountinput')).sendKeys(100.99);
-    console.log('Added Amount');
+    browser.sleep(500);
     const typeList = element(by.id('typeinput')).all(by.tagName('option'));
     typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
       typeList.get(randomNumber + 1).click();
-      console.log(randomNumber + 1);
     });
-    console.log('Random type filled ^');
+    browser.sleep(500);
     const today = new Date();
     element(by.id('dateinput'))
       .sendKeys(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
-    console.log(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
-    console.log('Date filled ^');
     e2eID = Math.random() * 100;
+    browser.sleep(500);
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
-    console.log(e2eID);
-    console.log('Random e2e number filled ^');
+    browser.sleep(500);
     const path = require('path');
     // tslint:disable-next-line:one-variable-per-declaration
     const file = 'assets/betaald.png',
       absolutePath = path.resolve(__dirname, file);
     element(by.id('attachmentinput')).sendKeys(absolutePath);
-    console.log(absolutePath);
-    console.log('File filled^');
+    browser.sleep(500);
     element(by.id('submit-click')).click();
-    console.log('Submit clicked');
+    browser.wait(until.visibilityOf(element(by.id('succes-alert'))), 10000, 'Expense creation took too long');
     const elem = element(by.id('succes-alert'));
-    browser.wait(until.visibilityOf(elem), 10000, 'Expense creation took too long').then(() => {
-      elem.getText().then(text => {
-        expenseID = text.split(' ').slice(-1)[0];
-      });
-    });
     expect(elem.isDisplayed()).toBe(true);
   });
 
@@ -151,8 +141,10 @@ describe('ExpenseApp:', () => {
     browser.sleep(3000);
     element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
     browser.sleep(2000);
+    expect(browser.wait(until.visibilityOf(element(by.css('.modal'))), 10000, 'Expense modal didn\'t open'));
     const attachmentList = element.all(by.css('.click-stop'));
     expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
+    browser.sleep(30000);
   });
 
   it('should approve the expense', () => {
@@ -199,6 +191,7 @@ describe('ExpenseApp:', () => {
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
     browser.sleep(1000);
     element(by.name('expenses/process')).click();
+    browser.sleep(1000);
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
     const expenseList = element.all(by.css('.ag-row'));
     expect(expenseList.count()).toBeGreaterThanOrEqual(1);
