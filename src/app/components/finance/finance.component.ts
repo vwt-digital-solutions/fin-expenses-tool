@@ -1,13 +1,13 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { HttpResponse } from '@angular/common/http';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { NgForm } from '@angular/forms';
-import { ExpensesConfigService } from '../../services/config.service';
+import {Component, OnInit} from '@angular/core';
+import {HttpClient, HttpResponse} from '@angular/common/http';
+import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import {NgForm} from '@angular/forms';
+import {ExpensesConfigService} from '../../services/config.service';
 import * as moment from 'moment';
-import { DomSanitizer } from '@angular/platform-browser';
-import { FormaterService } from 'src/app/services/formater.service';
-import { ActivatedRoute } from '@angular/router';
-import { map } from 'rxjs/operators';
+import {DomSanitizer} from '@angular/platform-browser';
+import {FormaterService} from 'src/app/services/formater.service';
+import {ActivatedRoute} from '@angular/router';
+import {map} from 'rxjs/operators';
 
 moment.locale('nl');
 
@@ -41,7 +41,8 @@ export class FinanceComponent implements OnInit {
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
     private sanitizer: DomSanitizer,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private http: HttpClient
   ) {
     this.columnDefs = [
       {
@@ -59,7 +60,7 @@ export class FinanceComponent implements OnInit {
           },
           {
             headerName: 'Declaratiedatum',
-            field: 'date_of_claim',
+            field: 'claim_date',
             sortable: true,
             filter: true,
             cellRenderer: params => {
@@ -72,7 +73,7 @@ export class FinanceComponent implements OnInit {
           },
           {
             headerName: 'Kosten', field: 'amount', valueFormatter: FormaterService.decimalFormatter,
-            sortable: true, filter: true, width: 150, cellStyle: { 'text-align': 'right' }
+            sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
           },
           {
             headerName: 'Soort', field: 'cost_type',
@@ -85,7 +86,7 @@ export class FinanceComponent implements OnInit {
             headerName: 'Beschrijving', field: 'note', resizable: true
           },
           {
-            headerName: 'Bondatum', field: 'date_of_transaction',
+            headerName: 'Bondatum', field: 'transaction_date',
             sortable: true, filter: true, width: 150,
             cellRenderer: params => {
               return this.fixDate(params.value);
@@ -102,7 +103,7 @@ export class FinanceComponent implements OnInit {
     this.showErrors = false;
     this.formResponse = {};
     this.rowSelection = 'single';
-    this.addBooking = { success: false, wrong: false, error: false };
+    this.addBooking = {success: false, wrong: false, error: false};
   }
 
   public expenseData: object;
@@ -113,16 +114,16 @@ export class FinanceComponent implements OnInit {
       headerName: '',
       children: [
         {
-          headerName: '', field: 'date_exported',
-          sortable: true, filter: true, cellStyle: { cursor: 'pointer' },
+          headerName: '', field: 'export_date',
+          sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
           suppressMovable: true, width: 180
         },
         {
-          headerName: '', field: '', cellStyle: { cursor: 'pointer' }, width: 65,
+          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
           template: '<i class="fas fa-file-excel" style="color: #4eb7da; font-size: 20px;"></i>'
         },
         {
-          headerName: '', field: '', cellStyle: { cursor: 'pointer' }, width: 65,
+          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
           template: '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>'
         }
       ]
@@ -132,7 +133,7 @@ export class FinanceComponent implements OnInit {
   rowData = null;
   historyRowData = null;
 
-  getDismissReason(reason: any): string {
+  static getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
       return 'by pressing ESC';
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
@@ -167,11 +168,9 @@ export class FinanceComponent implements OnInit {
       } else if (!isChrome) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
       }
-      // const sanitizedExpr = this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,'
-      //  + encodeURI(file)).changingThisBreaksApplicationSecurity;
       const sanitizedExpr = 'data:' + type + ';base64,' + encodeURI(file);
       // tslint:disable-next-line:max-line-length no-unused-expression
-      win.document.write('<iframe src="' +  sanitizedExpr + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
+      win.document.write('<iframe src="' + sanitizedExpr + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
     }
   }
 
@@ -180,16 +179,33 @@ export class FinanceComponent implements OnInit {
     return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth())] + ' ' + stepDate.getFullYear();
   }
 
-  getFileName(name) {
-    return (name.split('/')).slice(-1)[0];
-  }
-
   historyHit(event) {
+    let blobType = 'application/xml';
+    let downloadType = '.xml';
+    let eventType = event.data.payment_file;
     if (event.colDef.template !== '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>') {
-      this.downloadFromHistory(event);
-    } else {
-      this.downloadPaymentFile(event);
+      blobType = 'text/csv';
+      downloadType = '.csv';
+      eventType = event.data.booking_file;
     }
+    this.resetPopups();
+    this.http.get(eventType, {responseType: 'text'})
+      .subscribe(
+        (response) => {
+          console.log(response);
+          const blob = new Blob([response], {type: blobType});
+          const a = document.createElement('a');
+          document.body.appendChild(a);
+          const url = window.URL.createObjectURL(blob);
+          a.href = url;
+          a.download = event.data.export_date + downloadType;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          console.log('>> GET SUCCESS', response);
+        }, response => {
+          this.errorBooking();
+          console.error('>> GET FAILED', response.message);
+        });
   }
 
   onRowClicked(event, content) {
@@ -208,13 +224,13 @@ export class FinanceComponent implements OnInit {
           this.receiptFiles.push(img);
         }
       }
-      this.modalService.open(content, { centered: true }).result.then((result) => {
+      this.modalService.open(content, {centered: true}).result.then((result) => {
         this.gridApi.deselectAll();
         this.wantsRejectionNote = false;
         console.log(`Closed with: ${result}`);
       }, (reason) => {
         this.gridApi.deselectAll();
-        console.log(`Dismissed ${this.getDismissReason(reason)}`);
+        console.log(`Dismissed ${FinanceComponent.getDismissReason(reason)}`);
       });
     });
   }
@@ -260,7 +276,7 @@ export class FinanceComponent implements OnInit {
   }
 
   callHistoryRefresh() {
-    this.expenses.getPaymentFilesList()
+    this.expenses.getDocumentsList()
       .subscribe(result => this.historyRowData = [...result]);
   }
 
@@ -282,51 +298,9 @@ export class FinanceComponent implements OnInit {
     return this.addBooking.error = true;
   }
 
-  downloadPaymentFile(event) {
-    this.resetPopups();
-    const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5).split('.')[0];
-    this.expenses.downloadGeneratedFile(fileData, '/kinds/payment_file')
-      .subscribe(
-        (response) => {
-          const blob = new Blob([response], { type: 'application/xml' });
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          const url = window.URL.createObjectURL(blob);
-          a.href = url;
-          a.download = fileData.split('_')[2] + '.xml';
-          a.click();
-          window.URL.revokeObjectURL(url);
-          console.log('>> GET SUCCESS', response);
-        }, response => {
-          this.errorBooking();
-          console.error('>> GET FAILED', response.message);
-        });
-  }
-
-  downloadFromHistory(event) {
-    this.resetPopups();
-    const fileData = event.data.file_name.split('/').slice(2).join('_').slice(5);
-    this.expenses.downloadGeneratedFile(fileData, '/kinds/booking_file')
-      .subscribe(
-        (response) => {
-          const blob = new Blob([response], { type: 'text/csv' });
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          const url = window.URL.createObjectURL(blob);
-          a.href = url;
-          a.download = event.data.date_exported;
-          a.click();
-          window.URL.revokeObjectURL(url);
-          console.log('>> GET SUCCESS', response);
-        }, response => {
-          this.errorBooking();
-          console.error('>> GET FAILED', response.message);
-        });
-  }
-
   createBookingFile() {
     this.resetPopups();
-    this.expenses.createBookingFile({ responseType: 'blob', observe: 'response' })
+    this.expenses.createBookingFile({responseType: 'blob', observe: 'response'})
       .subscribe(
         (response: HttpResponse<any>) => {
           if (response.body.type === 'application/json') {
@@ -335,7 +309,7 @@ export class FinanceComponent implements OnInit {
           } else {
             const contentDispositionHeader = response.headers.get('Content-Disposition');
             const result = contentDispositionHeader.split('=')[1].split(';')[0];
-            const blob = new Blob([response.body], { type: 'text/csv' });
+            const blob = new Blob([response.body], {type: 'text/csv'});
             const a = document.createElement('a');
             document.body.appendChild(a);
             const url = window.URL.createObjectURL(blob);
@@ -344,38 +318,10 @@ export class FinanceComponent implements OnInit {
             a.click();
             window.URL.revokeObjectURL(url);
             console.log('>> GET SUCCESS', response);
-            this.createPaymentFile(contentDispositionHeader);
+            this.successfulDownload();
           }
         }, response => {
           this.errorBooking();
-          console.error('>> GET FAILED', response.message);
-        });
-  }
-
-  createPaymentFile(event) {
-    this.resetPopups();
-    const fileData = event.split('=')[2];
-    this.expenses.createPaymentFile(fileData, {
-      responseType: 'blob',
-      observe: 'response'
-    })
-      .subscribe(
-        (response: HttpResponse<any>) => {
-          const contentDispositionHeader = response.headers.get('Content-Disposition');
-          const result = contentDispositionHeader.split('=')[1].split(';')[0];
-          const blob = new Blob([response.body], { type: 'text/xml' });
-          const a = document.createElement('a');
-          document.body.appendChild(a);
-          const url = window.URL.createObjectURL(blob);
-          a.href = url;
-          a.download = result;
-          a.click();
-          window.URL.revokeObjectURL(url);
-          this.successfulDownload();
-          this.expenses.getExpenses().subscribe((response1: any) => this.rowData = [...response1]);
-          this.callHistoryRefresh();
-          console.log('>> GET SUCCESS', response);
-        }, response => {
           console.error('>> GET FAILED', response.message);
         });
   }
@@ -407,10 +353,12 @@ export class FinanceComponent implements OnInit {
               this.expenses.getExpenses().subscribe((response: any) => this.rowData = [...response]);
               this.showErrors = false;
               this.formSubmitted = !form.ngSubmit.hasError;
+              console.log('>> PUT SUCCESS', result);
             },
             error => {
               this.showErrors = true;
               Object.assign(this.formResponse, JSON.parse(error));
+              console.error('>> PUT FAILED', error.message);
             })
         : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
     }

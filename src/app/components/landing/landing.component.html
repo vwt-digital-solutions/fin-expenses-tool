@@ -14,7 +14,7 @@
           (click)="clickExpense(expenseContent, item)"
           [ngClass]="{clickable: isClickable(item)}"
           class="list-group-item d-flex justify-content-between align-items-center">
-          <p>{{decimalFormatter(item.amount)}} | {{dateFormatter(item.date_of_claim)}}</p>
+          <p>{{decimalFormatter(item.amount)}} | {{dateFormatter(item.claim_date)}}</p>
           <span class="badge badge-pill" [className]="statusClassing(item.status.text)">
             {{statusFormatter(item.status.text)}}</span>
         </li>
@@ -32,7 +32,7 @@
       </button>
       <button name="expenses/manage"
         [routerLink]="['/expenses/manage']"
-        [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('manager'))}" class="btn btn-primary">Declaraties Beoordelen
+        [ngClass]="{hidden: !(this.wantsManager)}" class="btn btn-primary">Declaraties Beoordelen
       </button>
       <button name="expenses/controller"
         [routerLink]="['/expenses/controller']"
@@ -89,11 +89,11 @@
               <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">{{t.ctype}}</option>
             </select>
           </div>
-          <!-- Form: Date of Transaction -->
+          <!-- Form: Transaction Date -->
           <label for="expenseDateOfTransaction">Datum bon:</label>
           <div class="input-group mb-3">
-            <input id="expenseDateOfTransaction" [ngClass]="{notFilled: !(ntransdate.valid)}" name="date_of_transaction"
-              class="form-control" required [ngModel]="expenseData.date_of_transaction | date:'yyyy-MM-dd'"
+            <input id="expenseDateOfTransaction" [ngClass]="{notFilled: !(ntransdate.valid)}" name="transaction_date"
+              class="form-control" required [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"
               #ntransdate="ngModel" type="date">
             <div class="input-group-append">
               <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
@@ -103,6 +103,7 @@
           <div class="fill-text move-18" *ngIf="!(ntransdate.valid)">
             <small>Graag een geldige datum invullen</small>
           </div>
+
           <label for="expenseNote">Omschrijving:</label>
           <div class="input-group mb-3 note-relative">
             <textarea id="expenseNote" [ngClass]="{notFilled: !(note.valid)}" class="form-control" type="text" required

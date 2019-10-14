@@ -102,15 +102,15 @@
                   <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">{{t.ctype}}</option>
                 </select>
               </div>
-              <!-- Form: Date of Transaction -->
+              <!-- Form: Transaction Date -->
               <label for="expenseDateOfTransaction">Datum bon:</label>
               <div class="input-group mb-3">
                 <input id="expenseDateOfTransaction"
                        [ngClass]="{notFilled: !(ntransdate.valid)}"
-                       name="date_of_transaction"
+                       name="transaction_date"
                        class="form-control"
                        readonly
-                       [ngModel]="expenseData.date_of_transaction | date:'yyyy-MM-dd'"
+                       [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"
                        #ntransdate="ngModel"
                        type="date">
                 <div class="input-group-append">

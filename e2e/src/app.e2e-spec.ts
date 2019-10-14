@@ -1,7 +1,4 @@
-import {browser, logging, protractor, by, element, Capabilities, Key} from 'protractor/built';
-import {AppPage} from './app.po';
-import {config} from 'rxjs';
-import {url} from 'inspector';
+import {browser, protractor, by, element} from 'protractor/built';
 
 const request = require('request');
 const fs = require('fs');
@@ -32,7 +29,6 @@ const get = (options: any): any => {
   });
   return defer.promise;
 };
-const EC = protractor.ExpectedConditions;
 const until = protractor.ExpectedConditions;
 let expenseID;
 let e2eID;
@@ -81,6 +77,7 @@ describe('ExpenseApp:', () => {
 
   it('should open the landing page', () => {
     browser.waitForAngularEnabled(false);
+    browser.sleep(1000);
     expect(element(by.css('h1')).getText()).toEqual('MIJN DECLARATIES');
     browser.sleep(1000);
   });
@@ -97,31 +94,39 @@ describe('ExpenseApp:', () => {
   it('should get the cost-types', () => {
     browser.waitForAngularEnabled(false);
     element(by.name('expenses')).click();
-    browser.sleep(1200); // Should be just enough
+    browser.sleep(1200);
     const typeList = element.all(by.css('option'));
     expect(typeList.count()).toEqual(29 + 1); // 29 Types + 1 Text
   });
 
   it('should create an expense', () => {
     browser.waitForAngularEnabled(false);
-    element(by.id('amountinput')).sendKeys(100); // Math.floor(Math.random() * 50)
+    element(by.id('amountinput')).sendKeys(100.99);
+    console.log('Added Amount');
     const typeList = element(by.id('typeinput')).all(by.tagName('option'));
     typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
       typeList.get(randomNumber + 1).click();
+      console.log(randomNumber + 1);
     });
+    console.log('Random type filled ^');
     const today = new Date();
     element(by.id('dateinput'))
-      .sendKeys(today.getMonth(),
-        today.getDate(),
-        today.getFullYear() - 1); // - 1 Resolves the "USA / The rest of the world" issue
+      .sendKeys(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
+    console.log(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
+    console.log('Date filled ^');
     e2eID = Math.random() * 100;
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
+    console.log(e2eID);
+    console.log('Random e2e number filled ^');
     const path = require('path');
     // tslint:disable-next-line:one-variable-per-declaration
     const file = 'assets/betaald.png',
       absolutePath = path.resolve(__dirname, file);
     element(by.id('attachmentinput')).sendKeys(absolutePath);
+    console.log(absolutePath);
+    console.log('File filled^');
     element(by.id('submit-click')).click();
+    console.log('Submit clicked');
     const elem = element(by.id('succes-alert'));
     browser.wait(until.visibilityOf(elem), 10000, 'Expense creation took too long').then(() => {
       elem.getText().then(text => {
@@ -143,6 +148,7 @@ describe('ExpenseApp:', () => {
 
   it('should get the attachments', () => {
     browser.waitForAngularEnabled(false);
+    browser.sleep(3000);
     element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
     browser.sleep(2000);
     const attachmentList = element.all(by.css('.click-stop'));
@@ -151,6 +157,7 @@ describe('ExpenseApp:', () => {
 
   it('should approve the expense', () => {
     browser.waitForAngularEnabled(false);
+    browser.sleep(1000);
     const elem = element(by.id('thumbs-up'));
     browser.wait(until.visibilityOf(elem), 10000, 'Expense approval form took too long to load').then(() => {
       elem.click();
@@ -164,7 +171,7 @@ describe('ExpenseApp:', () => {
     browser.sleep(1000);
     element(by.id('home-button')).click();
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
-    browser.sleep(1000);
+    browser.sleep(3000);
     element(by.name('expenses/controller')).click();
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
     browser.sleep(1000);
@@ -176,9 +183,9 @@ describe('ExpenseApp:', () => {
   it('should see the expense on the controller page', () => {
     browser.waitForAngularEnabled(false);
     browser.sleep(1000);
-    element(by.css('div[col-id=date_of_claim]')).click(); // Once
+    element(by.css('div[col-id=claim_date]')).click(); // Once
     browser.sleep(500);
-    element(by.css('div[col-id=date_of_claim]')).click(); // Twice
+    element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(500);
     element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
     expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));
@@ -200,10 +207,10 @@ describe('ExpenseApp:', () => {
   it('should get the attachments', () => {
     browser.waitForAngularEnabled(false);
     browser.sleep(1000);
-    element(by.css('div[col-id=date_of_claim]')).click(); // Once
+    element(by.css('div[col-id=claim_date]')).click(); // Once
     browser.sleep(500);
-    element(by.css('div[col-id=date_of_claim]')).click(); // Twice
-    browser.sleep(500);
+    element(by.css('div[col-id=claim_date]')).click(); // Twice
+    browser.sleep(1000);
     element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
     expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));
     browser.sleep(2000);

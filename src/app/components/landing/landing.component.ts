@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { ExpensesConfigService } from '../../services/config.service';
-import { Expense } from '../../models/expense';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { DomSanitizer } from '@angular/platform-browser';
-import { IdentityService } from 'src/app/services/identity.service';
-import { catchError, map } from 'rxjs/operators';
-import { Attachment } from 'src/app/models/attachment';
-import { ActivatedRoute } from '@angular/router';
+import {Component, OnInit} from '@angular/core';
+import {NgForm} from '@angular/forms';
+import {ExpensesConfigService} from '../../services/config.service';
+import {Expense} from '../../models/expense';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
+import {DomSanitizer} from '@angular/platform-browser';
+import {IdentityService} from 'src/app/services/identity.service';
+import {catchError, map} from 'rxjs/operators';
+import {Attachment} from 'src/app/models/attachment';
+import {ActivatedRoute} from '@angular/router';
 
 
 @Component({
@@ -30,6 +30,7 @@ export class LandingComponent implements OnInit {
   public today: Date;
   public hasNoExpenses: boolean;
   public typeOptions: Expense[];
+  public wantsManager: boolean;
 
   constructor(
     private identityService: IdentityService,
@@ -124,9 +125,10 @@ export class LandingComponent implements OnInit {
     this.route.data.pipe(
       map(data => data.costTypes)
     ).subscribe(costTypes => this.typeOptions = [...costTypes]);
+    // @ts-ignore
+    this.expenses.getManagerExpenses().subscribe(val => {this.wantsManager = (val.length > 0); }); // Check if user has manager role
     this.declarationCall();
     this.today = new Date();
-
   }
 
   declarationCall() {
@@ -199,11 +201,10 @@ export class LandingComponent implements OnInit {
 
   openExpenseDetailModal(content: any, data: any) {
     this.receiptFiles = [];
-    this.modalService.open(content, { centered: true });
+    this.modalService.open(content, {centered: true});
   }
 
-  onFileInput(file: any[]) {
-    console.log(file[0].type.split('/')[0]);
+  onFileInput(file) {
     if (file[0].type.split('/')[0] !== 'image' && file[0].type !== 'application/pdf') {
       alert('Graag alleen een pdf of afbeelding toevoegen');
       return;
@@ -267,13 +268,13 @@ export class LandingComponent implements OnInit {
       const dataVerified = {};
       const data = form.value;
       data.amount = Number((data.amount).toFixed(2));
-      data.date_of_transaction = (new Date(data.date_of_transaction).getTime());
+      data.transaction_date = (new Date(data.transaction_date).getTime());
       for (const prop in data) {
         if (prop.length !== 0) {
           dataVerified[prop] = data[prop];
         }
       }
-      dataVerified[`status`] = 'ready_for_manager'; // This needs to be done on the backend
+      dataVerified[`status`] = 'ready_for_manager';
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
         this.expenses.updateExpenseEmployee(dataVerified, expenseId)
           .subscribe(
@@ -320,8 +321,8 @@ export class LandingComponent implements OnInit {
           name: '' + this.receiptFiles.length,
           content: file.content
         }).subscribe(() => {
-            this.uploadSingleAttachment(expenseId);
-          });
+          this.uploadSingleAttachment(expenseId);
+        });
       } else {
         this.uploadSingleAttachment(expenseId);
       }

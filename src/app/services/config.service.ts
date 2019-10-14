@@ -1,12 +1,11 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
-import { EnvService } from './env.service';
-import { Observable, throwError, interval, of } from 'rxjs';
-import { catchError, retry, retryWhen, flatMap, count } from 'rxjs/operators';
-import { Endpoint } from '../models/endpoint.enum';
-import { debug } from 'util';
-import { Expense } from '../models/expense';
-import { Attachment } from '../models/attachment';
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpErrorResponse, HttpResponse} from '@angular/common/http';
+import {EnvService} from './env.service';
+import {Observable, throwError, interval, of} from 'rxjs';
+import {catchError, retryWhen, flatMap, count} from 'rxjs/operators';
+import {Endpoint} from '../models/endpoint.enum';
+import {Expense} from '../models/expense';
+import {Attachment} from '../models/attachment';
 
 interface ExpensesIfc {
   clone: any;
@@ -62,8 +61,8 @@ export class ExpensesConfigService {
       );
   }
 
-  public getDepartmentExpenses(departmentId): Observable<HttpResponse<ExpensesIfc>> {
-    return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.department + '/' + departmentId + '/expenses')
+  public getManagerExpenses(): Observable<HttpResponse<ExpensesIfc>> {
+    return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.manager)
       .pipe(
         ExpensesConfigService.retry(2),
         catchError(ExpensesConfigService.handleError)
@@ -88,6 +87,14 @@ export class ExpensesConfigService {
 
   public getFinanceAttachment(expenseId): Observable<HttpResponse<any[]>> {
     return this.http.get<any>(this.env.apiUrl + Endpoint.finance + '/' + expenseId + '/attachments')
+      .pipe(
+        ExpensesConfigService.retry(2),
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public getControllerAttachment(expenseId): Observable<HttpResponse<any[]>> {
+    return this.http.get<any>(this.env.apiUrl + Endpoint.controller + '/' + expenseId + '/attachments')
       .pipe(
         ExpensesConfigService.retry(2),
         catchError(ExpensesConfigService.handleError)
@@ -152,30 +159,23 @@ export class ExpensesConfigService {
       );
   }
 
-  public createPaymentFile(fileData: any, options: any): Observable<HttpResponse<any> | ArrayBuffer> {
-    return this.http.post(this.env.apiUrl + '/finances/expenses/payment_file/files?name=' + fileData, '', options)
+  public getDocumentsList() {
+    return this.http.get<any>(this.env.apiUrl + '/finances/documents')
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public downloadGeneratedFile(fileData, dataKind) {
+    return this.http.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + '/kinds/' + dataKind,
+      {responseType: 'blob'})
       .pipe(
         catchError(ExpensesConfigService.handleError)
       );
   }
 
   public createBookingFile(options: any): Observable<HttpResponse<any> | ArrayBuffer> {
-    return this.http.post(this.env.apiUrl + '/finances/expenses/booking_file/files', '', options)
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
-  public getPaymentFilesList() {
-    return this.http.get<any>(this.env.apiUrl + '/finances/expenses/booking_file/files')
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
-  public downloadGeneratedFile(fileData: any, dataKind: string) {
-    return this.http.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + dataKind,
-      { responseType: 'blob' })
+    return this.http.post(this.env.apiUrl + '/finances/documents', '', options)
       .pipe(
         catchError(ExpensesConfigService.handleError)
       );

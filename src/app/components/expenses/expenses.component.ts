@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { EnvService } from 'src/app/services/env.service';
-import { Router, ActivatedRoute } from '@angular/router';
-import { map, catchError } from 'rxjs/operators';
-import { ExpensesConfigService } from 'src/app/services/config.service';
+import {Component, OnInit} from '@angular/core';
+import {NgForm} from '@angular/forms';
+import {HttpClient} from '@angular/common/http';
+import {EnvService} from 'src/app/services/env.service';
+import {Router, ActivatedRoute} from '@angular/router';
+import {map, catchError} from 'rxjs/operators';
+import {ExpensesConfigService} from 'src/app/services/config.service';
 
 @Component({
   selector: 'app-expenses',
@@ -19,7 +19,7 @@ export class ExpensesComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    this.addClaimSuccess = { success: false, wrong: false };
+    this.addClaimSuccess = {success: false, wrong: false};
     this.today = new Date();
     this.notaData = 'Toevoegen';
     this.loadingThings = false;
@@ -71,7 +71,7 @@ export class ExpensesComponent implements OnInit {
     if (setClass.name === 'cost_type') {
       starBool = this.expenseType === false;
     }
-    if (setClass.name === 'date_of_transaction') {
+    if (setClass.name === 'transaction_date') {
       starBool = this.expenseTransDate === false;
     }
     if (setClass.name === 'attachment') {
@@ -105,7 +105,6 @@ export class ExpensesComponent implements OnInit {
   // End Classes Logic
 
   onFileInput(file: any[]) {
-    console.log(file[0].type.split('/')[0]);
     if (file[0].type.split('/')[0] !== 'image' && file[0].type !== 'application/pdf') {
       alert('Graag alleen een pdf of afbeelding toevoegen');
       return;
@@ -165,23 +164,22 @@ export class ExpensesComponent implements OnInit {
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
     this.expenseType = !(form.value.cost_type === undefined);
-    this.expenseTransDate = !(form.value.date_of_transaction === undefined || new Date(form.value.date_of_transaction) > this.today);
+    this.expenseTransDate = !(form.value.transaction_date === undefined || new Date(form.value.transaction_date) > this.today);
     this.expenseAttachment = !(this.locatedFile.length < 1);
-    if (form.value.date_of_transaction !== undefined) {
-      if (form.value.date_of_transaction.length > 8) {
+    if (form.value.transaction_date !== undefined) {
+      if (form.value.transaction_date.length > 8) {
         this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de aankoop';
       }
     }
     if (this.splitCheck()) {
       this.loadingThings = true;
-      // End Check Form Data
       // Format Values
       form.value.amount = Number((form.value.amount).toFixed(2));
-      form.value.date_of_transaction = (new Date(form.value.date_of_transaction).getTime());
+      form.value.transaction_date = (new Date(form.value.transaction_date).getTime());
+      form.value.transaction_date = new Date(form.value.transaction_date).toISOString();
 
       const obj = JSON.parse(JSON.stringify(form.value));
       // End Format Values
-      // Send Claim
       this.httpClient.post<string>(this.env.apiUrl + '/employees/expenses', obj)
         .subscribe(
           (val) => {
@@ -212,8 +210,7 @@ export class ExpensesComponent implements OnInit {
   }
 
   removeFromAttachmentList(item: any) {
-    let i: number;
-    for (i = 0; i < this.attachmentList.length; i++) {
+    for (let i = 0; i < this.attachmentList.length; i++) {
       if (this.attachmentList[i] === item) {
         this.attachmentList.splice(i, 1);
         this.locatedFile.splice(i, 1);

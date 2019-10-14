@@ -1,13 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
-import { NgForm } from '@angular/forms';
-import { ExpensesConfigService } from '../../services/config.service';
+import {Component, OnInit} from '@angular/core';
+import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
+import {NgForm} from '@angular/forms';
+import {ExpensesConfigService} from '../../services/config.service';
 import * as moment from 'moment';
-import { DomSanitizer } from '@angular/platform-browser';
-import { IdentityService } from 'src/app/services/identity.service';
-import { FormaterService } from 'src/app/services/formater.service';
-import { ActivatedRoute } from '@angular/router';
-import { map } from 'rxjs/operators';
+import {DomSanitizer} from '@angular/platform-browser';
+import {IdentityService} from 'src/app/services/identity.service';
+import {FormaterService} from 'src/app/services/formater.service';
+import {ActivatedRoute} from '@angular/router';
+import {map} from 'rxjs/operators';
 
 moment.locale('nl');
 
@@ -52,7 +52,7 @@ export class ManagerComponent implements OnInit {
           },
           {
             headerName: 'Declaratiedatum',
-            field: 'date_of_claim',
+            field: 'claim_date',
             sortable: true,
             filter: true,
             cellRenderer: params => {
@@ -65,7 +65,7 @@ export class ManagerComponent implements OnInit {
           },
           {
             headerName: 'Kosten', field: 'amount', valueFormatter: FormaterService.decimalFormatter,
-            sortable: true, filter: true, width: 150, cellStyle: { 'text-align': 'right' }
+            sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
           },
           {
             headerName: 'Soort', field: 'cost_type',
@@ -78,7 +78,7 @@ export class ManagerComponent implements OnInit {
             headerName: 'Beschrijving', field: 'note', resizable: true
           },
           {
-            headerName: 'Bondatum', field: 'date_of_transaction',
+            headerName: 'Bondatum', field: 'transaction_date',
             sortable: true, filter: true, width: 150,
             cellRenderer: params => {
               return this.fixDate(params.value);
@@ -92,15 +92,16 @@ export class ManagerComponent implements OnInit {
       }
     ];
     this.expenseDataRejection = [
-      { reason: 'Niet Duidelijk' },
-      { reason: 'Kan niet uitbetalen' }
+      {reason: 'Niet Duidelijk'},
+      {reason: 'Kan niet uitbetalen'}
     ];
     this.formSubmitted = false;
     this.showErrors = false;
     this.formResponse = {};
     this.rowSelection = 'single';
-    this.addBooking = { success: false, wrong: false, error: false };
+    this.addBooking = {success: false, wrong: false, error: false};
   }
+
   private gridApi;
   private gridColumnApi;
   public columnDefs;
@@ -110,7 +111,6 @@ export class ManagerComponent implements OnInit {
   public showErrors;
   public formErrors;
   public formResponse;
-  private submitingStart: boolean;
   private action: any;
   private departmentId: number;
   private OurJaneDoeIs: string;
@@ -132,11 +132,11 @@ export class ManagerComponent implements OnInit {
       children: [
         {
           headerName: 'Geschiedenis', field: 'date_exported',
-          sortable: true, filter: true, cellStyle: { cursor: 'pointer' },
+          sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
           suppressMovable: true
         },
         {
-          headerName: '', field: '', cellStyle: { cursor: 'pointer' }, width: 100,
+          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 100,
           template: '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>'
         }
       ]
@@ -146,7 +146,7 @@ export class ManagerComponent implements OnInit {
   rowData = null;
   historyRowData = null;
 
-  getDismissReason(reason: any): string {
+  static getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
       return 'by pressing ESC';
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
@@ -192,10 +192,6 @@ export class ManagerComponent implements OnInit {
     return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth())] + ' ' + stepDate.getFullYear();
   }
 
-  getFileName(name) {
-    return (name.split('/')).slice(-1)[0];
-  }
-
   onRowClicked(event, content) {
     this.gridApi = event.api;
     this.formSubmitted = false;
@@ -205,20 +201,20 @@ export class ManagerComponent implements OnInit {
     this.wantsRejectionNote = false;
     this.expenseData = event.data;
     this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
-    this.expenses.getFinanceAttachment(event.data.id).subscribe((image: any) => {
+    this.expenses.getManagerAttachment(event.data.id).subscribe((image: any) => {
       this.receiptFiles = [];
       for (const img of image) {
         if (!(this.receiptFiles.includes(img))) {
           this.receiptFiles.push(img);
         }
       }
-      this.modalService.open(content, { centered: true }).result.then((result) => {
+      this.modalService.open(content, {centered: true}).result.then((result) => {
         this.gridApi.deselectAll();
         this.wantsRejectionNote = false;
         console.log(`Closed with: ${result}`);
       }, (reason) => {
         this.gridApi.deselectAll();
-        console.log(`Dismissed ${this.getDismissReason(reason)}`);
+        console.log(`Dismissed ${ManagerComponent.getDismissReason(reason)}`);
       });
     });
   }
@@ -254,7 +250,7 @@ export class ManagerComponent implements OnInit {
     this.departmentId = claimJaneDoe.oid;
     this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
     // @ts-ignore
-    this.expenses.getDepartmentExpenses(this.departmentId).subscribe((data: ExpensesIfc) => this.rowData = [...data]);
+    this.expenses.getManagerExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
   }
 
   ngOnInit() {
@@ -288,7 +284,7 @@ export class ManagerComponent implements OnInit {
           result => {
             this.getNextExpense();
             // @ts-ignore
-            this.expenses.getDepartmentExpenses(this.departmentId).subscribe((response: ExpensesIfc) => this.rowData = [...response]);
+            this.expenses.getManagerExpenses().subscribe((response: ExpensesIfc) => this.rowData = [...response]);
             this.showErrors = false;
             this.formSubmitted = !form.ngSubmit.hasError;
           },
