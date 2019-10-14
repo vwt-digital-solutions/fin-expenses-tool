@@ -115,8 +115,11 @@ export class FinanceComponent implements OnInit {
       children: [
         {
           headerName: '', field: 'export_date',
-          sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
-          suppressMovable: true, width: 180
+          sortable: true, filter: true,
+          suppressMovable: true, width: 180,
+          cellRenderer: params => {
+            return FormaterService.getCorrectDate(params.value);
+          }
         },
         {
           headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
@@ -180,6 +183,9 @@ export class FinanceComponent implements OnInit {
   }
 
   historyHit(event) {
+    if (event.colDef.field === 'export_date') {
+      return;
+    }
     let blobType = 'application/xml';
     let downloadType = '.xml';
     let eventType = event.data.payment_file;
@@ -192,16 +198,15 @@ export class FinanceComponent implements OnInit {
     this.http.get(eventType, {responseType: 'text'})
       .subscribe(
         (response) => {
-          console.log(response);
           const blob = new Blob([response], {type: blobType});
           const a = document.createElement('a');
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
           a.href = url;
-          a.download = event.data.export_date + downloadType;
+          a.download = FormaterService.getCorrectDate(event.data.export_date) + downloadType;
           a.click();
           window.URL.revokeObjectURL(url);
-          console.log('>> GET SUCCESS', response);
+          console.log('>> GET SUCCESS');
         }, response => {
           this.errorBooking();
           console.error('>> GET FAILED', response.message);
