@@ -133,6 +133,8 @@ describe('ExpenseApp:', () => {
     browser.sleep(1000);
     element(by.name('expenses/manage')).click();
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
+    browser.sleep(1000);
+    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
     const expenseList = element.all(by.css('.ag-row'));
     expect(expenseList.count()).toBeGreaterThanOrEqual(1);
   });
@@ -140,6 +142,8 @@ describe('ExpenseApp:', () => {
   it('should get the attachments', () => {
     browser.sleep(3000);
     browser.waitForAngularEnabled(false);
+    expect(browser.wait(until.visibilityOf(element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID))),
+      10000, 'Expense isn\'t shown on manager page'));
     element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
     browser.sleep(2000);
     expect(browser.wait(until.visibilityOf(element(by.css('.modal'))), 10000, 'Expense modal didn\'t open'));
@@ -192,6 +196,8 @@ describe('ExpenseApp:', () => {
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
     browser.sleep(1000);
     element(by.name('expenses/process')).click();
+    browser.sleep(1000);
+    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
     browser.sleep(1000);
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
     const expenseList = element.all(by.css('.ag-row'));
