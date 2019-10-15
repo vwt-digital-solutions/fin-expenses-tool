@@ -142,9 +142,9 @@ describe('ExpenseApp:', () => {
   it('should get the attachments', () => {
     browser.sleep(3000);
     browser.waitForAngularEnabled(false);
-    expect(browser.wait(until.visibilityOf(element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID))),
+    expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID))),
       10000, 'Expense isn\'t shown on manager page'));
-    element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
+    element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID)).click();
     browser.sleep(2000);
     expect(browser.wait(until.visibilityOf(element(by.css('.modal'))), 10000, 'Expense modal didn\'t open'));
     const attachmentList = element.all(by.css('.click-stop'));
@@ -184,7 +184,7 @@ describe('ExpenseApp:', () => {
     browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(500);
-    element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
+    element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID)).click();
     expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));
     element(by.id('expenseModalClose')).click();
   });
@@ -211,7 +211,7 @@ describe('ExpenseApp:', () => {
     browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(1000);
-    element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
+    element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID)).click();
     expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));
     browser.sleep(2000);
     const attachmentList = element.all(by.css('.click-stop'));
