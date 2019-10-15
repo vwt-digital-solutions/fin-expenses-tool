@@ -171,13 +171,6 @@ export class ExpensesComponent implements OnInit {
         this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de aankoop';
       }
     }
-
-    console.log('Note: ' + this.expensesNote);
-    console.log('Amount: ' + this.expensesAmount);
-    console.log('Type: ' + this.expenseType);
-    console.log('TransDate: ' + this.expenseTransDate);
-    console.log('Attachment: ' + this.expenseAttachment);
-
     if (this.splitCheck()) {
       this.loadingThings = true;
       // Format Values

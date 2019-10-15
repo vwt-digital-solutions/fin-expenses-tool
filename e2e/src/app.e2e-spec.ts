@@ -75,8 +75,8 @@ describe('ExpenseApp:', () => {
   });
 
   it('should open the landing page', () => {
-    browser.waitForAngularEnabled(false);
-    browser.sleep(1000);
+    browser.waitForAngularEnabled(true);
+    browser.sleep(3000); // Wait for angular and loader
     expect(element(by.css('h1')).getText()).toEqual('MIJN DECLARATIES');
     browser.sleep(1000);
   });
@@ -127,6 +127,7 @@ describe('ExpenseApp:', () => {
   });
 
   it('should get expenses on manager page', () => {
+    browser.sleep(1000);
     browser.waitForAngularEnabled(false);
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
     browser.sleep(1000);
@@ -137,8 +138,8 @@ describe('ExpenseApp:', () => {
   });
 
   it('should get the attachments', () => {
-    browser.waitForAngularEnabled(false);
     browser.sleep(3000);
+    browser.waitForAngularEnabled(false);
     element(by.cssContainingText('.ag-cell', 'E2E Addition ' + e2eID)).click();
     browser.sleep(2000);
     expect(browser.wait(until.visibilityOf(element(by.css('.modal'))), 10000, 'Expense modal didn\'t open'));
@@ -148,8 +149,8 @@ describe('ExpenseApp:', () => {
   });
 
   it('should approve the expense', () => {
-    browser.waitForAngularEnabled(false);
     browser.sleep(1000);
+    browser.waitForAngularEnabled(false);
     const elem = element(by.id('thumbs-up'));
     browser.wait(until.visibilityOf(elem), 10000, 'Expense approval form took too long to load').then(() => {
       elem.click();
@@ -159,8 +160,8 @@ describe('ExpenseApp:', () => {
   });
 
   it('should get expenses on controller page', () => {
-    browser.waitForAngularEnabled(false);
     browser.sleep(1000);
+    browser.waitForAngularEnabled(false);
     element(by.id('home-button')).click();
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
     browser.sleep(3000);
@@ -173,8 +174,8 @@ describe('ExpenseApp:', () => {
   });
 
   it('should see the expense on the controller page', () => {
-    browser.waitForAngularEnabled(false);
     browser.sleep(1000);
+    browser.waitForAngularEnabled(false);
     element(by.css('div[col-id=claim_date]')).click(); // Once
     browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
@@ -185,8 +186,8 @@ describe('ExpenseApp:', () => {
   });
 
   it('should get expenses on process', () => {
-    browser.waitForAngularEnabled(false);
     browser.sleep(1000);
+    browser.waitForAngularEnabled(false);
     element(by.id('home-button')).click();
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
     browser.sleep(1000);
@@ -198,8 +199,8 @@ describe('ExpenseApp:', () => {
   });
 
   it('should get the attachments', () => {
-    browser.waitForAngularEnabled(false);
     browser.sleep(1000);
+    browser.waitForAngularEnabled(false);
     element(by.css('div[col-id=claim_date]')).click(); // Once
     browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
