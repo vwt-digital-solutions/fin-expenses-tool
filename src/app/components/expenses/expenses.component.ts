@@ -171,6 +171,13 @@ export class ExpensesComponent implements OnInit {
         this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de aankoop';
       }
     }
+
+    console.log('Note: ' + this.expensesNote);
+    console.log('Amount: ' + this.expensesAmount);
+    console.log('Type: ' + this.expenseType);
+    console.log('TransDate: ' + this.expenseTransDate);
+    console.log('Attachment: ' + this.expenseAttachment);
+
     if (this.splitCheck()) {
       this.loadingThings = true;
       // Format Values
@@ -222,7 +229,7 @@ export class ExpensesComponent implements OnInit {
   private uploadSingleAttachment(form: NgForm) {
     if (this.locatedFile.length > 0) {
       const file = this.locatedFile.splice(0, 1)[0];
-      this.httpClient.post(this.env.apiUrl + '/employees/expenses/${this.expenseID}/attachments', {
+      this.httpClient.post(this.env.apiUrl + '/employees/expenses/' + this.expenseID + '/attachments', {
         name: '' + this.locatedFile.length,
         content: file
       }).pipe(catchError(ExpensesConfigService.handleError))
