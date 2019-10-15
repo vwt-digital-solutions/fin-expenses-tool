@@ -75,7 +75,7 @@ describe('ExpenseApp:', () => {
   });
 
   it('should open the landing page', () => {
-    browser.waitForAngularEnabled(true);
+    browser.waitForAngularEnabled(false);
     browser.sleep(3000); // Wait for angular and loader
     expect(element(by.css('h1')).getText()).toEqual('MIJN DECLARATIES');
     browser.sleep(1000);
