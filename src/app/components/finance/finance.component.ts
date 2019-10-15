@@ -37,6 +37,8 @@ export class FinanceComponent implements OnInit {
   public selectedRejection;
   public noteData;
 
+  private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>'
+
   constructor(
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
@@ -127,7 +129,7 @@ export class FinanceComponent implements OnInit {
         },
         {
           headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 75,
-          template: '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>'
+          template: this.paymentfilecoldef
         }
       ]
     }
@@ -189,7 +191,7 @@ export class FinanceComponent implements OnInit {
     let blobType = 'application/xml';
     let downloadType = '.xml';
     let eventType = event.data.payment_file;
-    if (event.colDef.template !== '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>') {
+    if (event.colDef.template !== this.paymentfilecoldef) {
       blobType = 'text/csv';
       downloadType = '.csv';
       eventType = event.data.booking_file;
