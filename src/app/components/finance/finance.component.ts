@@ -37,7 +37,7 @@ export class FinanceComponent implements OnInit {
   public selectedRejection;
   public noteData;
 
-  private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>'
+  private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
 
   constructor(
     private expenses: ExpensesConfigService,
