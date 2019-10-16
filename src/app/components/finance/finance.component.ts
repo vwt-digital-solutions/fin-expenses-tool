@@ -37,6 +37,8 @@ export class FinanceComponent implements OnInit {
   public selectedRejection;
   public noteData;
 
+  private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
+
   constructor(
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
@@ -48,16 +50,16 @@ export class FinanceComponent implements OnInit {
       {
         headerName: 'Declaraties Overzicht',
         children: [
-          {
-            headerName: '',
-            field: 'id',
-            width: 65,
-            colId: 'id',
-            cellRenderer: params => {
-              const infoIcon = '<i id="information-icon" class="fa fa-edit"></i>';
-              return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
-            },
-          },
+          // {
+          //   headerName: '',
+          //   field: 'id',
+          //   width: 65,
+          //   colId: 'id',
+          //   cellRenderer: params => {
+          //     const infoIcon = '<i id="information-icon" class="fa fa-edit"></i>';
+          //     return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
+          //   },
+          // },
           {
             headerName: 'Declaratiedatum',
             field: 'claim_date',
@@ -69,11 +71,11 @@ export class FinanceComponent implements OnInit {
           },
           {
             headerName: 'Werknemer', field: 'employee',
-            sortable: true, filter: true, width: 200, resizable: true
+            sortable: true, filter: true, width: 180, resizable: true
           },
           {
             headerName: 'Kosten', field: 'amount', valueFormatter: FormaterService.decimalFormatter,
-            sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
+            sortable: true, filter: true, width: 120, cellStyle: {'text-align': 'right'}
           },
           {
             headerName: 'Soort', field: 'cost_type',
@@ -94,7 +96,7 @@ export class FinanceComponent implements OnInit {
           },
           {
             headerName: 'Status', field: 'status.text',
-            sortable: true, width: 250
+            sortable: true, width: 180
           },
         ]
       }
@@ -115,16 +117,19 @@ export class FinanceComponent implements OnInit {
       children: [
         {
           headerName: '', field: 'export_date',
-          sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
-          suppressMovable: true, width: 180
+          sortable: true, filter: true,
+          suppressMovable: true, width: 170,
+          cellRenderer: params => {
+            return FormaterService.getCorrectDate(params.value);
+          }
         },
         {
-          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
-          template: '<i class="fas fa-file-excel" style="color: #4eb7da; font-size: 20px;"></i>'
+          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 75,
+          template: '<i class="fas fa-book" style="color: #4eb7da; font-size: 20px;"></i>'
         },
         {
-          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 65,
-          template: '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>'
+          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 75,
+          template: this.paymentfilecoldef
         }
       ]
     }
@@ -180,10 +185,13 @@ export class FinanceComponent implements OnInit {
   }
 
   historyHit(event) {
+    if (event.colDef.field === 'export_date') {
+      return;
+    }
     let blobType = 'application/xml';
     let downloadType = '.xml';
     let eventType = event.data.payment_file;
-    if (event.colDef.template !== '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>') {
+    if (event.colDef.template !== this.paymentfilecoldef) {
       blobType = 'text/csv';
       downloadType = '.csv';
       eventType = event.data.booking_file;
@@ -192,16 +200,15 @@ export class FinanceComponent implements OnInit {
     this.http.get(eventType, {responseType: 'text'})
       .subscribe(
         (response) => {
-          console.log(response);
           const blob = new Blob([response], {type: blobType});
           const a = document.createElement('a');
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
           a.href = url;
-          a.download = event.data.export_date + downloadType;
+          a.download = FormaterService.getCorrectDate(event.data.export_date) + downloadType;
           a.click();
           window.URL.revokeObjectURL(url);
-          console.log('>> GET SUCCESS', response);
+          console.log('>> GET SUCCESS');
         }, response => {
           this.errorBooking();
           console.error('>> GET FAILED', response.message);

@@ -1,15 +1,16 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FormaterService {
 
-  constructor() { }
+  constructor() {
+  }
 
   static formatNumber(numb) {
     return (numb).toLocaleString('nl-NL',
-      { minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'EUR' })
+      {minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'EUR'})
       .replace(',', ';').replace(/\./g, ',').replace(';', '.');
     // return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
   }

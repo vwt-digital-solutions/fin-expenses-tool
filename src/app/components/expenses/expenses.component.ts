@@ -104,7 +104,7 @@ export class ExpensesComponent implements OnInit {
 
   // End Classes Logic
 
-  onFileInput(file: any[]) {
+  onFileInput(file: FileList) {
     if (file[0].type.split('/')[0] !== 'image' && file[0].type !== 'application/pdf') {
       alert('Graag alleen een pdf of afbeelding toevoegen');
       return;
@@ -222,7 +222,7 @@ export class ExpensesComponent implements OnInit {
   private uploadSingleAttachment(form: NgForm) {
     if (this.locatedFile.length > 0) {
       const file = this.locatedFile.splice(0, 1)[0];
-      this.httpClient.post(this.env.apiUrl + `/employees/expenses/${this.expenseID}/attachments`, {
+      this.httpClient.post(this.env.apiUrl + '/employees/expenses/' + this.expenseID + '/attachments', {
         name: '' + this.locatedFile.length,
         content: file
       }).pipe(catchError(ExpensesConfigService.handleError))
