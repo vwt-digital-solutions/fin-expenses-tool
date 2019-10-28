@@ -20,7 +20,7 @@ moment.locale('nl');
 
 export class FinanceComponent implements OnInit {
   private gridApi;
-  private gridColumnApi;
+  private historyGridApi;
   public columnDefs;
   public rowSelection;
   public typeOptions;
@@ -266,8 +266,8 @@ export class FinanceComponent implements OnInit {
     this.modalService.dismissAll();
   }
 
-  onGridReady(params: any) {
-    this.gridColumnApi = params.columnApi;
+  onHistoryGridReady(params: any) {
+    this.historyGridApi = params.api;
   }
 
   ngOnInit() {
@@ -307,29 +307,21 @@ export class FinanceComponent implements OnInit {
 
   createBookingFile() {
     this.resetPopups();
-    this.expenses.createBookingFile({responseType: 'blob', observe: 'response'})
+    this.expenses.createBookingFile({observe: 'response'})
       .subscribe(
         (response: HttpResponse<any>) => {
-          if (response.body.type === 'application/json') {
+          if (response.body.hasOwnProperty('Info')) {
             this.noExpenses();
-            console.log('>> GET EMPTY', response);
           } else {
-            const contentDispositionHeader = response.headers.get('Content-Disposition');
-            const result = contentDispositionHeader.split('=')[1].split(';')[0];
-            const blob = new Blob([response.body], {type: 'text/csv'});
-            const a = document.createElement('a');
-            document.body.appendChild(a);
-            const url = window.URL.createObjectURL(blob);
-            a.href = url;
-            a.download = result;
-            a.click();
-            window.URL.revokeObjectURL(url);
-            console.log('>> GET SUCCESS', response);
+            // @ts-ignore
+            this.historyRowData.unshift(response.body.file_list[0]);
+            this.historyGridApi.setRowData(this.historyRowData);
             this.successfulDownload();
           }
+          console.log('>> POST SUCCES');
         }, response => {
           this.errorBooking();
-          console.error('>> GET FAILED', response.message);
+          console.error('>> POST FAILED', response.message);
         });
   }
 

@@ -26,8 +26,7 @@
         [rowData]="rowData"
         [columnDefs]="columnDefs"
         [rowSelection]="rowSelection"
-        (rowClicked)="onRowClicked($event, expenseContent)"
-        (gridReady)="onGridReady($event)">
+        (rowClicked)="onRowClicked($event, expenseContent)">
       </ag-grid-angular>
       <!-- END AG-GRID EXPENSES -->
     </div>
@@ -43,7 +42,7 @@
         class="ag-theme-material"
         [rowData]="historyRowData"
         [columnDefs]="historyColumnDefs"
-        (gridReady)="onGridReady($event)"
+        (gridReady)="onHistoryGridReady($event)"
       >
       </ag-grid-angular>
       <!-- END AG-GRID HISTORY -->
