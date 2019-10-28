@@ -34,7 +34,7 @@
       <button name="expenses/manage"
               [routerLink]="['/expenses/manage']"
               [ngClass]="{hidden: !(this.managerAmount > 0)}" class="btn btn-primary">Declaraties Beoordelen
-        ({{this.managerAmount}})
+        <span class="badge badge-pill badge-light">{{this.managerAmount}}</span>
       </button>
       <button name="expenses/controller"
               [routerLink]="['/expenses/controller']"
