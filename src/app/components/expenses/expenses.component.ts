@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {NgForm} from '@angular/forms';
-import {HttpClient} from '@angular/common/http';
+import {HttpResponse} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
 import {Router, ActivatedRoute} from '@angular/router';
-import {map, catchError} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {ExpensesConfigService} from 'src/app/services/config.service';
 
 @Component({
@@ -37,7 +37,7 @@ export class ExpensesComponent implements OnInit {
   public expenseID: string | number;
 
   constructor(
-    private httpClient: HttpClient,
+    private expenses: ExpensesConfigService,
     private env: EnvService,
     private router: Router,
     private route: ActivatedRoute
@@ -92,12 +92,14 @@ export class ExpensesComponent implements OnInit {
   private uploadSingleAttachment(form: NgForm) {
     if (this.locatedFile.length > 0) {
       const file = this.locatedFile.splice(0, 1)[0];
-      this.httpClient.post(this.env.apiUrl + '/employees/expenses/' + this.expenseID + '/attachments', {
-        name: '' + this.locatedFile.length,
-        content: file
-      }).pipe(catchError(ExpensesConfigService.handleError))
-        .subscribe(() => {
+      this.expenses.uploadSingleAttachment(this.expenseID, {
+        name: '' + this.locatedFile.length, content: file
+      }).subscribe(
+        (response: HttpResponse<any>) => {
+          console.log('>> POST SUCCES');
           this.uploadSingleAttachment(form);
+        }, response => {
+          console.error('>> POST FAILED', response.message);
         });
     } else {
       if (this.wantsNext > 0) {
@@ -216,7 +218,7 @@ export class ExpensesComponent implements OnInit {
       const obj = JSON.parse(JSON.stringify(form.value));
       // End Format Values
 
-      this.httpClient.post<string>(this.env.apiUrl + '/employees/expenses', obj)
+      this.expenses.createExpenses(obj)
         .subscribe(
           (val) => {
             this.successfulClaim();

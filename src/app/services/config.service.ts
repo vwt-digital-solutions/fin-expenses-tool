@@ -164,4 +164,11 @@ export class ExpensesConfigService {
         catchError(ExpensesConfigService.handleError)
       );
   }
+
+  public createExpenses(form: any): Observable<any> {
+    return this.http.post(this.env.apiUrl + `/employees/expenses`, form)
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
 }
