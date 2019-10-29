@@ -3,14 +3,10 @@ import {HttpClient, HttpResponse} from '@angular/common/http';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
-import * as moment from 'moment';
 import {DomSanitizer} from '@angular/platform-browser';
 import {FormaterService} from 'src/app/services/formater.service';
 import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
-
-moment.locale('nl');
-
 
 @Component({
   selector: 'app-expenses',

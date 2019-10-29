@@ -57,10 +57,6 @@ input {
   height: auto;
 }
 
-//#historydiv {
-//  background-color: #fcfbfb;
-//}
-
 .fom {
   margin-bottom: 10px;
 }
@@ -73,6 +69,12 @@ input {
     margin-bottom: 10px;
     margin-right: 10px;
   }
+}
+
+.empty-creation-top {
+  border-bottom: 1px solid $vwt_color_blue_hr;
+  margin-bottom: 10px;
+  margin-top: 48px;
 }
 
 .input-group .form-control {
