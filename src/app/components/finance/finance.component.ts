@@ -322,27 +322,6 @@ export class FinanceComponent implements OnInit {
         }, response => {
           this.errorBooking();
           console.error('>> POST FAILED', response.message);
-          this.createBookingFileV2();
-        });
-  }
-
-  createBookingFileV2() {
-    this.resetPopups();
-    this.expenses.createBookingFileV2({observe: 'response'})
-      .subscribe(
-        (response: HttpResponse<any>) => {
-          if (response.body.hasOwnProperty('Info')) {
-            this.noExpenses();
-          } else {
-            // @ts-ignore
-            this.historyRowData.unshift(response.body.file_list[0]);
-            this.historyGridApi.setRowData(this.historyRowData);
-            this.successfulDownload();
-          }
-          console.log('>> POST SUCCES');
-        }, response => {
-          this.errorBooking();
-          console.error('>> POST FAILED', response.message);
         });
   }
 

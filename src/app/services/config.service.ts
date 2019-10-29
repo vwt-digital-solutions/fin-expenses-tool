@@ -172,11 +172,4 @@ export class ExpensesConfigService {
         catchError(ExpensesConfigService.handleError)
       );
   }
-
-  public createBookingFileV2(options: any): Observable<HttpResponse<any> | ArrayBuffer> {
-    return this.http.post(this.env.apiUrl + '/v2/finances/documents', '', options)
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
 }
