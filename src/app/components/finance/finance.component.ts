@@ -283,14 +283,15 @@ export class FinanceComponent implements OnInit {
   }
 
   callHistoryRefresh() {
-    try {
-      this.expenses.getDocumentsList()
-        .subscribe(result => this.historyRowData = [...result.file_list]);
-    } catch (e) {
-      this.expenses.getDocumentsList()
-        .subscribe(result => this.historyRowData = [...result]);
-    }
-
+    this.expenses.getDocumentsList()
+      .subscribe(result => {
+        try {
+          this.historyRowData = [...result.file_list];
+        } catch (e) {
+          if (e instanceof TypeError) {
+            this.historyRowData = [...result];
+          }
+        }});
   }
 
   resetPopups() {
