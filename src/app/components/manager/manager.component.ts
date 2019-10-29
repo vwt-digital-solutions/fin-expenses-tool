@@ -20,6 +20,28 @@ interface ExpensesIfc {
 
 export class ManagerComponent implements OnInit {
 
+  private gridApi;
+  private gridColumnApi;
+  public columnDefs;
+  public rowSelection;
+  public typeOptions;
+  public formSubmitted;
+  public showErrors;
+  public formErrors;
+  public formResponse;
+  private action: any;
+  private departmentId: number;
+  private OurJaneDoeIs: string;
+  private receiptFiles;
+  private isRejecting;
+  private monthNames;
+  public wantsRejectionNote;
+  public selectedRejection;
+  public today;
+  public noteData;
+  public expenseData: object;
+  public addBooking;
+  private modalDefinition;
   constructor(
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
@@ -78,29 +100,6 @@ export class ManagerComponent implements OnInit {
     this.rowSelection = 'single';
     this.addBooking = {success: false, wrong: false, error: false};
   }
-
-  private gridApi;
-  private gridColumnApi;
-  public columnDefs;
-  public rowSelection;
-  public typeOptions;
-  public formSubmitted;
-  public showErrors;
-  public formErrors;
-  public formResponse;
-  private action: any;
-  private departmentId: number;
-  private OurJaneDoeIs: string;
-  private receiptFiles;
-  private isRejecting;
-  private monthNames;
-  public wantsRejectionNote;
-  public selectedRejection;
-  public today;
-  public noteData;
-
-  public expenseData: object;
-  public addBooking;
 
   historyColumnDefs = [
     {
@@ -173,30 +172,37 @@ export class ManagerComponent implements OnInit {
   }
 
   onRowClicked(event, content) {
-    this.gridApi = event.api;
-    this.formSubmitted = false;
-    this.showErrors = false;
-    this.formErrors = '';
-    this.isRejecting = false;
-    this.wantsRejectionNote = false;
-    this.expenseData = event.data;
-    this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
-    this.expenses.getManagerAttachment(event.data.id).subscribe((image: any) => {
-      this.receiptFiles = [];
-      for (const img of image) {
-        if (!(this.receiptFiles.includes(img))) {
-          this.receiptFiles.push(img);
-        }
+    if (event === null || event === undefined) {
+      this.dismissModal();
+    } else {
+      this.modalDefinition = content;
+      if (event.api !== null && event.api !== undefined) {
+        this.gridApi = event.api;
       }
-      this.modalService.open(content, {centered: true}).result.then((result) => {
-        this.gridApi.deselectAll();
-        this.wantsRejectionNote = false;
-        console.log(`Closed with: ${result}`);
-      }, (reason) => {
-        this.gridApi.deselectAll();
-        console.log(`Dismissed ${ManagerComponent.getDismissReason(reason)}`);
+      this.formSubmitted = false;
+      this.showErrors = false;
+      this.formErrors = '';
+      this.isRejecting = false;
+      this.wantsRejectionNote = false;
+      this.expenseData = event.data;
+      this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
+      this.expenses.getManagerAttachment(event.data.id).subscribe((image: any) => {
+        this.receiptFiles = [];
+        for (const img of image) {
+          if (!(this.receiptFiles.includes(img))) {
+            this.receiptFiles.push(img);
+          }
+        }
+        this.modalService.open(content, {centered: true}).result.then((result) => {
+          this.gridApi.deselectAll();
+          this.wantsRejectionNote = false;
+          console.log(`Closed with: ${result}`);
+        }, (reason) => {
+          this.gridApi.deselectAll();
+          console.log(`Dismissed ${ManagerComponent.getDismissReason(reason)}`);
+        });
       });
-    });
+    }
   }
 
   rejectionHit(event) {
@@ -220,6 +226,11 @@ export class ManagerComponent implements OnInit {
   }
 
   getNextExpense() {
+    this.dismissModal();
+    this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(1), this.modalDefinition);
+  }
+
+  dismissModal() {
     this.modalService.dismissAll();
   }
 
