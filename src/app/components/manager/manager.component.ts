@@ -226,7 +226,6 @@ export class ManagerComponent implements OnInit {
   }
 
   getNextExpense() {
-    console.log('Next expense');
     this.dismissModal();
     setTimeout(() => {
       this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(0), this.modalDefinition);

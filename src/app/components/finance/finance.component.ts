@@ -36,8 +36,10 @@ export class FinanceComponent implements OnInit {
   public wantsRejectionNote;
   public selectedRejection;
   public noteData;
+  private currentRowIndex: number;
 
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
+  modalDefinition: any;
 
   constructor(
     private expenses: ExpensesConfigService,
@@ -50,16 +52,6 @@ export class FinanceComponent implements OnInit {
       {
         headerName: 'Declaraties Overzicht',
         children: [
-          // {
-          //   headerName: '',
-          //   field: 'id',
-          //   width: 65,
-          //   colId: 'id',
-          //   cellRenderer: params => {
-          //     const infoIcon = '<i id="information-icon" class="fa fa-edit"></i>';
-          //     return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
-          //   },
-          // },
           {
             headerName: 'Declaratiedatum',
             field: 'claim_date',
@@ -148,6 +140,16 @@ export class FinanceComponent implements OnInit {
     }
   }
 
+  private static getNavigator() {
+    return navigator.userAgent.match(/Android/i)
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i)
+      || navigator.userAgent.match(/BlackBerry/i)
+      || navigator.userAgent.match(/Windows Phone/i);
+  }
+
   openSanitizeFile(type, file) {
     const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
     const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
@@ -162,13 +164,7 @@ export class FinanceComponent implements OnInit {
       }
     } else {
       const win = window.open();
-      if (navigator.userAgent.match(/Android/i)
-        || navigator.userAgent.match(/webOS/i)
-        || navigator.userAgent.match(/iPhone/i)
-        || navigator.userAgent.match(/iPad/i)
-        || navigator.userAgent.match(/iPod/i)
-        || navigator.userAgent.match(/BlackBerry/i)
-        || navigator.userAgent.match(/Windows Phone/i)) {
+      if (FinanceComponent.getNavigator()) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge Mobile of Samsung Internet.</p>');
       } else if (!isChrome) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
@@ -216,30 +212,39 @@ export class FinanceComponent implements OnInit {
   }
 
   onRowClicked(event, content) {
-    this.gridApi = event.api;
-    this.formSubmitted = false;
-    this.showErrors = false;
-    this.formErrors = '';
-    this.isRejecting = false;
-    this.wantsRejectionNote = false;
-    this.expenseData = event.data;
-    this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
-    this.expenses.getFinanceAttachment(event.data.id).subscribe((image: any) => {
-      this.receiptFiles = [];
-      for (const img of image) {
-        if (!(this.receiptFiles.includes(img))) {
-          this.receiptFiles.push(img);
-        }
+    if (event === null || event === undefined) {
+      this.dismissModal();
+    } else {
+
+      if (event.api !== null && event.api !== undefined) {
+        this.gridApi = event.api;
       }
-      this.modalService.open(content, {centered: true}).result.then((result) => {
-        this.gridApi.deselectAll();
-        this.wantsRejectionNote = false;
-        console.log(`Closed with: ${result}`);
-      }, (reason) => {
-        this.gridApi.deselectAll();
-        console.log(`Dismissed ${FinanceComponent.getDismissReason(reason)}`);
+      this.formSubmitted = false;
+      this.showErrors = false;
+      this.formErrors = '';
+      this.isRejecting = false;
+      this.wantsRejectionNote = false;
+      this.expenseData = event.data;
+      this.modalDefinition = content;
+      this.currentRowIndex = event.rowIndex;
+      this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
+      this.expenses.getFinanceAttachment(event.data.id).subscribe((image: any) => {
+        this.receiptFiles = [];
+        for (const img of image) {
+          if (!(this.receiptFiles.includes(img))) {
+            this.receiptFiles.push(img);
+          }
+        }
+        this.modalService.open(content, {centered: true}).result.then((result) => {
+          this.gridApi.deselectAll();
+          this.wantsRejectionNote = false;
+          console.log(`Closed with: ${result}`);
+        }, (reason) => {
+          this.gridApi.deselectAll();
+          console.log(`Dismissed ${FinanceComponent.getDismissReason(reason)}`);
+        });
       });
-    });
+    }
   }
 
   rejectionHit(event) {
@@ -263,6 +268,13 @@ export class FinanceComponent implements OnInit {
   }
 
   getNextExpense() {
+    this.dismissModal();
+    setTimeout(() => {
+      this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(this.currentRowIndex + 1), this.modalDefinition);
+    }, 100);
+  }
+
+  dismissModal() {
     this.modalService.dismissAll();
   }
 
@@ -348,8 +360,10 @@ export class FinanceComponent implements OnInit {
         this.expenses.updateExpenseFinance(dataVerified, expenseId)
           .subscribe(
             result => {
-              this.getNextExpense();
-              this.expenses.getExpenses().subscribe((response: any) => this.rowData = [...response]);
+              this.expenses.getExpenses().subscribe((response: any) => {
+                this.rowData = [...response];
+                this.getNextExpense();
+              });
               this.showErrors = false;
               this.formSubmitted = !form.ngSubmit.hasError;
               console.log('>> PUT SUCCESS', result);
