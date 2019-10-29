@@ -34,7 +34,6 @@ export class ManagerComponent implements OnInit {
   private OurJaneDoeIs: string;
   private receiptFiles;
   private isRejecting;
-  private monthNames;
   public wantsRejectionNote;
   public selectedRejection;
   public today;
@@ -85,7 +84,7 @@ export class ManagerComponent implements OnInit {
             headerName: 'Bondatum', field: 'transaction_date',
             sortable: true, filter: true, width: 150,
             cellRenderer: params => {
-              return this.fixDate(params.value);
+              return FormaterService.getCorrectDate(params.value);
             }
           },
           {
@@ -167,11 +166,6 @@ export class ManagerComponent implements OnInit {
     }
   }
 
-  fixDate(date) {
-    const stepDate = new Date(date);
-    return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth())] + ' ' + stepDate.getFullYear();
-  }
-
   onRowClicked(event, content) {
     if (event === null || event === undefined) {
       this.dismissModal();
@@ -248,9 +242,6 @@ export class ManagerComponent implements OnInit {
 
   ngOnInit() {
     this.today = new Date();
-    this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
-    ];
     this.route.data.pipe(
       map(data => data.costTypes)
     ).subscribe(costTypes => this.typeOptions = [...costTypes]);

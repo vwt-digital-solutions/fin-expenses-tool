@@ -27,7 +27,6 @@ export class FinanceComponent implements OnInit {
   private action: any;
   private receiptFiles;
   private isRejecting;
-  private monthNames;
   public today;
   public wantsRejectionNote;
   public selectedRejection;
@@ -79,7 +78,7 @@ export class FinanceComponent implements OnInit {
             headerName: 'Bondatum', field: 'transaction_date',
             sortable: true, filter: true, width: 150,
             cellRenderer: params => {
-              return this.fixDate(params.value);
+              return FormaterService.getCorrectDate(params.value);
             }
           },
           {
@@ -169,11 +168,6 @@ export class FinanceComponent implements OnInit {
       // tslint:disable-next-line:max-line-length no-unused-expression
       win.document.write('<iframe src="' + sanitizedExpr + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
     }
-  }
-
-  fixDate(date) {
-    const stepDate = new Date(date);
-    return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth())] + ' ' + stepDate.getFullYear();
   }
 
   historyHit(event) {
@@ -280,9 +274,6 @@ export class FinanceComponent implements OnInit {
 
   ngOnInit() {
     this.today = new Date();
-    this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
-    ];
     this.callHistoryRefresh();
     this.route.data.pipe(
       map(data => data.costTypes)

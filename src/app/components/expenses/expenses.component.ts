@@ -54,6 +54,16 @@ export class ExpensesComponent implements OnInit {
     this.formError = 'Er is iets fout gegaan. Probeer het later opnieuw.';
   }
 
+  private static getNavigator() {
+    return navigator.userAgent.match(/Android/i)
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i)
+      || navigator.userAgent.match(/BlackBerry/i)
+      || navigator.userAgent.match(/Windows Phone/i);
+  }
+
   private splitSet(form: NgForm) {
     this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
     this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
@@ -217,13 +227,7 @@ export class ExpensesComponent implements OnInit {
           }, response => {
             if (response.status === 403) {
               this.wrongfulClaim('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
-              if (navigator.userAgent.match(/Android/i)
-                || navigator.userAgent.match(/webOS/i)
-                || navigator.userAgent.match(/iPhone/i)
-                || navigator.userAgent.match(/iPad/i)
-                || navigator.userAgent.match(/iPod/i)
-                || navigator.userAgent.match(/BlackBerry/i)
-                || navigator.userAgent.match(/Windows Phone/i)) {
+              if (ExpensesComponent.getNavigator()) {
                 alert('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
               }
             } else {

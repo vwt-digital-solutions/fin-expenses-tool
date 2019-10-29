@@ -12,11 +12,14 @@ export class FormaterService {
     return (numb).toLocaleString('nl-NL',
       {minimumFractionDigits: 2, maximumFractionDigits: 2, style: 'currency', currency: 'EUR'})
       .replace(',', ';').replace(/\./g, ',').replace(';', '.');
-    // return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
   }
 
   static decimalFormatter(amounts) {
-    return FormaterService.formatNumber(amounts.value);
+    try {
+      return FormaterService.formatNumber(amounts.value);
+    } catch (e) {
+      return FormaterService.formatNumber(amounts);
+    }
   }
 
   static getCorrectDateTime(date) {
