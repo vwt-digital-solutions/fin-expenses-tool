@@ -53,29 +53,10 @@ export class ExpensesConfigService {
     );
   }
 
+  // BEGIN FINANCE
+
   public getExpenses(): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.finance)
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
-  public getManagerExpenses(): Observable<HttpResponse<ExpensesIfc>> {
-    return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.manager)
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
-  public getControllerExpenses(): Observable<HttpResponse<ExpensesIfc>> {
-    return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.controller)
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
-  public getExpenseAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
-    return this.http.get<any>(this.env.apiUrl + Endpoint.employee + '/' + expenseId + '/attachments')
       .pipe(
         catchError(ExpensesConfigService.handleError)
       );
@@ -88,8 +69,32 @@ export class ExpensesConfigService {
       );
   }
 
-  public getControllerAttachment(expenseId): Observable<HttpResponse<any[]>> {
-    return this.http.get<any>(this.env.apiUrl + Endpoint.controller + '/' + expenseId + '/attachments')
+  public updateExpenseFinance(data, expenseId): Observable<HttpResponse<ExpensesIfc>> {
+    return this.http.put<ExpensesIfc>(this.env.apiUrl + Endpoint.finance + `/${expenseId}`, data)
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public getDocumentsList() {
+    return this.http.get<any>(this.env.apiUrl + '/finances/documents')
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public createBookingFile(options: any): Observable<HttpResponse<any> | ArrayBuffer> {
+    return this.http.post(this.env.apiUrl + '/finances/documents', '', options)
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  // END FINANCE
+  // BEGIN MANAGER
+
+  public getManagerExpenses(): Observable<HttpResponse<ExpensesIfc>> {
+    return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.manager)
       .pipe(
         catchError(ExpensesConfigService.handleError)
       );
@@ -102,6 +107,40 @@ export class ExpensesConfigService {
       );
   }
 
+  public updateExpenseManager(data, expenseId): Observable<HttpResponse<ExpensesIfc>> {
+    return this.http.put<ExpensesIfc>(this.env.apiUrl + Endpoint.manager + `/${expenseId}`, data)
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  // END MANAGER
+  // BEGIN CONTROLLER
+
+  public getControllerExpenses(): Observable<HttpResponse<ExpensesIfc>> {
+    return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.controller)
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  public getControllerAttachment(expenseId): Observable<HttpResponse<any[]>> {
+    return this.http.get<any>(this.env.apiUrl + Endpoint.controller + '/' + expenseId + '/attachments')
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
+  // END CONTROLLER
+  // BEGIN EMPLOYEE
+
+  public getExpenseAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
+    return this.http.get<any>(this.env.apiUrl + Endpoint.employee + '/' + expenseId + '/attachments')
+      .pipe(
+        catchError(ExpensesConfigService.handleError)
+      );
+  }
+
   public getCostTypes(): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<ExpensesIfc>(this.env.apiUrl + '/employees/cost-types')
       .pipe(
@@ -109,22 +148,8 @@ export class ExpensesConfigService {
       );
   }
 
-  public updateExpenseFinance(data, expenseId): Observable<HttpResponse<ExpensesIfc>> {
-    return this.http.put<ExpensesIfc>(this.env.apiUrl + Endpoint.finance + `/${expenseId}`, data)
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
   public updateExpenseEmployee(data, expenseId): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.put<ExpensesIfc>(this.env.apiUrl + Endpoint.employee + `/${expenseId}`, data)
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
-  public updateExpenseManager(data, expenseId): Observable<HttpResponse<ExpensesIfc>> {
-    return this.http.put<ExpensesIfc>(this.env.apiUrl + Endpoint.manager + `/${expenseId}`, data)
       .pipe(
         catchError(ExpensesConfigService.handleError)
       );
@@ -145,30 +170,18 @@ export class ExpensesConfigService {
   }
 
   public uploadSingleAttachment(expenseId, data: { name: string; content: any }): Observable<any> {
-    return this.http.post(this.env.apiUrl + `/employees/expenses/${expenseId}/attachments`, data)
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
-  public getDocumentsList() {
-    return this.http.get<any>(this.env.apiUrl + '/finances/documents')
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
-  public createBookingFile(options: any): Observable<HttpResponse<any> | ArrayBuffer> {
-    return this.http.post(this.env.apiUrl + '/finances/documents', '', options)
+    return this.http.post(this.env.apiUrl + Endpoint.employee + `/${expenseId}/attachments`, data)
       .pipe(
         catchError(ExpensesConfigService.handleError)
       );
   }
 
   public createExpenses(form: any): Observable<any> {
-    return this.http.post(this.env.apiUrl + `/employees/expenses`, form)
+    return this.http.post(this.env.apiUrl + Endpoint.employee, form)
       .pipe(
         catchError(ExpensesConfigService.handleError)
       );
   }
+
+  // END EMPLOYEE
 }
