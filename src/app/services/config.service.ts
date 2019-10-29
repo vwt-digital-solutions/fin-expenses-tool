@@ -166,14 +166,6 @@ export class ExpensesConfigService {
       );
   }
 
-  public downloadGeneratedFile(fileData, dataKind) {
-    return this.http.get(this.env.apiUrl + '/finances/expenses/documents/' + fileData + '/kinds/' + dataKind,
-      {responseType: 'blob'})
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
   public createBookingFile(options: any): Observable<HttpResponse<any> | ArrayBuffer> {
     return this.http.post(this.env.apiUrl + '/v2/finances/documents', '', options)
       .pipe(

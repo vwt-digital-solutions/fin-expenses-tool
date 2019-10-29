@@ -283,8 +283,14 @@ export class FinanceComponent implements OnInit {
   }
 
   callHistoryRefresh() {
-    this.expenses.getDocumentsList()
-      .subscribe(result => this.historyRowData = [...result]);
+    try {
+      this.expenses.getDocumentsList()
+        .subscribe(result => this.historyRowData = [...result.file_list]);
+    } catch (e) {
+      this.expenses.getDocumentsList()
+        .subscribe(result => this.historyRowData = [...result]);
+    }
+
   }
 
   resetPopups() {
