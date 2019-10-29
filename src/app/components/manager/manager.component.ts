@@ -121,7 +121,7 @@ export class ManagerComponent implements OnInit {
   rowData = null;
   historyRowData = null;
 
-  private static getDismissReason(reason: any): string {
+  static getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
       return 'by pressing ESC';
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
@@ -131,7 +131,7 @@ export class ManagerComponent implements OnInit {
     }
   }
 
-  private static getNavigator() {
+  static getNavigator() {
     return navigator.userAgent.match(/Android/i)
       || navigator.userAgent.match(/webOS/i)
       || navigator.userAgent.match(/iPhone/i)

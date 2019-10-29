@@ -42,7 +42,7 @@ export class LandingComponent implements OnInit {
   ) {
   }
 
-  private static getNavigator() {
+  static getNavigator() {
     return navigator.userAgent.match(/Android/i)
       || navigator.userAgent.match(/webOS/i)
       || navigator.userAgent.match(/iPhone/i)

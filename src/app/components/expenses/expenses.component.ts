@@ -54,7 +54,7 @@ export class ExpensesComponent implements OnInit {
     this.formError = 'Er is iets fout gegaan. Probeer het later opnieuw.';
   }
 
-  private static getNavigator() {
+  static getNavigator() {
     return navigator.userAgent.match(/Android/i)
       || navigator.userAgent.match(/webOS/i)
       || navigator.userAgent.match(/iPhone/i)
