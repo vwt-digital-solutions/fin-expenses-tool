@@ -57,9 +57,6 @@
       <div id="updateErrors" class="alert alert-danger" role="alert" *ngIf="showErrors">
         {{ formErrors }} {{ formResponse.detail }}
       </div>
-      <div id="updateSuccess" class="alert alert-success" role="alert" *ngIf="formSubmitted">
-        Update is geslaagd!
-      </div>
       <form id="expensesUpdateForm" #expenseUpdateForm="ngForm"
             (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, [note, namount, ntype, ntransdate])"
             name="expenseUpdateForm">

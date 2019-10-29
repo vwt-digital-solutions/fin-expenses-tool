@@ -5,7 +5,7 @@ import {Expense} from '../../models/expense';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DomSanitizer} from '@angular/platform-browser';
 import {IdentityService} from 'src/app/services/identity.service';
-import {catchError, map} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {Attachment} from 'src/app/models/attachment';
 import {ActivatedRoute} from '@angular/router';
 
@@ -126,8 +126,10 @@ export class LandingComponent implements OnInit {
       map(data => data.costTypes)
     ).subscribe(costTypes => this.typeOptions = [...costTypes]);
     this.expenses.getManagerExpenses()
-    // @ts-ignore
-      .subscribe(val => {this.managerAmount = val.length; }); // Check if user has manager role
+      .subscribe(val => {
+        // @ts-ignore
+        this.managerAmount = val.length;
+      });
     this.declarationCall();
     this.today = new Date();
   }
@@ -147,7 +149,7 @@ export class LandingComponent implements OnInit {
   clickExpense(content: any, item: any) {
     if (this.isClickable(item)) {
       this.expenses.getExpenseAttachment(item.id).subscribe((image: any) => {
-        for (const img of image) {// data:image/png;base64,
+        for (const img of image) {
           this.receiptFiles.push({
             content: `data:${img.content_type};base64,${img.content}`,
             content_type: img.content_type,
@@ -161,7 +163,7 @@ export class LandingComponent implements OnInit {
       this.expenseData = item;
       this.showErrors = false;
       this.formErrors = '';
-      this.openExpenseDetailModal(content, item);
+      this.openExpenseDetailModal(content);
     }
   }
 
@@ -169,7 +171,6 @@ export class LandingComponent implements OnInit {
     return item.status.text.toString().includes('rejected');
   }
 
-  // Modal
   dismissExpenseModal() {
     setTimeout(() => {
       this.modalService.dismissAll();
@@ -200,7 +201,7 @@ export class LandingComponent implements OnInit {
         > this.today) || namount.viewModel < 0.01;
   }
 
-  openExpenseDetailModal(content: any, data: any) {
+  openExpenseDetailModal(content: any) {
     this.receiptFiles = [];
     this.modalService.open(content, {centered: true});
   }
@@ -296,11 +297,8 @@ export class LandingComponent implements OnInit {
 
   cancelExpense() {
     const dataVerified = {};
-    // @ts-ignore
     const expenseId = this.expenseData.id;
-
     dataVerified[`status`] = 'cancelled';
-
     this.expenses.updateExpenseEmployee(dataVerified, expenseId)
       .subscribe(
         result => {
