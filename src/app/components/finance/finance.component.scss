@@ -33,7 +33,8 @@ input {
 
 #expensestable {
   width: 100%;
-  height: 46em;
+  height: 750px;
+  overflow: hidden;
   @include md-phone-only {
     height: 30rem;
   }
@@ -46,7 +47,8 @@ input {
 
 #historytable {
   width: 100%;
-  height: 50em;
+  overflow: hidden;
+  height: 750px;
   @include sm-phone-only {
     height: 10rem;
   }
@@ -144,6 +146,7 @@ input {
   height: 100%;
   overflow: hidden;
   background: transparent;
+
   span {
     padding: 10px;
   }
@@ -158,6 +161,7 @@ input {
 }
 
 .hidden {
+  visibility: hidden;
   display: none;
 }
 
