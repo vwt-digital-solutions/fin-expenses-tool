@@ -54,7 +54,7 @@ export class FinanceComponent implements OnInit {
             sortable: true,
             filter: true,
             cellRenderer: params => {
-              return FormaterService.getCorrectDate(params.value);
+              return FormaterService.getCorrectDateTime(params.value);
             },
           },
           {
@@ -108,7 +108,7 @@ export class FinanceComponent implements OnInit {
           sortable: true, filter: true,
           suppressMovable: true, width: 170,
           cellRenderer: params => {
-            return FormaterService.getCorrectDate(params.value);
+            return FormaterService.getCorrectDateTime(params.value);
           }
         },
         {
@@ -197,7 +197,7 @@ export class FinanceComponent implements OnInit {
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
           a.href = url;
-          a.download = FormaterService.getCorrectDate(event.data.export_date) + downloadType;
+          a.download = FormaterService.getCorrectDateTime(event.data.export_date) + downloadType;
           a.click();
           window.URL.revokeObjectURL(url);
           console.log('>> GET SUCCESS');

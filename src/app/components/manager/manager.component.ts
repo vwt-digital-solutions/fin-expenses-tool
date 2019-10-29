@@ -60,7 +60,7 @@ export class ManagerComponent implements OnInit {
             sortable: true,
             filter: true,
             cellRenderer: params => {
-              return FormaterService.getCorrectDate(params.value);
+              return FormaterService.getCorrectDateTime(params.value);
             },
           },
           {

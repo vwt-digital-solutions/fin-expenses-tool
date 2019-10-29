@@ -19,10 +19,14 @@ export class FormaterService {
     return FormaterService.formatNumber(amounts.value);
   }
 
-  static getCorrectDate(date) {
+  static getCorrectDateTime(date) {
     const d = new Date(date);
     return d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
       ('0' + d.getMinutes()).substr(-2) + ':' + ('0' + d.getSeconds()).substr(-2);
   }
 
+  static getCorrectDate(date) {
+    const d = new Date(date);
+    return d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear();
+  }
 }

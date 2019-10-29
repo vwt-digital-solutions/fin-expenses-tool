@@ -68,6 +68,12 @@
   display: none;
 }
 
+.compact {
+  margin-left: 225px;
+  margin-right: 225px;
+  width: auto !important;
+}
+
 .click-stop {
   cursor: pointer;
   color: $vwt_color_blue;

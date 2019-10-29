@@ -2,9 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ExpensesConfigService} from '../../services/config.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DomSanitizer} from '@angular/platform-browser';
-import {IdentityService} from 'src/app/services/identity.service';
 import {FormaterService} from 'src/app/services/formater.service';
-import {ActivatedRoute} from '@angular/router';
 
 interface ExpensesIfc {
   ['body']: any;
@@ -17,11 +15,18 @@ interface ExpensesIfc {
 })
 
 export class ControllerComponent implements OnInit {
+
+  private gridApi;
+  public columnDefs;
+  public today;
+  public denySelection;
+  public expenseData: object;
+  private receiptFiles;
+
   constructor(
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
-    private sanitizer: DomSanitizer,
-    private route: ActivatedRoute
+    private sanitizer: DomSanitizer
   ) {
     this.columnDefs = [
       {
@@ -33,7 +38,7 @@ export class ControllerComponent implements OnInit {
             sortable: true,
             filter: true,
             cellRenderer: params => {
-              return FormaterService.getCorrectDate(params.value);
+              return FormaterService.getCorrectDateTime(params.value);
             },
           },
           {
@@ -46,7 +51,7 @@ export class ControllerComponent implements OnInit {
           },
           {
             headerName: 'SoortGL', field: 'cost_type',
-            sortable: true, filter: true, resizable: true, width: 100,
+            sortable: true, filter: true, resizable: true, width: 150,
             cellRenderer: params => {
               return params.value.split(':')[1];
             }
@@ -58,15 +63,15 @@ export class ControllerComponent implements OnInit {
               return params.value.split(':')[0];
             }
           },
+          // {
+          //   headerName: 'Beschrijving', field: 'note', resizable: true
+          // },
           {
-            headerName: 'Beschrijving', field: 'note', resizable: true
-          },
-          {
-            headerName: 'Bondatum', field: 'date_of_transaction',
-            sortable: true, filter: true, width: 150,
+            headerName: 'Bondatum', field: 'transaction_date',
+            sortable: true, filter: true, width: 250,
             cellRenderer: params => {
-              return this.fixDate(params.value);
-            }
+              return FormaterService.getCorrectDate(params.value);
+            },
           },
           {
             headerName: 'Status', field: 'status.text',
@@ -76,14 +81,6 @@ export class ControllerComponent implements OnInit {
       }
     ];
   }
-
-  private monthNames;
-  private gridApi;
-  public columnDefs;
-  public today;
-  public denySelection;
-  public expenseData: object;
-  private receiptFiles;
 
   rowData = null;
 
@@ -95,9 +92,14 @@ export class ControllerComponent implements OnInit {
     }
   }
 
-  fixDate(date) {
-    const stepDate = new Date(date);
-    return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth())] + ' ' + stepDate.getFullYear();
+  private static getNavigator() {
+    return navigator.userAgent.match(/Android/i)
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i)
+      || navigator.userAgent.match(/BlackBerry/i)
+      || navigator.userAgent.match(/Windows Phone/i);
   }
 
   openSanitizeFile(type, file) {
@@ -114,13 +116,7 @@ export class ControllerComponent implements OnInit {
       }
     } else {
       const win = window.open();
-      if (navigator.userAgent.match(/Android/i)
-        || navigator.userAgent.match(/webOS/i)
-        || navigator.userAgent.match(/iPhone/i)
-        || navigator.userAgent.match(/iPad/i)
-        || navigator.userAgent.match(/iPod/i)
-        || navigator.userAgent.match(/BlackBerry/i)
-        || navigator.userAgent.match(/Windows Phone/i)) {
+      if (ControllerComponent.getNavigator()) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge Mobile of Samsung Internet.</p>');
       } else if (!isChrome) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
@@ -134,9 +130,6 @@ export class ControllerComponent implements OnInit {
   ngOnInit() {
     this.today = new Date();
     this.denySelection = false;
-    this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
-    ];
   }
 
   onBtExport() {
@@ -149,7 +142,6 @@ export class ControllerComponent implements OnInit {
 
   onGridReady(params: any) {
     this.gridApi = params.api;
-
     // @ts-ignore
     this.expenses.getControllerExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
   }
