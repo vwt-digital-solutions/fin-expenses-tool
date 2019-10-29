@@ -56,7 +56,6 @@ export class ExpensesConfigService {
   public getExpenses(): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.finance)
       .pipe(
-        ExpensesConfigService.retry(2),
         catchError(ExpensesConfigService.handleError)
       );
   }
@@ -64,7 +63,6 @@ export class ExpensesConfigService {
   public getManagerExpenses(): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.manager)
       .pipe(
-        ExpensesConfigService.retry(2),
         catchError(ExpensesConfigService.handleError)
       );
   }
@@ -72,7 +70,6 @@ export class ExpensesConfigService {
   public getControllerExpenses(): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.controller)
       .pipe(
-        ExpensesConfigService.retry(2),
         catchError(ExpensesConfigService.handleError)
       );
   }
@@ -80,7 +77,6 @@ export class ExpensesConfigService {
   public getExpenseAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<any>(this.env.apiUrl + Endpoint.employee + '/' + expenseId + '/attachments')
       .pipe(
-        ExpensesConfigService.retry(2),
         catchError(ExpensesConfigService.handleError)
       );
   }
@@ -88,7 +84,6 @@ export class ExpensesConfigService {
   public getFinanceAttachment(expenseId): Observable<HttpResponse<any[]>> {
     return this.http.get<any>(this.env.apiUrl + Endpoint.finance + '/' + expenseId + '/attachments')
       .pipe(
-        ExpensesConfigService.retry(2),
         catchError(ExpensesConfigService.handleError)
       );
   }
@@ -96,7 +91,6 @@ export class ExpensesConfigService {
   public getControllerAttachment(expenseId): Observable<HttpResponse<any[]>> {
     return this.http.get<any>(this.env.apiUrl + Endpoint.controller + '/' + expenseId + '/attachments')
       .pipe(
-        ExpensesConfigService.retry(2),
         catchError(ExpensesConfigService.handleError)
       );
   }
@@ -104,7 +98,6 @@ export class ExpensesConfigService {
   public getManagerAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<any>(this.env.apiUrl + Endpoint.manager + '/' + expenseId + '/attachments')
       .pipe(
-        ExpensesConfigService.retry(2),
         catchError(ExpensesConfigService.handleError)
       );
   }
@@ -112,7 +105,6 @@ export class ExpensesConfigService {
   public getCostTypes(): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<ExpensesIfc>(this.env.apiUrl + '/employees/cost-types')
       .pipe(
-        ExpensesConfigService.retry(2),
         catchError(ExpensesConfigService.handleError)
       );
   }
