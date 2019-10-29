@@ -1,7 +1,6 @@
-<div class="container">
+<div class="container-fluid compact">
   <!-- START AG-GRID EXPENSES -->
   <ag-grid-angular
-    style="width: 100%; height: 750px; overflow:hidden;"
     id="expensestable"
     class="ag-theme-material"
     [rowData]="rowData"
@@ -116,8 +115,7 @@
             <option value="note">Anders, reden:</option>
           </select>
         </div>
-        <div class="form-group"
-             style="visibility: hidden; display: none;"
+        <div class="form-group hidden"
              id="rejection-note-group">
                 <textarea id="rnote"
                           class="form-control"

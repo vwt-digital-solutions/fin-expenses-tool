@@ -2,23 +2,14 @@ import {Component, OnInit} from '@angular/core';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
-import * as moment from 'moment';
 import {DomSanitizer} from '@angular/platform-browser';
 import {IdentityService} from 'src/app/services/identity.service';
 import {FormaterService} from 'src/app/services/formater.service';
 import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
 
-moment.locale('nl');
-
-
 interface ExpensesIfc {
   ['body']: any;
-}
-
-interface IClaimRoles {
-  oid: any;
-  roles: any;
 }
 
 @Component({
@@ -40,16 +31,6 @@ export class ManagerComponent implements OnInit {
       {
         headerName: 'Declaraties Overzicht',
         children: [
-          {
-            headerName: '',
-            field: 'id',
-            width: 65,
-            colId: 'id',
-            cellRenderer: params => {
-              const infoIcon = '<i id="information-icon" class="fa fa-edit"></i>';
-              return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
-            },
-          },
           {
             headerName: 'Declaratiedatum',
             field: 'claim_date',
@@ -91,10 +72,6 @@ export class ManagerComponent implements OnInit {
         ]
       }
     ];
-    this.expenseDataRejection = [
-      {reason: 'Niet Duidelijk'},
-      {reason: 'Kan niet uitbetalen'}
-    ];
     this.formSubmitted = false;
     this.showErrors = false;
     this.formResponse = {};
@@ -114,7 +91,6 @@ export class ManagerComponent implements OnInit {
   private action: any;
   private departmentId: number;
   private OurJaneDoeIs: string;
-  private expenseDataRejection: ({ reason: string })[];
   private receiptFiles;
   private isRejecting;
   private monthNames;
@@ -146,7 +122,7 @@ export class ManagerComponent implements OnInit {
   rowData = null;
   historyRowData = null;
 
-  static getDismissReason(reason: any): string {
+  private static getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
       return 'by pressing ESC';
     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
@@ -154,6 +130,16 @@ export class ManagerComponent implements OnInit {
     } else {
       return `with: ${reason}`;
     }
+  }
+
+  private static getNavigator() {
+    return navigator.userAgent.match(/Android/i)
+    || navigator.userAgent.match(/webOS/i)
+    || navigator.userAgent.match(/iPhone/i)
+    || navigator.userAgent.match(/iPad/i)
+    || navigator.userAgent.match(/iPod/i)
+    || navigator.userAgent.match(/BlackBerry/i)
+    || navigator.userAgent.match(/Windows Phone/i);
   }
 
   openSanitizeFile(type, file) {
@@ -170,13 +156,7 @@ export class ManagerComponent implements OnInit {
       }
     } else {
       const win = window.open();
-      if (navigator.userAgent.match(/Android/i)
-        || navigator.userAgent.match(/webOS/i)
-        || navigator.userAgent.match(/iPhone/i)
-        || navigator.userAgent.match(/iPad/i)
-        || navigator.userAgent.match(/iPod/i)
-        || navigator.userAgent.match(/BlackBerry/i)
-        || navigator.userAgent.match(/Windows Phone/i)) {
+      if (ManagerComponent.getNavigator()) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge Mobile of Samsung Internet.</p>');
       } else if (!isChrome) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
@@ -245,7 +225,6 @@ export class ManagerComponent implements OnInit {
 
   onGridReady(params: any) {
     this.gridColumnApi = params.columnApi;
-    // @ts-ignore
     const claimJaneDoe = this.identityService.allClaims();
     this.departmentId = claimJaneDoe.oid;
     this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];

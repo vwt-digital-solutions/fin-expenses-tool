@@ -63,6 +63,12 @@ input {
   }
 }
 
+.ag-theme-material {
+  width: auto;
+  height: 750px;
+  overflow: hidden;
+}
+
 .input-group .form-control {
   float: none;
 }
@@ -120,6 +126,7 @@ input {
   height: 100%;
   overflow: hidden;
   background: transparent;
+
   span {
     padding: 10px;
   }
@@ -134,7 +141,14 @@ input {
 }
 
 .hidden {
+  visibility: hidden;
   display: none;
+}
+
+.compact {
+  margin-left: 270px;
+  margin-right: 270px;
+  width: auto !important;
 }
 
 .click-stop {
