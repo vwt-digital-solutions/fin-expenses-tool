@@ -226,8 +226,11 @@ export class ManagerComponent implements OnInit {
   }
 
   getNextExpense() {
+    console.log('Next expense');
     this.dismissModal();
-    this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(1), this.modalDefinition);
+    setTimeout(() => {
+      this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(0), this.modalDefinition);
+    }, 100);
   }
 
   dismissModal() {
@@ -272,9 +275,11 @@ export class ManagerComponent implements OnInit {
       this.expenses.updateExpenseManager(dataVerified, expenseId)
         .subscribe(
           result => {
-            this.getNextExpense();
-            // @ts-ignore
-            this.expenses.getManagerExpenses().subscribe((response: ExpensesIfc) => this.rowData = [...response]);
+            this.expenses.getManagerExpenses().subscribe((response: ExpensesIfc) => {
+              // @ts-ignore
+              this.rowData = [...response];
+              this.getNextExpense();
+            });
             this.showErrors = false;
             this.formSubmitted = !form.ngSubmit.hasError;
           },
