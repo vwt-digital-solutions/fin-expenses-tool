@@ -34,7 +34,7 @@
       <button name="expenses/manage"
               [routerLink]="['/expenses/manage']"
               [ngClass]="{hidden: !(this.managerAmount > 0)}" class="btn btn-primary">Declaraties Beoordelen
-        ({{this.managerAmount}})
+        <span class="badge badge-pill badge-light">{{this.managerAmount}}</span>
       </button>
       <button name="expenses/controller"
               [routerLink]="['/expenses/controller']"
@@ -56,9 +56,6 @@
       <code>{{ expenseData.employee_full_name }}</code>
       <div id="updateErrors" class="alert alert-danger" role="alert" *ngIf="showErrors">
         {{ formErrors }} {{ formResponse.detail }}
-      </div>
-      <div id="updateSuccess" class="alert alert-success" role="alert" *ngIf="formSubmitted">
-        Update is geslaagd!
       </div>
       <form id="expensesUpdateForm" #expenseUpdateForm="ngForm"
             (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, [note, namount, ntype, ntransdate])"
@@ -134,8 +131,8 @@
       </form>
     </div>
     <div class="modal-footer">
-      <button type="button" (click)="cancelExpense()" class="btn btn-danger">Annuleer Declaratie</button>
-      <button type="button" for="submit-update-form" class="btn btn-warning"
+      <button type="button" (click)="cancelExpense()" class="btn btn-danger">Declaratie Annuleren</button>
+      <button type="button" for="submit-update-form" class="btn btn-primary"
               (click)="claimUpdateForm(expenseUpdateForm, expenseData.id, [note, namount, ntype, ntransdate])"
               [ngClass]="{disabledbtn: submitButtonController(note, namount, ntype, ntransdate)}">Indienen
       </button>

@@ -2,23 +2,14 @@ import {Component, OnInit} from '@angular/core';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
-import * as moment from 'moment';
 import {DomSanitizer} from '@angular/platform-browser';
 import {IdentityService} from 'src/app/services/identity.service';
 import {FormaterService} from 'src/app/services/formater.service';
 import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
 
-moment.locale('nl');
-
-
 interface ExpensesIfc {
   ['body']: any;
-}
-
-interface IClaimRoles {
-  oid: any;
-  roles: any;
 }
 
 @Component({
@@ -28,6 +19,28 @@ interface IClaimRoles {
 })
 
 export class ManagerComponent implements OnInit {
+
+  private gridApi;
+  private gridColumnApi;
+  public columnDefs;
+  public rowSelection;
+  public typeOptions;
+  public formSubmitted;
+  public showErrors;
+  public formErrors;
+  public formResponse;
+  private action: any;
+  private departmentId: number;
+  private OurJaneDoeIs: string;
+  private receiptFiles;
+  private isRejecting;
+  public wantsRejectionNote;
+  public selectedRejection;
+  public today;
+  public noteData;
+  public expenseData: object;
+  public addBooking;
+  private modalDefinition;
 
   constructor(
     private expenses: ExpensesConfigService,
@@ -41,22 +54,12 @@ export class ManagerComponent implements OnInit {
         headerName: 'Declaraties Overzicht',
         children: [
           {
-            headerName: '',
-            field: 'id',
-            width: 65,
-            colId: 'id',
-            cellRenderer: params => {
-              const infoIcon = '<i id="information-icon" class="fa fa-edit"></i>';
-              return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
-            },
-          },
-          {
             headerName: 'Declaratiedatum',
             field: 'claim_date',
             sortable: true,
             filter: true,
             cellRenderer: params => {
-              return FormaterService.getCorrectDate(params.value);
+              return FormaterService.getCorrectDateTime(params.value);
             },
           },
           {
@@ -81,7 +84,7 @@ export class ManagerComponent implements OnInit {
             headerName: 'Bondatum', field: 'transaction_date',
             sortable: true, filter: true, width: 150,
             cellRenderer: params => {
-              return this.fixDate(params.value);
+              return FormaterService.getCorrectDate(params.value);
             }
           },
           {
@@ -91,40 +94,12 @@ export class ManagerComponent implements OnInit {
         ]
       }
     ];
-    this.expenseDataRejection = [
-      {reason: 'Niet Duidelijk'},
-      {reason: 'Kan niet uitbetalen'}
-    ];
     this.formSubmitted = false;
     this.showErrors = false;
     this.formResponse = {};
     this.rowSelection = 'single';
     this.addBooking = {success: false, wrong: false, error: false};
   }
-
-  private gridApi;
-  private gridColumnApi;
-  public columnDefs;
-  public rowSelection;
-  public typeOptions;
-  public formSubmitted;
-  public showErrors;
-  public formErrors;
-  public formResponse;
-  private action: any;
-  private departmentId: number;
-  private OurJaneDoeIs: string;
-  private expenseDataRejection: ({ reason: string })[];
-  private receiptFiles;
-  private isRejecting;
-  private monthNames;
-  public wantsRejectionNote;
-  public selectedRejection;
-  public today;
-  public noteData;
-
-  public expenseData: object;
-  public addBooking;
 
   historyColumnDefs = [
     {
@@ -156,6 +131,16 @@ export class ManagerComponent implements OnInit {
     }
   }
 
+  static getNavigator() {
+    return navigator.userAgent.match(/Android/i)
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i)
+      || navigator.userAgent.match(/BlackBerry/i)
+      || navigator.userAgent.match(/Windows Phone/i);
+  }
+
   openSanitizeFile(type, file) {
     const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
     const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
@@ -170,13 +155,7 @@ export class ManagerComponent implements OnInit {
       }
     } else {
       const win = window.open();
-      if (navigator.userAgent.match(/Android/i)
-        || navigator.userAgent.match(/webOS/i)
-        || navigator.userAgent.match(/iPhone/i)
-        || navigator.userAgent.match(/iPad/i)
-        || navigator.userAgent.match(/iPod/i)
-        || navigator.userAgent.match(/BlackBerry/i)
-        || navigator.userAgent.match(/Windows Phone/i)) {
+      if (ManagerComponent.getNavigator()) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge Mobile of Samsung Internet.</p>');
       } else if (!isChrome) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
@@ -187,36 +166,38 @@ export class ManagerComponent implements OnInit {
     }
   }
 
-  fixDate(date) {
-    const stepDate = new Date(date);
-    return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth())] + ' ' + stepDate.getFullYear();
-  }
-
   onRowClicked(event, content) {
-    this.gridApi = event.api;
-    this.formSubmitted = false;
-    this.showErrors = false;
-    this.formErrors = '';
-    this.isRejecting = false;
-    this.wantsRejectionNote = false;
-    this.expenseData = event.data;
-    this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
-    this.expenses.getManagerAttachment(event.data.id).subscribe((image: any) => {
-      this.receiptFiles = [];
-      for (const img of image) {
-        if (!(this.receiptFiles.includes(img))) {
-          this.receiptFiles.push(img);
-        }
+    if (event === null || event === undefined) {
+      this.dismissModal();
+    } else {
+      this.modalDefinition = content;
+      if (event.api !== null && event.api !== undefined) {
+        this.gridApi = event.api;
       }
-      this.modalService.open(content, {centered: true}).result.then((result) => {
-        this.gridApi.deselectAll();
-        this.wantsRejectionNote = false;
-        console.log(`Closed with: ${result}`);
-      }, (reason) => {
-        this.gridApi.deselectAll();
-        console.log(`Dismissed ${ManagerComponent.getDismissReason(reason)}`);
+      this.formSubmitted = false;
+      this.showErrors = false;
+      this.formErrors = '';
+      this.isRejecting = false;
+      this.wantsRejectionNote = false;
+      this.expenseData = event.data;
+      this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
+      this.expenses.getManagerAttachment(event.data.id).subscribe((image: any) => {
+        this.receiptFiles = [];
+        for (const img of image) {
+          if (!(this.receiptFiles.includes(img))) {
+            this.receiptFiles.push(img);
+          }
+        }
+        this.modalService.open(content, {centered: true}).result.then((result) => {
+          this.gridApi.deselectAll();
+          this.wantsRejectionNote = false;
+          console.log(`Closed with: ${result}`);
+        }, (reason) => {
+          this.gridApi.deselectAll();
+          console.log(`Dismissed ${ManagerComponent.getDismissReason(reason)}`);
+        });
       });
-    });
+    }
   }
 
   rejectionHit(event) {
@@ -240,12 +221,18 @@ export class ManagerComponent implements OnInit {
   }
 
   getNextExpense() {
+    this.dismissModal();
+    setTimeout(() => {
+      this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(0), this.modalDefinition);
+    }, 100);
+  }
+
+  dismissModal() {
     this.modalService.dismissAll();
   }
 
   onGridReady(params: any) {
     this.gridColumnApi = params.columnApi;
-    // @ts-ignore
     const claimJaneDoe = this.identityService.allClaims();
     this.departmentId = claimJaneDoe.oid;
     this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
@@ -255,9 +242,6 @@ export class ManagerComponent implements OnInit {
 
   ngOnInit() {
     this.today = new Date();
-    this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
-    ];
     this.route.data.pipe(
       map(data => data.costTypes)
     ).subscribe(costTypes => this.typeOptions = [...costTypes]);
@@ -282,9 +266,11 @@ export class ManagerComponent implements OnInit {
       this.expenses.updateExpenseManager(dataVerified, expenseId)
         .subscribe(
           result => {
-            this.getNextExpense();
-            // @ts-ignore
-            this.expenses.getManagerExpenses().subscribe((response: ExpensesIfc) => this.rowData = [...response]);
+            this.expenses.getManagerExpenses().subscribe((response: ExpensesIfc) => {
+              // @ts-ignore
+              this.rowData = [...response];
+              this.getNextExpense();
+            });
             this.showErrors = false;
             this.formSubmitted = !form.ngSubmit.hasError;
           },

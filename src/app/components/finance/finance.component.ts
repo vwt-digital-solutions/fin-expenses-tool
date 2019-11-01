@@ -3,14 +3,10 @@ import {HttpClient, HttpResponse} from '@angular/common/http';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
-import * as moment from 'moment';
 import {DomSanitizer} from '@angular/platform-browser';
 import {FormaterService} from 'src/app/services/formater.service';
 import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
-
-moment.locale('nl');
-
 
 @Component({
   selector: 'app-expenses',
@@ -20,7 +16,7 @@ moment.locale('nl');
 
 export class FinanceComponent implements OnInit {
   private gridApi;
-  private gridColumnApi;
+  private historyGridApi;
   public columnDefs;
   public rowSelection;
   public typeOptions;
@@ -31,13 +27,14 @@ export class FinanceComponent implements OnInit {
   private action: any;
   private receiptFiles;
   private isRejecting;
-  private monthNames;
   public today;
   public wantsRejectionNote;
   public selectedRejection;
   public noteData;
+  private currentRowIndex: number;
 
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
+  modalDefinition: any;
 
   constructor(
     private expenses: ExpensesConfigService,
@@ -50,23 +47,13 @@ export class FinanceComponent implements OnInit {
       {
         headerName: 'Declaraties Overzicht',
         children: [
-          // {
-          //   headerName: '',
-          //   field: 'id',
-          //   width: 65,
-          //   colId: 'id',
-          //   cellRenderer: params => {
-          //     const infoIcon = '<i id="information-icon" class="fa fa-edit"></i>';
-          //     return `<span style="color: #008BB8" id="${params.value}">${infoIcon}</span>`;
-          //   },
-          // },
           {
             headerName: 'Declaratiedatum',
             field: 'claim_date',
             sortable: true,
             filter: true,
             cellRenderer: params => {
-              return FormaterService.getCorrectDate(params.value);
+              return FormaterService.getCorrectDateTime(params.value);
             },
           },
           {
@@ -91,7 +78,7 @@ export class FinanceComponent implements OnInit {
             headerName: 'Bondatum', field: 'transaction_date',
             sortable: true, filter: true, width: 150,
             cellRenderer: params => {
-              return this.fixDate(params.value);
+              return FormaterService.getCorrectDate(params.value);
             }
           },
           {
@@ -120,7 +107,7 @@ export class FinanceComponent implements OnInit {
           sortable: true, filter: true,
           suppressMovable: true, width: 170,
           cellRenderer: params => {
-            return FormaterService.getCorrectDate(params.value);
+            return FormaterService.getCorrectDateTime(params.value);
           }
         },
         {
@@ -148,6 +135,16 @@ export class FinanceComponent implements OnInit {
     }
   }
 
+  static getNavigator() {
+    return navigator.userAgent.match(/Android/i)
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i)
+      || navigator.userAgent.match(/BlackBerry/i)
+      || navigator.userAgent.match(/Windows Phone/i);
+  }
+
   openSanitizeFile(type, file) {
     const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
     const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
@@ -162,13 +159,7 @@ export class FinanceComponent implements OnInit {
       }
     } else {
       const win = window.open();
-      if (navigator.userAgent.match(/Android/i)
-        || navigator.userAgent.match(/webOS/i)
-        || navigator.userAgent.match(/iPhone/i)
-        || navigator.userAgent.match(/iPad/i)
-        || navigator.userAgent.match(/iPod/i)
-        || navigator.userAgent.match(/BlackBerry/i)
-        || navigator.userAgent.match(/Windows Phone/i)) {
+      if (FinanceComponent.getNavigator()) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge Mobile of Samsung Internet.</p>');
       } else if (!isChrome) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
@@ -177,11 +168,6 @@ export class FinanceComponent implements OnInit {
       // tslint:disable-next-line:max-line-length no-unused-expression
       win.document.write('<iframe src="' + sanitizedExpr + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
     }
-  }
-
-  fixDate(date) {
-    const stepDate = new Date(date);
-    return stepDate.getDate() + ' ' + this.monthNames[(stepDate.getMonth())] + ' ' + stepDate.getFullYear();
   }
 
   historyHit(event) {
@@ -205,7 +191,7 @@ export class FinanceComponent implements OnInit {
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
           a.href = url;
-          a.download = FormaterService.getCorrectDate(event.data.export_date) + downloadType;
+          a.download = FormaterService.getCorrectDateTime(event.data.export_date) + downloadType;
           a.click();
           window.URL.revokeObjectURL(url);
           console.log('>> GET SUCCESS');
@@ -216,30 +202,39 @@ export class FinanceComponent implements OnInit {
   }
 
   onRowClicked(event, content) {
-    this.gridApi = event.api;
-    this.formSubmitted = false;
-    this.showErrors = false;
-    this.formErrors = '';
-    this.isRejecting = false;
-    this.wantsRejectionNote = false;
-    this.expenseData = event.data;
-    this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
-    this.expenses.getFinanceAttachment(event.data.id).subscribe((image: any) => {
-      this.receiptFiles = [];
-      for (const img of image) {
-        if (!(this.receiptFiles.includes(img))) {
-          this.receiptFiles.push(img);
-        }
+    if (event === null || event === undefined) {
+      this.dismissModal();
+    } else {
+
+      if (event.api !== null && event.api !== undefined) {
+        this.gridApi = event.api;
       }
-      this.modalService.open(content, {centered: true}).result.then((result) => {
-        this.gridApi.deselectAll();
-        this.wantsRejectionNote = false;
-        console.log(`Closed with: ${result}`);
-      }, (reason) => {
-        this.gridApi.deselectAll();
-        console.log(`Dismissed ${FinanceComponent.getDismissReason(reason)}`);
+      this.formSubmitted = false;
+      this.showErrors = false;
+      this.formErrors = '';
+      this.isRejecting = false;
+      this.wantsRejectionNote = false;
+      this.expenseData = event.data;
+      this.modalDefinition = content;
+      this.currentRowIndex = event.rowIndex;
+      this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
+      this.expenses.getFinanceAttachment(event.data.id).subscribe((image: any) => {
+        this.receiptFiles = [];
+        for (const img of image) {
+          if (!(this.receiptFiles.includes(img))) {
+            this.receiptFiles.push(img);
+          }
+        }
+        this.modalService.open(content, {centered: true}).result.then((result) => {
+          this.gridApi.deselectAll();
+          this.wantsRejectionNote = false;
+          console.log(`Closed with: ${result}`);
+        }, (reason) => {
+          this.gridApi.deselectAll();
+          console.log(`Dismissed ${FinanceComponent.getDismissReason(reason)}`);
+        });
       });
-    });
+    }
   }
 
   rejectionHit(event) {
@@ -263,18 +258,22 @@ export class FinanceComponent implements OnInit {
   }
 
   getNextExpense() {
+    this.dismissModal();
+    setTimeout(() => {
+      this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(this.currentRowIndex + 1), this.modalDefinition);
+    }, 100);
+  }
+
+  dismissModal() {
     this.modalService.dismissAll();
   }
 
-  onGridReady(params: any) {
-    this.gridColumnApi = params.columnApi;
+  onHistoryGridReady(params: any) {
+    this.historyGridApi = params.api;
   }
 
   ngOnInit() {
     this.today = new Date();
-    this.monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
-    ];
     this.callHistoryRefresh();
     this.route.data.pipe(
       map(data => data.costTypes)
@@ -284,7 +283,7 @@ export class FinanceComponent implements OnInit {
 
   callHistoryRefresh() {
     this.expenses.getDocumentsList()
-      .subscribe(result => this.historyRowData = [...result]);
+      .subscribe(result => this.historyRowData = [...result.file_list]);
   }
 
   resetPopups() {
@@ -307,29 +306,21 @@ export class FinanceComponent implements OnInit {
 
   createBookingFile() {
     this.resetPopups();
-    this.expenses.createBookingFile({responseType: 'blob', observe: 'response'})
+    this.expenses.createBookingFile({observe: 'response'})
       .subscribe(
         (response: HttpResponse<any>) => {
-          if (response.body.type === 'application/json') {
+          if (response.body.hasOwnProperty('Info')) {
             this.noExpenses();
-            console.log('>> GET EMPTY', response);
           } else {
-            const contentDispositionHeader = response.headers.get('Content-Disposition');
-            const result = contentDispositionHeader.split('=')[1].split(';')[0];
-            const blob = new Blob([response.body], {type: 'text/csv'});
-            const a = document.createElement('a');
-            document.body.appendChild(a);
-            const url = window.URL.createObjectURL(blob);
-            a.href = url;
-            a.download = result;
-            a.click();
-            window.URL.revokeObjectURL(url);
-            console.log('>> GET SUCCESS', response);
+            // @ts-ignore
+            this.historyRowData.unshift(response.body.file_list[0]);
+            this.historyGridApi.setRowData(this.historyRowData);
             this.successfulDownload();
           }
+          console.log('>> POST SUCCES');
         }, response => {
           this.errorBooking();
-          console.error('>> GET FAILED', response.message);
+          console.error('>> POST FAILED', response.message);
         });
   }
 
@@ -356,8 +347,10 @@ export class FinanceComponent implements OnInit {
         this.expenses.updateExpenseFinance(dataVerified, expenseId)
           .subscribe(
             result => {
-              this.getNextExpense();
-              this.expenses.getExpenses().subscribe((response: any) => this.rowData = [...response]);
+              this.expenses.getExpenses().subscribe((response: any) => {
+                this.rowData = [...response];
+                this.getNextExpense();
+              });
               this.showErrors = false;
               this.formSubmitted = !form.ngSubmit.hasError;
               console.log('>> PUT SUCCESS', result);

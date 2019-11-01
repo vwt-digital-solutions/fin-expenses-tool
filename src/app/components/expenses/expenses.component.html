@@ -3,11 +3,10 @@
     <div class="col col-sm-8" id="colstep">
       <div class="claim">
         <h5> Declaratie indienen </h5>
-        <hr class="add">
+        <hr class="line-border">
       </div>
       <div class="alert alert-success" role="alert" id="succes-alert" *ngIf="addClaimSuccess.success === true">
-        Declaratie is successvol ingediend {{this.expenseID}}<br>
-        Attachments to upload: {{this.locatedFile.length}}
+        Declaratie is successvol ingediend
       </div>
       <div class="alert alert-danger" role="alert" *ngIf="addClaimSuccess.wrong === true">
         {{this.formError}}
@@ -137,7 +136,9 @@
           </div>
 
           <div class="col-sm-12">
-            <small id="emailHelp" class="form-text text-muted">Vragen of opmerkingen? Mail naar <a href="mailto:crediteuren@vwtelecom.com?subject=Vraag/opmerking Declaratie-app">crediteuren@vwtelecom.com</a>.</small>
+            <small id="emailHelp" class="form-text text-muted">Vragen of opmerkingen? Mail naar <a
+              href="mailto:crediteuren@vwtelecom.com?subject=Vraag/opmerking Declaratie-app">crediteuren@vwtelecom.com</a>.
+            </small>
           </div>
 
           <input type="submit" id="submit-form" class="hidden"/>
@@ -149,6 +150,7 @@
     <div class="col col-sm-3" id="bodystep">
       <div class="claim">
         <h5 class="summary"> Samenvatting </h5>
+        <hr class="line-border">
       </div>
 
       <div class="row reason">
@@ -166,19 +168,19 @@
         <label for="submit-form"
                tabindex="0" class="btn btn-default deep_button"
                id="submit-click"
-               (click)="this.wantsNext = 'No'"
+               (click)="this.wantsNext = 0"
                [ngClass]="{disabledbtn: submitButtonController(nnote, namount, ntype, ntransdate, nattachment),
                   success : addClaimSuccess.success,
                   wrong : addClaimSuccess.wrong}">
-          Indienen <i *ngIf="loadingThings && this.wantsNext === 'No'" class="spinner-border text-light"></i>
+          Indienen <i *ngIf="loadingThings && this.wantsNext === 0" class="spinner-border text-light"></i>
         </label>
         <label for="submit-form-next"
                tabindex="0" class="btn btn-default deep_button deep_button_new"
-               (click)="this.wantsNext = 'Yes'"
+               (click)="this.wantsNext = 1"
                [ngClass]="{disabledbtn: submitButtonController(nnote, namount, ntype, ntransdate, nattachment),
-                  success : addClaimSuccess.success === true,
-                  wrong : addClaimSuccess.wrong === true}">
-          Indienen & Nieuwe<i *ngIf="loadingThings && this.wantsNext === 'Yes'" class="spinner-border text-light"></i>
+                  success : addClaimSuccess.success,
+                  wrong : addClaimSuccess.wrong}">
+          Indienen & Nieuwe<i *ngIf="loadingThings && this.wantsNext > 0" class="spinner-border text-light"></i>
         </label>
       </div>
     </div>

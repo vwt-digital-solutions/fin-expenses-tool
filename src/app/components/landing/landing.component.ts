@@ -5,9 +5,10 @@ import {Expense} from '../../models/expense';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DomSanitizer} from '@angular/platform-browser';
 import {IdentityService} from 'src/app/services/identity.service';
-import {catchError, map} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {Attachment} from 'src/app/models/attachment';
 import {ActivatedRoute} from '@angular/router';
+import {FormaterService} from '../../services/formater.service';
 
 
 @Component({
@@ -41,17 +42,22 @@ export class LandingComponent implements OnInit {
   ) {
   }
 
-  static formatNumber(numb: any) {
-    return ((numb).toFixed(2)).toString().replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+  static getNavigator() {
+    return navigator.userAgent.match(/Android/i)
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i)
+      || navigator.userAgent.match(/BlackBerry/i)
+      || navigator.userAgent.match(/Windows Phone/i);
   }
 
   decimalFormatter(amount: any) {
-    return '€' + LandingComponent.formatNumber(amount);
+    return FormaterService.decimalFormatter(amount);
   }
 
-  dateFormatter(firstDate: string | number | Date) {
-    const date = new Date(firstDate);
-    return date.getDate() + '-' + (date.getMonth() + 1) + '-' + date.getFullYear() + ' ' + date.toLocaleTimeString('nl-NL');
+  dateFormatter(firstDate) {
+    return FormaterService.getCorrectDate(firstDate);
   }
 
   openSanitizeFile(type: string, file: string) {
@@ -68,13 +74,7 @@ export class LandingComponent implements OnInit {
       }
     } else {
       const win = window.open();
-      if (navigator.userAgent.match(/Android/i)
-        || navigator.userAgent.match(/webOS/i)
-        || navigator.userAgent.match(/iPhone/i)
-        || navigator.userAgent.match(/iPad/i)
-        || navigator.userAgent.match(/iPod/i)
-        || navigator.userAgent.match(/BlackBerry/i)
-        || navigator.userAgent.match(/Windows Phone/i)) {
+      if (LandingComponent.getNavigator()) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge Mobile of Samsung Internet.</p>');
       } else if (!isChrome) {
         win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
@@ -126,8 +126,10 @@ export class LandingComponent implements OnInit {
       map(data => data.costTypes)
     ).subscribe(costTypes => this.typeOptions = [...costTypes]);
     this.expenses.getManagerExpenses()
-    // @ts-ignore
-      .subscribe(val => {this.managerAmount = val.length; }); // Check if user has manager role
+      .subscribe(val => {
+        // @ts-ignore
+        this.managerAmount = val.length;
+      });
     this.declarationCall();
     this.today = new Date();
   }
@@ -147,7 +149,7 @@ export class LandingComponent implements OnInit {
   clickExpense(content: any, item: any) {
     if (this.isClickable(item)) {
       this.expenses.getExpenseAttachment(item.id).subscribe((image: any) => {
-        for (const img of image) {// data:image/png;base64,
+        for (const img of image) {
           this.receiptFiles.push({
             content: `data:${img.content_type};base64,${img.content}`,
             content_type: img.content_type,
@@ -161,7 +163,7 @@ export class LandingComponent implements OnInit {
       this.expenseData = item;
       this.showErrors = false;
       this.formErrors = '';
-      this.openExpenseDetailModal(content, item);
+      this.openExpenseDetailModal(content);
     }
   }
 
@@ -169,7 +171,6 @@ export class LandingComponent implements OnInit {
     return item.status.text.toString().includes('rejected');
   }
 
-  // Modal
   dismissExpenseModal() {
     setTimeout(() => {
       this.modalService.dismissAll();
@@ -200,7 +201,7 @@ export class LandingComponent implements OnInit {
         > this.today) || namount.viewModel < 0.01;
   }
 
-  openExpenseDetailModal(content: any, data: any) {
+  openExpenseDetailModal(content: any) {
     this.receiptFiles = [];
     this.modalService.open(content, {centered: true});
   }
@@ -296,11 +297,8 @@ export class LandingComponent implements OnInit {
 
   cancelExpense() {
     const dataVerified = {};
-    // @ts-ignore
     const expenseId = this.expenseData.id;
-
     dataVerified[`status`] = 'cancelled';
-
     this.expenses.updateExpenseEmployee(dataVerified, expenseId)
       .subscribe(
         result => {

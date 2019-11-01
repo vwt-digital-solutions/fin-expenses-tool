@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {NgForm} from '@angular/forms';
-import {HttpClient} from '@angular/common/http';
+import {HttpResponse} from '@angular/common/http';
 import {EnvService} from 'src/app/services/env.service';
 import {Router, ActivatedRoute} from '@angular/router';
-import {map, catchError} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {ExpensesConfigService} from 'src/app/services/config.service';
 
 @Component({
@@ -12,23 +12,6 @@ import {ExpensesConfigService} from 'src/app/services/config.service';
   styleUrls: ['./expenses.component.scss']
 })
 export class ExpensesComponent implements OnInit {
-
-  constructor(
-    private httpClient: HttpClient,
-    private env: EnvService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {
-    this.addClaimSuccess = {success: false, wrong: false};
-    this.today = new Date();
-    this.notaData = 'Toevoegen';
-    this.loadingThings = false;
-    this.wantsList = true;
-    this.wantsNext = 'No';
-    this.locatedFile = [];
-    this.attachmentList = [];
-    this.formError = 'Er is iets fout gegaan. Probeer het later opnieuw.';
-  }
 
   public formNote: any;
   public formAmount: any;
@@ -45,13 +28,91 @@ export class ExpensesComponent implements OnInit {
   public typeOptions: any[];
   public today: Date;
   public notaData: string;
-  public transdateNotFilledMessage = 'Graag een geldige datum invullen';
+  public transdateNotFilledMessage;
   public locatedFile: any[] | (string | ArrayBuffer)[];
   public loadingThings: boolean;
   public wantsList: boolean;
   public attachmentList: any[];
-  public wantsNext: string;
+  public wantsNext: number;
   public expenseID: string | number;
+
+  constructor(
+    private expenses: ExpensesConfigService,
+    private env: EnvService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
+    this.addClaimSuccess = {success: false, wrong: false};
+    this.today = new Date();
+    this.notaData = 'Toevoegen';
+    this.loadingThings = false;
+    this.wantsList = true;
+    this.wantsNext = 0;
+    this.locatedFile = [];
+    this.attachmentList = [];
+    this.transdateNotFilledMessage = 'Graag een geldige datum invullen';
+    this.formError = 'Er is iets fout gegaan. Probeer het later opnieuw.';
+  }
+
+  static getNavigator() {
+    return navigator.userAgent.match(/Android/i)
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i)
+      || navigator.userAgent.match(/BlackBerry/i)
+      || navigator.userAgent.match(/Windows Phone/i);
+  }
+
+  private splitSet(form: NgForm) {
+    this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
+    this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
+    this.expenseType = !(form.value.cost_type === undefined || form.value.cost_type === null);
+    this.expenseTransDate = !((form.value.transaction_date === undefined
+      || form.value.transaction_date === null) || new Date(form.value.transaction_date) > this.today);
+    this.expenseAttachment = !(this.locatedFile.length < 1);
+  }
+
+  private splitCheck() {
+    return (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.expenseAttachment
+      && this.addClaimSuccess.wrong === false);
+  }
+
+  private successfulClaim() {
+    return this.addClaimSuccess.success = true;
+  }
+
+  private wrongfulClaim(text = null) {
+    if (text !== null) {
+      this.formError = text;
+    }
+    return this.addClaimSuccess.wrong = true;
+  }
+
+  private uploadSingleAttachment(form: NgForm) {
+    if (this.locatedFile.length > 0) {
+      const file = this.locatedFile.splice(0, 1)[0];
+      this.expenses.uploadSingleAttachment(this.expenseID, {
+        name: '' + this.locatedFile.length, content: file
+      }).subscribe(
+        (response: HttpResponse<any>) => {
+          console.log('>> POST SUCCES');
+          this.uploadSingleAttachment(form);
+        }, response => {
+          console.error('>> POST FAILED', response.message);
+        });
+    } else {
+      if (this.wantsNext > 0) {
+        form.reset();
+        this.attachmentList = [];
+        this.locatedFile = [];
+      } else {
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 1000);
+      }
+    }
+  }
 
   ngOnInit(): void {
     this.route.data.pipe(
@@ -59,7 +120,6 @@ export class ExpensesComponent implements OnInit {
     ).subscribe(costTypes => this.typeOptions = [...costTypes]);
   }
 
-  // Classes Logic
   notFilledClass(setClass: { name: string; invalid: any; dirty: any; touched: any; }) {
     let starBool: boolean;
     if (setClass.name === 'amount') {
@@ -81,17 +141,6 @@ export class ExpensesComponent implements OnInit {
     return starBool || (setClass.invalid && (setClass.dirty || setClass.touched));
   }
 
-  successfulClaim() {
-    return this.addClaimSuccess.success = true;
-  }
-
-  wrongfulClaim(text = null) {
-    if (text !== null) {
-      this.formError = text;
-    }
-    return this.addClaimSuccess.wrong = true;
-  }
-
   submitButtonController(nnote: { invalid: any; },
                          namount: { invalid: any; },
                          ntype: { invalid: any; },
@@ -101,8 +150,6 @@ export class ExpensesComponent implements OnInit {
       this.expenseAttachment === false || nnote.invalid || namount.invalid || ntype.invalid || ntransdate.invalid ||
       nattachment.invalid || this.addClaimSuccess.wrong === true;
   }
-
-  // End Classes Logic
 
   onFileInput(file: FileList) {
     if (file[0].type.split('/')[0] !== 'image' && file[0].type !== 'application/pdf') {
@@ -155,18 +202,9 @@ export class ExpensesComponent implements OnInit {
     }
   }
 
-  splitCheck() {
-    return (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.expenseAttachment
-      && this.addClaimSuccess.wrong === false);
-  }
-
   claimForm(form: NgForm) {
-    this.expensesAmount = !((typeof form.value.amount !== 'number') || (form.value.amount < 0.01));
-    this.expensesNote = !((typeof form.value.note !== 'string') || form.value.note === '');
-    this.expenseType = !(form.value.cost_type === undefined);
-    this.expenseTransDate = !(form.value.transaction_date === undefined || new Date(form.value.transaction_date) > this.today);
-    this.expenseAttachment = !(this.locatedFile.length < 1);
-    if (form.value.transaction_date !== undefined) {
+    this.splitSet(form);
+    if (form.value.transaction_date !== undefined && form.value.transaction_date !== null) {
       if (form.value.transaction_date.length > 8) {
         this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de aankoop';
       }
@@ -177,10 +215,10 @@ export class ExpensesComponent implements OnInit {
       form.value.amount = Number((form.value.amount).toFixed(2));
       form.value.transaction_date = (new Date(form.value.transaction_date).getTime());
       form.value.transaction_date = new Date(form.value.transaction_date).toISOString();
-
       const obj = JSON.parse(JSON.stringify(form.value));
       // End Format Values
-      this.httpClient.post<string>(this.env.apiUrl + '/employees/expenses', obj)
+
+      this.expenses.createExpenses(obj)
         .subscribe(
           (val) => {
             this.successfulClaim();
@@ -191,13 +229,7 @@ export class ExpensesComponent implements OnInit {
           }, response => {
             if (response.status === 403) {
               this.wrongfulClaim('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
-              if (navigator.userAgent.match(/Android/i)
-                || navigator.userAgent.match(/webOS/i)
-                || navigator.userAgent.match(/iPhone/i)
-                || navigator.userAgent.match(/iPad/i)
-                || navigator.userAgent.match(/iPod/i)
-                || navigator.userAgent.match(/BlackBerry/i)
-                || navigator.userAgent.match(/Windows Phone/i)) {
+              if (ExpensesComponent.getNavigator()) {
                 alert('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
               }
             } else {
@@ -217,29 +249,5 @@ export class ExpensesComponent implements OnInit {
       }
     }
     this.formAttachment = null;
-  }
-
-  private uploadSingleAttachment(form: NgForm) {
-    if (this.locatedFile.length > 0) {
-      const file = this.locatedFile.splice(0, 1)[0];
-      this.httpClient.post(this.env.apiUrl + '/employees/expenses/' + this.expenseID + '/attachments', {
-        name: '' + this.locatedFile.length,
-        content: file
-      }).pipe(catchError(ExpensesConfigService.handleError))
-        .subscribe(() => {
-          this.uploadSingleAttachment(form);
-        });
-    } else {
-      if (this.wantsNext === 'Yes') {
-        form.reset();
-        this.attachmentList = [];
-        this.locatedFile = [];
-      } else {
-        const that = this;
-        setTimeout(() => {
-          that.router.navigate(['/']);
-        }, 1000);
-      }
-    }
   }
 }

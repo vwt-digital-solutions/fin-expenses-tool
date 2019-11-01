@@ -33,7 +33,8 @@ input {
 
 #expensestable {
   width: 100%;
-  height: 46em;
+  height: 750px;
+  overflow: hidden;
   @include md-phone-only {
     height: 30rem;
   }
@@ -46,7 +47,8 @@ input {
 
 #historytable {
   width: 100%;
-  height: 50em;
+  overflow: hidden;
+  height: 750px;
   @include sm-phone-only {
     height: 10rem;
   }
@@ -56,10 +58,6 @@ input {
   padding: 2px;
   height: auto;
 }
-
-//#historydiv {
-//  background-color: #fcfbfb;
-//}
 
 .fom {
   margin-bottom: 10px;
@@ -73,6 +71,12 @@ input {
     margin-bottom: 10px;
     margin-right: 10px;
   }
+}
+
+.empty-creation-top {
+  border-bottom: 1px solid $vwt_color_blue_hr;
+  margin-bottom: 10px;
+  margin-top: 48px;
 }
 
 .input-group .form-control {
@@ -142,6 +146,7 @@ input {
   height: 100%;
   overflow: hidden;
   background: transparent;
+
   span {
     padding: 10px;
   }
@@ -156,6 +161,7 @@ input {
 }
 
 .hidden {
+  visibility: hidden;
   display: none;
 }
 
