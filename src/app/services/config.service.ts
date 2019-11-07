@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpErrorResponse, HttpResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {EnvService} from './env.service';
 import {Observable, throwError, interval, of} from 'rxjs';
 import {catchError, retryWhen, flatMap, count} from 'rxjs/operators';
@@ -9,13 +9,13 @@ import {Attachment} from '../models/attachment';
 
 interface ExpensesIfc {
   clone: any;
-  headers: any;
-  status: any;
-  statusText: any;
+  headers: HttpHeaders;
+  status: number;
+  statusText: string;
   body: any;
-  type: any;
+  type: number;
   ok: any;
-  url: any;
+  url: string;
 }
 
 @Injectable()
@@ -141,8 +141,8 @@ export class ExpensesConfigService {
       );
   }
 
-  public getCostTypes(): Observable<HttpResponse<ExpensesIfc>> {
-    return this.http.get<ExpensesIfc>(this.env.apiUrl + '/employees/cost-types')
+  public getCostTypes(): Observable<HttpResponse<any[]>> {
+    return this.http.get<any>(this.env.apiUrl + '/employees/cost-types')
       .pipe(
         catchError(ExpensesConfigService.handleError)
       );

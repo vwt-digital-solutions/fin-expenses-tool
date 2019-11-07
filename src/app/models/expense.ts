@@ -7,7 +7,7 @@ export interface Expense {
   id: number;
   note: string;
   status: {
-    date_exported: string;
+    export_date: string;
     rnote: string;
     text: string;
   };

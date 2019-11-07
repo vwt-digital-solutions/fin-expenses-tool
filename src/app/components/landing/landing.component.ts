@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
 import {Expense} from '../../models/expense';
+import {CostType} from '../../models/cost-type';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DomSanitizer} from '@angular/platform-browser';
 import {IdentityService} from 'src/app/services/identity.service';
@@ -9,6 +10,7 @@ import {map} from 'rxjs/operators';
 import {Attachment} from 'src/app/models/attachment';
 import {ActivatedRoute} from '@angular/router';
 import {FormaterService} from '../../services/formater.service';
+import {EnvService} from '../../services/env.service';
 
 
 @Component({
@@ -30,15 +32,17 @@ export class LandingComponent implements OnInit {
   private receiptFiles: Attachment[];
   public today: Date;
   public hasNoExpenses: boolean;
-  public typeOptions: Expense[];
+  public typeOptions: CostType[];
   public managerAmount: number;
+  public toggleView: boolean;
 
   constructor(
     private identityService: IdentityService,
     private modalService: NgbModal,
     private expenses: ExpensesConfigService,
     private sanitizer: DomSanitizer,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private env: EnvService
   ) {
   }
 
@@ -84,6 +88,50 @@ export class LandingComponent implements OnInit {
       win.document.write('<iframe src="' + dataContent + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
     }
   }
+
+  openAttachment(type, file) {
+    if (this.env.openToggle) {
+      if (this.toggleView) {
+        this.openImgModal(type, file);
+      } else {
+        this.openSanitizeFile(type, file);
+      }
+    } else {
+      this.openSanitizeFile(type, file);
+    }
+  }
+
+  // Image Modal BEGIN
+  openImgModal(type, file) {
+    const imgModal = document.getElementById('imgModal');
+    const imgImg = document.getElementById('imgImg');
+    const imgFrame = document.getElementById('imgFrame');
+    imgModal.style.display = 'block';
+
+    if (type === 'application/pdf') {
+      imgImg.style.display = 'none';
+      // @ts-ignore
+      imgFrame.src = 'data:' + type + ';base64,' + encodeURI(file);
+    } else {
+      // @ts-ignore
+      imgImg.src = 'data:' + type + ';base64,' + encodeURI(file);
+    }
+  }
+
+  closeImgModal(event) {
+    if (event.srcElement.id !== 'imgImg') {
+      const imgModal = document.getElementById('imgModal');
+      const imgImg = document.getElementById('imgImg');
+      const imgFrame = document.getElementById('imgFrame');
+      imgModal.style.display = 'none';
+      imgImg.style.display = 'block';
+      // @ts-ignore
+      imgImg.src = '';
+      // @ts-ignore
+      imgFrame.src = '';
+    }
+  }
+  // Image Modal END
 
   statusClassing(status: string) {
     if (status.includes('rejected')) {
@@ -151,7 +199,7 @@ export class LandingComponent implements OnInit {
       this.expenses.getExpenseAttachment(item.id).subscribe((image: any) => {
         for (const img of image) {
           this.receiptFiles.push({
-            content: `data:${img.content_type};base64,${img.content}`,
+            content: `${img.content}`,
             content_type: img.content_type,
             from_db: true,
             db_name: img.name,

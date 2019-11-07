@@ -2,3 +2,12 @@ $vwt_color_blue: #008BB8;
 $vwt_color_blue_hr: #008bb859;
 $vwt_mobile_background_color_blue: #028ab875;
 $vwt_font_family: 'Poppins', sans-serif;
+@-webkit-keyframes zoom {
+  from {-webkit-transform:scale(0)}
+  to {-webkit-transform:scale(1)}
+}
+
+@keyframes zoom {
+  from {transform:scale(0)}
+  to {transform:scale(1)}
+}

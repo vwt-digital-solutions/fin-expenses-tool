@@ -98,3 +98,79 @@ span.ag-header-group-text {
 		background-color: $vwt_mobile_background_color_blue;
 	}
 }
+
+
+// Image Modal BEGIN
+
+.img-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  padding-top: 100px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,.7);
+
+  .img-img{
+    margin: auto;
+    display: block;
+    width: 80%;
+    max-width: 600px;
+    height: auto;
+
+    -webkit-animation-name: zoom;
+    -webkit-animation-duration: 0.6s;
+    animation-name: zoom;
+    animation-duration: 0.6s;
+
+    @include lg-phone-only {
+      width: 100%;
+    }
+  }
+
+  .img-frame {
+    margin: auto;
+    display: block;
+    -webkit-animation-name: zoom;
+    -webkit-animation-duration: 0.6s;
+    animation-name: zoom;
+    animation-duration: 0.6s;
+    width: 750px;
+    height: 1000px;
+  }
+
+  .img-close {
+    position: fixed;
+    top: 3ex;
+    right: 8ex;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+
+    &:hover,
+    &:focus {
+      opacity: .8;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  }
+}
+
+// Image Modal END
+
+
+
+// Temporary button
+.toggled {
+  opacity: .8;
+}
+
+#toggleView {
+  padding: 0;
+  margin: 5px;
+}
