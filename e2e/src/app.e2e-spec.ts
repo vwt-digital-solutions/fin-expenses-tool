@@ -117,14 +117,14 @@ describe('ExpenseApp:', () => {
     element(by.id('attachmentinput')).sendKeys(absolutePath);
     browser.sleep(500);
     element(by.id('submit-click')).click();
-    browser.wait(until.visibilityOf(element(by.id('succes-alert'))), 10000, 'Expense creation took too long');
+    browser.wait(until.visibilityOf(element(by.id('succes-alert'))), 20000, 'Expense creation took too long');
     const elem = element(by.id('succes-alert'));
     expect(elem.isDisplayed()).toBe(true);
   });
 
   it('should get expenses on manager page', () => {
     browser.sleep(1000);
-    expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
+    expect(browser.wait(until.urlContains('/home'), 20000, 'Redirect took too long'));
     browser.sleep(1000);
     element(by.name('expenses/manage')).click();
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
@@ -134,37 +134,31 @@ describe('ExpenseApp:', () => {
     expect(expenseList.count()).toBeGreaterThanOrEqual(1);
   });
 
-  it('should get the attachments', () => {
+  it('should get the manager attachments', () => {
     browser.sleep(3000);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID))),
-      10000, 'Expense isn\'t shown on manager page'));
+      20000, 'Expense isn\'t shown on manager page'));
     element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID)).click();
     browser.sleep(2000);
-    expect(browser.wait(until.visibilityOf(element(by.css('.modal'))), 10000, 'Expense modal didn\'t open'));
+    expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 20000, 'Expense modal didn\'t open'));
     const attachmentList = element.all(by.css('.click-stop'));
     expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
-    browser.sleep(30000);
   });
 
   it('should approve the expense', () => {
     browser.sleep(1000);
     const elem = element(by.id('thumbs-up'));
-    browser.wait(until.visibilityOf(elem), 10000, 'Expense approval form took too long to load').then(() => {
+    browser.wait(until.visibilityOf(elem), 20000, 'Expense approval form took too long to load').then(() => {
       elem.click();
     });
-    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense approval took too long'));
+    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 20000, 'Expense approval took too long'));
     // expect(element(by.css('.modal-content')).isDisplayed()).toBe(false);
   });
 
   it('should get expenses on controller page', () => {
     browser.sleep(1000);
-    try {
-      element(by.id('home-button')).click();
-    } catch (e) {
-      console.log(e);
-      window.location.href =  window.location.hostname + '/home';
-    }
-    expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
+    browser.get('/home');
+    expect(browser.wait(until.urlContains('/home'), 20000, 'Redirect took too long'));
     browser.sleep(3000);
     element(by.name('expenses/controller')).click();
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
@@ -181,19 +175,15 @@ describe('ExpenseApp:', () => {
     element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(500);
     element(by.cssContainingText(`[role='gridcell'][col-id='employee']`, 'E2E, Opensource')).click();
-    expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));
+    expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 20000, 'Expense modal didn\'t open'));
     element(by.id('expenseModalClose')).click();
   });
 
   it('should get expenses on process', () => {
     browser.sleep(1000);
-    try {
-      element(by.id('home-button')).click();
-    } catch (e) {
-      console.log(e);
-      window.location.href =  window.location.hostname + '/home';
-    }
-    expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
+    browser.sleep(1000);
+    browser.get('/home');
+    expect(browser.wait(until.urlContains('/home'), 20000, 'Redirect took too long'));
     browser.sleep(1000);
     element(by.name('expenses/process')).click();
     browser.sleep(1000);
@@ -204,14 +194,14 @@ describe('ExpenseApp:', () => {
     expect(expenseList.count()).toBeGreaterThanOrEqual(1);
   });
 
-  it('should get the attachments', () => {
+  it('should get the process attachments', () => {
     browser.sleep(1000);
     element(by.css('div[col-id=claim_date]')).click(); // Once
     browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(1000);
     element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID)).click();
-    expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));
+    expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 20000, 'Expense modal didn\'t open'));
     browser.sleep(2000);
     const attachmentList = element.all(by.css('.click-stop'));
     expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
@@ -220,9 +210,9 @@ describe('ExpenseApp:', () => {
   it('should reject the expense', () => {
     element(by.id('thumbs-down')).click();
     const elem = element(by.id('thumbs-down-rejecting'));
-    browser.wait(until.visibilityOf(elem), 10000, 'Expense rejection form took too long to load').then(() => {
+    browser.wait(until.visibilityOf(elem), 20000, 'Expense rejection form took too long to load').then(() => {
       elem.click();
     });
-    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 10000, 'Expense rejection took too long'));
+    expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 20000, 'Expense rejection took too long'));
   });
 });
