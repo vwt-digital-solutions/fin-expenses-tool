@@ -97,20 +97,25 @@ describe('ExpenseApp:', () => {
 
   it('should create an expense', () => {
     element(by.id('amountinput')).sendKeys(100.99);
+    browser.sleep(500);
     const typeList = element(by.id('typeinput')).all(by.tagName('option'));
     typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
       typeList.get(randomNumber + 1).click();
     });
+    browser.sleep(500);
     const today = new Date();
     element(by.id('dateinput'))
       .sendKeys(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
     e2eID = Math.random() * 100;
+    browser.sleep(500);
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
+    browser.sleep(500);
     const path = require('path');
     // tslint:disable-next-line:one-variable-per-declaration
     const file = 'assets/betaald.png',
       absolutePath = path.resolve(__dirname, file);
     element(by.id('attachmentinput')).sendKeys(absolutePath);
+    browser.sleep(500);
     element(by.id('submit-click')).click();
     browser.wait(until.visibilityOf(element(by.id('succes-alert'))), 20000, 'Expense creation took too long');
     const elem = element(by.id('succes-alert'));
