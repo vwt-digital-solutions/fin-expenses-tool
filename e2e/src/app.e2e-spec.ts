@@ -75,13 +75,13 @@ describe('ExpenseApp:', () => {
   });
 
   it('should open the landing page', () => {
-    browser.sleep(3000); // Wait for angular and loader
-    expect(element(by.css('h1')).getText()).toEqual('MIJN DECLARATIES');
+    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
     browser.sleep(1000);
+    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
+    expect(element(by.css('h1')).getText()).toEqual('MIJN DECLARATIES');
   });
 
   it('should get the open expenses', () => {
-    browser.sleep(1000);
     browser.wait(until.visibilityOf(element(by.css('li'))), 20000, 'The API took too long to respond').then(() => {
       const expenseList = element.all(by.css('li'));
       expect(expenseList.count()).toBeGreaterThanOrEqual(1);
@@ -89,33 +89,28 @@ describe('ExpenseApp:', () => {
   });
 
   it('should get the cost-types', () => {
-    browser.sleep(1000);
     element(by.name('expenses')).click();
-    browser.sleep(1000);
-    expect(element.all(by.css('option')).count()).toEqual(29);
+    browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
+      expect(element.all(by.css('option')).count()).toEqual(29);
+    });
   });
 
   it('should create an expense', () => {
     element(by.id('amountinput')).sendKeys(100.99);
-    browser.sleep(500);
     const typeList = element(by.id('typeinput')).all(by.tagName('option'));
     typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
       typeList.get(randomNumber + 1).click();
     });
-    browser.sleep(500);
     const today = new Date();
     element(by.id('dateinput'))
       .sendKeys(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
     e2eID = Math.random() * 100;
-    browser.sleep(500);
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
-    browser.sleep(500);
     const path = require('path');
     // tslint:disable-next-line:one-variable-per-declaration
     const file = 'assets/betaald.png',
       absolutePath = path.resolve(__dirname, file);
     element(by.id('attachmentinput')).sendKeys(absolutePath);
-    browser.sleep(500);
     element(by.id('submit-click')).click();
     browser.wait(until.visibilityOf(element(by.id('succes-alert'))), 20000, 'Expense creation took too long');
     const elem = element(by.id('succes-alert'));
@@ -123,7 +118,6 @@ describe('ExpenseApp:', () => {
   });
 
   it('should get expenses on manager page', () => {
-    browser.sleep(1000);
     expect(browser.wait(until.urlContains('/home'), 20000, 'Redirect took too long'));
     browser.sleep(1000);
     element(by.name('expenses/manage')).click();
@@ -135,20 +129,18 @@ describe('ExpenseApp:', () => {
   });
 
   it('should get the manager attachments', () => {
-    browser.sleep(3000);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID))),
       20000, 'Expense isn\'t shown on manager page'));
     element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID)).click();
-    browser.sleep(2000);
     expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 20000, 'Expense modal didn\'t open').then(() => {
-      browser.sleep(2000);
-      const attachmentList = element.all(by.css('.click-stop'));
-      expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
+      expect(browser.wait(until.visibilityOf(element(by.css('li'))), 20000, 'No attachments are shown').then(() => {
+        const attachmentList = element.all(by.css('.click-stop'));
+        expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
+      }));
     }));
   });
 
   it('should approve the expense', () => {
-    browser.sleep(1000);
     const elem = element(by.id('thumbs-up'));
     browser.wait(until.visibilityOf(elem), 20000, 'Expense approval form took too long to load').then(() => {
       elem.click();
@@ -158,10 +150,9 @@ describe('ExpenseApp:', () => {
   });
 
   it('should get expenses on controller page', () => {
-    browser.sleep(1000);
     browser.get('/home');
     expect(browser.wait(until.urlContains('/home'), 20000, 'Redirect took too long'));
-    browser.sleep(3000);
+    browser.sleep(1000);
     element(by.name('expenses/controller')).click();
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
     browser.sleep(1000);
@@ -171,7 +162,6 @@ describe('ExpenseApp:', () => {
   });
 
   it('should see the expense on the controller page', () => {
-    browser.sleep(1000);
     element(by.css('div[col-id=claim_date]')).click(); // Once
     browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
@@ -182,13 +172,10 @@ describe('ExpenseApp:', () => {
   });
 
   it('should get expenses on process', () => {
-    browser.sleep(1000);
-    browser.sleep(1000);
     browser.get('/home');
     expect(browser.wait(until.urlContains('/home'), 20000, 'Redirect took too long'));
     browser.sleep(1000);
     element(by.name('expenses/process')).click();
-    browser.sleep(1000);
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
     browser.sleep(1000);
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long'));
@@ -197,14 +184,11 @@ describe('ExpenseApp:', () => {
   });
 
   it('should get the process attachments', () => {
-    browser.sleep(1000);
     element(by.css('div[col-id=claim_date]')).click(); // Once
     browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
-    browser.sleep(1000);
     element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID)).click();
     expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 20000, 'Expense modal didn\'t open').then(() => {
-      browser.sleep(2000);
       const attachmentList = element.all(by.css('.click-stop'));
       expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
     }));
