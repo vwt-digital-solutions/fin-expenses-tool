@@ -138,7 +138,7 @@ describe('ExpenseApp:', () => {
     browser.sleep(3000);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID))),
       20000, 'Expense isn\'t shown on manager page'));
-    element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID)).click();
+    element(by.cssContainingText(`[role='gridcell'][col-id='employee']`, 'E2E, Opensource')).click();
     browser.sleep(2000);
     expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 20000, 'Expense modal didn\'t open'));
     const attachmentList = element.all(by.css('.click-stop'));
@@ -200,7 +200,7 @@ describe('ExpenseApp:', () => {
     browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(1000);
-    element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID)).click();
+    element(by.cssContainingText(`[role='gridcell'][col-id='employee']`, 'E2E, Opensource')).click();
     expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 20000, 'Expense modal didn\'t open'));
     browser.sleep(2000);
     const attachmentList = element.all(by.css('.click-stop'));
