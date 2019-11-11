@@ -1,4 +1,5 @@
 import {browser, protractor, by, element} from 'protractor/built';
+import {ExpensesConfigService} from '../../src/app/services/config.service';
 
 const request = require('request');
 const fs = require('fs');
@@ -19,8 +20,6 @@ const get = (options: any): any => {
   const defer = protractor.promise.defer();
 
   request(options, (error, message) => {
-    console.log(JSON.stringify(error));
-    console.log(JSON.stringify(message));
     if (error || message.statusCode >= 400) {
       defer.reject({error, message});
     } else {
@@ -93,7 +92,7 @@ describe('ExpenseApp:', () => {
     browser.sleep(1000);
     element(by.name('expenses')).click();
     browser.sleep(1000);
-    expect(element.all(by.css('option')).count()).toEqual(30);
+    expect(element.all(by.css('option')).count()).toEqual(29);
   });
 
   it('should create an expense', () => {
@@ -159,7 +158,12 @@ describe('ExpenseApp:', () => {
 
   it('should get expenses on controller page', () => {
     browser.sleep(1000);
-    element(by.id('home-button')).click();
+    try {
+      element(by.id('home-button')).click();
+    } catch (e) {
+      console.log(e);
+      window.location.href =  window.location.hostname + '/home';
+    }
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
     browser.sleep(3000);
     element(by.name('expenses/controller')).click();
@@ -176,14 +180,19 @@ describe('ExpenseApp:', () => {
     browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(500);
-    element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID)).click();
+    element(by.cssContainingText(`[role='gridcell'][col-id='employee']`, 'E2E, Opensource')).click();
     expect(browser.wait(until.visibilityOf(element(by.css('.modal-content'))), 12000, 'Expense modal didn\'t open'));
     element(by.id('expenseModalClose')).click();
   });
 
   it('should get expenses on process', () => {
     browser.sleep(1000);
-    element(by.id('home-button')).click();
+    try {
+      element(by.id('home-button')).click();
+    } catch (e) {
+      console.log(e);
+      window.location.href =  window.location.hostname + '/home';
+    }
     expect(browser.wait(until.urlContains('/home'), 10000, 'Redirect took too long'));
     browser.sleep(1000);
     element(by.name('expenses/process')).click();
