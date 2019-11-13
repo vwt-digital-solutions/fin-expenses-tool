@@ -18,7 +18,8 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 ## Running unit tests
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Run `ng test --browsers=HeadlessChrome` to execute the unit tests (local) via [Karma](https://karma-runner.github.io).
+Run `ng test test-headless` to execute the unit tests (build) via [Karma](https://karma-runner.github.io).
 
 ## Running end-to-end tests
 

@@ -174,8 +174,8 @@ export class ExpensesComponent implements OnInit {
               img.onload = () => {
                 const canvas = document.createElement('canvas');
                 let width: number;
-                if (img.width > 600) {
-                  width = 600;
+                if (img.width > 1000) {
+                  width = 1000; // Limit images to 1000 as width (should be readable)
                 } else {
                   width = img.width;
                 }

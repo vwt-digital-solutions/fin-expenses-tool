@@ -7,10 +7,10 @@ import {IdentityService} from 'src/app/services/identity.service';
 import {FormaterService} from 'src/app/services/formater.service';
 import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
+import {Expense} from '../../models/expense';
+import {Attachment} from '../../models/attachment';
+import {EnvService} from '../../services/env.service';
 
-interface ExpensesIfc {
-  ['body']: any;
-}
 
 @Component({
   selector: 'app-expenses',
@@ -32,22 +32,24 @@ export class ManagerComponent implements OnInit {
   private action: any;
   private departmentId: number;
   private OurJaneDoeIs: string;
-  private receiptFiles;
+  private receiptFiles: Attachment[];
   private isRejecting;
   public wantsRejectionNote;
   public selectedRejection;
   public today;
   public noteData;
-  public expenseData: object;
+  public expenseData: Expense;
   public addBooking;
   private modalDefinition;
+  public toggleView: boolean;
 
   constructor(
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
     private identityService: IdentityService,
     private sanitizer: DomSanitizer,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private env: EnvService
   ) {
     this.columnDefs = [
       {
@@ -166,6 +168,50 @@ export class ManagerComponent implements OnInit {
     }
   }
 
+  openAttachment(type, file) {
+    if (this.env.openToggle) {
+      if (this.toggleView) {
+        this.openImgModal(type, file);
+      } else {
+        this.openSanitizeFile(type, file);
+      }
+    } else {
+      this.openSanitizeFile(type, file);
+    }
+  }
+
+  // Image Modal BEGIN
+  openImgModal(type, file) {
+    const imgModal = document.getElementById('imgModal');
+    const imgImg = document.getElementById('imgImg');
+    const imgFrame = document.getElementById('imgFrame');
+    imgModal.style.display = 'block';
+
+    if (type === 'application/pdf') {
+      imgImg.style.display = 'none';
+      // @ts-ignore
+      imgFrame.src = 'data:' + type + ';base64,' + encodeURI(file);
+    } else {
+      // @ts-ignore
+      imgImg.src = 'data:' + type + ';base64,' + encodeURI(file);
+    }
+  }
+
+  closeImgModal(event) {
+    if (event.srcElement.id !== 'imgImg') {
+      const imgModal = document.getElementById('imgModal');
+      const imgImg = document.getElementById('imgImg');
+      const imgFrame = document.getElementById('imgFrame');
+      imgModal.style.display = 'none';
+      imgImg.style.display = 'block';
+      // @ts-ignore
+      imgImg.src = '';
+      // @ts-ignore
+      imgFrame.src = '';
+    }
+  }
+  // Image Modal END
+
   onRowClicked(event, content) {
     if (event === null || event === undefined) {
       this.dismissModal();
@@ -237,7 +283,7 @@ export class ManagerComponent implements OnInit {
     this.departmentId = claimJaneDoe.oid;
     this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
     // @ts-ignore
-    this.expenses.getManagerExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
+    this.expenses.getManagerExpenses().subscribe((data) => this.rowData = [...data]);
   }
 
   ngOnInit() {
@@ -266,7 +312,7 @@ export class ManagerComponent implements OnInit {
       this.expenses.updateExpenseManager(dataVerified, expenseId)
         .subscribe(
           result => {
-            this.expenses.getManagerExpenses().subscribe((response: ExpensesIfc) => {
+            this.expenses.getManagerExpenses().subscribe((response) => {
               // @ts-ignore
               this.rowData = [...response];
               this.getNextExpense();

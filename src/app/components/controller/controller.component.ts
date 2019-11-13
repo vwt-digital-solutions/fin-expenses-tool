@@ -3,10 +3,9 @@ import {ExpensesConfigService} from '../../services/config.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DomSanitizer} from '@angular/platform-browser';
 import {FormaterService} from 'src/app/services/formater.service';
-
-interface ExpensesIfc {
-  ['body']: any;
-}
+import {Expense} from '../../models/expense';
+import {Attachment} from '../../models/attachment';
+import {EnvService} from '../../services/env.service';
 
 @Component({
   selector: 'app-manager',
@@ -20,13 +19,15 @@ export class ControllerComponent implements OnInit {
   public columnDefs;
   public today;
   public denySelection;
-  public expenseData: object;
-  private receiptFiles;
+  public expenseData: Expense;
+  private receiptFiles: Attachment[];
+  public toggleView: boolean;
 
   constructor(
     private expenses: ExpensesConfigService,
     private modalService: NgbModal,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private env: EnvService
   ) {
     this.columnDefs = [
       {
@@ -127,6 +128,50 @@ export class ControllerComponent implements OnInit {
     }
   }
 
+  openAttachment(type, file) {
+    if (this.env.openToggle) {
+      if (this.toggleView) {
+        this.openImgModal(type, file);
+      } else {
+        this.openSanitizeFile(type, file);
+      }
+    } else {
+      this.openSanitizeFile(type, file);
+    }
+  }
+
+  // Image Modal BEGIN
+  openImgModal(type, file) {
+    const imgModal = document.getElementById('imgModal');
+    const imgImg = document.getElementById('imgImg');
+    const imgFrame = document.getElementById('imgFrame');
+    imgModal.style.display = 'block';
+
+    if (type === 'application/pdf') {
+      imgImg.style.display = 'none';
+      // @ts-ignore
+      imgFrame.src = 'data:' + type + ';base64,' + encodeURI(file);
+    } else {
+      // @ts-ignore
+      imgImg.src = 'data:' + type + ';base64,' + encodeURI(file);
+    }
+  }
+
+  closeImgModal(event) {
+    if (event.srcElement.id !== 'imgImg') {
+      const imgModal = document.getElementById('imgModal');
+      const imgImg = document.getElementById('imgImg');
+      const imgFrame = document.getElementById('imgFrame');
+      imgModal.style.display = 'none';
+      imgImg.style.display = 'block';
+      // @ts-ignore
+      imgImg.src = '';
+      // @ts-ignore
+      imgFrame.src = '';
+    }
+  }
+  // Image Modal END
+
   ngOnInit() {
     this.today = new Date();
     this.denySelection = false;
@@ -143,7 +188,7 @@ export class ControllerComponent implements OnInit {
   onGridReady(params: any) {
     this.gridApi = params.api;
     // @ts-ignore
-    this.expenses.getControllerExpenses().subscribe((data: ExpensesIfc) => this.rowData = [...data]);
+    this.expenses.getControllerExpenses().subscribe((data) => this.rowData = [...data]);
   }
 
   onRowClicked(event, content) {

@@ -5,6 +5,7 @@ import {HttpClientModule} from '@angular/common/http';
 import {HeaderComponent} from './components/header/header.component';
 import {EnvServiceProvider} from './services/env.service.provider';
 import {OAuthLogger, OAuthService, UrlHelperService} from 'angular-oauth2-oidc';
+import {LoaderComponent} from './components/loader/loader.component';
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -15,7 +16,8 @@ describe('AppComponent', () => {
       ],
       declarations: [
         AppComponent,
-        HeaderComponent
+        HeaderComponent,
+        LoaderComponent
       ],
       providers: [
         EnvServiceProvider,

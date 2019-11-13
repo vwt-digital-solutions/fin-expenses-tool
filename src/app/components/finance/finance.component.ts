@@ -7,6 +7,10 @@ import {DomSanitizer} from '@angular/platform-browser';
 import {FormaterService} from 'src/app/services/formater.service';
 import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
+import {Expense} from '../../models/expense';
+import {CostType} from '../../models/cost-type';
+import {Attachment} from '../../models/attachment';
+import {EnvService} from '../../services/env.service';
 
 @Component({
   selector: 'app-expenses',
@@ -19,19 +23,20 @@ export class FinanceComponent implements OnInit {
   private historyGridApi;
   public columnDefs;
   public rowSelection;
-  public typeOptions;
+  public typeOptions: CostType[];
   public formSubmitted;
   public showErrors;
   public formErrors;
   public formResponse;
   private action: any;
-  private receiptFiles;
+  private receiptFiles: Attachment[];
   private isRejecting;
   public today;
   public wantsRejectionNote;
   public selectedRejection;
   public noteData;
   private currentRowIndex: number;
+  public toggleView: boolean;
 
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
   modalDefinition: any;
@@ -41,7 +46,8 @@ export class FinanceComponent implements OnInit {
     private modalService: NgbModal,
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
-    private http: HttpClient
+    private http: HttpClient,
+    private env: EnvService
   ) {
     this.columnDefs = [
       {
@@ -95,7 +101,7 @@ export class FinanceComponent implements OnInit {
     this.addBooking = {success: false, wrong: false, error: false};
   }
 
-  public expenseData: object;
+  public expenseData: Expense;
   public addBooking;
 
   historyColumnDefs = [
@@ -169,6 +175,50 @@ export class FinanceComponent implements OnInit {
       win.document.write('<iframe src="' + sanitizedExpr + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
     }
   }
+
+  openAttachment(type, file) {
+    if (this.env.openToggle) {
+      if (this.toggleView) {
+        this.openImgModal(type, file);
+      } else {
+        this.openSanitizeFile(type, file);
+      }
+    } else {
+      this.openSanitizeFile(type, file);
+    }
+  }
+
+  // Image Modal BEGIN
+  openImgModal(type, file) {
+    const imgModal = document.getElementById('imgModal');
+    const imgImg = document.getElementById('imgImg');
+    const imgFrame = document.getElementById('imgFrame');
+    imgModal.style.display = 'block';
+
+    if (type === 'application/pdf') {
+      imgImg.style.display = 'none';
+      // @ts-ignore
+      imgFrame.src = 'data:' + type + ';base64,' + encodeURI(file);
+    } else {
+      // @ts-ignore
+      imgImg.src = 'data:' + type + ';base64,' + encodeURI(file);
+    }
+  }
+
+  closeImgModal(event) {
+    if (event.srcElement.id !== 'imgImg') {
+      const imgModal = document.getElementById('imgModal');
+      const imgImg = document.getElementById('imgImg');
+      const imgFrame = document.getElementById('imgFrame');
+      imgModal.style.display = 'none';
+      imgImg.style.display = 'block';
+      // @ts-ignore
+      imgImg.src = '';
+      // @ts-ignore
+      imgFrame.src = '';
+    }
+  }
+  // Image Modal END
 
   historyHit(event) {
     if (event.colDef.field === 'export_date') {
