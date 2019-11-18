@@ -16,7 +16,7 @@
 <!-- FORM TEMPLATE -->
 <ng-template #expenseContent let-modal>
   <div class="modal-header">
-    <h4 class="modal-title" id="modal-basic-title">Declaratie Bewerken</h4>
+    <h4 class="modal-title" id="modal-basic-title">Declaratie Keuren</h4>
     <button id="expenseModalClose" type="button" class="close" aria-label="Close"
             (click)="modal.dismiss('Cross click')">
       <span aria-hidden="true">&times;</span>
@@ -24,7 +24,8 @@
   </div>
 
   <div class="modal-body">
-    <code>{{ expenseData.employee }}</code>
+    <p class="employee-text">{{ expenseData.employee }}</p>
+    <div class="employee-line"></div>
     <div id="updateErrors" class="alert alert-danger" role="alert" *ngIf="showErrors">
       {{ formErrors }} {{ formResponse.detail }}
     </div>

@@ -53,7 +53,8 @@
     </div>
 
     <div class="modal-body">
-      <code>{{ expenseData.employee }}</code>
+      <p class="employee-text">{{ expenseData.employee }}</p>
+      <div class="employee-line"></div>
       <div id="updateErrors" class="alert alert-danger" role="alert" *ngIf="showErrors">
         {{ formErrors }} {{ formResponse.detail }}
       </div>

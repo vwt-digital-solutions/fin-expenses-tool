@@ -77,6 +77,17 @@ input {
   margin-top: 10px;
 }
 
+.employee-text {
+  color: #3f8bb5;
+  font-weight: 400;
+  margin-bottom: 5px;
+}
+
+.employee-line {
+  border-bottom: 1px solid $vwt_color_blue_hr;
+  margin-bottom: 10px;
+}
+
 .input-group-addon {
   line-height: 32.5px;
   text-align: center;

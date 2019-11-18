@@ -307,10 +307,11 @@ export class FinanceComponent implements OnInit {
     }
   }
 
-  getNextExpense() {
+  getNextExpense(same) {
     this.dismissModal();
     setTimeout(() => {
-      this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(this.currentRowIndex + 1), this.modalDefinition);
+      // tslint:disable-next-line:max-line-length
+      this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(same ? this.currentRowIndex : this.currentRowIndex + 1), this.modalDefinition);
     }, 100);
   }
 
@@ -399,7 +400,7 @@ export class FinanceComponent implements OnInit {
             result => {
               this.expenses.getExpenses().subscribe((response: any) => {
                 this.rowData = [...response];
-                this.getNextExpense();
+                this.getNextExpense(this.action === 'rejecting');
               });
               this.showErrors = false;
               this.formSubmitted = !form.ngSubmit.hasError;
