@@ -89,19 +89,11 @@
         </div>
         <label>Bestanden:</label>
 
-        <!-- Temporary button -->
-        <button class="btn btn-secondary btn-sm"
-                id="toggleView"
-                type="button"
-                (click)="this.toggleView = !this.toggleView"
-                [ngClass]="{hidden: !this.env.openToggle, toggled: this.toggleView}">{{this.toggleView ? 'Intern' : 'Extern'}}</button>
-        <!-- Temporary button end -->
-
         <ul class="list-group">
           <li *ngFor="let item of receiptFiles"
               class="list-group-item d-flex justify-content-between align-items-center">
             <span class="click-stop"
-                  (click)="this.openAttachment(item.content_type, item.content)">View File - {{item.content_type}}</span>
+                  (click)="this.openSanitizeFile(item.content_type, item.content)">View File - {{item.content_type}}</span>
           </li>
         </ul>
         <!-- Form: Rejection Note -->
@@ -164,11 +156,3 @@
   </div>
 </ng-template>
 <!--   END FORM TEMPLATE-->
-
-<!--   Image Modal BEGIN   -->
-<div id="imgModal" class="img-modal" (click)="this.closeImgModal($event)">
-  <span class="img-close">&times;</span>
-  <img class="img-img" id="imgImg">
-  <iframe class="img-frame" frameborder="0" id="imgFrame"></iframe>
-</div>
-<!--   Image Modal END   -->

@@ -36,7 +36,6 @@ export class FinanceComponent implements OnInit {
   public selectedRejection;
   public noteData;
   private currentRowIndex: number;
-  public toggleView: boolean;
 
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
   modalDefinition: any;
@@ -175,50 +174,6 @@ export class FinanceComponent implements OnInit {
       win.document.write('<iframe src="' + sanitizedExpr + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
     }
   }
-
-  openAttachment(type, file) {
-    if (this.env.openToggle) {
-      if (this.toggleView) {
-        this.openImgModal(type, file);
-      } else {
-        this.openSanitizeFile(type, file);
-      }
-    } else {
-      this.openSanitizeFile(type, file);
-    }
-  }
-
-  // Image Modal BEGIN
-  openImgModal(type, file) {
-    const imgModal = document.getElementById('imgModal');
-    const imgImg = document.getElementById('imgImg');
-    const imgFrame = document.getElementById('imgFrame');
-    imgModal.style.display = 'block';
-
-    if (type === 'application/pdf') {
-      imgImg.style.display = 'none';
-      // @ts-ignore
-      imgFrame.src = 'data:' + type + ';base64,' + encodeURI(file);
-    } else {
-      // @ts-ignore
-      imgImg.src = 'data:' + type + ';base64,' + encodeURI(file);
-    }
-  }
-
-  closeImgModal(event) {
-    if (event.srcElement.id !== 'imgImg') {
-      const imgModal = document.getElementById('imgModal');
-      const imgImg = document.getElementById('imgImg');
-      const imgFrame = document.getElementById('imgFrame');
-      imgModal.style.display = 'none';
-      imgImg.style.display = 'block';
-      // @ts-ignore
-      imgImg.src = '';
-      // @ts-ignore
-      imgFrame.src = '';
-    }
-  }
-  // Image Modal END
 
   historyHit(event) {
     if (event.colDef.field === 'export_date') {
