@@ -67,7 +67,7 @@
           <form
             id="expensesUpdateForm"
             #expenseUpdateForm="ngForm"
-            (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, ntype)"
+            (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, ntype, rnote)"
             name="expenseUpdateForm">
             <div class="form-group">
               <!-- Form: Costs -->
@@ -189,7 +189,7 @@
           <div *ngIf="this.isRejecting" id="thumbs-down-rejecting" class="float-right badge badge-danger"
                (click)="updatingAction('rejecting')">
             <label for="submit-update-form"
-                   [ngClass]="{disabledbtn: submitButtonController(ntype)}">
+                   [ngClass]="{disabledbtn: submitButtonController(ntype, rnote)}">
               <a id="information-icon-down-rejecting">OK</a>
             </label>
           </div>

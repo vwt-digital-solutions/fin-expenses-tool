@@ -330,12 +330,16 @@ export class FinanceComponent implements OnInit {
         });
   }
 
-  submitButtonController(ntype: { invalid: boolean }) {
-    return ntype.invalid;
+  submitButtonController(ntype: { invalid: boolean }, rnote: { invalid: boolean } = null) {
+    if (this.wantsRejectionNote) {
+      return ntype.invalid || rnote.invalid;
+    } else {
+      return ntype.invalid;
+    }
   }
 
-  claimUpdateForm(form: NgForm, expenseId, type) {
-    if (!this.submitButtonController(type)) {
+  claimUpdateForm(form: NgForm, expenseId, type, note = null) {
+    if (!this.submitButtonController(type, note)) {
       const dataVerified = {};
       const data = form.value;
       if (!(this.wantsRejectionNote)) {
