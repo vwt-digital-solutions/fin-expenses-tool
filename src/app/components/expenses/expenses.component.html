@@ -35,7 +35,7 @@
             </div>
             <div class="fill-text"
                  *ngIf="notFilledClass(namount)">
-              <small>Graag een geldig bedrag invullen</small>
+              <small id="amountinputFill">Graag een geldig bedrag invullen</small>
             </div>
             <div class="mt-3"></div>
             <div class="input-group mb-3">
@@ -58,7 +58,7 @@
             </div>
             <div class="fill-text move-18"
                  *ngIf="notFilledClass(ntype)">
-              <small>Graag een declaratiesoort kiezen</small>
+              <small id="typeinputFill">Graag een declaratiesoort kiezen</small>
             </div>
 
             <label for="dateinput">Datum bon:</label>
@@ -79,7 +79,7 @@
             </div>
             <div class="fill-text"
                  *ngIf="notFilledClass(ntransdate)">
-              <small>{{transdateNotFilledMessage}}</small>
+              <small id="dateinputFill">{{transdateNotFilledMessage}}</small>
             </div>
             <div class="mb-3"></div>
             <div class="form-group">
@@ -97,7 +97,7 @@
             </div>
             <div class="fill-text move-18"
                  *ngIf="notFilledClass(nnote)">
-              <small>Graag een omschrijving invullen</small>
+              <small id="noteinputFill">Graag een omschrijving invullen</small>
             </div>
           </div>
 
@@ -131,7 +131,7 @@
             </div>
             <div class="fill-text"
                  *ngIf="notFilledClass(nattachment)">
-              <small>Graag een bijlage toevoegen</small>
+              <small id="attachmentinputFill">Graag een bijlage toevoegen</small>
             </div>
           </div>
 
