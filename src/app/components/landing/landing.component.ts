@@ -95,7 +95,7 @@ export class LandingComponent implements OnInit {
       return 'badge badge-pill badge-danger';
     } else if (status === 'approved') {
       return 'badge badge-pill badge-success';
-    } else if (status === 'payed') {
+    } else if (status === 'exported') {
       return 'badge badge-pill badge-success';
     } else {
       return 'badge badge-pill badge-info';
