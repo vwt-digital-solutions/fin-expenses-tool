@@ -31,6 +31,14 @@ const get = (options: any): any => {
 const until = protractor.ExpectedConditions;
 const e2eID = Math.random() * 100;
 
+
+function writeScreenShot(data, filename) {
+  const stream = fs.createWriteStream(filename);
+  stream.write(new Buffer(data, 'base64'));
+  stream.end();
+}
+
+
 describe('ExpenseApp:', () => {
   let originalTimeout;
 
@@ -82,6 +90,7 @@ describe('ExpenseApp:', () => {
   it('should get the list of expenses on the landing page (or none)', () => {
 
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+      browser.sleep(1000);
       browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long');
     }));
 
@@ -123,33 +132,35 @@ describe('ExpenseApp:', () => {
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
 
     const path = require('path');
-    const file = 'assets/betaald.png';
-    const absolutePath = path.resolve(__dirname, file);
+    // tslint:disable-next-line:one-variable-per-declaration
+    const file = 'assets/betaald.png',
+      absolutePath = path.resolve(__dirname, file);
     element(by.id('attachmentinput')).sendKeys(absolutePath);
 
-    expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
-
-    expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
-
-    expect(browser.wait(until.invisibilityOf(element(by.id('dateinputFill'))), 10, 'Date input went wrong'));
-
-    expect(browser.wait(until.invisibilityOf(element(by.id('noteinputFill'))), 10, 'Note input went wrong'));
-
-    expect(browser.wait(until.invisibilityOf(element(by.id('attachmentinputFill'))), 10, 'Attachment input went wrong'));
-
     element(by.id('submit-click')).click().then(() => {
-      expect(browser.wait(until.visibilityOf(element(by.id('success-alert'))), 10000, 'Expense creation took too long'));
+      expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
+      expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
+      expect(browser.wait(until.invisibilityOf(element(by.id('dateinputFill'))), 10, 'Date input went wrong'));
+      expect(browser.wait(until.invisibilityOf(element(by.id('noteinputFill'))), 10, 'Note input went wrong'));
+      expect(browser.wait(until.invisibilityOf(element(by.id('attachmentinputFill'))), 10, 'Attachment input went wrong'));
+      expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+        browser.sleep(1000);
+        browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long');
+      }));
     });
 
   });
 
   it('should redirect to the manager page and load the expenses', () => {
 
-    browser.wait(until.visibilityOf(element(by.name('expenses/manage'))), 200000, 'Not on the home page').then(() => {
+    browser.wait(until.visibilityOf(element(by.name('expenses/manage'))), 200000, 'Not on the home page or expense was not created')
+      .then(() => {
       expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+        browser.sleep(1000);
         browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
           element(by.name('expenses/manage')).click().then(() => {
             expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+              browser.sleep(1000);
               browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
                 expect(element.all(by.css('.ag-row')).count()).toBeGreaterThanOrEqual(1);
               });
@@ -166,9 +177,14 @@ describe('ExpenseApp:', () => {
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID))),
       10, 'Attachment is not shown on the manager page').then(() => {
       element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID)).click().then(() => {
-        expect(browser.wait(until.visibilityOf(element(by.css('li'))), 20000, 'No attachments are shown').then(() => {
-          const attachmentList = element.all(by.css('.click-stop'));
-          expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
+        expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+          browser.sleep(1000);
+          browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+            expect(browser.wait(until.visibilityOf(element(by.css('li'))), 20000, 'No attachments are shown').then(() => {
+              const attachmentList = element.all(by.css('.click-stop'));
+              expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
+            }));
+          });
         }));
       });
     }));
@@ -182,7 +198,7 @@ describe('ExpenseApp:', () => {
     expect(browser.wait(until.visibilityOf(element(by.id('thumbs-up'))),
       10, 'Approve button is not shown on the manager modal').then(() => {
       element(by.id('thumbs-up')).click().then(() => {
-        expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 20000, 'Expense rejection took too long'));
+        expect(browser.wait(until.invisibilityOf(element(by.css('.modal-content'))), 20000, 'Expense approval took too long'));
       });
     }));
 

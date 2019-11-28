@@ -258,7 +258,7 @@ export class ManagerComponent implements OnInit {
     if (!this.submitButtonController(note)) {
       const dataVerified = {};
       const data = form.value;
-      if (!(this.wantsRejectionNote)) {
+      if (!(this.wantsRejectionNote) && dataVerified[`status`] === 'rejecting') {
         data.rnote = this.selectedRejection;
       }
       for (const prop in data) {
