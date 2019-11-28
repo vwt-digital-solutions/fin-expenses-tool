@@ -5,6 +5,7 @@ import {EnvService} from 'src/app/services/env.service';
 import {Router, ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
 import {ExpensesConfigService} from 'src/app/services/config.service';
+import { DeviceDetectorService } from 'ngx-device-detector';
 
 @Component({
   selector: 'app-expenses',
@@ -35,13 +36,17 @@ export class ExpensesComponent implements OnInit {
   public attachmentList: any[];
   public wantsNext: number;
   public expenseID: string | number;
+  public isDesktopDevice = null;
 
   constructor(
     private expenses: ExpensesConfigService,
     private env: EnvService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private deviceService: DeviceDetectorService
   ) {
+    this.isDesktopDevice = this.deviceService.isDesktop();
+
     this.addClaimSuccess = {success: false, wrong: false};
     this.today = new Date();
     this.notaData = 'Toevoegen';

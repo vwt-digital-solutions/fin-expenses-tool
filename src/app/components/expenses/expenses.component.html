@@ -136,8 +136,14 @@
           </div>
 
           <div class="col-sm-12">
-            <small id="emailHelp" class="form-text text-muted">Vragen of opmerkingen? Mail naar <a
-              href="mailto:crediteuren@vwtelecom.com?subject=Vraag/opmerking Declaratie-app">crediteuren@vwtelecom.com</a>.
+            <small id="emailHelp" class="form-text text-muted">
+              Vragen of opmerkingen? Mail naar
+              <ng-container *ngIf="isDesktopDevice">
+                <a href="mailto:crediteuren@vwtelecom.com?subject=Vraag/opmerking Declaratie-app">crediteuren@vwtelecom.com</a>.
+              </ng-container>
+              <ng-container *ngIf="!isDesktopDevice">
+                crediteuren@vwtelecom.com.
+              </ng-container>
             </small>
           </div>
 
