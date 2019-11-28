@@ -138,15 +138,14 @@ describe('ExpenseApp:', () => {
     expect(browser.wait(until.invisibilityOf(element(by.id('attachmentinputFill'))), 10, 'Attachment input went wrong'));
 
     element(by.id('submit-click')).click().then(() => {
-      expect(browser.wait(until.invisibilityOf(element(by.id('succes-alert'))), 10000, 'Expense creation took too long'));
+      expect(browser.wait(until.visibilityOf(element(by.id('success-alert'))), 10000, 'Expense creation took too long'));
     });
 
   });
 
   it('should redirect to the manager page and load the expenses', () => {
 
-    expect(browser.wait(until.urlContains('/home'), 20000, 'Redirect took too long'));
-    browser.wait(until.visibilityOf(element(by.name('expenses/manage')))).then(() => {
+    browser.wait(until.visibilityOf(element(by.name('expenses/manage'))), 200000, 'Not on the home page').then(() => {
       expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
         browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
           element(by.name('expenses/manage')).click().then(() => {
