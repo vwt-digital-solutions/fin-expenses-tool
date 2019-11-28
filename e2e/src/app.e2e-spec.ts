@@ -136,7 +136,11 @@ describe('ExpenseApp:', () => {
     const file = 'e2e_image.png',
       absolutePath = path.resolve(__dirname, file);
     element(by.id('attachmentinput')).sendKeys(absolutePath);
-
+    console.log('______PRINTING PATH INFO______');
+    console.log(path);
+    console.log(file);
+    console.log(absolutePath);
+    console.log('______ENDING PATH INFO______');
     element(by.id('submit-click')).click().then(() => {
       expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
