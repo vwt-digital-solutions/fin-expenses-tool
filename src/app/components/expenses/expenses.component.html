@@ -103,7 +103,7 @@
 
           <div class="col-sm-6">
             <label for="attachmentinput">Bijlage:</label>
-            <div [ngClass]="{hidden: this.wantsList}">
+            <div class="hidden">
               <input id="attachmentinput"
                      type="file"
                      accept="application/pdf,image/png,image/jpeg,image/jpg"
@@ -114,7 +114,7 @@
                      #nattachment="ngModel"
                      #fileInputHidden>
             </div>
-            <div [ngClass]="{hidden: !this.wantsList}">
+            <div>
               <ul class="list-group">
                 <li class="list-group-item d-flex justify-content-between align-items-center"
                     id="upload"

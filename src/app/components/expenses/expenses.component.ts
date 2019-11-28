@@ -31,7 +31,6 @@ export class ExpensesComponent implements OnInit {
   public transdateNotFilledMessage;
   public locatedFile: any[] | (string | ArrayBuffer)[];
   public loadingThings: boolean;
-  public wantsList: boolean;
   public attachmentList: any[];
   public wantsNext: number;
   public expenseID: string | number;
@@ -46,7 +45,6 @@ export class ExpensesComponent implements OnInit {
     this.today = new Date();
     this.notaData = 'Toevoegen';
     this.loadingThings = false;
-    this.wantsList = true;
     this.wantsNext = 0;
     this.locatedFile = [];
     this.attachmentList = [];

@@ -133,7 +133,7 @@ describe('ExpenseApp:', () => {
 
     const path = require('path');
     // tslint:disable-next-line:one-variable-per-declaration
-    const file = 'assets/betaald.png',
+    const file = 'e2e_image.png',
       absolutePath = path.resolve(__dirname, file);
     element(by.id('attachmentinput')).sendKeys(absolutePath);
 
