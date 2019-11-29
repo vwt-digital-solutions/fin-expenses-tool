@@ -168,12 +168,15 @@ describe('ExpenseApp:', () => {
   it('should open the expense and see the attachment', () => {
 
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID))),
-      10, 'Attachment is not shown on the manager page').then(() => {
+      10, 'Expense is not shown on the manager page').then(() => {
       element(by.cssContainingText(`[role='gridcell'][col-id='note']`, 'E2E Addition ' + e2eID)).click().then(() => {
+        browser.waitForAngular();
         expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
           browser.sleep(1000);
           browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-            expect(browser.wait(until.visibilityOf(element(by.css('li'))), 20000, 'No attachments are shown').then(() => {
+            browser.waitForAngular();
+            element(by.id('modal-basic-title')).click();
+            expect(browser.wait(until.presenceOf(element(by.css('li'))), 20000, 'No attachments are shown').then(() => {
               const attachmentList = element.all(by.css('.click-stop'));
               expect(attachmentList.count()).toBeGreaterThanOrEqual(1);
             }));
@@ -186,7 +189,6 @@ describe('ExpenseApp:', () => {
 
 
   it('should approve the expense', () => {
-
 
     expect(browser.wait(until.visibilityOf(element(by.id('thumbs-up'))),
       10, 'Approve button is not shown on the manager modal').then(() => {
