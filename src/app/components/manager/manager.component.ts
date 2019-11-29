@@ -30,8 +30,6 @@ export class ManagerComponent implements OnInit {
   public formErrors;
   public formResponse;
   private action: any;
-  private departmentId: number;
-  private OurJaneDoeIs: string;
   private receiptFiles: Attachment[];
   private isRejecting;
   public wantsRejectionNote;
@@ -216,9 +214,6 @@ export class ManagerComponent implements OnInit {
 
   onGridReady(params: any) {
     this.gridColumnApi = params.columnApi;
-    const claimJaneDoe = this.identityService.allClaims();
-    this.departmentId = claimJaneDoe.oid;
-    this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
     // @ts-ignore
     this.expenses.getManagerExpenses().subscribe((data) => this.rowData = [...data]);
   }
