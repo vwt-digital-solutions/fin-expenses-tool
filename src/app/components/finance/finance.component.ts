@@ -342,7 +342,7 @@ export class FinanceComponent implements OnInit {
     if (!this.submitButtonController(type, note)) {
       const dataVerified = {};
       const data = form.value;
-      if (!(this.wantsRejectionNote)) {
+      if (!(this.wantsRejectionNote) && this.action === 'rejecting') {
         data.rnote = this.selectedRejection;
       }
       for (const prop in data) {

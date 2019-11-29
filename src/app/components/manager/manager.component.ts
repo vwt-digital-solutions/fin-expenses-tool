@@ -102,25 +102,7 @@ export class ManagerComponent implements OnInit {
     this.addBooking = {success: false, wrong: false, error: false};
   }
 
-  historyColumnDefs = [
-    {
-      headerName: '',
-      children: [
-        {
-          headerName: 'Geschiedenis', field: 'date_exported',
-          sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
-          suppressMovable: true
-        },
-        {
-          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 100,
-          template: '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>'
-        }
-      ]
-    }
-  ];
-
   rowData = null;
-  historyRowData = null;
 
   static getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
@@ -258,16 +240,15 @@ export class ManagerComponent implements OnInit {
     if (!this.submitButtonController(note)) {
       const dataVerified = {};
       const data = form.value;
-
+      if (!(this.wantsRejectionNote) && this.action === 'rejecting') {
+        data.rnote = this.selectedRejection;
+      }
       for (const prop in data) {
         if (prop.length !== 0) {
           dataVerified[prop] = data[prop];
         }
       }
       const action = this.action;
-      if (!(this.wantsRejectionNote) && dataVerified[`status`] === 'rejecting') {
-        data.rnote = this.selectedRejection;
-      }
       dataVerified[`status`] = action === 'approving' ? `ready_for_creditor` :
         action === 'rejecting' ? `rejected_by_manager` : null;
 
