@@ -323,7 +323,7 @@ export class FinanceComponent implements OnInit {
             this.historyGridApi.setRowData(this.historyRowData);
             this.successfulDownload();
           }
-          console.log('>> POST SUCCES');
+          console.log('>> POST SUCCESS');
         }, response => {
           this.errorBooking();
           console.error('>> POST FAILED', response.message);

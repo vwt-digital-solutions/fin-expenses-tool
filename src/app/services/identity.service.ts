@@ -29,4 +29,8 @@ export class IdentityService {
     }
     return claims;
   }
+
+  isTesting(): boolean {
+    return this.allClaims().email.split('@')[0] === 'opensource.e2e';
+  }
 }

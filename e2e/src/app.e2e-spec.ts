@@ -131,22 +131,11 @@ describe('ExpenseApp:', () => {
 
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
 
-    const path = require('path');
-    // tslint:disable-next-line:one-variable-per-declaration
-    const file = 'e2e_image.png',
-      absolutePath = path.resolve(__dirname, file);
-    element(by.id('attachmentinput')).sendKeys(absolutePath);
-    console.log('______PRINTING PATH INFO______');
-    console.log(path);
-    console.log(file);
-    console.log(absolutePath);
-    console.log('______ENDING PATH INFO______');
     element(by.id('submit-click')).click().then(() => {
       expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('dateinputFill'))), 10, 'Date input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('noteinputFill'))), 10, 'Note input went wrong'));
-      expect(browser.wait(until.invisibilityOf(element(by.id('attachmentinputFill'))), 10, 'Attachment input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
         browser.sleep(1000);
         browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long');
