@@ -36,7 +36,6 @@ export class FinanceComponent implements OnInit {
   public selectedRejection;
   public noteData;
   private currentRowIndex: number;
-  public toggleView: boolean;
 
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
   modalDefinition: any;
@@ -176,50 +175,6 @@ export class FinanceComponent implements OnInit {
     }
   }
 
-  openAttachment(type, file) {
-    if (this.env.openToggle) {
-      if (this.toggleView) {
-        this.openImgModal(type, file);
-      } else {
-        this.openSanitizeFile(type, file);
-      }
-    } else {
-      this.openSanitizeFile(type, file);
-    }
-  }
-
-  // Image Modal BEGIN
-  openImgModal(type, file) {
-    const imgModal = document.getElementById('imgModal');
-    const imgImg = document.getElementById('imgImg');
-    const imgFrame = document.getElementById('imgFrame');
-    imgModal.style.display = 'block';
-
-    if (type === 'application/pdf') {
-      imgImg.style.display = 'none';
-      // @ts-ignore
-      imgFrame.src = 'data:' + type + ';base64,' + encodeURI(file);
-    } else {
-      // @ts-ignore
-      imgImg.src = 'data:' + type + ';base64,' + encodeURI(file);
-    }
-  }
-
-  closeImgModal(event) {
-    if (event.srcElement.id !== 'imgImg') {
-      const imgModal = document.getElementById('imgModal');
-      const imgImg = document.getElementById('imgImg');
-      const imgFrame = document.getElementById('imgFrame');
-      imgModal.style.display = 'none';
-      imgImg.style.display = 'block';
-      // @ts-ignore
-      imgImg.src = '';
-      // @ts-ignore
-      imgFrame.src = '';
-    }
-  }
-  // Image Modal END
-
   historyHit(event) {
     if (event.colDef.field === 'export_date') {
       return;
@@ -307,10 +262,11 @@ export class FinanceComponent implements OnInit {
     }
   }
 
-  getNextExpense() {
+  getNextExpense(same) {
     this.dismissModal();
     setTimeout(() => {
-      this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(this.currentRowIndex + 1), this.modalDefinition);
+      // tslint:disable-next-line:max-line-length
+      this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(same ? this.currentRowIndex : this.currentRowIndex + 1), this.modalDefinition);
     }, 100);
   }
 
@@ -367,22 +323,26 @@ export class FinanceComponent implements OnInit {
             this.historyGridApi.setRowData(this.historyRowData);
             this.successfulDownload();
           }
-          console.log('>> POST SUCCES');
+          console.log('>> POST SUCCESS');
         }, response => {
           this.errorBooking();
           console.error('>> POST FAILED', response.message);
         });
   }
 
-  submitButtonController(ntype: { invalid: boolean }) {
-    return ntype.invalid;
+  submitButtonController(ntype: { invalid: boolean }, rnote: { invalid: boolean } = null) {
+    if (this.wantsRejectionNote) {
+      return ntype.invalid || rnote.invalid;
+    } else {
+      return ntype.invalid;
+    }
   }
 
-  claimUpdateForm(form: NgForm, expenseId, type) {
-    if (!this.submitButtonController(type)) {
+  claimUpdateForm(form: NgForm, expenseId, type, note = null) {
+    if (!this.submitButtonController(type, note)) {
       const dataVerified = {};
       const data = form.value;
-      if (!(this.wantsRejectionNote)) {
+      if (!(this.wantsRejectionNote) && this.action === 'rejecting') {
         data.rnote = this.selectedRejection;
       }
       for (const prop in data) {
@@ -399,7 +359,7 @@ export class FinanceComponent implements OnInit {
             result => {
               this.expenses.getExpenses().subscribe((response: any) => {
                 this.rowData = [...response];
-                this.getNextExpense();
+                this.getNextExpense(this.action === 'rejecting');
               });
               this.showErrors = false;
               this.formSubmitted = !form.ngSubmit.hasError;

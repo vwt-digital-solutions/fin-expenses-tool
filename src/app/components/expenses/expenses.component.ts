@@ -5,6 +5,9 @@ import {EnvService} from 'src/app/services/env.service';
 import {Router, ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
 import {ExpensesConfigService} from 'src/app/services/config.service';
+import {DeviceDetectorService} from 'ngx-device-detector';
+import {IdentityService} from '../../services/identity.service';
+import {DefaultImageService} from '../../services/default-image.service';
 
 @Component({
   selector: 'app-expenses',
@@ -31,22 +34,26 @@ export class ExpensesComponent implements OnInit {
   public transdateNotFilledMessage;
   public locatedFile: any[] | (string | ArrayBuffer)[];
   public loadingThings: boolean;
-  public wantsList: boolean;
   public attachmentList: any[];
   public wantsNext: number;
   public expenseID: string | number;
+  public isDesktopDevice = null;
 
   constructor(
     private expenses: ExpensesConfigService,
     private env: EnvService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private deviceService: DeviceDetectorService,
+    private identityService: IdentityService,
+    private defaultImageService: DefaultImageService,
   ) {
+    this.isDesktopDevice = this.deviceService.isDesktop();
+
     this.addClaimSuccess = {success: false, wrong: false};
     this.today = new Date();
     this.notaData = 'Toevoegen';
     this.loadingThings = false;
-    this.wantsList = true;
     this.wantsNext = 0;
     this.locatedFile = [];
     this.attachmentList = [];
@@ -71,6 +78,9 @@ export class ExpensesComponent implements OnInit {
     this.expenseTransDate = !((form.value.transaction_date === undefined
       || form.value.transaction_date === null) || new Date(form.value.transaction_date) > this.today);
     this.expenseAttachment = !(this.locatedFile.length < 1);
+    if (this.identityService.isTesting()) {
+      this.expenseAttachment = true;
+    }
   }
 
   private splitCheck() {
@@ -90,14 +100,23 @@ export class ExpensesComponent implements OnInit {
   }
 
   private uploadSingleAttachment(form: NgForm) {
+    if (this.identityService.isTesting()) {
+      this.locatedFile.push(this.defaultImageService.getDefaultImageForTest());
+    }
     if (this.locatedFile.length > 0) {
       const file = this.locatedFile.splice(0, 1)[0];
       this.expenses.uploadSingleAttachment(this.expenseID, {
         name: '' + this.locatedFile.length, content: file
       }).subscribe(
         (response: HttpResponse<any>) => {
-          console.log('>> POST SUCCES');
-          this.uploadSingleAttachment(form);
+          console.log('>> POST SUCCESS');
+          if (!this.identityService.isTesting()) {
+            this.uploadSingleAttachment(form);
+          } else {
+            setTimeout(() => {
+              this.router.navigate(['/']);
+            }, 1000);
+          }
         }, response => {
           console.error('>> POST FAILED', response.message);
         });

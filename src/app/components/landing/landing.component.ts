@@ -34,7 +34,6 @@ export class LandingComponent implements OnInit {
   public hasNoExpenses: boolean;
   public typeOptions: CostType[];
   public managerAmount: number;
-  public toggleView: boolean;
 
   constructor(
     private identityService: IdentityService,
@@ -89,50 +88,6 @@ export class LandingComponent implements OnInit {
     }
   }
 
-  openAttachment(type, file) {
-    if (this.env.openToggle) {
-      if (this.toggleView) {
-        this.openImgModal(type, file);
-      } else {
-        this.openSanitizeFile(type, file);
-      }
-    } else {
-      this.openSanitizeFile(type, file);
-    }
-  }
-
-  // Image Modal BEGIN
-  openImgModal(type, file) {
-    const imgModal = document.getElementById('imgModal');
-    const imgImg = document.getElementById('imgImg');
-    const imgFrame = document.getElementById('imgFrame');
-    imgModal.style.display = 'block';
-
-    if (type === 'application/pdf') {
-      imgImg.style.display = 'none';
-      // @ts-ignore
-      imgFrame.src = 'data:' + type + ';base64,' + encodeURI(file);
-    } else {
-      // @ts-ignore
-      imgImg.src = 'data:' + type + ';base64,' + encodeURI(file);
-    }
-  }
-
-  closeImgModal(event) {
-    if (event.srcElement.id !== 'imgImg') {
-      const imgModal = document.getElementById('imgModal');
-      const imgImg = document.getElementById('imgImg');
-      const imgFrame = document.getElementById('imgFrame');
-      imgModal.style.display = 'none';
-      imgImg.style.display = 'block';
-      // @ts-ignore
-      imgImg.src = '';
-      // @ts-ignore
-      imgFrame.src = '';
-    }
-  }
-  // Image Modal END
-
   statusClassing(status: string) {
     if (status.includes('rejected')) {
       return 'badge badge-pill badge-warning';
@@ -140,7 +95,7 @@ export class LandingComponent implements OnInit {
       return 'badge badge-pill badge-danger';
     } else if (status === 'approved') {
       return 'badge badge-pill badge-success';
-    } else if (status === 'payed') {
+    } else if (status === 'exported') {
       return 'badge badge-pill badge-success';
     } else {
       return 'badge badge-pill badge-info';

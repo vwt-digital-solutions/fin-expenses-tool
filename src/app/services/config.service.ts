@@ -18,7 +18,9 @@ interface ExpensesIfc {
   url: string;
 }
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ExpensesConfigService {
   constructor(
     private http: HttpClient,

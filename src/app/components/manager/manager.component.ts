@@ -30,8 +30,6 @@ export class ManagerComponent implements OnInit {
   public formErrors;
   public formResponse;
   private action: any;
-  private departmentId: number;
-  private OurJaneDoeIs: string;
   private receiptFiles: Attachment[];
   private isRejecting;
   public wantsRejectionNote;
@@ -41,7 +39,6 @@ export class ManagerComponent implements OnInit {
   public expenseData: Expense;
   public addBooking;
   private modalDefinition;
-  public toggleView: boolean;
 
   constructor(
     private expenses: ExpensesConfigService,
@@ -103,25 +100,7 @@ export class ManagerComponent implements OnInit {
     this.addBooking = {success: false, wrong: false, error: false};
   }
 
-  historyColumnDefs = [
-    {
-      headerName: '',
-      children: [
-        {
-          headerName: 'Geschiedenis', field: 'date_exported',
-          sortable: true, filter: true, cellStyle: {cursor: 'pointer'},
-          suppressMovable: true
-        },
-        {
-          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 100,
-          template: '<i class="fas fa-file-powerpoint" style="color: #4eb7da; font-size: 20px;"></i>'
-        }
-      ]
-    }
-  ];
-
   rowData = null;
-  historyRowData = null;
 
   static getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
@@ -167,50 +146,6 @@ export class ManagerComponent implements OnInit {
       win.document.write('<iframe src="' + dataContent + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
     }
   }
-
-  openAttachment(type, file) {
-    if (this.env.openToggle) {
-      if (this.toggleView) {
-        this.openImgModal(type, file);
-      } else {
-        this.openSanitizeFile(type, file);
-      }
-    } else {
-      this.openSanitizeFile(type, file);
-    }
-  }
-
-  // Image Modal BEGIN
-  openImgModal(type, file) {
-    const imgModal = document.getElementById('imgModal');
-    const imgImg = document.getElementById('imgImg');
-    const imgFrame = document.getElementById('imgFrame');
-    imgModal.style.display = 'block';
-
-    if (type === 'application/pdf') {
-      imgImg.style.display = 'none';
-      // @ts-ignore
-      imgFrame.src = 'data:' + type + ';base64,' + encodeURI(file);
-    } else {
-      // @ts-ignore
-      imgImg.src = 'data:' + type + ';base64,' + encodeURI(file);
-    }
-  }
-
-  closeImgModal(event) {
-    if (event.srcElement.id !== 'imgImg') {
-      const imgModal = document.getElementById('imgModal');
-      const imgImg = document.getElementById('imgImg');
-      const imgFrame = document.getElementById('imgFrame');
-      imgModal.style.display = 'none';
-      imgImg.style.display = 'block';
-      // @ts-ignore
-      imgImg.src = '';
-      // @ts-ignore
-      imgFrame.src = '';
-    }
-  }
-  // Image Modal END
 
   onRowClicked(event, content) {
     if (event === null || event === undefined) {
@@ -279,9 +214,6 @@ export class ManagerComponent implements OnInit {
 
   onGridReady(params: any) {
     this.gridColumnApi = params.columnApi;
-    const claimJaneDoe = this.identityService.allClaims();
-    this.departmentId = claimJaneDoe.oid;
-    this.OurJaneDoeIs = claimJaneDoe.roles[0].split('.')[0];
     // @ts-ignore
     this.expenses.getManagerExpenses().subscribe((data) => this.rowData = [...data]);
   }
@@ -293,37 +225,45 @@ export class ManagerComponent implements OnInit {
     ).subscribe(costTypes => this.typeOptions = [...costTypes]);
   }
 
-  claimUpdateForm(form: NgForm, expenseId) {
-    const dataVerified = {};
-    const data = form.value;
-    if (!(this.wantsRejectionNote)) {
-      data.rnote = this.selectedRejection;
+  submitButtonController(rnote: { invalid: boolean }) {
+    if (this.wantsRejectionNote) {
+      return rnote.invalid;
     }
-    for (const prop in data) {
-      if (prop.length !== 0) {
-        dataVerified[prop] = data[prop];
-      }
-    }
-    const action = this.action;
-    dataVerified[`status`] = action === 'approving' ? `ready_for_creditor` :
-      action === 'rejecting' ? `rejected_by_manager` : null;
+  }
 
-    Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
-      this.expenses.updateExpenseManager(dataVerified, expenseId)
-        .subscribe(
-          result => {
-            this.expenses.getManagerExpenses().subscribe((response) => {
-              // @ts-ignore
-              this.rowData = [...response];
-              this.getNextExpense();
-            });
-            this.showErrors = false;
-            this.formSubmitted = !form.ngSubmit.hasError;
-          },
-          error => {
-            this.showErrors = true;
-            Object.assign(this.formResponse, JSON.parse(error));
-          })
-      : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
+  claimUpdateForm(form: NgForm, expenseId, note) {
+    if (!this.submitButtonController(note)) {
+      const dataVerified = {};
+      const data = form.value;
+      if (!(this.wantsRejectionNote) && this.action === 'rejecting') {
+        data.rnote = this.selectedRejection;
+      }
+      for (const prop in data) {
+        if (prop.length !== 0) {
+          dataVerified[prop] = data[prop];
+        }
+      }
+      const action = this.action;
+      dataVerified[`status`] = action === 'approving' ? `ready_for_creditor` :
+        action === 'rejecting' ? `rejected_by_manager` : null;
+
+      Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
+        this.expenses.updateExpenseManager(dataVerified, expenseId)
+          .subscribe(
+            result => {
+              this.expenses.getManagerExpenses().subscribe((response) => {
+                // @ts-ignore
+                this.rowData = [...response];
+                this.getNextExpense();
+              });
+              this.showErrors = false;
+              this.formSubmitted = !form.ngSubmit.hasError;
+            },
+            error => {
+              this.showErrors = true;
+              Object.assign(this.formResponse, JSON.parse(error));
+            })
+        : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
+    }
   }
 }

@@ -29,6 +29,17 @@
   padding: 0 15px;
 }
 
+.employee-text {
+  color: #3f8bb5;
+  font-weight: 400;
+  margin-bottom: 5px;
+}
+
+.employee-line {
+  border-bottom: 1px solid $vwt_color_blue_hr;
+  margin-bottom: 10px;
+}
+
 .clickable {
   cursor: pointer;
 

@@ -17,7 +17,7 @@ describe('AppComponent', () => {
       declarations: [
         AppComponent,
         HeaderComponent,
-        LoaderComponent
+        LoaderComponent,
       ],
       providers: [
         EnvServiceProvider,

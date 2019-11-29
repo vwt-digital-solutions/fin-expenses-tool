@@ -28,6 +28,7 @@ import { ExpensesComponent } from './components/expenses/expenses.component';
 import { CommonModule } from '@angular/common';
 import { AgGridModule } from 'ag-grid-angular';
 import { NotFoundComponent } from './components/not-found/not-found.component';
+import { DeviceDetectorModule } from 'ngx-device-detector';
 
 
 @NgModule({
@@ -52,7 +53,8 @@ import { NotFoundComponent } from './components/not-found/not-found.component';
     AppRoutingModule,
     AgGridModule.withComponents([]),
     NgbDropdownModule,
-    NgbModule
+    NgbModule,
+    DeviceDetectorModule.forRoot()
   ],
 
   exports: [
