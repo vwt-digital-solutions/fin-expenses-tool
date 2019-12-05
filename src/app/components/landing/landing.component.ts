@@ -273,7 +273,7 @@ export class LandingComponent implements OnInit {
       const dataVerified = {};
       const data = form.value;
       data.amount = Number((data.amount).toFixed(2));
-      data.transaction_date = (new Date(data.transaction_date).getTime());
+      data.transaction_date = new Date(data.transaction_date).toISOString();
       for (const prop in data) {
         if (prop.length !== 0) {
           dataVerified[prop] = data[prop];

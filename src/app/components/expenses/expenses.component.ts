@@ -232,7 +232,6 @@ export class ExpensesComponent implements OnInit {
       this.loadingThings = true;
       // Format Values
       form.value.amount = Number((form.value.amount).toFixed(2));
-      form.value.transaction_date = (new Date(form.value.transaction_date).getTime());
       form.value.transaction_date = new Date(form.value.transaction_date).toISOString();
       const obj = JSON.parse(JSON.stringify(form.value));
       // End Format Values

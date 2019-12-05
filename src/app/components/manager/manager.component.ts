@@ -235,6 +235,7 @@ export class ManagerComponent implements OnInit {
     if (!this.submitButtonController(note)) {
       const dataVerified = {};
       const data = form.value;
+      data.transaction_date = new Date(data.transaction_date).toISOString();
       if (!(this.wantsRejectionNote) && this.action === 'rejecting') {
         data.rnote = this.selectedRejection;
       }
