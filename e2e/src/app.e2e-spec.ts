@@ -82,10 +82,6 @@ describe('ExpenseApp:', () => {
     });
   });
 
-  // TODO - Controller Page
-  // TODO - Finance Page
-  // TODO - Landing Page Load
-
   it('should get the list of expenses on the landing page (or none)', () => {
 
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {

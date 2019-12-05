@@ -9,7 +9,7 @@ import {IdentityService} from 'src/app/services/identity.service';
 import {map} from 'rxjs/operators';
 import {Attachment} from 'src/app/models/attachment';
 import {ActivatedRoute} from '@angular/router';
-import {FormaterService} from '../../services/formater.service';
+import {FormatterService} from '../../services/formatter.service';
 import {EnvService} from '../../services/env.service';
 
 
@@ -56,11 +56,11 @@ export class LandingComponent implements OnInit {
   }
 
   decimalFormatter(amount: any) {
-    return FormaterService.decimalFormatter(amount);
+    return FormatterService.decimalFormatter(amount);
   }
 
   dateFormatter(firstDate) {
-    return FormaterService.getCorrectDate(firstDate);
+    return FormatterService.getCorrectDate(firstDate);
   }
 
   openSanitizeFile(type: string, file: string) {
