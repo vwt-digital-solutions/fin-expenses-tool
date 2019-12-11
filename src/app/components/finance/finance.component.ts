@@ -262,11 +262,34 @@ export class FinanceComponent implements OnInit {
     }
   }
 
+  getNextNode(currentIndex: number, status: string) {
+    let new_node = null;
+    this.gridApi.forEachNodeAfterFilterAndSort(function(rowNode, index) {
+      if (new_node === null && index >= currentIndex && rowNode.data['status']['text'].includes(status)) {
+        new_node = rowNode;
+      }
+    });
+    return new_node;
+  }
+
   getNextExpense(same) {
     this.dismissModal();
     setTimeout(() => {
-      // tslint:disable-next-line:max-line-length
-      this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(same ? this.currentRowIndex : this.currentRowIndex + 1), this.modalDefinition);
+      let rowNode = null;
+      if (same) {
+        rowNode = this.gridApi.getRowNode(this.currentRowIndex);
+      } else {
+        rowNode = this.getNextNode(this.currentRowIndex + 1, 'ready_for_creditor');
+      }
+
+      if (rowNode != null && 'rowIndex' in rowNode) {
+        this.onRowClicked(rowNode, this.modalDefinition);
+      } else {
+        const rowNode = this.getNextNode(0, 'ready_for_creditor');
+        if (rowNode != null && 'rowIndex' in rowNode) {
+          this.onRowClicked(rowNode, this.modalDefinition);
+        }
+      }
     }, 100);
   }
 
