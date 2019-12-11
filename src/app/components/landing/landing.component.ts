@@ -122,7 +122,7 @@ export class LandingComponent implements OnInit {
     for (const role of claimJaneDoe.roles) {
       this.OurJaneDoeIs.push(role.split('.')[0]);
     }
-    this.personID = claimJaneDoe.email ? claimJaneDoe.email.split('@')[0] : 'UNDEFINED';
+    this.personID = claimJaneDoe.email ? claimJaneDoe.email.split('@')[0].toLowerCase() : 'UNDEFINED';
     this.displayPersonName = claimJaneDoe.name ? claimJaneDoe.name.split(',') : ['UNDEFINED', 'UNDEFINED'];
     this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName[0]).substring(1);
     this.route.data.pipe(
