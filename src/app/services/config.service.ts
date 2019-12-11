@@ -29,18 +29,13 @@ export class ExpensesConfigService {
   }
 
   static handleError(error: HttpErrorResponse) {
-    const errors = {};
     if (error.error instanceof ErrorEvent) {
-      Object.assign(errors, error.error);
       console.error('An error occurred:', error.error.message);
     } else {
-      Object.assign(errors, error.error);
       console.error(
-        `Backend returned code ${error.status}, ` +
-        `body was: ${error.error.detail}`);
+        `Backend returned code ${error.status}, body was: ${error.error}`);
     }
-    return throwError(
-      `${JSON.stringify(errors)}`);
+    return throwError(error);
   }
 
   static retry(maxRetry: number = 5, delayMs: number = 2000) {
