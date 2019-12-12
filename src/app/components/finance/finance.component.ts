@@ -263,13 +263,13 @@ export class FinanceComponent implements OnInit {
   }
 
   getNextNode(currentIndex: number, status: string) {
-    let new_node = null;
-    this.gridApi.forEachNodeAfterFilterAndSort(function(rowNode, index) {
-      if (new_node === null && index >= currentIndex && rowNode.data['status']['text'].includes(status)) {
-        new_node = rowNode;
+    let newNode = null;
+    this.gridApi.forEachNodeAfterFilterAndSort((rowNode, index) => {
+      if (newNode === null && index >= currentIndex && rowNode.data.status.text.includes(status)) {
+        newNode = rowNode;
       }
     });
-    return new_node;
+    return newNode;
   }
 
   getNextExpense(same) {
@@ -285,6 +285,7 @@ export class FinanceComponent implements OnInit {
       if (rowNode != null && 'rowIndex' in rowNode) {
         this.onRowClicked(rowNode, this.modalDefinition);
       } else {
+        // tslint:disable-next-line:no-shadowed-variable
         const rowNode = this.getNextNode(0, 'ready_for_creditor');
         if (rowNode != null && 'rowIndex' in rowNode) {
           this.onRowClicked(rowNode, this.modalDefinition);
