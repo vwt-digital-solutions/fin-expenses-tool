@@ -155,29 +155,6 @@ describe('ExpenseApp:', () => {
 
   });
 
-  it('should see the test modal', () => {
-
-    browser.wait(until.visibilityOf(element(by.name('expenses/manage'))), 20000, 'Not on the home page or expense was not created')
-      .then(() => {
-        expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-          browser.sleep(1000);
-          browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-            element(by.name('expenses/manage')).click().then(() => {
-              expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-                browser.sleep(1000);
-                browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-                  expect(element(by.id('testSample')).getText()).toEqual('Sample');
-                  element(by.id('testButton')).click();
-                  browser.get('/home');
-                });
-              }));
-            });
-          });
-        }));
-      });
-
-  });
-
   // it('should redirect to the manager page and load the expenses', () => {
   //
   //   browser.wait(until.visibilityOf(element(by.name('expenses/manage'))), 20000, 'Not on the home page or expense was not created')
