@@ -134,7 +134,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" (click)="cancelExpense()" class="btn btn-danger">Declaratie Annuleren</button>
-      <button type="button" for="submit-update-form" class="btn btn-primary"
+      <button type="button" for="submit-update-form" class="btn btn-primary" id="submit-update-button"
               (click)="claimUpdateForm(expenseUpdateForm, expenseData.id, [note, namount, ntype, ntransdate])"
               [ngClass]="{disabledbtn: submitButtonController(note, namount, ntype, ntransdate)}">Indienen
       </button>
