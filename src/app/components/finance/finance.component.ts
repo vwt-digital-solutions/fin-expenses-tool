@@ -361,18 +361,12 @@ export class FinanceComponent implements OnInit {
     }
   }
 
-  claimUpdateForm(form: NgForm, expenseId, type, note = null) {
+  claimUpdateForm({form, expenseId, type, note = null}: { form: NgForm, expenseId: number, type: any, note?: any }) {
     if (!this.submitButtonController(type, note)) {
       const dataVerified = {};
-      const data = form.value;
-      data.transaction_date = new Date(data.transaction_date).toISOString();
+      dataVerified[`rnote`] = form.value.rnote;
       if (!(this.wantsRejectionNote) && this.action === 'rejecting') {
-        data.rnote = this.selectedRejection;
-      }
-      for (const prop in data) {
-        if (prop.length !== 0) {
-          dataVerified[prop] = data[prop];
-        }
+        dataVerified[`rnote`] = this.selectedRejection;
       }
       const action = this.action;
       dataVerified[`status`] = action === 'approving' ? `approved` :

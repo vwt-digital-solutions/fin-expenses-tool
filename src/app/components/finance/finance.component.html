@@ -67,7 +67,7 @@
           <form
             id="expensesUpdateForm"
             #expenseUpdateForm="ngForm"
-            (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, ntype, rnote)"
+            (ngSubmit)="claimUpdateForm({form : expenseUpdateForm, expenseId : expenseData.id, type : ntype, note : rnote})"
             name="expenseUpdateForm">
             <div class="form-group">
               <!-- Form: Costs -->

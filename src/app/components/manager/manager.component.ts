@@ -233,23 +233,16 @@ export class ManagerComponent implements OnInit {
     }
   }
 
-  claimUpdateForm(form: NgForm, expenseId, note) {
+  claimUpdateForm({form, expenseId, note}: { form: NgForm, expenseId: any, note: any }) {
     if (!this.submitButtonController(note)) {
       const dataVerified = {};
-      const data = form.value;
-      data.transaction_date = new Date(data.transaction_date).toISOString();
+      dataVerified[`rnote`] = form.value.rnote;
       if (!(this.wantsRejectionNote) && this.action === 'rejecting') {
-        data.rnote = this.selectedRejection;
-      }
-      for (const prop in data) {
-        if (prop.length !== 0) {
-          dataVerified[prop] = data[prop];
-        }
+        dataVerified[`rnote`] = this.selectedRejection;
       }
       const action = this.action;
-      dataVerified[`status`] = action === 'approving' ? `ready_for_creditor` :
-        action === 'rejecting' ? `rejected_by_manager` : null;
-
+      dataVerified[`status`] = action === 'approving' ? `approved` :
+        action === 'rejecting' ? `rejected_by_creditor` : null;
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
         this.expenses.updateExpenseManager(dataVerified, expenseId)
           .subscribe(

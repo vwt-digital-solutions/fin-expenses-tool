@@ -32,7 +32,7 @@
     <form
       id="expensesUpdateForm"
       #expenseUpdateForm="ngForm"
-      (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, rnote)"
+      (ngSubmit)="claimUpdateForm({form : expenseUpdateForm, expenseId : expenseData.id, note : rnote})"
       name="expenseUpdateForm">
       <div class="form-group">
         <!-- Form: Costs -->
