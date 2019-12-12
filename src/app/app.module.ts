@@ -30,6 +30,7 @@ import { AgGridModule } from 'ag-grid-angular';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { DeviceDetectorModule } from 'ngx-device-detector';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
+import {ExpenseModalComponent} from './components/expense-modal/expense-modal.component';
 
 
 @NgModule({
@@ -38,6 +39,7 @@ import { SafeHtmlPipe } from './pipes/safe-html.pipe';
     HeaderComponent,
     AuthComponent,
     LoaderComponent,
+    ExpenseModalComponent,
     LandingComponent,
     FinanceComponent,
     ControllerComponent,

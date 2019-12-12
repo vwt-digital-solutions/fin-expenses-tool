@@ -40,6 +40,7 @@ export class ManagerComponent implements OnInit {
   public expenseData: Expense;
   public addBooking;
   private modalDefinition;
+  public wantsModal: boolean;
 
   constructor(
     private expenses: ExpensesConfigService,
@@ -221,6 +222,7 @@ export class ManagerComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.wantsModal = true;
     this.today = new Date();
     this.route.data.pipe(
       map(data => data.costTypes)
