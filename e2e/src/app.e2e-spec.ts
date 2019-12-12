@@ -250,6 +250,7 @@ describe('ExpenseApp:', () => {
           element(by.id('expenseAmount')).clear().then( () => {
             element(by.id('expenseAmount')).sendKeys(1.99);
             element(by.id('submit-update-button')).click();
+            browser.sleep(3000); // Should remove this
           });
         });
       }));
