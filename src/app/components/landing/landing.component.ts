@@ -292,7 +292,7 @@ export class LandingComponent implements OnInit {
             },
             error => {
               this.showErrors = true;
-              Object.assign(this.formResponse, JSON.parse(error));
+              this.formResponse = error;
             })
         : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
     }
@@ -311,7 +311,7 @@ export class LandingComponent implements OnInit {
         },
         error => {
           this.showErrors = true;
-          Object.assign(this.formResponse, JSON.parse(error));
+          this.formResponse = error;
         });
   }
 
