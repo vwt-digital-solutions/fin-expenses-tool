@@ -241,8 +241,8 @@ export class ManagerComponent implements OnInit {
         dataVerified[`rnote`] = this.selectedRejection;
       }
       const action = this.action;
-      dataVerified[`status`] = action === 'approving' ? `approved` :
-        action === 'rejecting' ? `rejected_by_creditor` : null;
+      dataVerified[`status`] = action === 'approving' ? `ready_for_creditor` :
+        action === 'rejecting' ? `rejected_by_manager` : null;
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
         this.expenses.updateExpenseManager(dataVerified, expenseId)
           .subscribe(
