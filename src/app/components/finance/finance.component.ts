@@ -4,7 +4,7 @@ import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
 import {DomSanitizer} from '@angular/platform-browser';
-import {FormaterService} from 'src/app/services/formater.service';
+import {FormatterService} from 'src/app/services/formatter.service';
 import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
 import {Expense} from '../../models/expense';
@@ -58,7 +58,7 @@ export class FinanceComponent implements OnInit {
             sortable: true,
             filter: true,
             cellRenderer: params => {
-              return FormaterService.getCorrectDateTime(params.value);
+              return FormatterService.getCorrectDateTime(params.value);
             },
           },
           {
@@ -66,7 +66,7 @@ export class FinanceComponent implements OnInit {
             sortable: true, filter: true, width: 180, resizable: true
           },
           {
-            headerName: 'Kosten', field: 'amount', valueFormatter: FormaterService.decimalFormatter,
+            headerName: 'Kosten', field: 'amount', valueFormatter: FormatterService.decimalFormatter,
             sortable: true, filter: true, width: 120, cellStyle: {'text-align': 'right'}
           },
           {
@@ -83,7 +83,7 @@ export class FinanceComponent implements OnInit {
             headerName: 'Bondatum', field: 'transaction_date',
             sortable: true, filter: true, width: 150,
             cellRenderer: params => {
-              return FormaterService.getCorrectDate(params.value);
+              return FormatterService.getCorrectDate(params.value);
             }
           },
           {
@@ -112,7 +112,7 @@ export class FinanceComponent implements OnInit {
           sortable: true, filter: true,
           suppressMovable: true, width: 170,
           cellRenderer: params => {
-            return FormaterService.getCorrectDateTime(params.value);
+            return FormatterService.getCorrectDateTime(params.value);
           }
         },
         {
@@ -196,7 +196,7 @@ export class FinanceComponent implements OnInit {
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
           a.href = url;
-          a.download = FormaterService.getCorrectDateTime(event.data.export_date) + downloadType;
+          a.download = FormatterService.getCorrectDateTime(event.data.export_date) + downloadType;
           a.click();
           window.URL.revokeObjectURL(url);
           console.log('>> GET SUCCESS');
@@ -262,11 +262,35 @@ export class FinanceComponent implements OnInit {
     }
   }
 
+  getNextNode(currentIndex: number, status: string) {
+    let newNode = null;
+    this.gridApi.forEachNodeAfterFilterAndSort((rowNode, index) => {
+      if (newNode === null && index >= currentIndex && rowNode.data.status.text.includes(status)) {
+        newNode = rowNode;
+      }
+    });
+    return newNode;
+  }
+
   getNextExpense(same) {
     this.dismissModal();
     setTimeout(() => {
-      // tslint:disable-next-line:max-line-length
-      this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(same ? this.currentRowIndex : this.currentRowIndex + 1), this.modalDefinition);
+      let rowNode = null;
+      if (same) {
+        rowNode = this.gridApi.getRowNode(this.currentRowIndex);
+      } else {
+        rowNode = this.getNextNode(this.currentRowIndex + 1, 'ready_for_creditor');
+      }
+
+      if (rowNode != null && 'rowIndex' in rowNode) {
+        this.onRowClicked(rowNode, this.modalDefinition);
+      } else {
+        // tslint:disable-next-line:no-shadowed-variable
+        const rowNode = this.getNextNode(0, 'ready_for_creditor');
+        if (rowNode != null && 'rowIndex' in rowNode) {
+          this.onRowClicked(rowNode, this.modalDefinition);
+        }
+      }
     }, 100);
   }
 
@@ -338,17 +362,12 @@ export class FinanceComponent implements OnInit {
     }
   }
 
-  claimUpdateForm(form: NgForm, expenseId, type, note = null) {
+  claimUpdateForm({form, expenseId, type, note = null}: { form: NgForm, expenseId: number, type: any, note?: any }) {
     if (!this.submitButtonController(type, note)) {
       const dataVerified = {};
-      const data = form.value;
+      dataVerified[`rnote`] = form.value.rnote;
       if (!(this.wantsRejectionNote) && this.action === 'rejecting') {
-        data.rnote = this.selectedRejection;
-      }
-      for (const prop in data) {
-        if (prop.length !== 0) {
-          dataVerified[prop] = data[prop];
-        }
+        dataVerified[`rnote`] = this.selectedRejection;
       }
       const action = this.action;
       dataVerified[`status`] = action === 'approving' ? `approved` :

@@ -1,15 +1,16 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Pipe} from '@angular/core';
 import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
 import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
 import {DomSanitizer} from '@angular/platform-browser';
 import {IdentityService} from 'src/app/services/identity.service';
-import {FormaterService} from 'src/app/services/formater.service';
+import {FormatterService} from 'src/app/services/formatter.service';
 import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
 import {Expense} from '../../models/expense';
 import {Attachment} from '../../models/attachment';
 import {EnvService} from '../../services/env.service';
+import {SafeHtmlPipe} from '../../pipes/safe-html.pipe';
 
 
 @Component({
@@ -46,7 +47,8 @@ export class ManagerComponent implements OnInit {
     private identityService: IdentityService,
     private sanitizer: DomSanitizer,
     private route: ActivatedRoute,
-    private env: EnvService
+    private env: EnvService,
+    private safeHTML: SafeHtmlPipe
   ) {
     this.columnDefs = [
       {
@@ -58,7 +60,7 @@ export class ManagerComponent implements OnInit {
             sortable: true,
             filter: true,
             cellRenderer: params => {
-              return FormaterService.getCorrectDateTime(params.value);
+              return FormatterService.getCorrectDateTime(params.value);
             },
           },
           {
@@ -66,7 +68,7 @@ export class ManagerComponent implements OnInit {
             sortable: true, filter: true, width: 200, resizable: true
           },
           {
-            headerName: 'Kosten', field: 'amount', valueFormatter: FormaterService.decimalFormatter,
+            headerName: 'Kosten', field: 'amount', valueFormatter: FormatterService.decimalFormatter,
             sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
           },
           {
@@ -83,7 +85,7 @@ export class ManagerComponent implements OnInit {
             headerName: 'Bondatum', field: 'transaction_date',
             sortable: true, filter: true, width: 150,
             cellRenderer: params => {
-              return FormaterService.getCorrectDate(params.value);
+              return FormatterService.getCorrectDate(params.value);
             }
           },
           {
@@ -231,22 +233,16 @@ export class ManagerComponent implements OnInit {
     }
   }
 
-  claimUpdateForm(form: NgForm, expenseId, note) {
+  claimUpdateForm({form, expenseId, note}: { form: NgForm, expenseId: any, note: any }) {
     if (!this.submitButtonController(note)) {
       const dataVerified = {};
-      const data = form.value;
+      dataVerified[`rnote`] = form.value.rnote;
       if (!(this.wantsRejectionNote) && this.action === 'rejecting') {
-        data.rnote = this.selectedRejection;
-      }
-      for (const prop in data) {
-        if (prop.length !== 0) {
-          dataVerified[prop] = data[prop];
-        }
+        dataVerified[`rnote`] = this.selectedRejection;
       }
       const action = this.action;
       dataVerified[`status`] = action === 'approving' ? `ready_for_creditor` :
         action === 'rejecting' ? `rejected_by_manager` : null;
-
       Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
         this.expenses.updateExpenseManager(dataVerified, expenseId)
           .subscribe(

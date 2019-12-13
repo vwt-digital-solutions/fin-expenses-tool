@@ -9,7 +9,7 @@ import {IdentityService} from 'src/app/services/identity.service';
 import {map} from 'rxjs/operators';
 import {Attachment} from 'src/app/models/attachment';
 import {ActivatedRoute} from '@angular/router';
-import {FormaterService} from '../../services/formater.service';
+import {FormatterService} from '../../services/formatter.service';
 import {EnvService} from '../../services/env.service';
 
 
@@ -56,11 +56,11 @@ export class LandingComponent implements OnInit {
   }
 
   decimalFormatter(amount: any) {
-    return FormaterService.decimalFormatter(amount);
+    return FormatterService.decimalFormatter(amount);
   }
 
   dateFormatter(firstDate) {
-    return FormaterService.getCorrectDate(firstDate);
+    return FormatterService.getCorrectDate(firstDate);
   }
 
   openSanitizeFile(type: string, file: string) {
@@ -122,7 +122,7 @@ export class LandingComponent implements OnInit {
     for (const role of claimJaneDoe.roles) {
       this.OurJaneDoeIs.push(role.split('.')[0]);
     }
-    this.personID = claimJaneDoe.email ? claimJaneDoe.email.split('@')[0] : 'UNDEFINED';
+    this.personID = claimJaneDoe.email ? claimJaneDoe.email.split('@')[0].toLowerCase() : 'UNDEFINED';
     this.displayPersonName = claimJaneDoe.name ? claimJaneDoe.name.split(',') : ['UNDEFINED', 'UNDEFINED'];
     this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName[0]).substring(1);
     this.route.data.pipe(
@@ -273,7 +273,7 @@ export class LandingComponent implements OnInit {
       const dataVerified = {};
       const data = form.value;
       data.amount = Number((data.amount).toFixed(2));
-      data.transaction_date = (new Date(data.transaction_date).getTime());
+      data.transaction_date = new Date(data.transaction_date).toISOString();
       for (const prop in data) {
         if (prop.length !== 0) {
           dataVerified[prop] = data[prop];
@@ -292,7 +292,7 @@ export class LandingComponent implements OnInit {
             },
             error => {
               this.showErrors = true;
-              Object.assign(this.formResponse, JSON.parse(error));
+              this.formResponse = error;
             })
         : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
     }
@@ -311,7 +311,7 @@ export class LandingComponent implements OnInit {
         },
         error => {
           this.showErrors = true;
-          Object.assign(this.formResponse, JSON.parse(error));
+          this.formResponse = error;
         });
   }
 

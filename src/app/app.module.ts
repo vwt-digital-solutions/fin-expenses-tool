@@ -29,6 +29,7 @@ import { CommonModule } from '@angular/common';
 import { AgGridModule } from 'ag-grid-angular';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { DeviceDetectorModule } from 'ngx-device-detector';
+import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 
 
 @NgModule({
@@ -42,7 +43,8 @@ import { DeviceDetectorModule } from 'ngx-device-detector';
     ControllerComponent,
     ManagerComponent,
     ExpensesComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    SafeHtmlPipe
   ],
   imports: [
     BrowserModule,
@@ -63,6 +65,7 @@ import { DeviceDetectorModule } from 'ngx-device-detector';
     EnvServiceProvider,
     ExpensesConfigService,
     AuthGuard,
+    SafeHtmlPipe,
     OAuthService,
     {
       provide: HTTP_INTERCEPTORS,

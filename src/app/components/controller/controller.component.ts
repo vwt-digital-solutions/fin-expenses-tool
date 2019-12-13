@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ExpensesConfigService} from '../../services/config.service';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {DomSanitizer} from '@angular/platform-browser';
-import {FormaterService} from 'src/app/services/formater.service';
+import {FormatterService} from 'src/app/services/formatter.service';
 import {Expense} from '../../models/expense';
 import {Attachment} from '../../models/attachment';
 import {EnvService} from '../../services/env.service';
@@ -38,7 +38,7 @@ export class ControllerComponent implements OnInit {
             sortable: true,
             filter: true,
             cellRenderer: params => {
-              return FormaterService.getCorrectDateTime(params.value);
+              return FormatterService.getCorrectDateTime(params.value);
             },
           },
           {
@@ -46,7 +46,7 @@ export class ControllerComponent implements OnInit {
             sortable: true, filter: true, width: 200, resizable: true
           },
           {
-            headerName: 'Kosten', field: 'amount', valueFormatter: FormaterService.decimalFormatter,
+            headerName: 'Kosten', field: 'amount', valueFormatter: FormatterService.decimalFormatter,
             sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
           },
           {
@@ -70,7 +70,7 @@ export class ControllerComponent implements OnInit {
             headerName: 'Bondatum', field: 'transaction_date',
             sortable: true, filter: true, width: 250,
             cellRenderer: params => {
-              return FormaterService.getCorrectDate(params.value);
+              return FormatterService.getCorrectDate(params.value);
             },
           },
           {

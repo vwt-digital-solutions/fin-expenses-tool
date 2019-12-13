@@ -27,6 +27,6 @@ export class HeaderComponent {
     if (!claims) {
       return null;
     }
-    return claims.email;
+    return claims.email.toLowerCase();
   }
 }

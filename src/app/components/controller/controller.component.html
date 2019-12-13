@@ -81,8 +81,8 @@
                           readonly
                           class="form-control"
                           type="text"
-                          [ngModel]="expenseData.note"
-                          name="note" ngModel></textarea>
+                          [innerHTML]="expenseData.note | safeHtml: 'html'"
+                          name="note"></textarea>
           </div>
           <label>Bestanden:</label>
 

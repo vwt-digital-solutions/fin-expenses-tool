@@ -1,5 +1,5 @@
-@import "~src/assets/scss/mixins";
-@import "~src/assets/scss/constants";
+@import "src/assets/scss/mixins";
+@import "src/assets/scss/constants";
 
 .input-group .form-control {
   float: none;
@@ -88,6 +88,10 @@
 .compact {
   margin-left: 225px;
   margin-right: 225px;
+  @include lg-phone-only {
+    margin-left: 0;
+    margin-right: 0;
+  }
   width: auto !important;
 }
 

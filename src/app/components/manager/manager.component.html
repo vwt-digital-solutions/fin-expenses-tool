@@ -32,7 +32,7 @@
     <form
       id="expensesUpdateForm"
       #expenseUpdateForm="ngForm"
-      (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, rnote)"
+      (ngSubmit)="claimUpdateForm({form : expenseUpdateForm, expenseId : expenseData.id, note : rnote})"
       name="expenseUpdateForm">
       <div class="form-group">
         <!-- Form: Costs -->
@@ -65,7 +65,6 @@
         <label for="expenseDateOfTransaction">Datum bon:</label>
         <div class="input-group mb-3">
           <input id="expenseDateOfTransaction"
-                 [ngClass]="{notFilled: !(ntransdate.valid)}"
                  name="transaction_date"
                  class="form-control"
                  readonly
@@ -82,10 +81,10 @@
         <div class="input-group mb-3 note-relative">
                 <textarea id="expenseNote"
                           readonly
-                          class="form-control"
                           type="text"
-                          [ngModel]="expenseData.note"
-                          name="note" ngModel></textarea>
+                          class="form-control"
+                          [innerHTML]="expenseData.note | safeHtml: 'html'"
+                          name="note"></textarea>
         </div>
         <label>Bestanden:</label>
 

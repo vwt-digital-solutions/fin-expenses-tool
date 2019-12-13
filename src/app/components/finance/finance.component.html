@@ -67,7 +67,7 @@
           <form
             id="expensesUpdateForm"
             #expenseUpdateForm="ngForm"
-            (ngSubmit)="claimUpdateForm(expenseUpdateForm, expenseData.id, ntype, rnote)"
+            (ngSubmit)="claimUpdateForm({form : expenseUpdateForm, expenseId : expenseData.id, type : ntype, note : rnote})"
             name="expenseUpdateForm">
             <div class="form-group">
               <!-- Form: Costs -->
@@ -104,12 +104,10 @@
               <label for="expenseDateOfTransaction">Datum bon:</label>
               <div class="input-group mb-3">
                 <input id="expenseDateOfTransaction"
-                       [ngClass]="{notFilled: !(ntransdate.valid)}"
                        name="transaction_date"
                        class="form-control"
                        readonly
                        [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"
-                       #ntransdate="ngModel"
                        type="date">
                 <div class="input-group-append">
                 <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
@@ -123,8 +121,7 @@
                           readonly
                           class="form-control"
                           type="text"
-                          [ngModel]="expenseData.note"
-                          name="note" ngModel></textarea>
+                          [innerHTML]="expenseData.note | safeHtml: 'html'"></textarea>
               </div>
               <label>Bestanden:</label>
 

@@ -3,7 +3,7 @@ import {Injectable} from '@angular/core';
 @Injectable({
   providedIn: 'root'
 })
-export class FormaterService {
+export class FormatterService {
 
   constructor() {
   }
@@ -16,9 +16,9 @@ export class FormaterService {
 
   static decimalFormatter(amounts) {
     try {
-      return FormaterService.formatNumber(amounts.value);
+      return FormatterService.formatNumber(amounts.value);
     } catch (e) {
-      return FormaterService.formatNumber(amounts);
+      return FormatterService.formatNumber(amounts);
     }
   }
 

@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
-import { FormaterService } from './formater.service';
+import { FormatterService } from './formatter.service';
 
-describe('FormaterService', () => {
+describe('FormatterService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: FormaterService = TestBed.get(FormaterService);
+    const service: FormatterService = TestBed.get(FormatterService);
     expect(service).toBeTruthy();
   });
 });
