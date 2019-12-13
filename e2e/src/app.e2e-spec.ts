@@ -189,9 +189,14 @@ describe('ExpenseApp:', () => {
 
   it('should open the expense on the manager page', () => {
 
+    browser.sleep(5000);
     element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
       'E2E Addition ' + e2eID)).click().then(() => {
       browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+        return browser.getPageSource().then( (source) => {
+          console.log(source);
+        });
+      }).then( () => {
         expect(element(by.css('.employee-text')).getText()).toEqual('E2E, Opensource');
       });
     });
