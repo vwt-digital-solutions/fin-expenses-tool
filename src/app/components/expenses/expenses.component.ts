@@ -250,6 +250,8 @@ export class ExpensesComponent implements OnInit {
               if (ExpensesComponent.getNavigator()) {
                 alert('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
               }
+            } else if(response.status === 400) {
+              this.wrongfulClaim(response.error);
             } else {
               this.wrongfulClaim();
             }
