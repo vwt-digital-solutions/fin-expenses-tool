@@ -272,7 +272,8 @@ describe('ExpenseApp:', () => {
   //         browser.sleep(1000);
   //         browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
   //           element(by.name('expenses/process')).click().then(() => {
-  //             expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+  //             expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000,
+  //             'The loader is showing too long').then(() => {
   //               browser.sleep(1000);
   //               browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
   //                 expect(element.all(by.css('.ag-row')).count()).toBeGreaterThanOrEqual(1);
