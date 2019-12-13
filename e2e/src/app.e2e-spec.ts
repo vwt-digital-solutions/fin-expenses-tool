@@ -187,7 +187,7 @@ describe('ExpenseApp:', () => {
 
   });
 
-  it('should open the expense on the manager page', () => {
+  it('this step does not want to work', () => {
 
     browser.sleep(5000);
     element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
