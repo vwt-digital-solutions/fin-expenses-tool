@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse, HttpHeaders, HttpResponse} from '@angular/common/http';
 import {EnvService} from './env.service';
-import {Observable, throwError, interval, of} from 'rxjs';
+import {Observable, throwError, interval, of, forkJoin} from 'rxjs';
 import {catchError, retryWhen, flatMap, count} from 'rxjs/operators';
 import {Endpoint} from '../models/endpoint.enum';
 import {Expense} from '../models/expense';
@@ -85,6 +85,14 @@ export class ExpensesConfigService {
       .pipe(
         catchError(ExpensesConfigService.handleError)
       );
+  }
+
+  public createDataExport(options: any): Observable<any[]> {
+    const response1 = this.http.get(
+      this.env.apiUrl + '/finances/expenses/export?expenses_list=expenses', options);
+    const response2 = this.http.get(
+      this.env.apiUrl + '/finances/expenses/export?expenses_list=expenses_journal', options);
+    return forkJoin([response1, response2]);
   }
 
   // END FINANCE

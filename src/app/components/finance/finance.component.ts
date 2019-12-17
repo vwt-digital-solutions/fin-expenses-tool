@@ -11,6 +11,8 @@ import {Expense} from '../../models/expense';
 import {CostType} from '../../models/cost-type';
 import {Attachment} from '../../models/attachment';
 import {EnvService} from '../../services/env.service';
+import { saveAs } from 'file-saver';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-expenses',
@@ -102,6 +104,7 @@ export class FinanceComponent implements OnInit {
 
   public expenseData: Expense;
   public addBooking;
+  public dataExport;
 
   historyColumnDefs = [
     {
@@ -351,6 +354,24 @@ export class FinanceComponent implements OnInit {
         }, response => {
           this.errorBooking();
           console.error('>> POST FAILED', response.message);
+        });
+  }
+
+  createDataExport() {
+    this.dataExport = 'warning';
+    this.expenses.createDataExport({ observe: 'response', responseType: 'blob' as 'csv' })
+      .subscribe(
+        responseList => {
+          const timestamp = new Date().getTime();
+          const date_format = formatDate(timestamp, 'yyyyMMddTHHmmss', 'nl');
+          saveAs(responseList[0]['body'], `expenses_${date_format}.csv`);
+          saveAs(responseList[1]['body'], `expenses_journal_${date_format}.csv`);
+
+          this.dataExport = 'success';
+          setTimeout(() => {this.dataExport = ''}, 2000);
+        }, error => {
+          this.dataExport = 'danger';
+          console.error('>> GET FAILED', error.message);
         });
   }
 

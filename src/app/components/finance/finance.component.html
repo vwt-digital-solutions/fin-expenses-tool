@@ -1,20 +1,36 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col col-sm-8">
-      <div class="bookfile-creation-top btn-toolbar">
-        <button type="button" id="createBookingFile" (click)="createBookingFile()" class="btn btn-primary">Nieuwe
-          bestanden
-          maken
-        </button>
-        <div class="alert alert-success" role="alert" *ngIf="addBooking.success === true">
-          <i class="fas fa-check-circle"></i> Bestanden zijn aangemaakt.
+      <div class="row btn-toolbar">
+        <div class="col col-md-6 col-sm-12 bookfile-creation-top">
+          <button type="button" id="createBookingFile" (click)="createBookingFile()" class="btn btn-primary">Nieuwe
+            bestanden
+            maken
+          </button>
+          <div class="alert alert-success" role="alert" *ngIf="addBooking.success === true">
+            <i class="fas fa-check-circle"></i> Bestanden zijn aangemaakt.
+          </div>
+          <div class="alert alert-warning" role="alert" *ngIf="addBooking.wrong === true">
+            <i class="fa fa-exclamation-circle"></i> Er zijn geen openstaande declaraties. Bekijk de eerdere Booking
+            Files.
+          </div>
+          <div class="alert alert-danger" role="alert" *ngIf="addBooking.error === true">
+            <i class="fa fa-exclamation-circle"></i> Er is iets fout gegaan. Probeer het later opnieuw.
+          </div>
         </div>
-        <div class="alert alert-warning" role="alert" *ngIf="addBooking.wrong === true">
-          <i class="fa fa-exclamation-circle"></i> Er zijn geen openstaande declaraties. Bekijk de eerdere Booking
-          Files.
-        </div>
-        <div class="alert alert-danger" role="alert" *ngIf="addBooking.error === true">
-          <i class="fa fa-exclamation-circle"></i> Er is iets fout gegaan. Probeer het later opnieuw.
+
+        <div class="col col-md-6 col-sm-12 data-export-top text-md-right">
+          <button
+            type="button"
+            id="createDataExport"
+            (click)="createDataExport()"
+            class="btn btn-{{dataExport ? dataExport : 'secondary'}}"
+            title="Exporteer declaraties en declaratie geschiedenis als csv" >Exporteer alle data
+            <i *ngIf="!dataExport" class="fa fa-download"></i>
+            <i *ngIf="dataExport === 'warning'" class="fas fa-spinner fa-spin"></i>
+            <i *ngIf="dataExport === 'success'" class="fas fa-check-circle"></i>
+            <i *ngIf="dataExport === 'danger'" class="fa fa-exclamation-circle"></i>
+          </button>
         </div>
       </div>
 
