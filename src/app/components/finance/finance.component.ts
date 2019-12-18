@@ -408,7 +408,7 @@ export class FinanceComponent implements OnInit {
             },
             error => {
               this.showErrors = true;
-              Object.assign(this.formResponse, JSON.parse(error));
+              this.formResponse = error
               console.error('>> PUT FAILED', error.message);
             })
         : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');

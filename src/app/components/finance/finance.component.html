@@ -77,7 +77,7 @@
           <p class="employee-text">{{ expenseData.employee }}</p>
           <div class="employee-line"></div>
           <div id="updateErrors" class="alert alert-danger" role="alert" *ngIf="showErrors">
-            {{ formErrors }} {{ formResponse.detail }}
+            {{ formErrors }} {{ formResponse.error }}
           </div>
           <div id="updateSuccess" class="alert alert-success" role="alert" *ngIf="formSubmitted">
             Update is geslaagd!
