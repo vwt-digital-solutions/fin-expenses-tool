@@ -363,9 +363,9 @@ export class FinanceComponent implements OnInit {
       .subscribe(
         responseList => {
           const timestamp = new Date().getTime();
-          const date_format = formatDate(timestamp, 'yyyyMMddTHHmmss', 'nl');
-          saveAs(responseList[0]['body'], `expenses_${date_format}.csv`);
-          saveAs(responseList[1]['body'], `expenses_journal_${date_format}.csv`);
+          const dateFormat = formatDate(timestamp, 'yyyyMMddTHHmmss', 'nl');
+          saveAs(responseList[0].body, `expenses_${dateFormat}.csv`);
+          saveAs(responseList[1].body, `expenses_journal_${dateFormat}.csv`);
 
           this.dataExport = 'success';
           setTimeout(() => {this.dataExport = ''}, 2000);
