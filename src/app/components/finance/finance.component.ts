@@ -389,6 +389,8 @@ export class FinanceComponent implements OnInit {
       dataVerified[`rnote`] = form.value.rnote;
       if (!(this.wantsRejectionNote) && this.action === 'rejecting') {
         dataVerified[`rnote`] = this.selectedRejection;
+      } else {
+        dataVerified[`cost_type`] = form.value.cost_type;
       }
       const action = this.action;
       dataVerified[`status`] = action === 'approving' ? `approved` :
