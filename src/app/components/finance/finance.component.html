@@ -19,19 +19,21 @@
           </div>
         </div>
 
-        <div class="col col-md-6 col-sm-12 data-export-top text-md-right">
-          <button
-            type="button"
-            id="createDataExport"
-            (click)="createDataExport()"
-            class="btn btn-{{dataExport ? dataExport : 'secondary'}}"
-            title="Exporteer declaraties en declaratie geschiedenis als csv" >Exporteer alle data
-            <i *ngIf="!dataExport" class="fa fa-download"></i>
-            <i *ngIf="dataExport === 'warning'" class="fas fa-spinner fa-spin"></i>
-            <i *ngIf="dataExport === 'success'" class="fas fa-check-circle"></i>
-            <i *ngIf="dataExport === 'danger'" class="fa fa-exclamation-circle"></i>
-          </button>
-        </div>
+        <ng-container *ngIf="dataExport != 'invisible'">
+          <div class="col col-md-6 col-sm-12 data-export-top text-md-right">
+            <button
+              type="button"
+              id="createDataExport"
+              (click)="createDataExport()"
+              class="btn btn-{{dataExport ? dataExport : 'secondary'}}"
+              title="Exporteer declaraties en declaratie geschiedenis als csv" >Exporteer alle data
+              <i *ngIf="!dataExport" class="fa fa-download"></i>
+              <i *ngIf="dataExport === 'warning'" class="fas fa-spinner fa-spin"></i>
+              <i *ngIf="dataExport === 'success'" class="fas fa-check-circle"></i>
+              <i *ngIf="dataExport === 'danger'" class="fa fa-exclamation-circle"></i>
+            </button>
+          </div>
+        </ng-container>
       </div>
 
       <!-- START AG-GRID EXPENSES -->
