@@ -27,7 +27,7 @@
     <p class="employee-text">{{ expenseData.employee }}</p>
     <div class="employee-line"></div>
     <div id="updateErrors" class="alert alert-danger" role="alert" *ngIf="showErrors">
-      {{ formErrors }} {{ formResponse.detail }}
+      {{ formErrors }} {{ formResponse.error }}
     </div>
     <form
       id="expensesUpdateForm"
