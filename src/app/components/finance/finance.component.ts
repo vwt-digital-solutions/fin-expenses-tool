@@ -11,6 +11,8 @@ import {Expense} from '../../models/expense';
 import {CostType} from '../../models/cost-type';
 import {Attachment} from '../../models/attachment';
 import {EnvService} from '../../services/env.service';
+import { saveAs } from 'file-saver';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-expenses',
@@ -102,6 +104,7 @@ export class FinanceComponent implements OnInit {
 
   public expenseData: Expense;
   public addBooking;
+  public dataExport = 'invisible';
 
   historyColumnDefs = [
     {
@@ -354,6 +357,24 @@ export class FinanceComponent implements OnInit {
         });
   }
 
+  createDataExport() {
+    this.dataExport = 'warning';
+    this.expenses.createDataExport({ observe: 'response', responseType: 'blob' as 'csv' })
+      .subscribe(
+        responseList => {
+          const timestamp = new Date().getTime();
+          const dateFormat = formatDate(timestamp, 'yyyyMMddTHHmmss', 'nl');
+          saveAs(responseList[0].body, `expenses_${dateFormat}.csv`);
+          saveAs(responseList[1].body, `expenses_journal_${dateFormat}.csv`);
+
+          this.dataExport = 'success';
+          setTimeout(() => {this.dataExport = ''}, 2000);
+        }, error => {
+          this.dataExport = 'danger';
+          console.error('>> GET FAILED', error.message);
+        });
+  }
+
   submitButtonController(ntype: { invalid: boolean }, rnote: { invalid: boolean } = null) {
     if (this.wantsRejectionNote) {
       return ntype.invalid || rnote.invalid;
@@ -366,6 +387,7 @@ export class FinanceComponent implements OnInit {
     if (!this.submitButtonController(type, note)) {
       const dataVerified = {};
       dataVerified[`rnote`] = form.value.rnote;
+      dataVerified[`cost_type`] = form.value.cost_type;
       if (!(this.wantsRejectionNote) && this.action === 'rejecting') {
         dataVerified[`rnote`] = this.selectedRejection;
       }
@@ -386,7 +408,7 @@ export class FinanceComponent implements OnInit {
             },
             error => {
               this.showErrors = true;
-              Object.assign(this.formResponse, JSON.parse(error));
+              this.formResponse = error
               console.error('>> PUT FAILED', error.message);
             })
         : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
