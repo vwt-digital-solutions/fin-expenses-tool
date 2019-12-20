@@ -88,18 +88,34 @@ export class MaxModalComponent implements OnInit {
         }
       });
     } else if (this.isViewer) {
-      this.expensesConfigService.getControllerAttachment(this.expenseData.id).subscribe((image: any) => {
-        this.receiptFiles = [];
-        for (const img of image) {
-          this.receiptFiles.push({
-            content: `${img.content}`,
-            content_type: img.content_type,
-            from_db: true,
-            db_name: img.name,
-            expense_id: this.expenseData.id
-          });
-        }
-      });
+      if (this.forceViewer) {
+        this.expensesConfigService.getExpenseAttachment(this.expenseData.id).subscribe((image: any) => {
+          this.receiptFiles = [];
+          for (const img of image) {
+            this.receiptFiles.push({
+              content: `${img.content}`,
+              content_type: img.content_type,
+              from_db: true,
+              db_name: img.name,
+              expense_id: this.expenseData.id
+            });
+          }
+        });
+      } else {
+        this.expensesConfigService.getControllerAttachment(this.expenseData.id).subscribe((image: any) => {
+          this.receiptFiles = [];
+          for (const img of image) {
+            this.receiptFiles.push({
+              content: `${img.content}`,
+              content_type: img.content_type,
+              from_db: true,
+              db_name: img.name,
+              expense_id: this.expenseData.id
+            });
+          }
+        });
+      }
+
     } else if (this.isEditor) {
       this.expensesConfigService.getExpenseAttachment(this.expenseData.id).subscribe((image: any) => {
         this.receiptFiles = [];

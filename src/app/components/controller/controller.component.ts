@@ -1,12 +1,7 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {ExpensesConfigService} from '../../services/config.service';
-import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {DomSanitizer} from '@angular/platform-browser';
 import {FormatterService} from 'src/app/services/formatter.service';
 import {Expense} from '../../models/expense';
-import {Attachment} from '../../models/attachment';
-import {EnvService} from '../../services/env.service';
-import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-manager',
