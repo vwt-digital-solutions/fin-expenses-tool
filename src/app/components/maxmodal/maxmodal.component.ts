@@ -17,10 +17,9 @@ export class MaxModalComponent implements OnInit {
   @Input() forceViewer: boolean;
   @Output() messageEvent = new EventEmitter<boolean[]>();
 
-  protected safeNote: string;
-  protected typeOptions: CostType[];
-  protected receiptFiles: Attachment[];
-  protected errorMessage: string;
+  public typeOptions: CostType[];
+  public receiptFiles: Attachment[];
+  public errorMessage: string;
   private readonly today: Date;
   private action: string;
   private selectedRejection: any;
@@ -155,7 +154,7 @@ export class MaxModalComponent implements OnInit {
     }
   }
 
-  protected claimUpdateForm(form, expenseId: any, instArray: any[]): void {
+  claimUpdateForm(form, expenseId: any, instArray: any[]): void {
     if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3], instArray[4])) {
       const dataVerified = {};
       const data = form.value;
@@ -202,7 +201,7 @@ export class MaxModalComponent implements OnInit {
     }
   }
 
-  protected rejectionHit(event: any) {
+  rejectionHit(event: any) {
     this.rejectionNote = (event.target.value === 'note');
     this.selectedRejection = event.target.value;
     if (this.rejectionNote) {
@@ -228,7 +227,7 @@ export class MaxModalComponent implements OnInit {
         });
   }
 
-  protected closeModal(reload, next = true): void {
+  closeModal(reload, next = true): void {
     document.getElementById('max-modal').className = 'move-bottom';
     setTimeout(() => {
       this.messageEvent.emit([reload, next]);
@@ -298,7 +297,7 @@ export class MaxModalComponent implements OnInit {
   }
 
   // File Input, structured to limit file size and check if input would work.
-  protected onFileInput(file) {
+  onFileInput(file) {
     if (file[0].type.split('/')[0] !== 'image' && file[0].type !== 'application/pdf') {
       alert('Graag alleen een pdf of afbeelding toevoegen');
       return;
