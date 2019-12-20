@@ -6,6 +6,7 @@ import {FormatterService} from 'src/app/services/formatter.service';
 import {Expense} from '../../models/expense';
 import {Attachment} from '../../models/attachment';
 import {EnvService} from '../../services/env.service';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'app-manager',
@@ -13,20 +14,15 @@ import {EnvService} from '../../services/env.service';
   styleUrls: ['./controller.component.scss']
 })
 
-export class ControllerComponent implements OnInit {
+export class ControllerComponent {
 
-  private gridApi;
+  private gridApi: any;
   public columnDefs;
-  public today;
-  public denySelection;
   public expenseData: Expense;
-  private receiptFiles: Attachment[];
+  public wantsNewModal;
 
   constructor(
-    private expenses: ExpensesConfigService,
-    private modalService: NgbModal,
-    private sanitizer: DomSanitizer,
-    private env: EnvService
+    private expenses: ExpensesConfigService
   ) {
     this.columnDefs = [
       {
@@ -92,44 +88,24 @@ export class ControllerComponent implements OnInit {
     }
   }
 
-  static getNavigator() {
-    return navigator.userAgent.match(/Android/i)
-      || navigator.userAgent.match(/webOS/i)
-      || navigator.userAgent.match(/iPhone/i)
-      || navigator.userAgent.match(/iPad/i)
-      || navigator.userAgent.match(/iPod/i)
-      || navigator.userAgent.match(/BlackBerry/i)
-      || navigator.userAgent.match(/Windows Phone/i);
-  }
-
-  openSanitizeFile(type, file) {
-    const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
-    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-    if (isIEOrEdge) {
-      if (type === 'application/pdf') {
-        alert('Please use Chrome or Firefox to view this file');
-      } else {
-        const win = window.open();
-        // @ts-ignore
-        // tslint:disable-next-line:max-line-length
-        win.document.write('<img src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" alt="">');
-      }
-    } else {
-      const win = window.open();
-      if (ControllerComponent.getNavigator()) {
-        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge Mobile of Samsung Internet.</p>');
-      } else if (!isChrome) {
-        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
-      }
-      // @ts-ignore
-      // tslint:disable-next-line:max-line-length no-unused-expression
-      win.document.write('<iframe src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
+  onRowClicked(event: any) {
+    if (event === null || event === undefined) {
+      return false;
+    }
+    this.expenseData = event.data;
+    this.wantsNewModal = true;
+    if (event.api !== null && event.api !== undefined) {
+      this.gridApi = event.api;
     }
   }
 
-  ngOnInit() {
-    this.today = new Date();
-    this.denySelection = false;
+  receiveMessage(message) {
+    this.wantsNewModal = false;
+  }
+
+  onGridReady(params: any) {
+    // @ts-ignore
+    this.expenses.getControllerExpenses().subscribe((data) => this.rowData = [...data]);
   }
 
   onBtExport() {
@@ -138,29 +114,5 @@ export class ControllerComponent implements OnInit {
       processCellCallback: ControllerComponent.processExcelCellCallback.bind(this)
     };
     this.gridApi.exportDataAsExcel(params1);
-  }
-
-  onGridReady(params: any) {
-    this.gridApi = params.api;
-    // @ts-ignore
-    this.expenses.getControllerExpenses().subscribe((data) => this.rowData = [...data]);
-  }
-
-  onRowClicked(event, content) {
-    this.gridApi = event.api;
-    this.expenseData = event.data;
-    this.expenses.getControllerAttachment(event.data.id).subscribe((image: any) => {
-      this.receiptFiles = [];
-      for (const img of image) {
-        if (!(this.receiptFiles.includes(img))) {
-          this.receiptFiles.push(img);
-        }
-      }
-      this.modalService.open(content, {centered: true}).result.then((result) => {
-        this.gridApi.deselectAll();
-      }, (reason) => {
-        this.gridApi.deselectAll();
-      });
-    });
   }
 }

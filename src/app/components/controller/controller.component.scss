@@ -1,88 +1,10 @@
 @import "src/assets/scss/mixins";
 @import "src/assets/scss/constants";
 
-.input-group .form-control {
-  float: none;
-}
-
-.employee-text {
-  color: #3f8bb5;
-  font-weight: 400;
-  margin-bottom: 5px;
-}
-
-.employee-line {
-  border-bottom: 1px solid $vwt_color_blue_hr;
-  margin-bottom: 10px;
-}
-
-.input-group-addon {
-  line-height: 32.5px;
-  text-align: center;
-  background-color: #f6f6f6;
-  font-weight: bold;
-  color: #858585;
-  border: 1px solid #dce5eb;
-  outline: none;
-  width: 45px;
-  cursor: pointer;
-
-  &:hover {
-    border: 1px solid $vwt_color_blue_hr;
-    opacity: .5;
-  }
-}
-
 #expensestable {
   width: 100%;
   height: 750px;
   overflow: hidden;
-}
-
-.modal-footer {
-  #thumbs-up, #thumbs-down, #thumbs-down-rejecting {
-    font-size: large;
-  }
-
-  #information-icon-down, #information-icon, #information-icon-down-rejecting {
-    cursor: pointer;
-  }
-}
-
-#expensesUpdateForm {
-  label {
-    color: #3f8bb5;
-    font-weight: 600;
-  }
-}
-
-#mobile-loader-button {
-  left: 50%;
-  margin: 0 -50% 0 0;
-  transform: translate(-50%, -50%);
-  top: 50%;
-  padding: 0;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: transparent;
-
-  span {
-    padding: 10px;
-  }
-}
-
-.disabledbtn {
-  opacity: .5;
-}
-
-.disabledbtn:hover {
-  cursor: not-allowed;
-}
-
-.hidden {
-  display: none;
 }
 
 .compact {
@@ -93,13 +15,4 @@
     margin-right: 0;
   }
   width: auto !important;
-}
-
-.click-stop {
-  cursor: pointer;
-  color: $vwt_color_blue;
-
-  &:hover {
-    opacity: .6;
-  }
 }
