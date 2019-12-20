@@ -15,31 +15,38 @@ export class MaxModalComponent implements OnInit {
 
   @Input() expenseData: Expense;
   @Input() forceViewer: boolean;
-  @Output() messageEvent = new EventEmitter<boolean>();
+  @Output() messageEvent = new EventEmitter<boolean[]>();
 
+  protected safeNote: string;
   protected typeOptions: CostType[];
   protected receiptFiles: Attachment[];
+  protected errorMessage: string;
   private readonly today: Date;
-  private readonly wantsNext: boolean;
+  private action: string;
+  private selectedRejection: any;
   public isCreditor: boolean;
   public isManager: boolean;
   public isViewer: boolean;
   public isEditor: boolean;
+  public isRejecting: boolean;
+  public rejectionNote: boolean;
 
   constructor(private expensesConfigService: ExpensesConfigService, private route: ActivatedRoute) {
     if (window.location.pathname === '/home' || window.location.pathname === '/') {
       this.isEditor = true;
-    } else if (window.location.pathname === 'expense/manage') {
+    } else if (window.location.pathname === '/expenses/manage') {
       this.isManager = true;
-    } else if (window.location.pathname === 'expenses/process') {
+    } else if (window.location.pathname === '/expenses/process') {
       this.isCreditor = true;
     } else {
       this.isViewer = true;
     }
 
+    this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
+
     window.onmousedown = event => {
       if (event.target === document.getElementById('maxModal')) {
-        this.wantsNext ? this.getNext() : this.closeModal(false);
+        this.closeModal(false, false);
       }
     };
     this.route.data.pipe(
@@ -129,35 +136,81 @@ export class MaxModalComponent implements OnInit {
   protected submitButtonController(nNote: { invalid: any; },
                                    nAmount: { invalid: any; viewModel: number; },
                                    nType: { invalid: any; },
-                                   nTransDate: { invalid: any; viewModel: string | number | Date; }) {
-    return nNote.invalid || nAmount.invalid || nType.invalid
-      || nTransDate.invalid || (new Date(nTransDate.viewModel)
-        > this.today) || nAmount.viewModel < 0.01;
+                                   nTransDate: { invalid: any; viewModel: string | number | Date; },
+                                   rNote: { invalid: boolean }) {
+    if (this.isEditor) {
+      return nNote.invalid || nAmount.invalid || nType.invalid
+        || nTransDate.invalid || (new Date(nTransDate.viewModel)
+          > this.today) || nAmount.viewModel < 0.01;
+    } else if (this.isManager) {
+      if (this.rejectionNote) {
+        return rNote.invalid;
+      }
+    } else if (this.isCreditor) {
+      if (this.rejectionNote) {
+        return nType.invalid || rNote.invalid;
+      } else {
+        return nType.invalid;
+      }
+    }
   }
 
   protected claimUpdateForm(form, expenseId: any, instArray: any[]): void {
-    if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3])) {
+    if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3], instArray[4])) {
       const dataVerified = {};
       const data = form.value;
-      data.amount = Number((data.amount).toFixed(2));
-      data.transaction_date = new Date(data.transaction_date).toISOString();
-      for (const prop in data) {
-        if (prop.length !== 0) {
-          dataVerified[prop] = data[prop];
+      if (this.isEditor) {
+        data.amount = Number((data.amount).toFixed(2));
+        data.transaction_date = new Date(data.transaction_date).toISOString();
+        for (const prop in data) {
+          if (prop.length !== 0) {
+            dataVerified[prop] = data[prop];
+          }
         }
+        dataVerified[`status`] = 'ready_for_manager';
+        Object.keys(dataVerified).length !== 0 ?
+          this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
+            .subscribe(
+              result => {
+                this.uploadSingleAttachment(expenseId);
+                this.closeModal(true);
+              },
+              error => {
+                console.log(error);
+                this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+              })
+          : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
+      } else if (this.isManager) {
+        dataVerified[`rnote`] = data.rnote;
+        if (!(this.rejectionNote) && this.action === 'rejecting') {
+          dataVerified[`rnote`] = this.selectedRejection;
+        }
+        dataVerified[`status`] = this.action === 'approving' ? `ready_for_creditor` :
+          this.action === 'rejecting' ? `rejected_by_manager` : null;
+        Object.keys(dataVerified).length !== 0 ?
+          this.expensesConfigService.updateExpenseManager(dataVerified, expenseId)
+            .subscribe(
+              result => {
+                this.closeModal(true);
+              },
+              error => {
+                console.log(error);
+                this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+              })
+          : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
       }
-      dataVerified[`status`] = 'ready_for_manager';
-      Object.keys(dataVerified).length !== 0 ?
-        this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
-          .subscribe(
-            result => {
-              this.uploadSingleAttachment(expenseId);
-              this.closeModal(true);
-            },
-            error => {
-              console.error('SOMETHING HAPPENED');
-            })
-        : (console.log('SOMETHING HAPPENED'));
+    }
+  }
+
+  protected rejectionHit(event: any) {
+    this.rejectionNote = (event.target.value === 'note');
+    this.selectedRejection = event.target.value;
+    if (this.rejectionNote) {
+      document.getElementById('rejection-note-group').style.visibility = 'visible';
+      document.getElementById('rejection-note-group').style.display = 'block';
+    } else {
+      document.getElementById('rejection-note-group').style.visibility = 'hidden';
+      document.getElementById('rejection-note-group').style.display = 'none';
     }
   }
 
@@ -171,22 +224,22 @@ export class MaxModalComponent implements OnInit {
           this.closeModal(true);
         },
         error => {
-          console.error('SOMETHING HAPPENED');
+          this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
         });
   }
 
-  protected closeModal(reload): void {
+  protected closeModal(reload, next = true): void {
     document.getElementById('max-modal').className = 'move-bottom';
     setTimeout(() => {
-      this.messageEvent.emit(reload);
+      this.messageEvent.emit([reload, next]);
     }, 300);
   }
 
-  protected getNext(): void {
-    document.getElementById('max-modal').className = 'move-right';
-    setTimeout(() => {
-      this.messageEvent.emit();
-    }, 300);
+  protected updatingAction(event) {
+    this.action = event;
+    if (event === 'rejecting') {
+      this.isRejecting = true;
+    }
   }
 
   protected openFile(type, content): void {
@@ -205,6 +258,42 @@ export class MaxModalComponent implements OnInit {
           this.receiptFiles.splice(i, 1);
         }
       }
+    }
+  }
+
+  // Messy functions from here on. Will be moved or changed in other stories.
+  private getNavigator() {
+    return navigator.userAgent.match(/Android/i)
+      || navigator.userAgent.match(/webOS/i)
+      || navigator.userAgent.match(/iPhone/i)
+      || navigator.userAgent.match(/iPad/i)
+      || navigator.userAgent.match(/iPod/i)
+      || navigator.userAgent.match(/BlackBerry/i)
+      || navigator.userAgent.match(/Windows Phone/i);
+  }
+
+  protected openSanitizeFile(type: string, file: string) {
+    const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
+    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
+    if (isIEOrEdge) {
+      if (type === 'application/pdf') {
+        alert('Please use Chrome or Firefox to view this file');
+      } else {
+        const win = window.open();
+        // @ts-ignore
+        // tslint:disable-next-line:max-line-length
+        win.document.write('<img src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" alt="">');
+      }
+    } else {
+      const win = window.open();
+      if (this.getNavigator()) {
+        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge Mobile of Samsung Internet.</p>');
+      } else if (!isChrome) {
+        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
+      }
+      const dataContent = 'data:' + type + ';base64,' + encodeURI(file);
+      // tslint:disable-next-line:max-line-length no-unused-expression
+      win.document.write('<iframe src="' + dataContent + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
     }
   }
 
@@ -259,7 +348,7 @@ export class MaxModalComponent implements OnInit {
                     });
                   };
                 }, file[0].type, 1);
-              }, reader.onerror = Error => console.log(Error);
+              }, reader.onerror = Error => console.error(Error);
             }
           }
         };

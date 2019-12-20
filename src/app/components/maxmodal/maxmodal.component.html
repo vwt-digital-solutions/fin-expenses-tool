@@ -4,7 +4,7 @@
     <div class="max-modal-header">
       <h2 class="header-text">Declaratie</h2>
       <button id="modalClose"
-              (click)="wantsNext ? getNext() : closeModal()"
+              (click)="closeModal(false, false)"
               type="button">
         <span>&times;</span>
       </button>
@@ -13,8 +13,11 @@
 
       <p class="employee-text">{{ expenseData.employee }}</p>
       <div class="employee-line"></div>
+      <div id="updateErrors" class="alert alert-danger" role="alert" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
       <form id="expenseForm" #expenseForm="ngForm"
-            (ngSubmit)="claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate])">
+            (ngSubmit)="claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])">
 
         <div class="form-group">
           <!-- Form: Rejection Note-->
@@ -77,6 +80,7 @@
                      step="0.01"
                      min="0.01"
                      name="amount"
+                     required
                      placeholder="{{expenseData.amount | currency: 'EUR' }}"
                      [ngModel]="this.expenseData.amount"
                      #namount="ngModel">
@@ -181,9 +185,7 @@
                       class="form-control"
                       type="text"
                       readonly
-                      [ngModel]="expenseData.note"
-                      name="note"
-                      #note="ngModel"></textarea>
+                      [innerHTML]="expenseData.note | safeHtml: 'html'"></textarea>
 
           </div>
           <!-- Form: END : Note -->
@@ -206,7 +208,7 @@
               <li *ngFor="let item of receiptFiles"
                   class="list-group-item d-flex justify-content-between align-items-center">
               <span class="clickable"
-                    (click)="this.openFile(item.content_type, item.content)">
+                    (click)="this.openSanitizeFile(item.content_type, item.content)">
                 View File - {{item.db_name}}</span>
                 <i class="fa fa-times clickable" (click)="removeFromAttachmentList(item)"></i>
               </li>
@@ -219,11 +221,43 @@
               <li *ngFor="let item of receiptFiles"
                   class="list-group-item d-flex justify-content-between align-items-center">
                   <span class="clickable"
-                        (click)="this.openFile(item.content_type, item.content)">View File - {{item.db_name}}</span>
+                        (click)="this.openSanitizeFile(item.content_type, item.content)">View File - {{item.db_name}}</span>
               </li>
             </ul>
           </div>
           <!-- Form: END : Attachments -->
+          <!-- Form: Rejection Note | Check submit-update-form label after every change -->
+          <div class="input-group mb-3" [ngClass]="{hidden: !this.isRejecting}">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="rnoteselect">Reden:</label>
+            </div>
+            <select id="rnoteselect"
+                    class="custom-select"
+                    (change)="rejectionHit($event)"
+                    name="rnoteselect">
+              <option>Deze kosten kun je declareren via Regweb (PSA)</option>
+              <option>Deze kosten kun je declareren via de leasemaatschappij</option>
+              <option>Deze kosten zijn al gedeclareerd</option>
+              <option value="note">Anders, reden:</option>
+            </select>
+          </div>
+          <div class="form-group hidden"
+               id="rejection-note-group">
+                <textarea id="rnote"
+                          class="form-control"
+                          [ngClass]="{notFilled: (rnote.invalid && (rnote.dirty || rnote.touched))}"
+                          type="text"
+                          name="rnote"
+                          required minlength="1"
+                          [ngModel]="expenseData.status.rnote"
+                          #rnote="ngModel">
+                </textarea>
+          </div>
+          <div class="fill-text move-18"
+               *ngIf="(rnote.invalid && (rnote.dirty || rnote.touched))"
+               [ngClass]="{hidden: !this.rejectionNote}">
+            <small>Graag een geldige reden invullen</small>
+          </div>
 
 
           <input type="submit" id="submit-update-form" hidden #submitForm/>
@@ -237,13 +271,35 @@
       <div *ngIf="isEditor">
         <button type="button" (click)="cancelExpense()" class="btn btn-danger">Declaratie Annuleren</button>
         <button type="button" (click)="submitForm.click()" class="btn btn-primary" id="submit-update-button"
-                [ngClass]="{disabledbtn: submitButtonController(note, namount, ntype, ntransdate)}">Indienen
+                [ngClass]="{disabledbtn: submitButtonController(note, namount, ntype, ntransdate, undefined)}">Indienen
         </button>
       </div>
       <!-- END Employee Modal Options-->
 
       <!-- Viewer (Manager, Creditor) Modal Options-->
+      <div *ngIf="isManager || isCreditor">
+        <div *ngIf="!this.isRejecting" id="thumbs-up" class="badge badge-success"
+             (click)="updatingAction('approving')">
+          <label for="submit-update-form">
+            <a id="information-icon">Goedkeuren</a>
+          </label>
+        </div>
 
+        <div *ngIf="!this.isRejecting" id="thumbs-down" class="badge badge-danger"
+             (click)="updatingAction('rejecting')">
+          <label for="thumbs-down">
+            <a id="information-icon-down">Afkeuren</a>
+          </label>
+        </div>
+        <div *ngIf="this.isRejecting" id="thumbs-down-rejecting" class="badge badge-danger"
+             (click)="updatingAction('rejecting')">
+          <label for="submit-update-form"
+                 [ngClass]="{disabledbtn: submitButtonController(undefined,
+                 undefined, undefined, undefined, rnote)}">
+            <a id="information-icon-down-rejecting">OK</a>
+          </label>
+        </div>
+      </div>
       <!-- END Viewer (Manager, Creditor) Modal Options -->
     </div>
   </div>

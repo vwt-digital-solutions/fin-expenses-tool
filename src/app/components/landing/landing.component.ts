@@ -109,7 +109,7 @@ export class LandingComponent implements OnInit {
 
   receiveMessage(message) {
     this.wantsNewModal = false;
-    if (message) {
+    if (message[0]) {
       this.declarationCall();
     }
   }

@@ -111,9 +111,9 @@ describe('ExpenseApp:', () => {
 
   });
 
-  it('should fill the expenseform for the manager', () => {
+  it('should fill the expenseform for the creditor', () => {
 
-    element(by.id('amountinput')).sendKeys(100.99);
+    element(by.id('amountinput')).sendKeys(1.99);
 
     const typeList = element(by.id('typeinput')).all(by.tagName('option'));
     typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
@@ -140,7 +140,6 @@ describe('ExpenseApp:', () => {
   });
 
   it('should get the list of expenses on the landing page again', () => {
-
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
       browser.sleep(1000);
       browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long');
@@ -155,163 +154,16 @@ describe('ExpenseApp:', () => {
 
   });
 
-  it('should redirect to the manager page and load the expenses', () => {
+  it('should check for the employee text', () => {
 
-    browser.wait(until.visibilityOf(element(by.name('expenses/manage'))), 20000, 'Not on the home page or expense was not created')
-      .then(() => {
-        expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-          browser.sleep(1000);
-          browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-            element(by.name('expenses/manage')).click().then(() => {
-              expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-                browser.sleep(1000);
-                browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-                  expect(element.all(by.css('.ag-row')).count()).toBeGreaterThanOrEqual(1);
-                });
-              }));
-            });
-          });
-        }));
-      });
-
-  });
-
-  it('should see the created expense on the manager page', () => {
-
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
-    element(by.css('div[col-id=claim_date]')).click(); // Twice
-    browser.sleep(500);
-    expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
-      'E2E Addition ' + e2eID))), 10000, 'Expense not present'));
-
-  });
-
-  it('this step does not want to work', () => {
-
-    browser.sleep(5000);
-    element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
-      'E2E Addition ' + e2eID)).click().then(() => {
-      browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-        return browser.getPageSource().then( (source) => {
-          console.log(source);
-        });
-      }).then( () => {
-        expect(element(by.css('.employee-text')).getText()).toEqual('E2E, Opensource');
-      });
-    });
-
-  });
-
-  it('should see the expense attachment on the manager page', () => {
-
-    browser.wait(until.visibilityOf(element(by.css('.click-stop'))), 20000, 'The attachments are not loading').then(() => {
-      expect(element.all(by.css('.click-stop')).count()).toBeGreaterThanOrEqual(1);
-    });
-
-  });
-
-  it('should reject the expense on the manager page', () => {
-
-    element(by.id('thumbs-down')).click();
-    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-      browser.sleep(1000);
-      browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-        element(by.id('information-icon-down-rejecting')).click();
-        expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-          browser.sleep(1000);
-          browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-            browser.get('/home');
-          });
-        }));
-      });
-    }));
-
-  });
-
-
-  it('should get the list of expenses on the landing page again', () => {
-
-    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-      browser.sleep(1000);
-      browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long');
-    }));
-
-    expect(browser.wait(until.visibilityOf(element(by.cssContainingText('Small', 'Opensource E2E'))), 10, 'Name is not present'));
-
-    browser.wait(until.visibilityOf(element(by.css('li'))), 20000, 'The API took too long to respond').then(() => {
-      const expensesList = element.all(by.css('li'));
-      expect(expensesList.count()).toBeGreaterThanOrEqual(1);
-    });
-
-  });
-
-  it('should submit the expense with a lower amount', () => {
-
-    element(by.cssContainingText('li', ' Aanpassing vereist')).click().then(() => {
+    element(by.css('li')).click().then(() => {
       expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
         browser.sleep(1000);
         browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-          element(by.id('expenseAmount')).clear().then(() => {
-            element(by.id('expenseAmount')).sendKeys(1.99);
-            element(by.id('submit-update-button')).click();
-            browser.sleep(3000); // Should remove this
-          });
+          expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
         });
       }));
     });
 
   });
-  //
-  //
-  // it('should redirect to the creditor page and load the expenses', () => {
-  //
-  //   browser.wait(until.visibilityOf(element(by.name('expenses/manage'))), 20000, 'Not on the home page or blocked')
-  //     .then(() => {
-  //       expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-  //         browser.sleep(1000);
-  //         browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-  //           element(by.name('expenses/process')).click().then(() => {
-  //             expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000,
-  //             'The loader is showing too long').then(() => {
-  //               browser.sleep(1000);
-  //               browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-  //                 expect(element.all(by.css('.ag-row')).count()).toBeGreaterThanOrEqual(1);
-  //               });
-  //             }));
-  //           });
-  //         });
-  //       }));
-  //     });
-  //
-  // });
-  //
-  // it('should see the created expense on the creditor page', () => {
-  //
-  //   element(by.css('div[col-id=claim_date]')).click(); // Once
-  //   browser.sleep(500);
-  //   element(by.css('div[col-id=claim_date]')).click(); // Twice
-  //   browser.sleep(500);
-  //   expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
-  //     'E2E Addition ' + e2eID))), 10000, 'Expense not present'));
-  //   element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
-  //     'E2E Addition ' + e2eID)).click();
-  // });
-  //
-  // it('should get the list of expenses on the landing page again', () => {
-  //
-  //   element(by.id('home-button')).click();
-  //   expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-  //     browser.sleep(1000);
-  //     browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long');
-  //   }));
-  //
-  //   expect(browser.wait(until.visibilityOf(element(by.cssContainingText('Small', 'Opensource E2E'))), 10, 'Name is not present'));
-  //
-  //   browser.wait(until.visibilityOf(element(by.css('li'))), 20000, 'The API took too long to respond').then(() => {
-  //     const expensesList = element.all(by.css('li'));
-  //     expect(expensesList.count()).toBeGreaterThanOrEqual(1);
-  //   });
-  //
-  // });
 });

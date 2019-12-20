@@ -26,7 +26,7 @@
               id="createDataExport"
               (click)="createDataExport()"
               class="btn btn-{{dataExport ? dataExport : 'secondary'}}"
-              title="Exporteer declaraties en declaratie geschiedenis als csv" >Exporteer alle data
+              title="Exporteer declaraties en declaratie geschiedenis als csv">Exporteer alle data
               <i *ngIf="!dataExport" class="fa fa-download"></i>
               <i *ngIf="dataExport === 'warning'" class="fas fa-spinner fa-spin"></i>
               <i *ngIf="dataExport === 'success'" class="fas fa-check-circle"></i>

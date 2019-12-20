@@ -368,7 +368,7 @@ export class FinanceComponent implements OnInit {
           saveAs(responseList[1].body, `expenses_journal_${dateFormat}.csv`);
 
           this.dataExport = 'success';
-          setTimeout(() => {this.dataExport = ''}, 2000);
+          setTimeout(() => {this.dataExport = ''; }, 2000);
         }, error => {
           this.dataExport = 'danger';
           console.error('>> GET FAILED', error.message);
@@ -408,7 +408,7 @@ export class FinanceComponent implements OnInit {
             },
             error => {
               this.showErrors = true;
-              this.formResponse = error
+              this.formResponse = error;
               console.error('>> PUT FAILED', error.message);
             })
         : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
