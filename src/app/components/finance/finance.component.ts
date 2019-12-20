@@ -104,7 +104,7 @@ export class FinanceComponent implements OnInit {
 
   public expenseData: Expense;
   public addBooking;
-  public dataExport = 'invisible';
+  public dataExport = 'secondary';
 
   historyColumnDefs = [
     {
