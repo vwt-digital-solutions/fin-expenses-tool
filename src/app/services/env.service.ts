@@ -19,6 +19,7 @@ export class EnvService {
 
   // Ag Grid
   public agGridKey = '';
+  public featureToggle = '';
 
   constructor() {
   }

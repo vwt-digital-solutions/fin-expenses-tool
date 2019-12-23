@@ -5,6 +5,7 @@ import {FormatterService} from 'src/app/services/formatter.service';
 import {Expense} from '../../models/expense';
 import {saveAs} from 'file-saver';
 import {formatDate} from '@angular/common';
+import {EnvService} from '../../services/env.service';
 
 @Component({
   selector: 'app-expenses',
@@ -19,12 +20,14 @@ export class FinanceComponent {
   public rowSelection;
   private currentRowIndex: number;
   private wantsNewModal: boolean;
+  public dataExport = 'invisible';
 
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
 
   constructor(
     private expenses: ExpensesConfigService,
     private http: HttpClient,
+    private env: EnvService
   ) {
     this.columnDefs = [
       {
@@ -73,11 +76,13 @@ export class FinanceComponent {
     ];
     this.rowSelection = 'single';
     this.addBooking = {success: false, wrong: false, error: false};
+    if (this.env.featureToggle) {
+      this.dataExport = 'secondary';
+    }
   }
 
   public expenseData: Expense;
   public addBooking;
-  public dataExport = 'invisible';
 
   historyColumnDefs = [
     {
