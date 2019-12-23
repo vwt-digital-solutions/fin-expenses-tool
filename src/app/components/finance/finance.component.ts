@@ -38,6 +38,8 @@ export class FinanceComponent implements OnInit {
   public selectedRejection;
   public noteData;
   private currentRowIndex: number;
+  public dataExport: string = 'invisible';
+
 
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
   modalDefinition: any;
@@ -100,11 +102,13 @@ export class FinanceComponent implements OnInit {
     this.formResponse = {};
     this.rowSelection = 'single';
     this.addBooking = {success: false, wrong: false, error: false};
+    if (this.env.featureToggle) {
+      this.dataExport = 'secondary';
+    }
   }
 
   public expenseData: Expense;
   public addBooking;
-  public dataExport = 'secondary';
 
   historyColumnDefs = [
     {
