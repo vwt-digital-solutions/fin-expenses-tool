@@ -151,7 +151,7 @@ describe('ExpenseApp:', () => {
 
     browser.wait(until.visibilityOf(element(by.css('li'))), 20000, 'The API took too long to respond').then(() => {
       const expensesList = element.all(by.css('li'));
-      expect(expensesList.count()).toBeGreaterThan(expensesListCount);
+      expect(expensesList.count()).toBeGreaterThanOrEqual(expensesListCount);
       expensesListCount = expensesList.count();
     });
 
