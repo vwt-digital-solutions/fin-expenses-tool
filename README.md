@@ -24,6 +24,7 @@ Run `ng test test-headless` to execute the unit tests (build) via [Karma](https:
 ## Running end-to-end tests
 
 Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Run `ng e2e-build` to execute the end-to-end tests for builds via [Protractor](http://www.protractortest.org/).
 
 ## Further help
 

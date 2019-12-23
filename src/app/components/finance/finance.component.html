@@ -43,7 +43,8 @@
         [rowData]="rowData"
         [columnDefs]="columnDefs"
         [rowSelection]="rowSelection"
-        (rowClicked)="onRowClicked($event, expenseContent)">
+        (rowClicked)="onRowClicked($event)"
+        (gridReady)="onGridReady($event)">
       </ag-grid-angular>
       <!-- END AG-GRID EXPENSES -->
     </div>
@@ -62,155 +63,10 @@
       >
       </ag-grid-angular>
       <!-- END AG-GRID HISTORY -->
-
-      <!-- FORM TEMPLATE -->
-      <ng-template #expenseContent let-modal>
-        <div class="modal-header">
-          <h4 class="modal-title" id="modal-basic-title">Declaratie Keuren</h4>
-          <button id="expenseModalClose" type="button" class="close" aria-label="Close"
-                  (click)="modal.dismiss('Cross click')">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <p class="employee-text">{{ expenseData.employee }}</p>
-          <div class="employee-line"></div>
-          <div id="updateErrors" class="alert alert-danger" role="alert" *ngIf="showErrors">
-            {{ formErrors }} {{ formResponse.error }}
-          </div>
-          <div id="updateSuccess" class="alert alert-success" role="alert" *ngIf="formSubmitted">
-            Update is geslaagd!
-          </div>
-          <form
-            id="expensesUpdateForm"
-            #expenseUpdateForm="ngForm"
-            (ngSubmit)="claimUpdateForm({form : expenseUpdateForm, expenseId : expenseData.id, type : ntype, note : rnote})"
-            name="expenseUpdateForm">
-            <div class="form-group">
-              <!-- Form: Costs -->
-              <label for="expenseAmount">Kosten:</label>
-              <div class="input-group mb-3">
-                <input id="expenseAmount"
-                       class="form-control"
-                       [ngClass]="{notFilled: !(namount.valid)}"
-                       type="number"
-                       step="0.01"
-                       min="0.01"
-                       name="amount"
-                       readonly
-                       placeholder="{{expenseData.amount | currency: 'EUR' }}"
-                       [ngModel]="this.expenseData.amount"
-                       #namount="ngModel">
-              </div>
-              <div class="mt-3"></div>
-              <!-- Form: Cost Type -->
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="expenseCostType">Soort:</label>
-                </div>
-                <select id="expenseCostType"
-                        class="custom-select"
-                        name="cost_type"
-                        [ngModel]="expenseData.cost_type"
-                        #ntype="ngModel">
-                  <option value="" disabled><kbd>Huidige:</kbd> {{ expenseData.cost_type.split(':')[0] }}</option>
-                  <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">{{t.ctype}}</option>
-                </select>
-              </div>
-              <!-- Form: Transaction Date -->
-              <label for="expenseDateOfTransaction">Datum bon:</label>
-              <div class="input-group mb-3">
-                <input id="expenseDateOfTransaction"
-                       name="transaction_date"
-                       class="form-control"
-                       readonly
-                       [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"
-                       type="date">
-                <div class="input-group-append">
-                <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
-                  <i class=" fa fa-calendar-alt"></i> </span>
-                </div>
-              </div>
-              <!-- Form No Edit: Note of employee -->
-              <label for="expenseNote">Omschrijving:</label>
-              <div class="input-group mb-3 note-relative">
-                <textarea id="expenseNote"
-                          readonly
-                          class="form-control"
-                          type="text"
-                          [innerHTML]="expenseData.note | safeHtml: 'html'"></textarea>
-              </div>
-              <label>Bestanden:</label>
-
-              <ul class="list-group">
-                <li *ngFor="let item of receiptFiles"
-                    class="list-group-item d-flex justify-content-between align-items-center">
-                  <span class="click-stop"
-                        (click)="this.openSanitizeFile(item.content_type, item.content)">View File - {{item.content_type}}</span>
-                </li>
-              </ul>
-              <!-- Form: Rejection Note | Check submit-update-form label after every change -->
-              <div class="input-group mb-3" [ngClass]="{hidden: !this.isRejecting}">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="rnoteselect">Reden:</label>
-                </div>
-                <select id="rnoteselect"
-                        class="custom-select"
-                        (change)="rejectionHit($event)"
-                        name="rnoteselect">
-                  <option>Deze kosten kun je declareren via Regweb (PSA)</option>
-                  <option>Deze kosten kun je declareren via de leasemaatschappij</option>
-                  <option>Deze kosten zijn al gedeclareerd</option>
-                  <option value="note">Anders, reden:</option>
-                </select>
-              </div>
-              <div class="form-group hidden"
-                   id="rejection-note-group">
-                <textarea id="rnote"
-                          class="form-control"
-                          [ngClass]="{notFilled: (rnote.invalid && (rnote.dirty || rnote.touched))}"
-                          type="text"
-                          name="rnote"
-                          required minlength="1"
-                          [(ngModel)]="noteData"
-                          #rnote="ngModel">
-                </textarea>
-              </div>
-              <div class="fill-text move-18"
-                   *ngIf="(rnote.invalid && (rnote.dirty || rnote.touched))"
-                   [ngClass]="{hidden: !this.wantsRejectionNote}">
-                <small>Graag een geldige reden invullen</small>
-              </div>
-              <input type="submit" id="submit-update-form" hidden/>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <div *ngIf="!this.isRejecting" id="thumbs-up" class="float-right badge badge-success"
-               (click)="updatingAction('approving')">
-            <label for="submit-update-form"
-                   [ngClass]="{disabledbtn: submitButtonController(ntype)}">
-              <a id="information-icon">Goedkeuren</a>
-            </label>
-          </div>
-
-          <div *ngIf="!this.isRejecting" id="thumbs-down" class="float-right badge badge-danger"
-               (click)="updatingAction('rejecting')">
-            <label for="thumbs-down">
-              <a id="information-icon-down">Afkeuren</a>
-            </label>
-          </div>
-          <div *ngIf="this.isRejecting" id="thumbs-down-rejecting" class="float-right badge badge-danger"
-               (click)="updatingAction('rejecting')">
-            <label for="submit-update-form"
-                   [ngClass]="{disabledbtn: submitButtonController(ntype, rnote)}">
-              <a id="information-icon-down-rejecting">OK</a>
-            </label>
-          </div>
-        </div>
-      </ng-template>
-      <!--   END FORM TEMPLATE-->
     </div>
   </div>
 </div>
+
+<app-maxmodal *ngIf="wantsNewModal"
+              (messageEvent)="receiveMessage($event)"
+              [expenseData]="expenseData"></app-maxmodal>

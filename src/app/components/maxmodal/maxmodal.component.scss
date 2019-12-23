@@ -92,19 +92,6 @@
   margin: 2px;
 }
 
-.badge {
-  border: none;
-  padding: 5px 10px;
-  font-size: large;
-  cursor: pointer;
-  &:hover {
-    opacity: .8;
-  }
-  label {
-    cursor: pointer;
-  }
-}
-
 // Content
 .employee-text {
   color: #3f8bb5;
@@ -162,7 +149,7 @@
 .move-top {
   animation-name: moveFromTop;
   animation-duration: 0.4s;
-  @include sm-phone-only {
+  @include md-phone-only {
     animation-name: moveFromTopMob;
     animation-duration: 0.4s;
   }
@@ -171,7 +158,7 @@
 .move-bottom {
   animation-name: moveToTop;
   animation-duration: 0.4s;
-  @include sm-phone-only {
+  @include md-phone-only {
     animation-name: moveToTopMob;
     animation-duration: 0.4s;
   }
@@ -179,7 +166,7 @@
 
 .move-left {
   animation-name: moveFromLeft;
-  animation-duration: 1s;
+  animation-duration: 0.4s;
 }
 
 .move-right {

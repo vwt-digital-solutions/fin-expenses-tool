@@ -226,6 +226,7 @@
             </ul>
           </div>
           <!-- Form: END : Attachments -->
+
           <!-- Form: Rejection Note | Check submit-update-form label after every change -->
           <div class="input-group mb-3" [ngClass]="{hidden: !this.isRejecting}">
             <div class="input-group-prepend">
@@ -269,7 +270,7 @@
     <div class="max-modal-footer">
       <!-- Employee Modal Options -->
       <div *ngIf="isEditor">
-        <button type="button" (click)="cancelExpense()" class="btn btn-danger">Declaratie Annuleren</button>
+        <button type="button" (click)="cancelExpense()" class="btn btn-danger" id="cancel-update-button">Declaratie Annuleren</button>
         <button type="button" (click)="submitForm.click()" class="btn btn-primary" id="submit-update-button"
                 [ngClass]="{disabledbtn: submitButtonController(note, namount, ntype, ntransdate, undefined)}">Indienen
         </button>
@@ -278,27 +279,21 @@
 
       <!-- Viewer (Manager, Creditor) Modal Options-->
       <div *ngIf="isManager || isCreditor">
-        <div *ngIf="!this.isRejecting" id="thumbs-up" class="badge badge-success"
-             (click)="updatingAction('approving')">
-          <label for="submit-update-form">
-            <a id="information-icon">Goedkeuren</a>
-          </label>
-        </div>
+        <button type="button" *ngIf="!this.isRejecting" id="thumbs-up" class="btn btn-success"
+             (click)="updatingAction('approving'); this.claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])">
+          <a id="information-icon">Goedkeuren</a>
+        </button>
 
-        <div *ngIf="!this.isRejecting" id="thumbs-down" class="badge badge-danger"
-             (click)="updatingAction('rejecting')">
-          <label for="thumbs-down">
-            <a id="information-icon-down">Afkeuren</a>
-          </label>
-        </div>
-        <div *ngIf="this.isRejecting" id="thumbs-down-rejecting" class="badge badge-danger"
-             (click)="updatingAction('rejecting')">
-          <label for="submit-update-form"
-                 [ngClass]="{disabledbtn: submitButtonController(undefined,
-                 undefined, undefined, undefined, rnote)}">
-            <a id="information-icon-down-rejecting">OK</a>
-          </label>
-        </div>
+        <button type="button" *ngIf="!this.isRejecting" id="thumbs-down" class="btn btn-danger"
+             (click)="updatingAction('rejecting');">
+          <a id="information-icon-down">Afkeuren</a>
+        </button>
+        <button type="button" *ngIf="this.isRejecting" id="thumbs-down-rejecting" class="btn btn-danger"
+             (click)="updatingAction('rejecting'); this.claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])"
+             [ngClass]="{disabledbtn: submitButtonController(undefined,
+                 undefined, this.isCreditor ? ntype : undefined, undefined, rnote)}">
+          <a id="information-icon-down-rejecting">OK</a>
+        </button>
       </div>
       <!-- END Viewer (Manager, Creditor) Modal Options -->
     </div>

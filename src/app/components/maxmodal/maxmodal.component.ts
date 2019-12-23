@@ -5,6 +5,8 @@ import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
 import {Attachment} from '../../models/attachment';
 import {ExpensesConfigService} from '../../services/config.service';
+import {IdentityService} from '../../services/identity.service';
+import {DefaultImageService} from '../../services/default-image.service';
 
 @Component({
   selector: 'app-maxmodal',
@@ -30,7 +32,10 @@ export class MaxModalComponent implements OnInit {
   public isRejecting: boolean;
   public rejectionNote: boolean;
 
-  constructor(private expensesConfigService: ExpensesConfigService, private route: ActivatedRoute) {
+  constructor(private expensesConfigService: ExpensesConfigService,
+              private identityService: IdentityService,
+              private defaultImageService: DefaultImageService,
+              private route: ActivatedRoute) {
     if (window.location.pathname === '/home' || window.location.pathname === '/') {
       this.isEditor = true;
     } else if (window.location.pathname === '/expenses/manage') {
@@ -54,13 +59,16 @@ export class MaxModalComponent implements OnInit {
     this.today = new Date();
   }
 
+  /** OnInit to get the expenses. Can be slow! Every role has it's own getAttachment. */
   ngOnInit(): void {
+    // forceViewer can be called from parent to allow the EMPLOYEE (landing page) to only see the expense
     if (this.forceViewer) {
       this.isViewer = true;
       this.isEditor = false;
       this.isManager = false;
       this.isCreditor = false;
     }
+    // Checks what role the user has and makes a specific request
     if (this.isCreditor) {
       this.expensesConfigService.getFinanceAttachment(this.expenseData.id).subscribe((image: any) => {
         this.receiptFiles = [];
@@ -87,37 +95,21 @@ export class MaxModalComponent implements OnInit {
           });
         }
       });
-    } else if (this.isViewer) {
-      if (this.forceViewer) {
-        this.expensesConfigService.getExpenseAttachment(this.expenseData.id).subscribe((image: any) => {
-          this.receiptFiles = [];
-          for (const img of image) {
-            this.receiptFiles.push({
-              content: `${img.content}`,
-              content_type: img.content_type,
-              from_db: true,
-              db_name: img.name,
-              expense_id: this.expenseData.id
-            });
-          }
-        });
-      } else {
-        this.expensesConfigService.getControllerAttachment(this.expenseData.id).subscribe((image: any) => {
-          this.receiptFiles = [];
-          for (const img of image) {
-            this.receiptFiles.push({
-              content: `${img.content}`,
-              content_type: img.content_type,
-              from_db: true,
-              db_name: img.name,
-              expense_id: this.expenseData.id
-            });
-          }
-        });
-      }
-
-    } else if (this.isEditor) {
+    } else if (this.isEditor || this.forceViewer) {
       this.expensesConfigService.getExpenseAttachment(this.expenseData.id).subscribe((image: any) => {
+        this.receiptFiles = [];
+        for (const img of image) {
+          this.receiptFiles.push({
+            content: `${img.content}`,
+            content_type: img.content_type,
+            from_db: true,
+            db_name: img.name,
+            expense_id: this.expenseData.id
+          });
+        }
+      });
+    } else if (this.isViewer) {
+      this.expensesConfigService.getControllerAttachment(this.expenseData.id).subscribe((image: any) => {
         this.receiptFiles = [];
         for (const img of image) {
           this.receiptFiles.push({
@@ -132,6 +124,8 @@ export class MaxModalComponent implements OnInit {
     }
   }
 
+  // BEGIN Subject to change
+  /** Used to upload the attachments from the receiptFiles */
   private uploadSingleAttachment(expenseId: any) {
     if (this.receiptFiles.length > 0) {
       const file: Attachment = this.receiptFiles.splice(0, 1)[0];
@@ -148,11 +142,15 @@ export class MaxModalComponent implements OnInit {
     }
   }
 
+  // END Subject to change
+
+  /** Controls the submit buttons and UpdateForm: Checks every input needed. */
   protected submitButtonController(nNote: { invalid: any; },
                                    nAmount: { invalid: any; viewModel: number; },
                                    nType: { invalid: any; },
                                    nTransDate: { invalid: any; viewModel: string | number | Date; },
                                    rNote: { invalid: boolean }) {
+    // Checks what role the user has and verifies the inputs accordingly.
     if (this.isEditor) {
       return nNote.invalid || nAmount.invalid || nType.invalid
         || nTransDate.invalid || (new Date(nTransDate.viewModel)
@@ -170,11 +168,16 @@ export class MaxModalComponent implements OnInit {
     }
   }
 
+  // BEGIN Subject to change
+  /** Used to update the expense in form. Every role that can update has it's own part */
   claimUpdateForm(form, expenseId: any, instArray: any[]): void {
     if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3], instArray[4])) {
       const dataVerified = {};
       const data = form.value;
+
+      // Checks what role the user has and updates the expense accordingly.
       if (this.isEditor) {
+
         data.amount = Number((data.amount).toFixed(2));
         data.transaction_date = new Date(data.transaction_date).toISOString();
         for (const prop in data) {
@@ -195,11 +198,15 @@ export class MaxModalComponent implements OnInit {
                 this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
               })
           : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
+
       } else if (this.isManager) {
+
         dataVerified[`rnote`] = data.rnote;
+
         if (!(this.rejectionNote) && this.action === 'rejecting') {
           dataVerified[`rnote`] = this.selectedRejection;
         }
+
         dataVerified[`status`] = this.action === 'approving' ? `ready_for_creditor` :
           this.action === 'rejecting' ? `rejected_by_manager` : null;
         Object.keys(dataVerified).length !== 0 ?
@@ -213,10 +220,36 @@ export class MaxModalComponent implements OnInit {
                 this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
               })
           : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
+
+      } else if (this.isCreditor) {
+
+        dataVerified[`rnote`] = data.rnote;
+        dataVerified[`cost_type`] = data.cost_type;
+
+        if (!(this.rejectionNote) && this.action === 'rejecting') {
+          dataVerified[`rnote`] = this.selectedRejection;
+        }
+
+        dataVerified[`status`] = this.action === 'approving' ? `approved` :
+          this.action === 'rejecting' ? `rejected_by_creditor` : null;
+        Object.keys(dataVerified).length !== 0 ?
+          this.expensesConfigService.updateExpenseFinance(dataVerified, expenseId)
+            .subscribe(
+              result => {
+                this.closeModal(true);
+              },
+              error => {
+                console.log(error);
+                this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+              })
+          : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
       }
     }
   }
 
+  // END Subject to change
+
+  /** Used to update the rejection note with normal style change (works better on mobile) */
   rejectionHit(event: any) {
     this.rejectionNote = (event.target.value === 'note');
     this.selectedRejection = event.target.value;
@@ -229,6 +262,7 @@ export class MaxModalComponent implements OnInit {
     }
   }
 
+  /** Only for the employee to cancel the expense */
   protected cancelExpense() {
     const dataVerified = {};
     const expenseId = this.expenseData.id;
@@ -243,6 +277,7 @@ export class MaxModalComponent implements OnInit {
         });
   }
 
+  /** Used to close the modal (Could also control the animation) */
   closeModal(reload, next = true): void {
     document.getElementById('max-modal').className = 'move-bottom';
     setTimeout(() => {
@@ -250,6 +285,7 @@ export class MaxModalComponent implements OnInit {
     }, 300);
   }
 
+  /** Used to update the review action */
   protected updatingAction(event) {
     this.action = event;
     if (event === 'rejecting') {
@@ -257,11 +293,22 @@ export class MaxModalComponent implements OnInit {
     }
   }
 
-  protected openFile(type, content): void {
-    console.log(type, content);
-  }
-
+  // BEGIN Subject to change
+  /** Used to remove the attachments from the receiptFiles and delete it. */
   protected removeFromAttachmentList(item): void {
+    if (this.identityService.isTesting()) {
+      this.receiptFiles.push({
+        content: this.defaultImageService.getDefaultImageForTest(),
+        content_type: 'image/png',
+        from_db: false
+      });
+      this.receiptFiles.push({
+        content: this.defaultImageService.getDefaultImageForTest(),
+        content_type: 'image/png',
+        from_db: false
+      });
+    }
+
     for (let i = 0; i < this.receiptFiles.length; i++) {
       if (this.receiptFiles[i] === item) {
         if (item.from_db) {
@@ -275,6 +322,8 @@ export class MaxModalComponent implements OnInit {
       }
     }
   }
+
+  // END Subject to change
 
   // Messy functions from here on. Will be moved or changed in other stories.
   private getNavigator() {
