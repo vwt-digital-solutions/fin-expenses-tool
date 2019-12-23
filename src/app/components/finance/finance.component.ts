@@ -19,7 +19,7 @@ export class FinanceComponent {
   public columnDefs;
   public rowSelection;
   private currentRowIndex: number;
-  private wantsNewModal: boolean;
+  public wantsNewModal: boolean;
   public dataExport = 'invisible';
 
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
