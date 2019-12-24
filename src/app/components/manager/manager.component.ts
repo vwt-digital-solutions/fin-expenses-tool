@@ -15,6 +15,7 @@ export class ManagerComponent {
   public columnDefs;
   public rowSelection;
   public expenseData: Expense;
+  public moveDirection = 'move-up';
 
   public wantsNewModal;
   private gridApi;
@@ -72,10 +73,11 @@ export class ManagerComponent {
 
   rowData = null;
 
-  onRowClicked(event: any) {
+  onRowClicked(event: any, direct= false) {
     if (event === null || event === undefined) {
       return false;
     }
+    this.moveDirection = direct ? 'move-left' : 'move-up';
     this.expenseData = event.data;
     this.wantsNewModal = true;
     if (event.api !== null && event.api !== undefined) {
@@ -85,7 +87,7 @@ export class ManagerComponent {
 
   getNextExpense() {
     setTimeout(() => {
-      this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(0));
+      this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(0), true);
     }, 100);
   }
 

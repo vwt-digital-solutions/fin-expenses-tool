@@ -17,6 +17,7 @@ export class MaxModalComponent implements OnInit {
 
   @Input() expenseData: Expense;
   @Input() forceViewer: boolean;
+  @Input() moveDirection: string;
   @Output() messageEvent = new EventEmitter<boolean[]>();
 
   public typeOptions: CostType[];
@@ -279,7 +280,11 @@ export class MaxModalComponent implements OnInit {
 
   /** Used to close the modal (Could also control the animation) */
   closeModal(reload, next = true): void {
-    document.getElementById('max-modal').className = 'move-bottom';
+    if (reload && !this.isViewer && !this.isEditor) {
+      document.getElementById('max-modal').className = 'move-right';
+    } else {
+      document.getElementById('max-modal').className = 'move-bottom';
+    }
     setTimeout(() => {
       this.messageEvent.emit([reload, next]);
     }, 300);

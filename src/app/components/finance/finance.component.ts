@@ -21,6 +21,7 @@ export class FinanceComponent {
   private currentRowIndex: number;
   public wantsNewModal: boolean;
   public dataExport = 'invisible';
+  public moveDirection = 'move-up';
 
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
 
@@ -142,10 +143,11 @@ export class FinanceComponent {
         });
   }
 
-  onRowClicked(event) {
+  onRowClicked(event, direct= false) {
     if (event === null || event === undefined) {
       return false;
     }
+    this.moveDirection = direct ? 'move-left' : 'move-up';
     this.expenseData = event.data;
     this.wantsNewModal = true;
     if (event.api !== null && event.api !== undefined) {
@@ -172,12 +174,12 @@ export class FinanceComponent {
       }
 
       if (rowNode != null && 'rowIndex' in rowNode) {
-        this.onRowClicked(rowNode);
+        this.onRowClicked(rowNode, true);
       } else {
         // tslint:disable-next-line:no-shadowed-variable
         const rowNode = this.getNextNode(0, 'ready_for_creditor');
         if (rowNode != null && 'rowIndex' in rowNode) {
-          this.onRowClicked(rowNode);
+          this.onRowClicked(rowNode, true);
         }
       }
     }, 100);

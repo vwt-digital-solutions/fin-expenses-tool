@@ -46,5 +46,6 @@
   <app-maxmodal *ngIf="wantsNewModal"
                 (messageEvent)="receiveMessage($event)"
                 [forceViewer]="forceViewer"
+                [moveDirection]="'move-top'"
                 [expenseData]="expenseData"></app-maxmodal>
 </div>
