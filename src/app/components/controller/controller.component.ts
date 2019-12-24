@@ -42,7 +42,7 @@ export class ControllerComponent {
           },
           {
             headerName: 'SoortGL', field: 'cost_type',
-            sortable: true, filter: true, resizable: true, width: 150,
+            sortable: true, filter: true, resizable: true, width: 130,
             cellRenderer: params => {
               return params.value.split(':')[1];
             }
@@ -59,7 +59,7 @@ export class ControllerComponent {
           // },
           {
             headerName: 'Bondatum', field: 'transaction_date',
-            sortable: true, filter: true, width: 250,
+            sortable: true, filter: true, width: 130,
             cellRenderer: params => {
               return FormatterService.getCorrectDate(params.value);
             },
