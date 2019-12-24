@@ -54,6 +54,13 @@ export class MaxModalComponent implements OnInit {
         this.closeModal(false, false);
       }
     };
+
+    window.onkeydown = event => {
+      if (event.key === 'Escape') {
+        this.closeModal(false, false);
+      }
+    };
+
     this.route.data.pipe(
       map(data => data.costTypes)
     ).subscribe(costTypes => this.typeOptions = [...costTypes]);
