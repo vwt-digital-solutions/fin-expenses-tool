@@ -363,7 +363,8 @@ export class FinanceComponent implements OnInit {
 
   createDataExport() {
     this.dataExport = 'warning';
-    this.expenses.createDataExport({ observe: 'response', responseType: 'blob' as 'csv' })
+    this.expenses.createDataExport({ observe: 'response', responseType: 'blob' as 'csv',
+    headers: {'Accept': 'text/csv'}})
       .subscribe(
         responseList => {
           const timestamp = new Date().getTime();
