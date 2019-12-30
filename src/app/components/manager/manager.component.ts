@@ -1,10 +1,6 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {ExpensesConfigService} from '../../services/config.service';
-import {DomSanitizer} from '@angular/platform-browser';
-import {IdentityService} from 'src/app/services/identity.service';
 import {FormatterService} from 'src/app/services/formatter.service';
-import {ActivatedRoute} from '@angular/router';
-import {map} from 'rxjs/operators';
 import {Expense} from '../../models/expense';
 
 
@@ -14,23 +10,18 @@ import {Expense} from '../../models/expense';
   styleUrls: ['./manager.component.scss']
 })
 
-export class ManagerComponent implements OnInit {
+export class ManagerComponent {
 
-  private gridColumnApi;
   public columnDefs;
   public rowSelection;
-  public typeOptions;
-  public today;
   public expenseData: Expense;
+  public moveDirection = 'move-up';
 
   public wantsNewModal;
-  private gridApi: any;
+  private gridApi;
 
   constructor(
-    private expenses: ExpensesConfigService,
-    private identityService: IdentityService,
-    private sanitizer: DomSanitizer,
-    private route: ActivatedRoute
+    private expenses: ExpensesConfigService
   ) {
     this.columnDefs = [
       {
@@ -82,10 +73,11 @@ export class ManagerComponent implements OnInit {
 
   rowData = null;
 
-  onRowClicked(event: any) {
+  onRowClicked(event: any, direct= false) {
     if (event === null || event === undefined) {
       return false;
     }
+    this.moveDirection = direct ? 'move-left' : 'move-up';
     this.expenseData = event.data;
     this.wantsNewModal = true;
     if (event.api !== null && event.api !== undefined) {
@@ -95,7 +87,7 @@ export class ManagerComponent implements OnInit {
 
   getNextExpense() {
     setTimeout(() => {
-      this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(0));
+      this.onRowClicked(this.gridApi.getDisplayedRowAtIndex(0), true);
     }, 100);
   }
 
@@ -115,15 +107,7 @@ export class ManagerComponent implements OnInit {
   }
 
   onGridReady(params: any) {
-    this.gridColumnApi = params.columnApi;
     // @ts-ignore
     this.expenses.getManagerExpenses().subscribe((data) => this.rowData = [...data]);
-  }
-
-  ngOnInit() {
-    this.today = new Date();
-    this.route.data.pipe(
-      map(data => data.costTypes)
-    ).subscribe(costTypes => this.typeOptions = [...costTypes]);
   }
 }
