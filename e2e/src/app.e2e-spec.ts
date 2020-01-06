@@ -124,8 +124,12 @@ describe('ExpenseApp:', () => {
     });
 
     const today = new Date();
+    const today_day = today.getUTCDate() < 10 ? '0' + today.getUTCDate() : today.getUTCDate();
+    const today_month = today.getUTCMonth() + 1 < 10 ? `0${today.getUTCMonth() + 1}` : today.getUTCMonth() + 1;
+    const today_year = today.getUTCFullYear();
+
     element(by.id('dateinput'))
-      .sendKeys(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
+      .sendKeys(`${today_month}/${today_day}/${today_year}`);
 
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     e2eList.push(e2eID);
