@@ -1,4 +1,5 @@
 import {Injectable} from '@angular/core';
+import {formatDate} from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -22,14 +23,20 @@ export class FormatterService {
     }
   }
 
+  static parseDate(date, dateFormat = 'dd-MM-yyyy') {
+    const timestamp = Date.parse(date);
+    if (isNaN(timestamp) == false) {
+      return formatDate(new Date(timestamp), dateFormat, 'nl');
+    } else {
+      return 'N/A';
+    };
+  }
+
   static getCorrectDateTime(date) {
-    const d = new Date(date);
-    return d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear() + ' ' + ('0' + d.getHours()).substr(-2) + ':' +
-      ('0' + d.getMinutes()).substr(-2) + ':' + ('0' + d.getSeconds()).substr(-2);
+    return this.parseDate(date, 'dd-MM-yyyy HH:mm:ss');
   }
 
   static getCorrectDate(date) {
-    const d = new Date(date);
-    return d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear();
+    return this.parseDate(date, 'dd-MM-yyyy');
   }
 }
