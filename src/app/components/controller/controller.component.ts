@@ -99,6 +99,7 @@ export class ControllerComponent {
   }
 
   onGridReady(params: any) {
+    this.gridApi = params.api;
     // @ts-ignore
     this.expenses.getControllerExpenses().subscribe((data) => this.rowData = [...data]);
   }
