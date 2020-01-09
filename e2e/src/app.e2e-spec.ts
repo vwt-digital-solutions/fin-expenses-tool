@@ -29,6 +29,11 @@ const get = (options: any): any => {
 };
 const until = protractor.ExpectedConditions;
 const e2eID = Math.random() * 100;
+const today = new Date();
+const todayDay = today.getUTCDate() < 10 ? '0' + today.getUTCDate() : today.getUTCDate();
+const todayMonth = today.getUTCMonth() + 1 < 10 ? `0${today.getUTCMonth() + 1}` : today.getUTCMonth() + 1;
+const todayYear = today.getUTCFullYear();
+
 let expensesListCount;
 let updateType;
 const isOnBuild = process.env.isOnBuild || false;
@@ -123,13 +128,8 @@ describe('ExpenseApp:', () => {
       typeList.get(randomNumber + 1).click();
     });
 
-    const today = new Date();
-    const today_day = today.getUTCDate() < 10 ? '0' + today.getUTCDate() : today.getUTCDate();
-    const today_month = today.getUTCMonth() + 1 < 10 ? `0${today.getUTCMonth() + 1}` : today.getUTCMonth() + 1;
-    const today_year = today.getUTCFullYear();
-
     element(by.id('dateinput'))
-      .sendKeys(`${today_month}/${today_day}/${today_year}`);
+      .sendKeys(`${todayMonth}/${todayDay}/${todayYear}`);
 
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     e2eList.push(e2eID);
@@ -331,9 +331,8 @@ describe('ExpenseApp:', () => {
       typeList.get(randomNumber + 1).click();
     });
 
-    const today = new Date();
     element(by.id('dateinput'))
-      .sendKeys(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
+      .sendKeys(`${todayMonth}/${todayDay}/${todayYear}`);
 
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     e2eList.push(e2eID);
@@ -577,9 +576,8 @@ describe('ExpenseApp:', () => {
       typeList.get(randomNumber + 1).click();
     });
 
-    const today = new Date();
     element(by.id('dateinput'))
-      .sendKeys(today.getMonth() + 1 + '-' + today.getDate() + '-' + today.getUTCFullYear());
+      .sendKeys(`${todayMonth}/${todayDay}/${todayYear}`);
 
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     e2eList.push(e2eID);
