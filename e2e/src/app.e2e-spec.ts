@@ -28,7 +28,7 @@ const get = (options: any): any => {
   return defer.promise;
 };
 const until = protractor.ExpectedConditions;
-const e2eID = Math.random() * 100;
+let e2eID;
 const today = new Date();
 const todayDay = today.getUTCDate() < 10 ? '0' + today.getUTCDate() : today.getUTCDate();
 const todayMonth = today.getUTCMonth() + 1 < 10 ? `0${today.getUTCMonth() + 1}` : today.getUTCMonth() + 1;
@@ -38,12 +38,13 @@ let expensesListCount;
 let updateType;
 const isOnBuild = process.env.isOnBuild || false;
 
-const e2eList = [];
+let e2eList = [];
 
 describe('ExpenseApp:', () => {
   let originalTimeout;
 
   afterEach(() => {
+    console.log(e2eID);
     jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
 
     browser.manage().logs().get('browser').then((messages) => {
@@ -131,6 +132,7 @@ describe('ExpenseApp:', () => {
     element(by.id('dateinput'))
       .sendKeys(`${todayMonth}/${todayDay}/${todayYear}`);
 
+    e2eID = Math.random() * 100;
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     e2eList.push(e2eID);
 
@@ -334,6 +336,7 @@ describe('ExpenseApp:', () => {
     element(by.id('dateinput'))
       .sendKeys(`${todayMonth}/${todayDay}/${todayYear}`);
 
+    e2eID = Math.random() * 100;
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     e2eList.push(e2eID);
 
@@ -579,6 +582,7 @@ describe('ExpenseApp:', () => {
     element(by.id('dateinput'))
       .sendKeys(`${todayMonth}/${todayDay}/${todayYear}`);
 
+    e2eID = Math.random() * 100;
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     e2eList.push(e2eID);
 
@@ -774,22 +778,24 @@ describe('ExpenseApp:', () => {
   it('MR2: should close the expense on the landing page, go to the manager page and load the expense(s)', () => {
 
     element(by.id('modalClose')).click();
-    browser.wait(until.visibilityOf(element(by.name('expenses/manage'))), 20000, 'Not on the home page or not a manager')
-      .then(() => {
-        expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-          browser.sleep(1000);
-          browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-            element(by.name('expenses/manage')).click().then(() => {
-              expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-                browser.sleep(1000);
-                browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-                  expect(element.all(by.css('.ag-row')).count()).toBeGreaterThanOrEqual(1);
-                });
-              }));
+    browser.driver.navigate().refresh().then(() => {
+      browser.wait(until.visibilityOf(element(by.name('expenses/manage'))), 20000, 'Not on the home page or not a manager')
+        .then(() => {
+          expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+            browser.sleep(1000);
+            browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+              element(by.name('expenses/manage')).click().then(() => {
+                expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+                  browser.sleep(1000);
+                  browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+                    expect(element.all(by.css('.ag-row')).count()).toBeGreaterThanOrEqual(1);
+                  });
+                }));
+              });
             });
-          });
-        }));
-      });
+          }));
+        });
+    });
 
   });
 
@@ -1007,6 +1013,7 @@ describe('ExpenseApp:', () => {
     const expenses = element.all(by.cssContainingText(`[role='gridcell'][col-id='employee']`,
       'E2E, Opensource'));
     // tslint:disable-next-line
+    e2eList = e2eList.reverse();
     for (let i = 0; i < e2eList.length; ++i) {
       expenses.get(i).click().then(() => {
         browser.sleep(1000);
