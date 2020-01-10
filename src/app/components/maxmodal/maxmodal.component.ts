@@ -69,6 +69,7 @@ export class MaxModalComponent implements OnInit {
 
   /** OnInit to get the expenses. Can be slow! Every role has it's own getAttachment. */
   ngOnInit(): void {
+    document.getElementById('modalClose').focus();
     // forceViewer can be called from parent to allow the EMPLOYEE (landing page) to only see the expense
     if (this.forceViewer) {
       this.isViewer = true;
