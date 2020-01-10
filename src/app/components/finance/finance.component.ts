@@ -252,7 +252,7 @@ export class FinanceComponent {
   createDataExport() {
     this.dataExport = 'warning';
     this.expenses.createDataExport({ observe: 'response', responseType: 'blob' as 'csv',
-    headers: {'Accept': 'text/csv'}})
+    headers: {Accept: 'text/csv'}})
       .subscribe(
         responseList => {
           const timestamp = new Date().getTime();

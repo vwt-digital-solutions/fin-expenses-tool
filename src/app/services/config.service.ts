@@ -146,13 +146,6 @@ export class ExpensesConfigService {
       );
   }
 
-  public getCostTypes(): Observable<HttpResponse<any[]>> {
-    return this.http.get<any>(this.env.apiUrl + '/employees/cost-types')
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
   public updateExpenseEmployee(data, expenseId): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.put<ExpensesIfc>(this.env.apiUrl + Endpoint.employee + `/${expenseId}`, data)
       .pipe(

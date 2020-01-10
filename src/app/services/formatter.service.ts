@@ -25,11 +25,11 @@ export class FormatterService {
 
   static parseDate(date, dateFormat = 'dd-MM-yyyy') {
     const timestamp = Date.parse(date);
-    if (isNaN(timestamp) == false) {
+    if (isNaN(timestamp) === false) {
       return formatDate(new Date(timestamp), dateFormat, 'nl');
     } else {
       return 'N/A';
-    };
+    }
   }
 
   static getCorrectDateTime(date) {
