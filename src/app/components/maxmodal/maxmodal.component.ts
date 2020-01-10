@@ -179,81 +179,88 @@ export class MaxModalComponent implements OnInit {
 
   // BEGIN Subject to change
   /** Used to update the expense in form. Every role that can update has it's own part */
-  claimUpdateForm(form, expenseId: any, instArray: any[]): void {
+  claimUpdateForm(form: any, expenseId: any, instArray: any[]): void {
     if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3], instArray[4])) {
       const dataVerified = {};
       const data = form.value;
 
       // Checks what role the user has and updates the expense accordingly.
       if (this.isEditor) {
-
-        data.amount = Number((data.amount).toFixed(2));
-        data.transaction_date = new Date(data.transaction_date).toISOString();
-        for (const prop in data) {
-          if (prop.length !== 0) {
-            dataVerified[prop] = data[prop];
-          }
-        }
-        dataVerified[`status`] = 'ready_for_manager';
-        Object.keys(dataVerified).length !== 0 ?
-          this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
-            .subscribe(
-              result => {
-                this.uploadSingleAttachment(expenseId);
-                this.closeModal(true);
-              },
-              error => {
-                console.log(error);
-                this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
-              })
-          : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
-
+        this.claimForEditor(dataVerified, expenseId, data);
       } else if (this.isManager) {
-
-        dataVerified[`rnote`] = data.rnote;
-
-        if (!(this.rejectionNote) && this.action === 'rejecting') {
-          dataVerified[`rnote`] = this.selectedRejection;
-        }
-
-        dataVerified[`status`] = this.action === 'approving' ? `ready_for_creditor` :
-          this.action === 'rejecting' ? `rejected_by_manager` : null;
-        Object.keys(dataVerified).length !== 0 ?
-          this.expensesConfigService.updateExpenseManager(dataVerified, expenseId)
-            .subscribe(
-              result => {
-                this.closeModal(true);
-              },
-              error => {
-                console.log(error);
-                this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
-              })
-          : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
-
+        this.claimForManager(dataVerified, expenseId, data);
       } else if (this.isCreditor) {
-
-        dataVerified[`rnote`] = data.rnote;
-        dataVerified[`cost_type`] = data.cost_type;
-
-        if (!(this.rejectionNote) && this.action === 'rejecting') {
-          dataVerified[`rnote`] = this.selectedRejection;
-        }
-
-        dataVerified[`status`] = this.action === 'approving' ? `approved` :
-          this.action === 'rejecting' ? `rejected_by_creditor` : null;
-        Object.keys(dataVerified).length !== 0 ?
-          this.expensesConfigService.updateExpenseFinance(dataVerified, expenseId)
-            .subscribe(
-              result => {
-                this.closeModal(true);
-              },
-              error => {
-                console.log(error);
-                this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
-              })
-          : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
+        this.claimForCreditor(dataVerified, expenseId, data);
       }
     }
+  }
+
+  claimForEditor(dataVerified, expenseId, data) {
+    data.amount = Number((data.amount).toFixed(2));
+    data.transaction_date = new Date(data.transaction_date).toISOString();
+    for (const prop in data) {
+      if (prop.length !== 0) {
+        dataVerified[prop] = data[prop];
+      }
+    }
+    dataVerified[`status`] = 'ready_for_manager';
+    Object.keys(dataVerified).length !== 0 ?
+      this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
+        .subscribe(
+          result => {
+            this.uploadSingleAttachment(expenseId);
+            this.closeModal(true);
+          },
+          error => {
+            console.log(error);
+            this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+          })
+      : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
+  }
+
+  claimForManager(dataVerified, expenseId, data) {
+    dataVerified[`rnote`] = data.rnote;
+
+    if (!(this.rejectionNote) && this.action === 'rejecting') {
+      dataVerified[`rnote`] = this.selectedRejection;
+    }
+
+    dataVerified[`status`] = this.action === 'approving' ? `ready_for_creditor` :
+      this.action === 'rejecting' ? `rejected_by_manager` : null;
+    Object.keys(dataVerified).length !== 0 ?
+      this.expensesConfigService.updateExpenseManager(dataVerified, expenseId)
+        .subscribe(
+          result => {
+            this.closeModal(true);
+          },
+          error => {
+            console.log(error);
+            this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+          })
+      : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
+  }
+
+  claimForCreditor(dataVerified, expenseId, data) {
+    dataVerified[`rnote`] = data.rnote;
+    dataVerified[`cost_type`] = data.cost_type;
+
+    if (!(this.rejectionNote) && this.action === 'rejecting') {
+      dataVerified[`rnote`] = this.selectedRejection;
+    }
+
+    dataVerified[`status`] = this.action === 'approving' ? `approved` :
+      this.action === 'rejecting' ? `rejected_by_creditor` : null;
+    Object.keys(dataVerified).length !== 0 ?
+      this.expensesConfigService.updateExpenseFinance(dataVerified, expenseId)
+        .subscribe(
+          result => {
+            this.closeModal(true);
+          },
+          error => {
+            console.log(error);
+            this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+          })
+      : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
   }
 
   // END Subject to change
