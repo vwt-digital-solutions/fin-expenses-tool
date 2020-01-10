@@ -30,22 +30,24 @@ import { AgGridModule } from 'ag-grid-angular';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { DeviceDetectorModule } from 'ngx-device-detector';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
+import {MaxModalComponent} from './components/maxmodal/maxmodal.component';
 
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HeaderComponent,
-    AuthComponent,
-    LoaderComponent,
-    LandingComponent,
-    FinanceComponent,
-    ControllerComponent,
-    ManagerComponent,
-    ExpensesComponent,
-    NotFoundComponent,
-    SafeHtmlPipe
-  ],
+    declarations: [
+        AppComponent,
+        HeaderComponent,
+        AuthComponent,
+        LoaderComponent,
+        LandingComponent,
+        FinanceComponent,
+        ControllerComponent,
+        ManagerComponent,
+        ExpensesComponent,
+        NotFoundComponent,
+        SafeHtmlPipe,
+        MaxModalComponent
+    ],
   imports: [
     BrowserModule,
     FormsModule,

@@ -1,35 +1,5 @@
-@import "~src/assets/scss/mixins";
-@import "~src/assets/scss/constants";
-
-input {
-  border-radius: 4px;
-  outline: none;
-  border: 1px solid #dce5eb;
-}
-
-.col-9 {
-  background-color: #fcfbfb;
-}
-
-.notFilled {
-  border: 1px solid #dc44446b;
-  background-color: #dc44440f;
-}
-
-.fill-text {
-  padding: 0;
-  margin: 0;
-  position: relative;
-  color: #dc4444c2;
-}
-
-.move-18 {
-  bottom: 18px;
-}
-
-#bookinghistory {
-  border-bottom: 1px solid $vwt_color_blue_hr;
-}
+@import "src/assets/scss/mixins";
+@import "src/assets/scss/constants";
 
 #expensestable {
   width: 100%;
@@ -38,11 +8,6 @@ input {
   @include md-phone-only {
     height: 30rem;
   }
-}
-
-#expenseNote {
-  height: 100px;
-  max-height: 250px
 }
 
 #historytable {
@@ -59,17 +24,13 @@ input {
   height: auto;
 }
 
-.fom {
-  margin-bottom: 10px;
-}
-
 .btn-toolbar {
   border-bottom: 1px solid $vwt_color_blue_hr;
   margin-bottom: 10px;
   padding-bottom: 10px;
 
   button {
-    &:focus{
+    &:focus {
       outline: none;
       box-shadow: none;
     }
@@ -78,6 +39,7 @@ input {
       margin-left: 5px;
     }
   }
+
   .alert {
     margin-top: 10px;
   }
@@ -87,38 +49,6 @@ input {
   border-bottom: 1px solid $vwt_color_blue_hr;
   margin-bottom: 10px;
   margin-top: 48px;
-}
-
-.input-group .form-control {
-  float: none;
-}
-
-.employee-text {
-  color: #3f8bb5;
-  font-weight: 400;
-  margin-bottom: 5px;
-}
-
-.employee-line {
-  border-bottom: 1px solid $vwt_color_blue_hr;
-  margin-bottom: 10px;
-}
-
-.input-group-addon {
-  line-height: 32.5px;
-  text-align: center;
-  background-color: #f6f6f6;
-  font-weight: bold;
-  color: #858585;
-  border: 1px solid #dce5eb;
-  outline: none;
-  width: 45px;
-  cursor: pointer;
-
-  &:hover {
-    border: 1px solid $vwt_color_blue_hr;
-    opacity: .5;
-  }
 }
 
 #linestep {
@@ -132,65 +62,5 @@ input {
   transform: translate(50%, 0);
   @include lg-phone-only {
     display: none;
-  }
-}
-
-#updateErrors, #updateSuccess {
-  padding: 0.75rem 1.25rem;
-}
-
-.modal-footer {
-  #thumbs-up, #thumbs-down, #thumbs-down-rejecting {
-    font-size: large;
-  }
-
-  #information-icon-down, #information-icon, #information-icon-down-rejecting {
-    cursor: pointer;
-  }
-}
-
-#expensesUpdateForm {
-  label {
-    color: #3f8bb5;
-    font-weight: 600;
-  }
-}
-
-//#mobile-loader-button {
-//  left: 50%;
-//  margin: 0 -50% 0 0;
-//  transform: translate(-50%, -50%);
-//  top: 50%;
-//  padding: 0;
-//  position: fixed;
-//  width: 100%;
-//  height: 100%;
-//  overflow: hidden;
-//  background: transparent;
-//
-//  span {
-//    padding: 10px;
-//  }
-//}
-
-.disabledbtn {
-  opacity: .5;
-}
-
-.disabledbtn:hover {
-  cursor: not-allowed;
-}
-
-.hidden {
-  visibility: hidden;
-  display: none;
-}
-
-.click-stop {
-  cursor: pointer;
-  color: $vwt_color_blue;
-
-  &:hover {
-    opacity: .6;
   }
 }

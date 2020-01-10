@@ -89,9 +89,9 @@ export class ExpensesConfigService {
 
   public createDataExport(options: any): Observable<any[]> {
     const response1 = this.http.get(
-      this.env.apiUrl + '/finances/expenses/export?expenses_list=expenses', options);
+      this.env.apiUrl + '/finances/expenses?expenses_list=expenses_all', options);
     const response2 = this.http.get(
-      this.env.apiUrl + '/finances/expenses/export?expenses_list=expenses_journal', options);
+      this.env.apiUrl + '/finances/expenses/journal', options);
     return forkJoin([response1, response2]);
   }
 
@@ -141,13 +141,6 @@ export class ExpensesConfigService {
 
   public getExpenseAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
     return this.http.get<any>(this.env.apiUrl + Endpoint.employee + '/' + expenseId + '/attachments')
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
-  public getCostTypes(): Observable<HttpResponse<any[]>> {
-    return this.http.get<any>(this.env.apiUrl + '/employees/cost-types')
       .pipe(
         catchError(ExpensesConfigService.handleError)
       );

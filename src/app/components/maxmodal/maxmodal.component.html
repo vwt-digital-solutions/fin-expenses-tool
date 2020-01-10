@@ -1,0 +1,302 @@
+<div class="max-modal-overlay" id="maxModal">
+
+  <div id="max-modal" class="{{this.moveDirection}} move-top">
+    <div class="max-modal-header">
+      <h2 class="header-text">Declaratie</h2>
+      <button id="modalClose"
+              (click)="closeModal(false, false)"
+              type="button">
+        <span>&times;</span>
+      </button>
+    </div>
+    <div class="max-modal-body">
+
+      <p class="employee-text" id="employeeText">{{ expenseData.employee }}</p>
+      <div class="employee-line"></div>
+      <div id="updateErrors" class="alert alert-danger" role="alert" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+      <form id="expenseForm" #expenseForm="ngForm"
+            (ngSubmit)="claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])">
+
+        <div class="form-group">
+          <!-- Form: Rejection Note-->
+          <div *ngIf="isEditor">
+            <label for="rejectionNoteRead">Reden voor afkeuring:</label>
+            <div class="input-group mb-3 note-relative">
+            <textarea id="rejectionNoteRead"
+                      readonly
+                      class="form-control"
+                      type="text"
+                      [ngModel]="expenseData.status.rnote"
+                      name="rnote"></textarea>
+            </div>
+          </div>
+          <!-- Form: END : Rejection Note-->
+
+          <!-- Form: Cost Type -->
+          <div [ngClass]="{hidden: !isEditor && !isCreditor}">
+            <div class="input-group mb-3">
+
+              <label class="input-group-text"
+                     for="expenseCostType">Soort:</label>
+              <select id="expenseCostType"
+                      class="custom-select"
+                      name="cost_type"
+                      required
+                      [ngModel]="expenseData.cost_type"
+                      #ntype="ngModel">
+                <option value="" disabled><kbd>Huidige:</kbd> {{ expenseData.cost_type.split(':')[0] }}</option>
+                <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">{{t.ctype}}</option>
+              </select>
+
+            </div>
+          </div>
+
+          <div *ngIf="isManager || isViewer">
+            <div class="form-group">
+              <label for="expenseCostTypeRead">Soort:</label>
+              <div class="input-group mb-3">
+                <input id="expenseCostTypeRead"
+                       class="form-control"
+                       type="text"
+                       name="cost_type"
+                       readonly
+                       value="{{expenseData.cost_type.split(':')[0]}}">
+              </div>
+            </div>
+          </div>
+          <!-- Form: END : Cost Type -->
+
+          <!-- Form: Costs -->
+          <div [ngClass]="{hidden: !isEditor}">
+
+            <label for="expenseAmount">Kosten:</label>
+            <div class="input-group mb-3">
+              <input id="expenseAmount"
+                     class="form-control"
+                     [ngClass]="{notFilled: !(namount.valid)}"
+                     type="number"
+                     step="0.01"
+                     min="0.01"
+                     name="amount"
+                     required
+                     placeholder="{{expenseData.amount | currency: 'EUR' }}"
+                     [ngModel]="this.expenseData.amount"
+                     #namount="ngModel">
+            </div>
+
+            <div class="fill-text move-18" *ngIf="!(namount.valid) && isEditor">
+              <small>Graag een geldig bedrag invullen</small>
+            </div>
+
+          </div>
+
+          <div *ngIf="isManager || isCreditor || isViewer">
+
+            <label for="expenseAmountRead">Kosten:</label>
+            <div class="input-group mb-3">
+              <input id="expenseAmountRead"
+                     class="form-control"
+                     name="amount"
+                     readonly
+                     placeholder="{{expenseData.amount | currency: 'EUR' }}"
+                     [ngModel]="this.expenseData.amount"
+                     #namount="ngModel">
+            </div>
+
+          </div>
+          <!-- Form: END : Costs -->
+
+          <!-- Form: Transaction Date -->
+          <div [ngClass]="{hidden: !isEditor}">
+
+            <label for="expenseDateOfTransaction">Datum bon:</label>
+
+            <div class="input-group mb-3">
+              <input id="expenseDateOfTransaction"
+                     [ngClass]="{notFilled: !(ntransdate.valid)}"
+                     name="transaction_date"
+                     class="form-control"
+                     required
+                     [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"
+                     #ntransdate="ngModel" type="date">
+
+              <div class="input-group-append">
+
+              <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
+                <i class=" fa fa-calendar-alt"></i> </span>
+              </div>
+
+            </div>
+
+            <div class="fill-text move-18" *ngIf="!(ntransdate.valid) && isEditor">
+              <small>Graag een geldige datum invullen</small>
+            </div>
+
+          </div>
+
+          <div *ngIf="isManager || isCreditor || isViewer">
+
+            <label for="expenseDateOfTransactionRead">Datum bon:</label>
+
+            <div class="input-group mb-3">
+              <input id="expenseDateOfTransactionRead"
+                     name="transaction_date"
+                     class="form-control"
+                     readonly
+                     [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"
+                     #ntransdate="ngModel" type="date">
+
+              <div class="input-group-append">
+
+              <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
+                <i class=" fa fa-calendar-alt"></i> </span>
+              </div>
+
+            </div>
+
+          </div>
+          <!-- Form: END : Transaction Date -->
+
+          <!-- Form: Note -->
+          <div [ngClass]="{hidden: !isEditor}">
+
+            <label for="expenseNote">Omschrijving:</label>
+            <textarea id="expenseNote"
+                      [ngClass]="{notFilled: !(note.valid)}"
+                      class="form-control"
+                      type="text"
+                      required
+                      minlength="1"
+                      [ngModel]="expenseData.note"
+                      name="note"
+                      #note="ngModel"></textarea>
+            <div class="fill-text" *ngIf="!(note.valid) && isEditor">
+              <small>Graag een geldige omschrijving invullen</small>
+            </div>
+
+          </div>
+
+          <div *ngIf="isManager || isCreditor || isViewer">
+
+            <label for="expenseNoteRead">Omschrijving:</label>
+            <textarea id="expenseNoteRead"
+                      class="form-control"
+                      type="text"
+                      readonly
+                      [innerHTML]="expenseData.note | safeHtml: 'html'"></textarea>
+
+          </div>
+          <!-- Form: END : Note -->
+
+          <!-- Form: Attachments -->
+          <div [ngClass]="{hidden: !isEditor}">
+            <label>Bestanden:</label>
+            <input id="attachmentinput"
+                   type="file"
+                   accept="application/pdf,image/*"
+                   name="attachment"
+                   required
+                   class="hidden"
+                   (change)="onFileInput(fileInput.files)"
+                   #fileInput capture="camera">
+            <ul class="list-group">
+              <li class="list-group-item text-center clickable" (click)="fileInput.click()">
+                <span>Bestand toevoegen</span>
+              </li>
+              <li *ngFor="let item of receiptFiles"
+                  class="list-group-item d-flex justify-content-between align-items-center">
+              <span class="clickable"
+                    (click)="this.openSanitizeFile(item.content_type, item.content)">
+                View File - {{item.db_name}}</span>
+                <i class="fa fa-times clickable" (click)="removeFromAttachmentList(item)"></i>
+              </li>
+            </ul>
+          </div>
+
+          <div *ngIf="isManager || isCreditor || isViewer">
+            <label>Bestanden:</label>
+            <ul class="list-group">
+              <li *ngFor="let item of receiptFiles"
+                  class="list-group-item d-flex justify-content-between align-items-center">
+                  <span class="clickable"
+                        (click)="this.openSanitizeFile(item.content_type, item.content)">View File - {{item.db_name}}</span>
+              </li>
+            </ul>
+          </div>
+          <!-- Form: END : Attachments -->
+
+          <!-- Form: Rejection Note | Check submit-update-form label after every change -->
+          <div class="input-group mb-3" [ngClass]="{hidden: !this.isRejecting}">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="rnoteselect">Reden:</label>
+            </div>
+            <select id="rnoteselect"
+                    class="custom-select"
+                    (change)="rejectionHit($event)"
+                    name="rnoteselect">
+              <option>Deze kosten kun je declareren via Regweb (PSA)</option>
+              <option>Deze kosten kun je declareren via de leasemaatschappij</option>
+              <option>Deze kosten zijn al gedeclareerd</option>
+              <option value="note">Anders, reden:</option>
+            </select>
+          </div>
+          <div class="form-group hidden"
+               id="rejection-note-group">
+                <textarea id="rnote"
+                          class="form-control"
+                          [ngClass]="{notFilled: (rnote.invalid && (rnote.dirty || rnote.touched))}"
+                          type="text"
+                          name="rnote"
+                          required minlength="1"
+                          [ngModel]="expenseData.status.rnote"
+                          #rnote="ngModel">
+                </textarea>
+          </div>
+          <div class="fill-text move-18"
+               *ngIf="(rnote.invalid && (rnote.dirty || rnote.touched))"
+               [ngClass]="{hidden: !this.rejectionNote}">
+            <small>Graag een geldige reden invullen</small>
+          </div>
+
+
+          <input type="submit" id="submit-update-form" hidden #submitForm/>
+        </div>
+      </form>
+
+
+    </div>
+    <div class="max-modal-footer">
+      <!-- Employee Modal Options -->
+      <div *ngIf="isEditor">
+        <button type="button" (click)="cancelExpense()" class="btn btn-danger" id="cancel-update-button">Declaratie Annuleren</button>
+        <button type="button" (click)="submitForm.click()" class="btn btn-primary" id="submit-update-button"
+                [ngClass]="{disabledbtn: submitButtonController(note, namount, ntype, ntransdate, undefined)}">Indienen
+        </button>
+      </div>
+      <!-- END Employee Modal Options-->
+
+      <!-- Viewer (Manager, Creditor) Modal Options-->
+      <div *ngIf="isManager || isCreditor">
+        <button type="button" *ngIf="!this.isRejecting" id="thumbs-up" class="btn btn-success"
+             (click)="updatingAction('approving'); this.claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])">
+          <a id="information-icon">Goedkeuren</a>
+        </button>
+
+        <button type="button" *ngIf="!this.isRejecting" id="thumbs-down" class="btn btn-danger"
+             (click)="updatingAction('rejecting');">
+          <a id="information-icon-down">Afkeuren</a>
+        </button>
+        <button type="button" *ngIf="this.isRejecting" id="thumbs-down-rejecting" class="btn btn-danger"
+             (click)="updatingAction('rejecting'); this.claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])"
+             [ngClass]="{disabledbtn: submitButtonController(undefined,
+                 undefined, this.isCreditor ? ntype : undefined, undefined, rnote)}">
+          <a id="information-icon-down-rejecting">OK</a>
+        </button>
+      </div>
+      <!-- END Viewer (Manager, Creditor) Modal Options -->
+    </div>
+  </div>
+
+</div>

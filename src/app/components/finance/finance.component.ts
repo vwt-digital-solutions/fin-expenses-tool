@@ -1,18 +1,11 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
-import {NgbModal, ModalDismissReasons} from '@ng-bootstrap/ng-bootstrap';
-import {NgForm} from '@angular/forms';
 import {ExpensesConfigService} from '../../services/config.service';
-import {DomSanitizer} from '@angular/platform-browser';
 import {FormatterService} from 'src/app/services/formatter.service';
-import {ActivatedRoute} from '@angular/router';
-import {map} from 'rxjs/operators';
 import {Expense} from '../../models/expense';
-import {CostType} from '../../models/cost-type';
-import {Attachment} from '../../models/attachment';
+import {saveAs} from 'file-saver';
+import {formatDate} from '@angular/common';
 import {EnvService} from '../../services/env.service';
-import { saveAs } from 'file-saver';
-import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-expenses',
@@ -20,33 +13,20 @@ import { formatDate } from '@angular/common';
   styleUrls: ['./finance.component.scss']
 })
 
-export class FinanceComponent implements OnInit {
+export class FinanceComponent {
   private gridApi;
   private historyGridApi;
   public columnDefs;
   public rowSelection;
-  public typeOptions: CostType[];
-  public formSubmitted;
-  public showErrors;
-  public formErrors;
-  public formResponse;
-  private action: any;
-  private receiptFiles: Attachment[];
-  private isRejecting;
-  public today;
-  public wantsRejectionNote;
-  public selectedRejection;
-  public noteData;
   private currentRowIndex: number;
+  public wantsNewModal: boolean;
+  public dataExport = 'invisible';
+  public moveDirection = 'move-up';
 
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
-  modalDefinition: any;
 
   constructor(
     private expenses: ExpensesConfigService,
-    private modalService: NgbModal,
-    private sanitizer: DomSanitizer,
-    private route: ActivatedRoute,
     private http: HttpClient,
     private env: EnvService
   ) {
@@ -95,16 +75,15 @@ export class FinanceComponent implements OnInit {
         ]
       }
     ];
-    this.formSubmitted = false;
-    this.showErrors = false;
-    this.formResponse = {};
     this.rowSelection = 'single';
     this.addBooking = {success: false, wrong: false, error: false};
+    if (this.env.featureToggle) {
+      this.dataExport = 'secondary';
+    }
   }
 
   public expenseData: Expense;
   public addBooking;
-  public dataExport = 'invisible';
 
   historyColumnDefs = [
     {
@@ -132,51 +111,6 @@ export class FinanceComponent implements OnInit {
 
   rowData = null;
   historyRowData = null;
-
-  static getDismissReason(reason: any): string {
-    if (reason === ModalDismissReasons.ESC) {
-      return 'by pressing ESC';
-    } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-      return 'by clicking on a backdrop';
-    } else {
-      return `with: ${reason}`;
-    }
-  }
-
-  static getNavigator() {
-    return navigator.userAgent.match(/Android/i)
-      || navigator.userAgent.match(/webOS/i)
-      || navigator.userAgent.match(/iPhone/i)
-      || navigator.userAgent.match(/iPad/i)
-      || navigator.userAgent.match(/iPod/i)
-      || navigator.userAgent.match(/BlackBerry/i)
-      || navigator.userAgent.match(/Windows Phone/i);
-  }
-
-  openSanitizeFile(type, file) {
-    const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
-    const isChrome = /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor);
-    if (isIEOrEdge) {
-      if (type === 'application/pdf') {
-        alert('Please use Chrome or Firefox to view this file');
-      } else {
-        const win = window.open();
-        // @ts-ignore
-        // tslint:disable-next-line:max-line-length
-        win.document.write('<img src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" alt="">');
-      }
-    } else {
-      const win = window.open();
-      if (FinanceComponent.getNavigator()) {
-        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Edge Mobile of Samsung Internet.</p>');
-      } else if (!isChrome) {
-        win.document.write('<p>Problemen bij het weergeven van het bestand? Gebruik Chrome of Firefox.</p>');
-      }
-      const sanitizedExpr = 'data:' + type + ';base64,' + encodeURI(file);
-      // tslint:disable-next-line:max-line-length no-unused-expression
-      win.document.write('<iframe src="' + sanitizedExpr + '" frameborder="0" style="border:0; top:auto; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>');
-    }
-  }
 
   historyHit(event) {
     if (event.colDef.field === 'export_date') {
@@ -209,60 +143,17 @@ export class FinanceComponent implements OnInit {
         });
   }
 
-  onRowClicked(event, content) {
+  onRowClicked(event, direct= false) {
     if (event === null || event === undefined) {
-      this.dismissModal();
-    } else {
-
-      if (event.api !== null && event.api !== undefined) {
-        this.gridApi = event.api;
-      }
-      this.formSubmitted = false;
-      this.showErrors = false;
-      this.formErrors = '';
-      this.isRejecting = false;
-      this.wantsRejectionNote = false;
-      this.expenseData = event.data;
-      this.modalDefinition = content;
-      this.currentRowIndex = event.rowIndex;
-      this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
-      this.expenses.getFinanceAttachment(event.data.id).subscribe((image: any) => {
-        this.receiptFiles = [];
-        for (const img of image) {
-          if (!(this.receiptFiles.includes(img))) {
-            this.receiptFiles.push(img);
-          }
-        }
-        this.modalService.open(content, {centered: true}).result.then((result) => {
-          this.gridApi.deselectAll();
-          this.wantsRejectionNote = false;
-          console.log(`Closed with: ${result}`);
-        }, (reason) => {
-          this.gridApi.deselectAll();
-          console.log(`Dismissed ${FinanceComponent.getDismissReason(reason)}`);
-        });
-      });
+      return false;
     }
-  }
-
-  rejectionHit(event) {
-    this.wantsRejectionNote = (event.target.value === 'note');
-    this.selectedRejection = event.target.value;
-    this.noteData = '';
-    if (this.wantsRejectionNote) {
-      document.getElementById('rejection-note-group').style.visibility = 'visible';
-      document.getElementById('rejection-note-group').style.display = 'block';
-    } else {
-      document.getElementById('rejection-note-group').style.visibility = 'hidden';
-      document.getElementById('rejection-note-group').style.display = 'none';
+    this.moveDirection = direct ? 'move-left' : 'move-up';
+    this.expenseData = event.data;
+    this.wantsNewModal = true;
+    if (event.api !== null && event.api !== undefined) {
+      this.gridApi = event.api;
     }
-  }
-
-  updatingAction(event) {
-    this.action = event;
-    if (event === 'rejecting') {
-      this.isRejecting = true;
-    }
+    this.currentRowIndex = event.rowIndex;
   }
 
   getNextNode(currentIndex: number, status: string) {
@@ -275,48 +166,49 @@ export class FinanceComponent implements OnInit {
     return newNode;
   }
 
-  getNextExpense(same) {
-    this.dismissModal();
+  getNextExpense(next: boolean) {
     setTimeout(() => {
       let rowNode = null;
-      if (same) {
-        rowNode = this.gridApi.getRowNode(this.currentRowIndex);
-      } else {
+      if (next) {
         rowNode = this.getNextNode(this.currentRowIndex + 1, 'ready_for_creditor');
       }
 
       if (rowNode != null && 'rowIndex' in rowNode) {
-        this.onRowClicked(rowNode, this.modalDefinition);
+        this.onRowClicked(rowNode, true);
       } else {
         // tslint:disable-next-line:no-shadowed-variable
         const rowNode = this.getNextNode(0, 'ready_for_creditor');
         if (rowNode != null && 'rowIndex' in rowNode) {
-          this.onRowClicked(rowNode, this.modalDefinition);
+          this.onRowClicked(rowNode, true);
         }
       }
     }, 100);
   }
 
-  dismissModal() {
-    this.modalService.dismissAll();
+  receiveMessage(message) {
+    this.wantsNewModal = false;
+    if (message[0]) {
+      this.expenses.getExpenses().subscribe((response) => {
+        // @ts-ignore
+        this.rowData = [...response];
+        if (message[1]) {
+          this.getNextExpense(true);
+        }
+      });
+    } else if (message[1]) {
+      this.getNextExpense(false);
+    }
   }
 
   onHistoryGridReady(params: any) {
     this.historyGridApi = params.api;
-  }
-
-  ngOnInit() {
-    this.today = new Date();
-    this.callHistoryRefresh();
-    this.route.data.pipe(
-      map(data => data.costTypes)
-    ).subscribe(costTypes => this.typeOptions = [...costTypes]);
-    this.expenses.getExpenses().subscribe((data: any) => this.rowData = [...data]);
-  }
-
-  callHistoryRefresh() {
     this.expenses.getDocumentsList()
       .subscribe(result => this.historyRowData = [...result.file_list]);
+  }
+
+  onGridReady(params: any) {
+    // @ts-ignore
+    this.expenses.getExpenses().subscribe((data) => this.rowData = [...data]);
   }
 
   resetPopups() {
@@ -359,7 +251,8 @@ export class FinanceComponent implements OnInit {
 
   createDataExport() {
     this.dataExport = 'warning';
-    this.expenses.createDataExport({ observe: 'response', responseType: 'blob' as 'csv' })
+    this.expenses.createDataExport({ observe: 'response', responseType: 'blob' as 'csv',
+    headers: {Accept: 'text/csv'}})
       .subscribe(
         responseList => {
           const timestamp = new Date().getTime();
@@ -368,50 +261,12 @@ export class FinanceComponent implements OnInit {
           saveAs(responseList[1].body, `expenses_journal_${dateFormat}.csv`);
 
           this.dataExport = 'success';
-          setTimeout(() => {this.dataExport = ''}, 2000);
+          setTimeout(() => {
+            this.dataExport = '';
+          }, 2000);
         }, error => {
           this.dataExport = 'danger';
           console.error('>> GET FAILED', error.message);
         });
-  }
-
-  submitButtonController(ntype: { invalid: boolean }, rnote: { invalid: boolean } = null) {
-    if (this.wantsRejectionNote) {
-      return ntype.invalid || rnote.invalid;
-    } else {
-      return ntype.invalid;
-    }
-  }
-
-  claimUpdateForm({form, expenseId, type, note = null}: { form: NgForm, expenseId: number, type: any, note?: any }) {
-    if (!this.submitButtonController(type, note)) {
-      const dataVerified = {};
-      dataVerified[`rnote`] = form.value.rnote;
-      dataVerified[`cost_type`] = form.value.cost_type;
-      if (!(this.wantsRejectionNote) && this.action === 'rejecting') {
-        dataVerified[`rnote`] = this.selectedRejection;
-      }
-      const action = this.action;
-      dataVerified[`status`] = action === 'approving' ? `approved` :
-        action === 'rejecting' ? `rejected_by_creditor` : null;
-      Object.keys(dataVerified).length !== 0 || this.formSubmitted === true ?
-        this.expenses.updateExpenseFinance(dataVerified, expenseId)
-          .subscribe(
-            result => {
-              this.expenses.getExpenses().subscribe((response: any) => {
-                this.rowData = [...response];
-                this.getNextExpense(this.action === 'rejecting');
-              });
-              this.showErrors = false;
-              this.formSubmitted = !form.ngSubmit.hasError;
-              console.log('>> PUT SUCCESS', result);
-            },
-            error => {
-              this.showErrors = true;
-              this.formResponse = error
-              console.error('>> PUT FAILED', error.message);
-            })
-        : (this.showErrors = true, this.formErrors = 'Geen gegevens geüpdatet');
-    }
   }
 }
