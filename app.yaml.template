@@ -16,22 +16,9 @@ runtime: nodejs10
 service: frontend
 
 handlers:
-- url: /(.*\.(gif|png|jpeg|jpg|css|js|ico|svg))$
+- url: /(.*\.(gif|png|jpeg|jpg|css|js|ico|svg|json|eot|woff|woff2))$
   static_files: dist/\1
   upload: dist/(.*)
-  secure: always
-  redirect_http_response_code: 301
-  http_headers:
-    X-Content-Type-Options: 'nosniff'
-    Strict-Transport-Security: 'max-age=31536000'
-    # Modifications to CSP can be tested here before they go to the one below
-    Content-Security-Policy-Report-Only: "default-src 'none'; script-src 'self'; img-src 'self' data:; font-src 'self' fonts.gstatic.com data: ; style-src 'self' fonts.googleapis.com 'unsafe-inline'; style-src-elem 'self' fonts.googleapis.com 'unsafe-inline'; connect-src __API_CONNECT_SRC__; form-action 'none'; frame-src data:; frame-ancestors 'none'"
-    # ONLY EDIT Content-Security-Policy after testing in -Reporting-Only above
-    Content-Security-Policy: "default-src 'none'; script-src 'self'; img-src 'self' data:; font-src 'self' fonts.gstatic.com data: ; style-src 'self' fonts.googleapis.com 'unsafe-inline'; style-src-elem 'self' fonts.googleapis.com 'unsafe-inline'; connect-src __API_CONNECT_SRC__; form-action 'none'; frame-src data:; frame-ancestors 'none'"
-
-- url: /assets/fonts/(.*\.(eot|woff|woff2))$
-  static_files: dist/assets/fonts/\1
-  upload: dist/assets/fonts/(.*)
   secure: always
   redirect_http_response_code: 301
   http_headers:
