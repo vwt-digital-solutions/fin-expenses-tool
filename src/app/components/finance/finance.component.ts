@@ -6,7 +6,7 @@ import {Expense} from '../../models/expense';
 import {saveAs} from 'file-saver';
 import {formatDate} from '@angular/common';
 import {EnvService} from '../../services/env.service';
-import {FormGroup, FormControl, Validators} from '@angular/forms';
+import {FormGroup, FormControl, Validators, AbstractControl} from '@angular/forms';
 
 @Component({
   selector: 'app-expenses',
@@ -24,7 +24,7 @@ export class FinanceComponent {
   public dataExport = 'invisible';
   public moveDirection = 'move-up';
 
-  public getAllExpensesForm;
+  public dateExportForm;
 
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
 
@@ -289,23 +289,25 @@ export class FinanceComponent {
     const currentStartDate = formatDate(currentDate.setDate(
       currentDate.getDate() - 7), 'yyyy-MM-dd', 'nl');
 
-    this.getAllExpensesForm = new FormGroup({
-      'startDate': new FormControl(currentStartDate, [Validators.required, this.validDateFormat]),
-      'endDate': new FormControl(currentEndDate, [Validators.required, this.validDateFormat])
-    });
+    this.dateExportForm = new FormGroup({
+      'startDate': new FormControl(
+        currentStartDate, [Validators.required, this.validDateFormat]),
+      'endDate': new FormControl(
+        currentEndDate, [Validators.required, this.validDateFormat])
+    }, { validators: this.checkIfEndDateAfterStartDate });
   }
 
   onSubmit(event: Event) {
     event.preventDefault();
     event.stopPropagation();
 
-    if (this.getAllExpensesForm.valid) {
+    if (this.dateExportForm.valid) {
       this.createDataExport(
-        this.getAllExpensesForm.value.startDate,
-        this.getAllExpensesForm.value.endDate
+        this.dateExportForm.value.startDate,
+        this.dateExportForm.value.endDate
       );
     } else {
-      this.validateAllFormFields(this.getAllExpensesForm);
+      this.validateAllFormFields(this.dateExportForm);
     }
 
   }
@@ -323,6 +325,18 @@ export class FinanceComponent {
     }
 
     return !validDateFormat ? { validDateFormat: true } : null;
+  }
+
+  checkIfEndDateAfterStartDate(control: AbstractControl) {
+    let validDateOrder = false;
+    const startDate = control.get('startDate');
+    const endDate = control.get('endDate');
+
+    if (new Date(startDate.value).getTime() <= new Date(endDate.value).getTime()) {
+      validDateOrder = true;
+    }
+
+    return !validDateOrder ? { validDateOrder: true } : null;
   }
 
   validateAllFormFields(formGroup: FormGroup) {

@@ -34,29 +34,35 @@
               <div class="dropdown-menu">
                 <form
                   class="px-4 py-3"
-                  [formGroup]="getAllExpensesForm"
+                  [formGroup]="dateExportForm"
                   (submit)="onSubmit($event)"
                   (keydown.enter)="$event.preventDefault()" >
                   <div class="form-group">
-                    <label for="exampleDropdownFormEmail1">Begindatum</label>
+                    <label for="startDate">Begindatum</label>
                     <input id="startDate" type="date" class="form-control" formControlName="startDate" >
                   </div>
                   <div class="form-group">
-                    <label for="exampleDropdownFormPassword1">Einddatum</label>
+                    <label for="endDate">Einddatum</label>
                     <input id="endDate" type="date" class="form-control" formControlName="endDate" >
                   </div>
                   <button
                     type="submit"
                     class="btn btn-{{dataExport ? dataExport : 'secondary'}}"
-                    disabled="{{ this.getAllExpensesForm.valid ? '' : 'disabled' }}"
+                    disabled="{{ dateExportForm.valid ? '' : 'disabled' }}"
                     title="Exporteer als csv">Exporteren
                     <i *ngIf="dataExport === 'warning'" class="fas fa-spinner fa-spin"></i>
                     <i *ngIf="dataExport === 'success'" class="fas fa-check-circle"></i>
                     <i *ngIf="dataExport === 'danger'" class="fa fa-exclamation-circle"></i>
                   </button>
+
+                  <div
+                    *ngIf="dateExportForm.errors?.validDateOrder && (dateExportForm.touched || dateExportForm.dirty)"
+                    class="cross-validation-error-message alert alert-danger">
+                    <small>De begindatum moet ouder zijn dan de einddatum!</small>
+                  </div>
                 </form>
                 <div class="dropdown-divider"></div>
-                <small class="form-text text-muted">
+                <small class="form-text text-muted description-text">
                   De data zal worden geëxporteerd als CSV en kan gevoelige informatie bevatten.
                 </small>
               </div>
