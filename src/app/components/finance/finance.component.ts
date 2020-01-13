@@ -1,11 +1,12 @@
 import {Component} from '@angular/core';
-import {HttpClient, HttpResponse} from '@angular/common/http';
+import {HttpClient, HttpResponse, HttpParams} from '@angular/common/http';
 import {ExpensesConfigService} from '../../services/config.service';
 import {FormatterService} from 'src/app/services/formatter.service';
 import {Expense} from '../../models/expense';
 import {saveAs} from 'file-saver';
 import {formatDate} from '@angular/common';
 import {EnvService} from '../../services/env.service';
+import {FormGroup, FormControl, Validators} from '@angular/forms';
 
 @Component({
   selector: 'app-expenses',
@@ -23,6 +24,8 @@ export class FinanceComponent {
   public dataExport = 'invisible';
   public moveDirection = 'move-up';
 
+  public getAllExpensesForm;
+
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
 
   constructor(
@@ -30,6 +33,16 @@ export class FinanceComponent {
     private http: HttpClient,
     private env: EnvService
   ) {
+    const currentDate = new Date();
+    const currentStartDate = formatDate(currentDate, 'yyyy-MM-dd', 'nl');
+    const currentEndDate = formatDate(currentDate.setDate(
+      currentDate.getDate() - 7), 'yyyy-MM-dd', 'nl');
+
+    this.getAllExpensesForm = new FormGroup({
+      'startDate': new FormControl(currentStartDate, Validators.required),
+      'endDate': new FormControl(currentEndDate, Validators.required)
+    });
+
     this.columnDefs = [
       {
         headerName: 'Declaraties Overzicht',
@@ -249,10 +262,18 @@ export class FinanceComponent {
         });
   }
 
-  createDataExport() {
+  createDataExport(startDate: string, endDate: string) {
+    let params = new HttpParams().set("date_from", startDate).set("date_to", endDate);
+
+    const httpOptions = {
+      observe: 'response',
+      responseType: 'blob' as 'csv',
+      headers: {Accept: 'text/csv'},
+      params: params
+    };
+
     this.dataExport = 'warning';
-    this.expenses.createDataExport({ observe: 'response', responseType: 'blob' as 'csv',
-    headers: {Accept: 'text/csv'}})
+    this.expenses.createDataExport(httpOptions)
       .subscribe(
         responseList => {
           const timestamp = new Date().getTime();
@@ -268,5 +289,27 @@ export class FinanceComponent {
           this.dataExport = 'danger';
           console.error('>> GET FAILED', error.message);
         });
+  }
+
+  onSubmit(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (this.getAllExpensesForm.valid) {
+      this.createDataExport(
+        this.getAllExpensesForm.value.startDate,
+        this.getAllExpensesForm.value.endDate
+      );
+    } else {
+      this.validateAllFormFields(this.getAllExpensesForm);
+    }
+
+  }
+
+  validateAllFormFields(formGroup: FormGroup) {
+    Object.keys(formGroup.controls).forEach(field => {
+      const control = formGroup.get(field);
+      control.markAsTouched({ onlySelf: true });
+    });
   }
 }

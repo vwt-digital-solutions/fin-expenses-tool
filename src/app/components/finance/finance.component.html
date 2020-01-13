@@ -21,17 +21,46 @@
 
         <ng-container *ngIf="dataExport != 'invisible'">
           <div class="col col-md-6 col-sm-12 data-export-top text-md-right">
-            <button
-              type="button"
-              id="createDataExport"
-              (click)="createDataExport()"
-              class="btn btn-{{dataExport ? dataExport : 'secondary'}}"
-              title="Exporteer declaraties en declaratie geschiedenis als csv">Exporteer alle data
-              <i *ngIf="!dataExport" class="fa fa-download"></i>
-              <i *ngIf="dataExport === 'warning'" class="fas fa-spinner fa-spin"></i>
-              <i *ngIf="dataExport === 'success'" class="fas fa-check-circle"></i>
-              <i *ngIf="dataExport === 'danger'" class="fa fa-exclamation-circle"></i>
-            </button>
+            <div class="dropdown">
+              <button
+                class="btn btn-secondary dropdown-toggle"
+                type="button"
+                id="dropdownForm"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+                Data exporteren
+              </button>
+              <div class="dropdown-menu">
+                <form
+                  class="px-4 py-3"
+                  [formGroup]="getAllExpensesForm"
+                  (submit)="onSubmit($event)"
+                  (keydown.enter)="$event.preventDefault()" >
+                  <div class="form-group">
+                    <label for="exampleDropdownFormEmail1">Begindatum</label>
+                    <input id="startDate" type="date" class="form-control" formControlName="startDate" >
+                  </div>
+                  <div class="form-group">
+                    <label for="exampleDropdownFormPassword1">Einddatum</label>
+                    <input id="endDate" type="date" class="form-control" formControlName="endDate" >
+                  </div>
+                  <button
+                    type="submit"
+                    class="btn btn-{{dataExport ? dataExport : 'secondary'}}"
+                    disabled="{{ this.getAllExpensesForm.valid ? '' : 'disabled' }}"
+                    title="Exporteer als csv">Exporteren
+                    <i *ngIf="dataExport === 'warning'" class="fas fa-spinner fa-spin"></i>
+                    <i *ngIf="dataExport === 'success'" class="fas fa-check-circle"></i>
+                    <i *ngIf="dataExport === 'danger'" class="fa fa-exclamation-circle"></i>
+                  </button>
+                </form>
+                <div class="dropdown-divider"></div>
+                <small class="form-text text-muted">
+                  De data zal worden geëxporteerd als CSV en kan gevoelige informatie bevatten.
+                </small>
+              </div>
+            </div>
           </div>
         </ng-container>
       </div>

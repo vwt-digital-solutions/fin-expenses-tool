@@ -43,6 +43,16 @@
   .alert {
     margin-top: 10px;
   }
+  .dropdown {
+    form {
+      input.ng-invalid {
+        border: 2px solid #c0392b;
+      }
+    }
+    small {
+      padding: 0 1.5rem;
+    }
+  }
 }
 
 .empty-creation-top {
