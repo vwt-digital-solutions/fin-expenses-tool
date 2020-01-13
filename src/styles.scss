@@ -5,16 +5,20 @@
 
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-material.css";
+
 $vwt_font_family: 'Poppins', sans-serif;
-$fa-font-path: "/assets/fonts/font-awesome";
-@import "/assets/fontawesome/scss/fontawesome.scss";
-@import "/assets/fontawesome/scss/solid.scss";
-@import "/assets/fontawesome/scss/brands.scss";
+
+$fa-font-path: "~src/assets/fonts/font-awesome";
+@import "~src/assets/fontawesome/scss/fontawesome.scss";
+@import "~src/assets/fontawesome/scss/regular.scss";
+@import "~src/assets/fontawesome/scss/solid.scss";
+@import "~src/assets/fontawesome/scss/brands.scss";
+
 @import "~ag-grid-community/dist/styles/ag-theme-balham.css";
 
 
 body {
-  font-family: $vwt_font_family;
+  font-family: $vwt_font_family !important;
   margin: 5em 0 0;
 }
 h1 {
