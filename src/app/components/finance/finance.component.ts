@@ -33,15 +33,7 @@ export class FinanceComponent {
     private http: HttpClient,
     private env: EnvService
   ) {
-    const currentDate = new Date();
-    const currentStartDate = formatDate(currentDate, 'yyyy-MM-dd', 'nl');
-    const currentEndDate = formatDate(currentDate.setDate(
-      currentDate.getDate() - 7), 'yyyy-MM-dd', 'nl');
-
-    this.getAllExpensesForm = new FormGroup({
-      'startDate': new FormControl(currentStartDate, Validators.required),
-      'endDate': new FormControl(currentEndDate, Validators.required)
-    });
+    this.setUpForm();
 
     this.columnDefs = [
       {
@@ -291,6 +283,18 @@ export class FinanceComponent {
         });
   }
 
+  setUpForm() {
+    const currentDate = new Date();
+    const currentStartDate = formatDate(currentDate, 'yyyy-MM-dd', 'nl');
+    const currentEndDate = formatDate(currentDate.setDate(
+      currentDate.getDate() - 7), 'yyyy-MM-dd', 'nl');
+
+    this.getAllExpensesForm = new FormGroup({
+      'startDate': new FormControl(currentStartDate, [Validators.required, this.validDateFormat]),
+      'endDate': new FormControl(currentEndDate, [Validators.required, this.validDateFormat])
+    });
+  }
+
   onSubmit(event: Event) {
     event.preventDefault();
     event.stopPropagation();
@@ -304,6 +308,21 @@ export class FinanceComponent {
       this.validateAllFormFields(this.getAllExpensesForm);
     }
 
+  }
+
+  validDateFormat(control: FormControl) {
+    let validDateFormat = false;
+
+    const timestamp = Date.parse(control.value);
+    const validTime = new Date('1970-01-01').getTime();
+    const validFormat = control.value.search(
+      /([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/g);
+
+    if (isNaN(timestamp) === false && timestamp > validTime && validFormat == 0) {
+      validDateFormat = true;
+    }
+
+    return !validDateFormat ? { validDateFormat: true } : null;
   }
 
   validateAllFormFields(formGroup: FormGroup) {
