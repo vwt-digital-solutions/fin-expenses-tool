@@ -285,8 +285,8 @@ export class FinanceComponent {
 
   setUpForm() {
     const currentDate = new Date();
-    const currentStartDate = formatDate(currentDate, 'yyyy-MM-dd', 'nl');
-    const currentEndDate = formatDate(currentDate.setDate(
+    const currentEndDate = formatDate(currentDate, 'yyyy-MM-dd', 'nl');
+    const currentStartDate = formatDate(currentDate.setDate(
       currentDate.getDate() - 7), 'yyyy-MM-dd', 'nl');
 
     this.getAllExpensesForm = new FormGroup({
