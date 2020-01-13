@@ -25,6 +25,7 @@ export class FinanceComponent {
   public moveDirection = 'move-up';
 
   public dateExportForm;
+  public dateExportFormReponse = [];
 
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
 
@@ -265,18 +266,35 @@ export class FinanceComponent {
     };
 
     this.dataExport = 'warning';
+    this.dateExportFormReponse = [];
     this.expenses.createDataExport(httpOptions)
       .subscribe(
         responseList => {
           const timestamp = new Date().getTime();
           const dateFormat = formatDate(timestamp, 'yyyyMMddTHHmmss', 'nl');
-          saveAs(responseList[0].body, `expenses_${dateFormat}.csv`);
-          saveAs(responseList[1].body, `expenses_journal_${dateFormat}.csv`);
+          const emptyResponseStatuses = [];
 
-          this.dataExport = 'success';
-          setTimeout(() => {
+          for (const response of responseList) {
+            if (response.status === 200 && 'body' in response) {
+              const fileName = response.url.includes('journal') ?
+                `expenses_journal_${dateFormat}.csv` :
+                `expenses_${dateFormat}.csv`;
+              saveAs(response.body, fileName);
+            } else {
+              emptyResponseStatuses.push(
+                response.url.includes('journal') ? 'logboek' : 'declaraties');
+            }
+          }
+
+          if (emptyResponseStatuses.length > 0) {
+            this.dateExportFormReponse = emptyResponseStatuses;
             this.dataExport = '';
-          }, 2000);
+          } else {
+            this.dataExport = 'success';
+            setTimeout(() => {
+              this.dataExport = '';
+            }, 2000);
+          }
         }, error => {
           this.dataExport = 'danger';
           console.error('>> GET FAILED', error.message);
@@ -295,6 +313,10 @@ export class FinanceComponent {
       'endDate': new FormControl(
         currentEndDate, [Validators.required, this.validDateFormat])
     }, { validators: this.checkIfEndDateAfterStartDate });
+
+    this.dateExportForm.valueChanges.subscribe(val => {
+      this.dateExportFormReponse = [];
+    })
   }
 
   onSubmit(event: Event) {
@@ -309,7 +331,6 @@ export class FinanceComponent {
     } else {
       this.validateAllFormFields(this.dateExportForm);
     }
-
   }
 
   validDateFormat(control: FormControl) {

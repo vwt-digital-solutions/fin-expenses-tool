@@ -57,8 +57,14 @@
 
                   <div
                     *ngIf="dateExportForm.errors?.validDateOrder && (dateExportForm.touched || dateExportForm.dirty)"
-                    class="cross-validation-error-message alert alert-danger">
+                    class="form-message alert alert-danger">
                     <small>De begindatum moet ouder zijn dan de einddatum!</small>
+                  </div>
+
+                  <div
+                    *ngIf="dateExportFormReponse.length > 0"
+                    class="form-message alert alert-warning">
+                    <small>De volgende onderdelen zijn niet gevonden voor dit tijdschema: <i>{{ dateExportFormReponse.join(', ') }}</i></small>
                   </div>
                 </form>
                 <div class="dropdown-divider"></div>

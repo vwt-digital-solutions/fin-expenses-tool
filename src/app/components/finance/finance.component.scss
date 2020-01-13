@@ -54,8 +54,9 @@
       input.ng-invalid {
         border: 2px solid #c0392b;
       }
-      .cross-validation-error-message {
+      .form-message {
         margin-bottom: 0;
+        padding: 5px 10px;
       }
     }
     small.description-text {
