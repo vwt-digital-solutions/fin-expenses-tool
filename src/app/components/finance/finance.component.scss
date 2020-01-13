@@ -44,6 +44,12 @@
     margin-top: 10px;
   }
   .dropdown {
+    @include for-desktop-up {
+      .dropdown-menu {
+        max-width: 350px;
+      }
+    }
+
     form {
       input.ng-invalid {
         border: 2px solid #c0392b;
