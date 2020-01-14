@@ -23,6 +23,10 @@ export class HeaderComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    if($('.navbar-collapse').hasClass('show')){
+      $('.navbar-collapse').collapse('hide');
+    }
+
     $('body').on('click',function() {
       if($('.navbar-collapse').hasClass('show')){
         $('.navbar-collapse').collapse('hide');
