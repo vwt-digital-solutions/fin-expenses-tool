@@ -71,7 +71,7 @@ export class MaxModalComponent implements OnInit {
   ngOnInit(): void {
     document.getElementById('modalClose').focus();
     // forceViewer can be called from parent to allow the EMPLOYEE (landing page) to only see the expense
-    if (this.forceViewer) {
+    if (this.forceViewer || this.expenseData.status.text === 'approved') {
       this.isViewer = true;
       this.isEditor = false;
       this.isManager = false;
