@@ -256,13 +256,13 @@ export class FinanceComponent {
   }
 
   createDataExport(startDate: string, endDate: string) {
-    let params = new HttpParams().set("date_from", startDate).set("date_to", endDate);
+    const params = new HttpParams().set('date_from', startDate).set('date_to', endDate);
 
     const httpOptions = {
       observe: 'response',
       responseType: 'blob' as 'csv',
-      headers: {Accept: 'text/csv'},
-      params: params
+      headers: { Accept: 'text/csv' },
+      params: { params }
     };
 
     this.dataExport = 'warning';
@@ -308,15 +308,15 @@ export class FinanceComponent {
       currentDate.getDate() - 7), 'yyyy-MM-dd', 'nl');
 
     this.dateExportForm = new FormGroup({
-      'startDate': new FormControl(
+      startDate: new FormControl(
         currentStartDate, [Validators.required, this.validDateFormat]),
-      'endDate': new FormControl(
+      endDate: new FormControl(
         currentEndDate, [Validators.required, this.validDateFormat])
     }, { validators: this.checkIfEndDateAfterStartDate });
 
     this.dateExportForm.valueChanges.subscribe(val => {
       this.dateExportFormReponse = [];
-    })
+    });
   }
 
   onSubmit(event: Event) {
@@ -341,7 +341,7 @@ export class FinanceComponent {
     const validFormat = control.value.search(
       /([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/g);
 
-    if (isNaN(timestamp) === false && timestamp > validTime && validFormat == 0) {
+    if (isNaN(timestamp) === false && timestamp > validTime && validFormat === 0) {
       validDateFormat = true;
     }
 

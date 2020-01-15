@@ -22,7 +22,7 @@ export class EnvService {
   public featureToggle = '';
 
   // Feedback email address
-  public feedbackEmail = ''
+  public feedbackEmail = '';
 
   constructor() {
   }

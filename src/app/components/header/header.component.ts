@@ -23,12 +23,12 @@ export class HeaderComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    if($('.navbar-collapse').hasClass('show')){
+    if ($('.navbar-collapse').hasClass('show')) {
       $('.navbar-collapse').collapse('hide');
     }
 
-    $('body').on('click',function() {
-      if($('.navbar-collapse').hasClass('show')){
+    $('body').on('click', () => {
+      if ($('.navbar-collapse').hasClass('show')) {
         $('.navbar-collapse').collapse('hide');
       }
     });
@@ -39,7 +39,7 @@ export class HeaderComponent implements OnInit {
   }
 
   sendFeedback() {
-    window.location.href = `mailto:${this.feedbackEmail}?subject=Feedback%20Declaratie-app`
+    window.location.href = `mailto:${this.feedbackEmail}?subject=Feedback%20Declaratie-app`;
   }
 
   get email() {
