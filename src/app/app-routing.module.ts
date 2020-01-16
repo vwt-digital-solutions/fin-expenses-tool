@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ExpensesComponent } from './components/expenses/expenses.component';
 import { ManagerComponent } from './components/manager/manager.component';
-import { LeaseCoordinatorComponent } from './components/lease-coordinator/lease-coordinator.component';
 import { FinanceComponent } from './components/finance/finance.component';
 import { ControllerComponent } from './components/controller/controller.component';
 import { LandingComponent } from './components/landing/landing.component';
@@ -32,13 +31,7 @@ const routes: Routes = [
       {
         path: 'manage',
         component: ManagerComponent,
-        data: { roles: [Role.Manager] },
-        resolve: { costTypes: CostTypesResolver },
-      },
-      {
-        path: 'lease-coordinator',
-        component: LeaseCoordinatorComponent,
-        data: { roles: [Role.LeaseCoordinator] },
+        data: { roles: [Role.Manager, Role.LeaseCoordinator] },
         resolve: { costTypes: CostTypesResolver },
       },
       {

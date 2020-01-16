@@ -120,30 +120,6 @@ export class ExpensesConfigService {
   }
 
   // END MANAGER
-  // BEGIN LEASE COORDINATOR
-
-  public getLeaseCoordinatorExpenses(): Observable<HttpResponse<ExpensesIfc>> {
-    return this.http.get<ExpensesIfc>(this.env.apiUrl + Endpoint.leasecoordinator)
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
-  public getLeaseCoordinatorAttachment(expenseId): Observable<HttpResponse<ExpensesIfc>> {
-    return this.http.get<any>(this.env.apiUrl + Endpoint.leasecoordinator + '/' + expenseId + '/attachments')
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
-  public updateExpenseLeaseCoordinator(data, expenseId): Observable<HttpResponse<ExpensesIfc>> {
-    return this.http.put<ExpensesIfc>(this.env.apiUrl + Endpoint.leasecoordinator + `/${expenseId}`, data)
-      .pipe(
-        catchError(ExpensesConfigService.handleError)
-      );
-  }
-
-  // END LEASE COORDINATOR
   // BEGIN CONTROLLER
 
   public getControllerExpenses(): Observable<HttpResponse<ExpensesIfc>> {
