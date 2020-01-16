@@ -1,0 +1,30 @@
+@import "src/assets/scss/mixins";
+@import "src/assets/scss/constants";
+
+.app-page-not-found {
+  .icon-box {
+    text-align: center;
+    i.fa-circle{
+      color: $vwt_color_blue;
+    }
+  }
+
+  .jumbotron {
+    background: transparent;
+
+    h1 {
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 15px;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-tablet - 1) {
+  .app-page-not-found {
+    .jumbotron {
+      margin: 0;
+    }
+  }
+}

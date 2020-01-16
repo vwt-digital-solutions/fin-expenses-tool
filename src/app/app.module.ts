@@ -27,7 +27,7 @@ import { ManagerComponent } from './components/manager/manager.component';
 import { ExpensesComponent } from './components/expenses/expenses.component';
 import { CommonModule } from '@angular/common';
 import { AgGridModule } from 'ag-grid-angular';
-import { NotFoundComponent } from './components/not-found/not-found.component';
+import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { DeviceDetectorModule } from 'ngx-device-detector';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import {MaxModalComponent} from './components/maxmodal/maxmodal.component';
@@ -44,7 +44,7 @@ import {MaxModalComponent} from './components/maxmodal/maxmodal.component';
         ControllerComponent,
         ManagerComponent,
         ExpensesComponent,
-        NotFoundComponent,
+        PageNotFoundComponent,
         SafeHtmlPipe,
         MaxModalComponent
     ],
@@ -63,7 +63,7 @@ import {MaxModalComponent} from './components/maxmodal/maxmodal.component';
   ],
 
   exports: [
-    NotFoundComponent,
+    PageNotFoundComponent,
     FormsModule,
     ReactiveFormsModule
   ],
