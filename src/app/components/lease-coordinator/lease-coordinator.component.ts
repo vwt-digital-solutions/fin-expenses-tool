@@ -12,6 +12,7 @@ import {Expense} from '../../models/expense';
 export class LeaseCoordinatorComponent {
 
   private gridApi: any;
+  public rowSelection;
   public columnDefs;
   public expenseData: Expense;
   public wantsNewModal;
@@ -71,6 +72,7 @@ export class LeaseCoordinatorComponent {
         ]
       }
     ];
+    this.rowSelection = 'single';
   }
 
   rowData = null;
