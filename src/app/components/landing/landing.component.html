@@ -36,6 +36,10 @@
               [ngClass]="{hidden: !(this.managerAmount > 0)}" class="btn btn-primary">Declaraties Beoordelen
         <span class="badge badge-pill badge-light">{{this.managerAmount}}</span>
       </button>
+      <button name="expenses/leasecoordinator"
+              [routerLink]="['/expenses/lease-coordinator']"
+              [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('leasecoordinator'))}" class="btn btn-primary">Lease Coördinator
+      </button>
       <button name="expenses/controller"
               [routerLink]="['/expenses/controller']"
               [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('controller'))}" class="btn btn-primary">Controller

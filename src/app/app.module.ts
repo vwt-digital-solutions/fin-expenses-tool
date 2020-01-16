@@ -24,6 +24,7 @@ import { LandingComponent } from './components/landing/landing.component';
 import { FinanceComponent } from './components/finance/finance.component';
 import { ControllerComponent } from './components/controller/controller.component';
 import { ManagerComponent } from './components/manager/manager.component';
+import { LeaseCoordinatorComponent } from './components/lease-coordinator/lease-coordinator.component';
 import { ExpensesComponent } from './components/expenses/expenses.component';
 import { CommonModule } from '@angular/common';
 import { AgGridModule } from 'ag-grid-angular';
@@ -43,6 +44,7 @@ import {MaxModalComponent} from './components/maxmodal/maxmodal.component';
         FinanceComponent,
         ControllerComponent,
         ManagerComponent,
+        LeaseCoordinatorComponent,
         ExpensesComponent,
         PageNotFoundComponent,
         SafeHtmlPipe,
