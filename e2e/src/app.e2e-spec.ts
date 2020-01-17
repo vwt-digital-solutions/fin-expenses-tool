@@ -61,6 +61,11 @@ describe('ExpenseApp:', () => {
     browser.waitForAngularEnabled(false);
   });
 
+  it('should redirect to the login page when getting the tool without authentication', () => {
+    browser.get('/');
+    expect(browser.getTitle()).toEqual('Sign in to your account');
+  });
+
   it('should login and authenticate', () => {
     // TODO - Call to API and check if page loads without authentication
     browser.waitForAngularEnabled(false);
@@ -85,10 +90,15 @@ describe('ExpenseApp:', () => {
     });
   });
 
-  it('E1 should get the list of expenses on the landing page (or none)', () => {
+  it('E0 should get the list of expenses on the landing page (or none)', () => {
 
+    browser.manage().addCookie({ name: 'e2e_role', value: 'FOUND_COOKIE' });
+    browser.manage().getCookies().then(cookies => {
+      console.dir(cookies);
+    });
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
       browser.sleep(1000);
+
       browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long');
     }));
 
@@ -102,13 +112,151 @@ describe('ExpenseApp:', () => {
       }
       expect(expensesList.count()).toBeGreaterThanOrEqual(1);
     });
+    browser.sleep(50000);
 
   });
+
+  // START OF RED SEPARATION (BAD USERS)
+
+  it('NO_AFAS1: should redirect to the expenses page and load cost-types', () => {
+
+
+    console.log('Changing E2E Token to TEST_SEQ 1');
+    browser.executeScript('window.sessionStorage.setItem(\'access_token\',' +
+      'window.sessionStorage.getItem(\'access_token\').split(\'!\')[0] + \'!1\')');
+
+    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+      browser.sleep(1000);
+
+      browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long');
+    }));
+
+    element(by.name('expenses')).click().then(() => {
+      expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h5', ' Declaratie indienen '))),
+        20000, 'The redirect took too long').then(() => {
+        browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
+          expect(element.all(by.css('option')).count()).toEqual(29);
+        });
+      }));
+    });
+
+  });
+
+  it('NO_AFAS1: should fill the expenseform for no afas message', () => {
+
+    element(by.id('amountinput')).sendKeys(1.99);
+
+    const typeList = element(by.id('typeinput')).all(by.tagName('option'));
+    typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
+      typeList.get(randomNumber + 1).click();
+    });
+
+    element(by.id('dateinput'))
+      .sendKeys(`${todayMonth}/${todayDay}/${todayYear}`);
+
+    e2eID = Math.random() * 100;
+    element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
+
+    element(by.id('submit-click')).click().then(() => {
+      browser.sleep(1000);
+      expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
+      expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
+      expect(browser.wait(until.invisibilityOf(element(by.id('dateinputFill'))), 10, 'Date input went wrong'));
+      expect(browser.wait(until.invisibilityOf(element(by.id('noteinputFill'))), 10, 'Note input went wrong'));
+      expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+        browser.sleep(1000);
+        browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long');
+      }));
+    });
+
+  });
+
+  it('NO_AFAS1: should not have completed the creation and should dislay no afas message', () => {
+
+    expect(element(by.css('div[role=alert]')).getText())
+      .toEqual('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
+
+    browser.get('/home').then(() => {
+      browser.sleep(1000);
+    });
+
+  });
+
+  it('PAO1: should redirect to the expenses page and load cost-types', () => {
+
+
+    browser.get('/home');
+    console.log('Changing E2E Token to TEST_SEQ 2');
+    browser.executeScript('window.sessionStorage.setItem(\'access_token\',' +
+      'window.sessionStorage.getItem(\'access_token\').split(\'!\')[0] + \'!2\')');
+
+    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+      browser.sleep(1000);
+
+      browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long');
+    }));
+    element(by.name('expenses')).click().then(() => {
+      expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h5', ' Declaratie indienen '))),
+        20000, 'The redirect took too long').then(() => {
+        browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
+          expect(element.all(by.css('option')).count()).toEqual(29);
+        });
+      }));
+    });
+
+  });
+
+  it('PAO1: should fill the expenseform for pao message', () => {
+
+    element(by.id('amountinput')).sendKeys(10);
+
+    const typeList = element(by.id('typeinput')).all(by.tagName('option'));
+    typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
+      typeList.get(randomNumber + 1).click();
+    });
+
+    element(by.id('dateinput'))
+      .sendKeys(`${todayMonth}/${todayDay}/${todayYear}`);
+
+    e2eID = Math.random() * 100;
+    element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
+
+    element(by.id('submit-click')).click().then(() => {
+      browser.sleep(1000);
+      expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
+      expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
+      expect(browser.wait(until.invisibilityOf(element(by.id('dateinputFill'))), 10, 'Date input went wrong'));
+      expect(browser.wait(until.invisibilityOf(element(by.id('noteinputFill'))), 10, 'Note input went wrong'));
+      expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+        browser.sleep(1000);
+        browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long');
+      }));
+    });
+
+  });
+
+  it('PAO1: should not have completed the creation and should display pao message', () => {
+
+    expect(element(by.css('div[role=alert]')).getText())
+      .toEqual('Het declaratiebedrag moet hoger zijn dan €10,-');
+    browser.get('/home');
+  });
+
+  // END OF RED SEPARATION (BAD USERS)
 
   // START OF GREEN
 
   it('E1: should redirect to the expenses page and load cost-types', () => {
 
+    console.log('Changing E2E Token to TEST_SEQ 0');
+    browser.executeScript('window.sessionStorage.setItem(\'access_token\',' +
+      'window.sessionStorage.getItem(\'access_token\').split(\'!\')[0])');
+
+    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+      browser.sleep(1000);
+
+      browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long');
+    }));
     element(by.name('expenses')).click().then(() => {
       expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h5', ' Declaratie indienen '))),
         20000, 'The redirect took too long').then(() => {
