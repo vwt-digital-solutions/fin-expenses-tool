@@ -262,7 +262,7 @@ export class FinanceComponent {
       observe: 'response',
       responseType: 'blob' as 'csv',
       headers: { Accept: 'text/csv' },
-      params: { params }
+      params
     };
 
     this.dataExport = 'warning';
