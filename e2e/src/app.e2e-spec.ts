@@ -57,7 +57,7 @@ describe('ExpenseApp:', () => {
   beforeEach(() => {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
-    browser.manage().window().setSize(1600, 1200);
+    // browser.manage().window().setSize(1600, 1200);
     browser.waitForAngularEnabled(false);
   });
 
@@ -982,6 +982,49 @@ describe('ExpenseApp:', () => {
   });
 
   // END OF RED
+
+  it('C1: should go to the creditor page and create booking/payment files', () => {
+
+    browser.wait(until.visibilityOf(element(by.name('expenses/process'))), 20000, 'Not on the home page or not a creditor')
+      .then(() => {
+        expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+          browser.sleep(1000);
+          browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+            element(by.name('expenses/process')).click().then(() => {
+              expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+                browser.sleep(1000);
+                browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+                  element(by.id('createBookingFile')).click().then(() => {
+                    expect(element(by.css(`.alert-success`)).isDisplayed());
+                  });
+                });
+              }));
+            });
+          });
+        }));
+      });
+
+  });
+
+  it('C2: should create journal and total expenses files', () => {
+
+
+    expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+      browser.sleep(1000);
+      browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+        element(by.id('dropdownForm')).click().then(() => {
+          element(by.cssContainingText('.btn-secondary', 'Exporteren')).click().then(() => {
+            browser.sleep(200);
+            browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+              expect(element(by.css('.btn-success')).getText()).toEqual('Exporteren');
+              browser.get('/home');
+            });
+          });
+        });
+      });
+    }));
+
+  });
 
   it('CON1: should go to the controller page and load the expense(s)', () => {
 
