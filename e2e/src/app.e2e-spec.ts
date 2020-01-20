@@ -1008,7 +1008,6 @@ describe('ExpenseApp:', () => {
 
   it('C2: should create journal and total expenses files', () => {
 
-
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
       browser.sleep(1000);
       browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
