@@ -57,7 +57,7 @@ describe('ExpenseApp:', () => {
   beforeEach(() => {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
-    // browser.manage().window().setSize(1600, 1200);
+    browser.manage().window().setSize(1600, 1200);
     browser.waitForAngularEnabled(false);
   });
 
