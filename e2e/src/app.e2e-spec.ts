@@ -995,7 +995,9 @@ describe('ExpenseApp:', () => {
                 browser.sleep(1000);
                 browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
                   element(by.id('createBookingFile')).click().then(() => {
-                    expect(element(by.css(`.alert-success`)).isDisplayed());
+                    browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+                      expect(element(by.css(`.alert-success`)).isDisplayed());
+                    });
                   });
                 });
               }));
