@@ -1014,6 +1014,11 @@ describe('ExpenseApp:', () => {
       browser.sleep(1000);
       browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
         element(by.id('dropdownForm')).click().then(() => {
+          element(by.id('startDate')).sendKeys(`${todayMonth}/${todayDay}/${todayYear}`);
+          element(by.id('endDate')).sendKeys(`${todayMonth}/${todayDay}/${todayYear}`);
+
+          browser.sleep(1000);
+
           element(by.cssContainingText('.btn-secondary', 'Exporteren')).click().then(() => {
             browser.sleep(200);
             browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
