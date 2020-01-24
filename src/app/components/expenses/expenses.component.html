@@ -43,7 +43,7 @@
                 <label class="input-group-text" for="typeinput">Soort:</label>
               </div>
               <select id="typeinput"
-                      (change)="expenseType = true; ;"
+                      (change)="onChangeType($event)"
                       class="custom-select"
                       [ngClass]="{notFilled: notFilledClass(ntype)}"
                       [(ngModel)]="formType"
@@ -91,13 +91,16 @@
                         type="text"
                         name="note"
                         required minlength="1"
+                        placeholder="{{ formNoteLicensePlate ? 'Vul kentekenplaat in' : '' }}"
                         [(ngModel)]="formNote"
                         #nnote="ngModel">
           </textarea>
             </div>
             <div class="fill-text move-18"
                  *ngIf="notFilledClass(nnote)">
-              <small id="noteinputFill">Graag een omschrijving invullen</small>
+              <small id="noteinputFill">
+                Graag een omschrijving {{ formNoteLicensePlate ? 'en kentekenplaat' : '' }} invullen
+              </small>
             </div>
           </div>
 

@@ -17,6 +17,7 @@ import {DefaultImageService} from '../../services/default-image.service';
 export class ExpensesComponent implements OnInit {
 
   public formNote: any;
+  public formNoteLicensePlate = false;
   public formAmount: any;
   public formType: any;
   public formError: string;
@@ -269,5 +270,18 @@ export class ExpensesComponent implements OnInit {
       }
     }
     this.formAttachment = null;
+  }
+
+  onChangeType(event: Event) {
+    this.expenseType = true;
+    for (const type of this.typeOptions) {
+      if (event.target['value'].includes(type.cid)) {
+        if (type.managertype === 'leasecoordinator') {
+          this.formNoteLicensePlate = true;
+        } else {
+          this.formNoteLicensePlate = false;
+        }
+      }
+    }
   }
 }
