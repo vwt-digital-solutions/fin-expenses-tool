@@ -21,7 +21,7 @@
 
         <div class="form-group">
           <!-- Form: Rejection Note-->
-          <div *ngIf="isEditor">
+          <div *ngIf="(isViewer || isEditor) && expenseData.status.rnote">
             <label for="rejectionNoteRead">Reden voor afkeuring:</label>
             <div class="input-group mb-3 note-relative">
             <textarea id="rejectionNoteRead"
