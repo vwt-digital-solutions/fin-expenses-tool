@@ -345,6 +345,18 @@ export class MaxModalComponent implements OnInit {
 
   // END Subject to change
 
+  checkRNoteVisibility(expense) {
+    const rNoteStatuses = ['cancelled', 'rejected_by_manager', 'rejected_by_creditor'];
+    if (
+      expense.status.rnote &&
+      (this.isViewer || this.isEditor) &&
+      rNoteStatuses.includes(expense.status.text)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   // Messy functions from here on. Will be moved or changed in other stories.
   private getNavigator() {
     return navigator.userAgent.match(/Android/i)

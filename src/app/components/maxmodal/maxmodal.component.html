@@ -21,16 +21,10 @@
 
         <div class="form-group">
           <!-- Form: Rejection Note-->
-          <div *ngIf="(isViewer || isEditor) && expenseData.status.rnote">
-            <label for="rejectionNoteRead">Reden voor afkeuring:</label>
-            <div class="input-group mb-3 note-relative">
-            <textarea id="rejectionNoteRead"
-                      readonly
-                      class="form-control"
-                      type="text"
-                      [ngModel]="expenseData.status.rnote"
-                      name="rnote"></textarea>
-            </div>
+          <div
+            *ngIf="checkRNoteVisibility(expenseData)"
+            class="alert alert-warning">
+            Reden voor afkeuring: <strong>{{ expenseData.status.rnote }}</strong>
           </div>
           <!-- Form: END : Rejection Note-->
 
