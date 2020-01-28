@@ -17,6 +17,7 @@ import {DefaultImageService} from '../../services/default-image.service';
 export class ExpensesComponent implements OnInit {
 
   public formNote: any;
+  public formCostTypeMessage: string;
   public formAmount: any;
   public formType: any;
   public formError: string;
@@ -118,6 +119,7 @@ export class ExpensesComponent implements OnInit {
             }, 1000);
           }
         }, response => {
+          this.wrongfulClaim('Er is iets fout gegaan bij het uploaden van de bestanden, neem contact op met de crediteuren afdeling.');
           console.error('>> POST FAILED', response.message);
         });
     } else {
@@ -269,5 +271,18 @@ export class ExpensesComponent implements OnInit {
       }
     }
     this.formAttachment = null;
+  }
+
+  onChangeType(event: Event) {
+    this.expenseType = true;
+    for (const type of this.typeOptions) {
+      if (event.target['value'].includes(type.cid)) {
+        if (type.managertype === 'leasecoordinator') {
+          this.formCostTypeMessage = type.message;
+        } else {
+          this.formCostTypeMessage = '';
+        }
+      }
+    }
   }
 }

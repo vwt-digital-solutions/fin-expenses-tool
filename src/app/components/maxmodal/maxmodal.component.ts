@@ -32,6 +32,7 @@ export class MaxModalComponent implements OnInit {
   public isEditor: boolean;
   public isRejecting: boolean;
   public rejectionNote: boolean;
+  public formCostTypeMessage: string;
 
   constructor(private expensesConfigService: ExpensesConfigService,
               private identityService: IdentityService,
@@ -71,7 +72,7 @@ export class MaxModalComponent implements OnInit {
   ngOnInit(): void {
     document.getElementById('modalClose').focus();
     // forceViewer can be called from parent to allow the EMPLOYEE (landing page) to only see the expense
-    if (this.forceViewer) {
+    if (this.forceViewer || this.expenseData.status.text === 'approved') {
       this.isViewer = true;
       this.isEditor = false;
       this.isManager = false;
@@ -345,6 +346,18 @@ export class MaxModalComponent implements OnInit {
 
   // END Subject to change
 
+  checkRNoteVisibility(expense) {
+    const rNoteStatuses = ['cancelled', 'rejected_by_manager', 'rejected_by_creditor'];
+    if (
+      expense.status.rnote &&
+      (this.isViewer || this.isEditor) &&
+      rNoteStatuses.includes(expense.status.text)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
   // Messy functions from here on. Will be moved or changed in other stories.
   private getNavigator() {
     return navigator.userAgent.match(/Android/i)
@@ -436,6 +449,18 @@ export class MaxModalComponent implements OnInit {
             }
           }
         };
+      }
+    }
+  }
+
+  onChangeType(event: Event) {
+    for (const type of this.typeOptions) {
+      if (event.target['value'].includes(type.cid)) {
+        if (type.managertype === 'leasecoordinator') {
+          this.formCostTypeMessage = type.message;
+        } else {
+          this.formCostTypeMessage = '';
+        }
       }
     }
   }

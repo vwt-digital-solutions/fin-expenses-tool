@@ -1,23 +1,56 @@
-<div class="header container-fluid">
-  <div class="row">
-    <div class="brand col-6 col-md-10">
-      <div class="logo"></div>
-      <h4>{{title}}</h4>
+<nav class="navbar navbar-expand-md navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="brand">
+      <a
+        routerLink="home"
+        title="Home" >
+        <div class="logo"></div>
+      </a>
+      <span>{{title}}</span>
     </div>
 
-    <div class="col-6 col-md-2 navbar-container">
-      <div class="navbar">
-        <a id="home-button" class="navItem" routerLink="/">Home</a>
-        <div *ngIf="email" ngbDropdown class="d-inline-block">
-          <button class="btn" id="dropdownMenu" ngbDropdownToggle>
-            <i class="fa fa-user-circle"></i>
-          </button>
-          <div ngbDropdownMenu aria-labelledby="dropdownMenu">
-            <span ngbDropdownItem>{{email}}</span>
-            <button ngbDropdownItem (click)="logout()">Logout</button>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-toggle="collapse"
+      data-target="#navbarCollapse"
+      aria-controls="navbarCollapse"
+      aria-expanded="false"
+      aria-label="Toggle navigation" >
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarCollapse">
+      <ul class="nav navbar-nav ml-auto">
+        <li
+          class="nav-item"
+          [routerLinkActive]="['active']" >
+          <a routerLink="home">Home</a>
+        </li>
+
+        <li
+          class="nav-item blocked d-block d-md-none">
+          <span *ngIf="email">{{ email }}</span>
+          <span class="link" (click)="sendFeedback()">Verstuur feedback</span>
+          <span class="link" (click)="logout()">Uitloggen</span>
+        </li>
+
+        <li class="nav-item dropdown d-none d-md-block">
+          <a
+            class="dropdown-toggle"
+            id="navbarDropdownMenuLink"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false" >
+            <i class="fas fa-user-cog"></i>
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <span class="dropdown-item" *ngIf="email">{{ email }}</span>
+            <a class="dropdown-item feedback" (click)="sendFeedback()">Verstuur feedback</a>
+            <a class="dropdown-item" (click)="logout()">Uitloggen</a>
           </div>
-        </div>
-      </div>
+        </li>
+      </ul>
     </div>
   </div>
-</div>
+</nav>

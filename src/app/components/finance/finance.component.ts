@@ -1,11 +1,12 @@
 import {Component} from '@angular/core';
-import {HttpClient, HttpResponse} from '@angular/common/http';
+import {HttpClient, HttpResponse, HttpParams} from '@angular/common/http';
 import {ExpensesConfigService} from '../../services/config.service';
 import {FormatterService} from 'src/app/services/formatter.service';
 import {Expense} from '../../models/expense';
 import {saveAs} from 'file-saver';
 import {formatDate} from '@angular/common';
 import {EnvService} from '../../services/env.service';
+import {FormGroup, FormControl, Validators, AbstractControl} from '@angular/forms';
 
 @Component({
   selector: 'app-expenses',
@@ -23,6 +24,9 @@ export class FinanceComponent {
   public dataExport = 'invisible';
   public moveDirection = 'move-up';
 
+  public dateExportForm;
+  public dateExportFormReponse = [];
+
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
 
   constructor(
@@ -30,6 +34,8 @@ export class FinanceComponent {
     private http: HttpClient,
     private env: EnvService
   ) {
+    this.setUpForm();
+
     this.columnDefs = [
       {
         headerName: 'Declaraties Overzicht',
@@ -249,24 +255,115 @@ export class FinanceComponent {
         });
   }
 
-  createDataExport() {
+  createDataExport(startDate: string, endDate: string) {
+    const params = new HttpParams().set('date_from', startDate).set('date_to', endDate);
+
+    const httpOptions = {
+      observe: 'response',
+      responseType: 'blob' as 'csv',
+      headers: { Accept: 'text/csv' },
+      params
+    };
+
     this.dataExport = 'warning';
-    this.expenses.createDataExport({ observe: 'response', responseType: 'blob' as 'csv',
-    headers: {Accept: 'text/csv'}})
+    this.dateExportFormReponse = [];
+    this.expenses.createDataExport(httpOptions)
       .subscribe(
         responseList => {
           const timestamp = new Date().getTime();
           const dateFormat = formatDate(timestamp, 'yyyyMMddTHHmmss', 'nl');
-          saveAs(responseList[0].body, `expenses_${dateFormat}.csv`);
-          saveAs(responseList[1].body, `expenses_journal_${dateFormat}.csv`);
+          const emptyResponseStatuses = [];
 
-          this.dataExport = 'success';
-          setTimeout(() => {
+          for (const response of responseList) {
+            if (response.status === 200 && 'body' in response) {
+              const fileName = response.url.includes('journal') ?
+                `expenses_journal_${dateFormat}.csv` :
+                `expenses_${dateFormat}.csv`;
+              saveAs(response.body, fileName);
+            } else {
+              emptyResponseStatuses.push(
+                response.url.includes('journal') ? 'logboek' : 'declaraties');
+            }
+          }
+
+          if (emptyResponseStatuses.length > 0) {
+            this.dateExportFormReponse = emptyResponseStatuses;
             this.dataExport = '';
-          }, 2000);
+          } else {
+            this.dataExport = 'success';
+            setTimeout(() => {
+              this.dataExport = '';
+            }, 2000);
+          }
         }, error => {
           this.dataExport = 'danger';
           console.error('>> GET FAILED', error.message);
         });
+  }
+
+  setUpForm() {
+    const currentDate = new Date();
+    const currentEndDate = formatDate(currentDate, 'yyyy-MM-dd', 'nl');
+    const currentStartDate = formatDate(currentDate.setDate(
+      currentDate.getDate() - 7), 'yyyy-MM-dd', 'nl');
+
+    this.dateExportForm = new FormGroup({
+      startDate: new FormControl(
+        currentStartDate, [Validators.required, this.validDateFormat]),
+      endDate: new FormControl(
+        currentEndDate, [Validators.required, this.validDateFormat])
+    }, { validators: this.checkIfEndDateAfterStartDate });
+
+    this.dateExportForm.valueChanges.subscribe(val => {
+      this.dateExportFormReponse = [];
+    });
+  }
+
+  onSubmit(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (this.dateExportForm.valid) {
+      this.createDataExport(
+        this.dateExportForm.value.startDate,
+        this.dateExportForm.value.endDate
+      );
+    } else {
+      this.validateAllFormFields(this.dateExportForm);
+    }
+  }
+
+  validDateFormat(control: FormControl) {
+    let validDateFormat = false;
+
+    const timestamp = Date.parse(control.value);
+    const validTime = new Date('1970-01-01').getTime();
+    const validFormat = control.value.search(
+      /([12]\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]))/g);
+
+    if (isNaN(timestamp) === false && timestamp > validTime && validFormat === 0) {
+      validDateFormat = true;
+    }
+
+    return !validDateFormat ? { validDateFormat: true } : null;
+  }
+
+  checkIfEndDateAfterStartDate(control: AbstractControl) {
+    let validDateOrder = false;
+    const startDate = control.get('startDate');
+    const endDate = control.get('endDate');
+
+    if (new Date(startDate.value).getTime() <= new Date(endDate.value).getTime()) {
+      validDateOrder = true;
+    }
+
+    return !validDateOrder ? { validDateOrder: true } : null;
+  }
+
+  validateAllFormFields(formGroup: FormGroup) {
+    Object.keys(formGroup.controls).forEach(field => {
+      const control = formGroup.get(field);
+      control.markAsTouched({ onlySelf: true });
+    });
   }
 }

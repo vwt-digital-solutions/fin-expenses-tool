@@ -1,25 +1,45 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
+import { EnvService } from 'src/app/services/env.service';
 import { OAuthService } from 'angular-oauth2-oidc';
 
 interface IClaimsEmail {
   email: any;
 }
 
+declare var $: any;
+
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent {
-  title = 'Declaraties';
+export class HeaderComponent implements OnInit {
+  title = 'Declaratie app';
 
   constructor(
+    private env: EnvService,
     private oauthService: OAuthService
   ) {}
 
+  ngOnInit() {
+    if ($('.navbar-collapse').hasClass('show')) {
+      $('.navbar-collapse').collapse('hide');
+    }
+
+    $('body').on('click', () => {
+      if ($('.navbar-collapse').hasClass('show')) {
+        $('.navbar-collapse').collapse('hide');
+      }
+    });
+  }
+
   logout() {
     this.oauthService.logOut();
+  }
+
+  sendFeedback() {
+    window.location.href = `mailto:${this.feedbackEmail}?subject=Feedback%20Declaratie-app`;
   }
 
   get email() {
@@ -28,5 +48,9 @@ export class HeaderComponent {
       return null;
     }
     return claims.email.toLowerCase();
+  }
+
+  get feedbackEmail() {
+    return this.env.feedbackEmail;
   }
 }

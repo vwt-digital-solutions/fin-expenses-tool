@@ -21,16 +21,10 @@
 
         <div class="form-group">
           <!-- Form: Rejection Note-->
-          <div *ngIf="isEditor">
-            <label for="rejectionNoteRead">Reden voor afkeuring:</label>
-            <div class="input-group mb-3 note-relative">
-            <textarea id="rejectionNoteRead"
-                      readonly
-                      class="form-control"
-                      type="text"
-                      [ngModel]="expenseData.status.rnote"
-                      name="rnote"></textarea>
-            </div>
+          <div
+            *ngIf="checkRNoteVisibility(expenseData)"
+            class="alert alert-warning">
+            Reden voor afkeuring: <strong>{{ expenseData.status.rnote }}</strong>
           </div>
           <!-- Form: END : Rejection Note-->
 
@@ -42,6 +36,7 @@
                      for="expenseCostType">Soort:</label>
               <select id="expenseCostType"
                       class="custom-select"
+                      (change)="onChangeType($event)"
                       name="cost_type"
                       required
                       [ngModel]="expenseData.cost_type"
@@ -172,6 +167,9 @@
                       [ngModel]="expenseData.note"
                       name="note"
                       #note="ngModel"></textarea>
+            <small *ngIf="formCostTypeMessage && isEditor" id="noteMessage" class="form-text text-muted font-italic">
+              {{ formCostTypeMessage }}
+            </small>
             <div class="fill-text" *ngIf="!(note.valid) && isEditor">
               <small>Graag een geldige omschrijving invullen</small>
             </div>

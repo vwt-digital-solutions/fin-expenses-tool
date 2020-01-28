@@ -8,7 +8,7 @@ import { LandingComponent } from './components/landing/landing.component';
 import { Role } from './models/role.enum';
 import { AuthGuard } from './auth/auth.guard';
 import { AuthComponent } from './auth/auth.component';
-import { NotFoundComponent } from './components/not-found/not-found.component';
+import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { CostTypesResolver } from './services/cost-types.resolver';
 
 const routes: Routes = [
@@ -31,7 +31,7 @@ const routes: Routes = [
       {
         path: 'manage',
         component: ManagerComponent,
-        data: { roles: [Role.Manager] },
+        data: { roles: [Role.Manager, Role.LeaseCoordinator] },
         resolve: { costTypes: CostTypesResolver },
       },
       {
@@ -55,7 +55,7 @@ const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
     path: '**',
-    component: NotFoundComponent
+    component: PageNotFoundComponent
   }
 ];
 

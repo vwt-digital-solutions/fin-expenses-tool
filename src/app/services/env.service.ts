@@ -21,6 +21,9 @@ export class EnvService {
   public agGridKey = '';
   public featureToggle = '';
 
+  // Feedback email address
+  public feedbackEmail = '';
+
   constructor() {
   }
 
