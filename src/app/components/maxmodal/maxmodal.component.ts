@@ -32,6 +32,7 @@ export class MaxModalComponent implements OnInit {
   public isEditor: boolean;
   public isRejecting: boolean;
   public rejectionNote: boolean;
+  public formCostTypeMessage: string;
 
   constructor(private expensesConfigService: ExpensesConfigService,
               private identityService: IdentityService,
@@ -448,6 +449,18 @@ export class MaxModalComponent implements OnInit {
             }
           }
         };
+      }
+    }
+  }
+
+  onChangeType(event: Event) {
+    for (const type of this.typeOptions) {
+      if (event.target['value'].includes(type.cid)) {
+        if (type.managertype === 'leasecoordinator') {
+          this.formCostTypeMessage = type.message;
+        } else {
+          this.formCostTypeMessage = '';
+        }
       }
     }
   }
