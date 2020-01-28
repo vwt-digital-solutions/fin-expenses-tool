@@ -53,7 +53,7 @@ export class LandingComponent implements OnInit {
     } else if (status === 'exported') {
       return 'badge badge-pill badge-success';
     } else {
-      return 'badge badge-pill badge-info';
+      return 'badge badge-pill badge-primary';
     }
   }
 

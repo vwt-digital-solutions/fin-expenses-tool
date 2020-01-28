@@ -27,6 +27,15 @@ $form-disabled:           #e9ecef;
 $form-disabled-opacity:   rgba(233, 236, 239, .65);
 $form-disabled-border:    #ced4da;
 
+$theme-colors: (
+  "primary": $vwt_color_blue,
+  "secondary": $gray-dark,
+  "success": $green,
+  "danger": $red,
+  "warning": $orange,
+  "light": $gray
+);
+
 @-webkit-keyframes zoom {
   from {-webkit-transform:scale(0)}
   to {-webkit-transform:scale(1)}

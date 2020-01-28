@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i");
-@import "~bootstrap/dist/css/bootstrap.css";
-@import "/assets/scss/mixins";
 @import "/assets/scss/constants";
+@import "~bootstrap/scss/bootstrap";
+@import "/assets/scss/mixins";
 
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-material.css";
@@ -89,31 +89,6 @@ span.ag-header-group-text {
 }
 
 .btn {
-  &.btn-primary {
-    @include button-variant($vwt_color_blue, $vwt_color_blue, $vwt_color_blue_hr, $vwt_color_blue_hr, $vwt_color_blue_hr, $vwt_color_blue_hr);
-    &:focus { background-color: $vwt_color_blue_hr; }
-  }
-  &.btn-secondary {
-    @include button-variant($gray-dark, $gray-dark, $gray-dark-hover, $gray-dark-hover, $gray-dark-hover, $gray-dark-hover);
-    &:focus { background-color: $gray-dark-hover; }
-  }
-  &.btn-success {
-    @include button-variant($green, $green, $green-hover, $green-hover, $green-hover, $green-hover);
-    &:focus { background-color: $green-hover; }
-  }
-  &.btn-danger {
-    @include button-variant($red, $red, $red-hover, $red-hover, $red-hover, $red-hover);
-    &:focus { background-color: $red-hover; }
-  }
-  &.btn-warning {
-    @include button-variant($orange, $orange, $orange-hover, $orange-hover, $orange-hover, $orange-hover);
-    &:focus { background-color: $orange-hover; }
-  }
-  &.btn-light {
-    @include button-variant($gray, $gray, $gray-hover, $gray-hover, $gray-hover, $gray-hover);
-    &:focus { background-color: $gray-hover; }
-  }
-
   &:disabled {
     background-color: $form-disabled !important;
     border-color: $form-disabled-border !important;
@@ -123,27 +98,5 @@ span.ag-header-group-text {
       cursor: default !important;
     }
   }
-}
-
-.badge {
-  padding: 4px 6px;
-}
-.badge-primary {
-  background-color: $vwt_color_blue;
-}
-.badge-secondary {
-  background-color: $gray-dark;
-}
-.badge-success {
-  background-color: $green;
-}
-.badge-danger {
-  background-color: $red;
-}
-.badge-warning {
-  background-color: $orange;
-}
-.badge-light {
-  background-color: $gray;
 }
 // END BOOTSTRAP OVERRIDES
