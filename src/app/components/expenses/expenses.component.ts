@@ -119,7 +119,7 @@ export class ExpensesComponent implements OnInit {
             }, 1000);
           }
         }, response => {
-          this.wrongfulClaim('Er is iets fout gegaan bij het indienen van de declaratie, neem contact op met de crediteuren afdeling.');
+          this.wrongfulClaim('Er is iets fout gegaan bij het uploaden van de bestanden, neem contact op met de crediteuren afdeling.');
           console.error('>> POST FAILED', response.message);
         });
     } else {
