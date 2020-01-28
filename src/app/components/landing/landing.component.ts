@@ -46,6 +46,8 @@ export class LandingComponent implements OnInit {
       return 'badge badge-pill badge-warning';
     } else if (status.includes('cancelled')) {
       return 'badge badge-pill badge-danger';
+    } else if (status === 'draft') {
+      return 'badge badge-pill badge-secondary';
     } else if (status === 'approved') {
       return 'badge badge-pill badge-success';
     } else if (status === 'exported') {
@@ -60,6 +62,8 @@ export class LandingComponent implements OnInit {
       return 'Aanpassing vereist';
     } else if (status.includes('cancelled')) {
       return 'Geannuleerd';
+    } else if (status === 'draft') {
+      return 'Concept';
     } else if (status === 'approved') {
       return 'Goedgekeurd';
     } else if (status === 'exported') {

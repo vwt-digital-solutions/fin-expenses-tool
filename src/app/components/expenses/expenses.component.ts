@@ -1,21 +1,22 @@
-import {Component, OnInit} from '@angular/core';
-import {NgForm} from '@angular/forms';
-import {HttpResponse} from '@angular/common/http';
-import {EnvService} from 'src/app/services/env.service';
-import {Router, ActivatedRoute} from '@angular/router';
-import {map} from 'rxjs/operators';
-import {ExpensesConfigService} from 'src/app/services/config.service';
-import {DeviceDetectorService} from 'ngx-device-detector';
-import {IdentityService} from '../../services/identity.service';
-import {DefaultImageService} from '../../services/default-image.service';
+import { Component, OnInit } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+
+import { NgForm } from '@angular/forms';
+import { forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+import { EnvService } from 'src/app/services/env.service';
+import { ExpensesConfigService } from 'src/app/services/config.service';
+import { DeviceDetectorService } from 'ngx-device-detector';
+import { IdentityService } from '../../services/identity.service';
+import { DefaultImageService } from '../../services/default-image.service';
 
 @Component({
   selector: 'app-expenses',
   templateUrl: './expenses.component.html',
   styleUrls: ['./expenses.component.scss']
 })
-export class ExpensesComponent implements OnInit {
-
+export class ExpensesComponent implements  OnInit {
   public formNote: any;
   public formCostTypeMessage: string;
   public formAmount: any;
@@ -36,8 +37,9 @@ export class ExpensesComponent implements OnInit {
   public locatedFile: any[] | (string | ArrayBuffer)[];
   public loadingThings: boolean;
   public attachmentList: any[];
-  public wantsNext: number;
-  public expenseID: string | number;
+  public wantsNext = 0;
+  public wantsSubmit = 0;
+  public expenseID: number;
   public isDesktopDevice = null;
 
   constructor(
@@ -55,7 +57,6 @@ export class ExpensesComponent implements OnInit {
     this.today = new Date();
     this.notaData = 'Toevoegen';
     this.loadingThings = false;
-    this.wantsNext = 0;
     this.locatedFile = [];
     this.attachmentList = [];
     this.transdateNotFilledMessage = 'Graag een geldige datum invullen';
@@ -89,56 +90,41 @@ export class ExpensesComponent implements OnInit {
       && this.addClaimSuccess.wrong === false);
   }
 
-  private successfulClaim() {
-    return this.addClaimSuccess.success = true;
+  private successfulClaim(form: NgForm) {
+    this.addClaimSuccess.success = true;
+    this.loadingThings = false;
+
+    if (this.wantsNext > 0) {
+      form.reset();
+      this.attachmentList = [];
+      this.locatedFile = [];
+
+      setTimeout(() => {
+         this.addClaimSuccess = { success: false, wrong: false }
+      }, 4000);
+    } else {
+        setTimeout(() => {
+        this.router.navigate(['/']);
+      }, 1000);
+    }
   }
 
   private wrongfulClaim(text = null) {
     if (text !== null) {
       this.formError = text;
     }
-    return this.addClaimSuccess.wrong = true;
-  }
-
-  private uploadSingleAttachment(form: NgForm) {
-    if (this.identityService.isTesting()) {
-      this.locatedFile.push(this.defaultImageService.getDefaultImageForTest());
-    }
-    if (this.locatedFile.length > 0) {
-      const file = this.locatedFile.splice(0, 1)[0];
-      this.expenses.uploadSingleAttachment(this.expenseID, {
-        name: '' + this.locatedFile.length, content: file
-      }).subscribe(
-        (response: HttpResponse<any>) => {
-          console.log('>> POST SUCCESS');
-          if (!this.identityService.isTesting()) {
-            this.uploadSingleAttachment(form);
-          } else {
-            setTimeout(() => {
-              this.router.navigate(['/']);
-            }, 1000);
-          }
-        }, response => {
-          this.wrongfulClaim('Er is iets fout gegaan bij het uploaden van de bestanden, neem contact op met de crediteuren afdeling.');
-          console.error('>> POST FAILED', response.message);
-        });
-    } else {
-      if (this.wantsNext > 0) {
-        form.reset();
-        this.attachmentList = [];
-        this.locatedFile = [];
-      } else {
-        setTimeout(() => {
-          this.router.navigate(['/']);
-        }, 1000);
-      }
-    }
+    this.addClaimSuccess.wrong = true;
+    this.loadingThings = false;
   }
 
   ngOnInit(): void {
     this.route.data.pipe(
       map(data => data.costTypes)
     ).subscribe(costTypes => this.typeOptions = [...costTypes]);
+
+    if (this.identityService.isTesting()) {
+      this.locatedFile.push(this.defaultImageService.getDefaultImageForTest());
+    }
   }
 
   notFilledClass(setClass: { name: string; invalid: any; dirty: any; touched: any; }) {
@@ -167,6 +153,10 @@ export class ExpensesComponent implements OnInit {
                          ntype: { invalid: any; },
                          ntransdate: { invalid: any; },
                          nattachment: { invalid: any; }) {
+    if (this.identityService.isTesting()) {
+      nattachment = { invalid: false }
+    }
+
     return this.expensesNote === false || this.expensesAmount === false || this.expenseType === false || this.expenseTransDate === false ||
       this.expenseAttachment === false || nnote.invalid || namount.invalid || ntype.invalid || ntransdate.invalid ||
       nattachment.invalid || this.addClaimSuccess.wrong === true;
@@ -176,54 +166,19 @@ export class ExpensesComponent implements OnInit {
     if (file[0].type.split('/')[0] !== 'image' && file[0].type !== 'application/pdf') {
       alert('Graag alleen een pdf of afbeelding toevoegen');
       return;
-    }
-    const isIEOrEdge = /msie\s|trident\/|edge\//i.test(window.navigator.userAgent);
-    if (isIEOrEdge) {
+    } else if (/msie\s|trident\/|edge\//i.test(window.navigator.userAgent)) {
       alert('Please use Chrome or Firefox to use this ');
-    } else {
-      if (!(file[0] === undefined || file[0] === null)) {
-        this.attachmentList.push(file);
-        const reader = new FileReader();
-        reader.readAsDataURL(file[0]);
-        reader.onload = () => {
-          if (file[0].type === 'application/pdf') {
-            this.locatedFile.push(reader.result);
-          } else if (file[0].type.split('/')[0] === 'image') {
-            const img = new Image();
-            if (typeof reader.result === 'string') {
-              img.src = reader.result;
-              img.onload = () => {
-                const canvas = document.createElement('canvas');
-                let width: number;
-                if (img.width > 1000) {
-                  width = 1000; // Limit images to 1000 as width (should be readable)
-                } else {
-                  width = img.width;
-                }
-                const scaleFactor = width / img.width;
-                canvas.width = width;
-                canvas.height = img.height * scaleFactor;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, img.height * scaleFactor);
-                ctx.canvas.toBlob(blob => {
-                  const filla = new File([blob], file[0].name, {
-                    type: file[0].type,
-                    lastModified: this.today.getTime()
-                  });
-                  reader.readAsDataURL(filla);
-                  reader.onload = () => {
-                    this.locatedFile.push(reader.result);
-                  };
-                }, file[0].type, 1);
-              }, reader.onerror = Error => console.log(Error);
-            }
-          }
-        };
-      }
+    } else if (!(file[0] === undefined || file[0] === null)) {
+      this.attachmentList.push(file);
+      const reader = new FileReader();
+      reader.readAsDataURL(file[0]);
+      reader.onload = () => {
+        this.locatedFile.push(reader.result);
+      };
     }
   }
 
-  claimForm(form: NgForm) {
+  claimForm(event: Event, form: NgForm) {
     this.splitSet(form);
     if (form.value.transaction_date !== undefined && form.value.transaction_date !== null) {
       if (form.value.transaction_date.length > 8) {
@@ -238,28 +193,75 @@ export class ExpensesComponent implements OnInit {
       const obj = JSON.parse(JSON.stringify(form.value));
       // End Format Values
 
-      this.expenses.createExpenses(obj)
-        .subscribe(
-          (val) => {
-            this.successfulClaim();
-            this.loadingThings = false;
-            console.log('>> POST SUCCESS', val);
-            this.expenseID = val;
-            this.uploadSingleAttachment(form);
-          }, response => {
-            if (response.status === 403) {
-              this.wrongfulClaim('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
-              if (ExpensesComponent.getNavigator()) {
-                alert('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
-              }
-            } else if (response.status === 400) {
-              this.wrongfulClaim(response.error);
-            } else {
-              this.wrongfulClaim();
+      this.expenses.createExpenses(obj).subscribe(
+        response => {
+          this.expenseID = response;
+          console.log('>> POST EXPENSE SUCCESS', response);
+          this.afterPostExpense(response, form);
+        }, error => {
+          if (error.status === 403) {
+            this.wrongfulClaim('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
+            if (ExpensesComponent.getNavigator()) {
+              alert('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
             }
-            this.loadingThings = false;
-            console.error('>> POST FAILED', response.message);
-          });
+          } else if (error.status === 400) {
+            this.wrongfulClaim(error.error);
+          } else {
+            this.wrongfulClaim();
+          }
+          console.error('>> POST EXPENSE FAILED', error.message);
+        });
+    }
+  }
+
+  bulkAttachmentUpload(expenseID: number) {
+    const fileRequests = [];
+    for (const count in this.locatedFile) {
+      fileRequests.push(
+        this.expenses.uploadSingleAttachment(expenseID, {
+          name: count.toString(),
+          content: this.locatedFile[count]
+        })
+      );
+    }
+
+    return forkJoin(fileRequests);
+  }
+
+  afterPostExpense(expenseID: number, form: NgForm) {
+    if (this.locatedFile.length > 0) {
+      this.bulkAttachmentUpload(expenseID).subscribe(
+        responseList => {
+          console.log('>> POST ATTACHMENTS SUCCESS', responseList);
+          this.afterPostAttachments(expenseID, form);
+        }, error => {
+          this.wrongfulClaim('Er is iets fout gegaan bij het uploaden van de bestanden, neem contact op met de crediteuren afdeling.');
+          console.error('>> POST ATTACHMENTS FAILED', error.message);
+          setTimeout(() => {
+            this.router.navigate(['home']);
+          }, 4000);
+        })
+    } else {
+      this.afterPostAttachments(expenseID, form);
+    }
+  }
+
+  afterPostAttachments(expenseID: number, form: NgForm) {
+    if (this.wantsSubmit > 0) {
+      this.expenses.updateExpenseEmployee(
+        { status: 'ready_for_manager' }, expenseID
+      ).subscribe(
+        response => this.successfulClaim(form),
+        error => {
+          this.wrongfulClaim('Er is iets fout gegaan bij het indienen van de declaratie, neem contact op met de crediteuren afdeling.');
+          console.error('>> PUT EXPENSE FAILED', error.message);
+          setTimeout(() => {
+            this.router.navigate(['home']);
+          }, 4000);
+        }
+      );
+    } else {
+      this.successfulClaim(form);
     }
   }
 

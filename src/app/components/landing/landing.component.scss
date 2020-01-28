@@ -47,10 +47,6 @@
     font-weight: 300;
   }
 
-  @include lg-phone-only {
-    margin-top: 7.5rem !important;
-  }
-
   small {
     color: darkgrey;
     font-weight: 600;

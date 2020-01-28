@@ -110,7 +110,7 @@ describe('ExpenseApp:', () => {
   it('E1: should redirect to the expenses page and load cost-types', () => {
 
     element(by.name('expenses')).click().then(() => {
-      expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h5', ' Declaratie indienen '))),
+      expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h3', 'Declaratie indienen'))),
         20000, 'The redirect took too long').then(() => {
         browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
           expect(element.all(by.css('option')).count()).toEqual(29);
@@ -136,7 +136,7 @@ describe('ExpenseApp:', () => {
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     e2eList.push(e2eID);
 
-    element(by.id('submit-click')).click().then(() => {
+    element(by.id('submit-save-submit')).click().then(() => {
       browser.sleep(1000);
       expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
@@ -314,7 +314,7 @@ describe('ExpenseApp:', () => {
 
     element(by.id('modalClose')).click();
     element(by.name('expenses')).click().then(() => {
-      expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h5', ' Declaratie indienen '))),
+      expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h3', 'Declaratie indienen'))),
         20000, 'The redirect took too long').then(() => {
         browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
           expect(element.all(by.css('option')).count()).toEqual(29);
@@ -340,7 +340,7 @@ describe('ExpenseApp:', () => {
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     e2eList.push(e2eID);
 
-    element(by.id('submit-click')).click().then(() => {
+    element(by.id('submit-save-submit')).click().then(() => {
       browser.sleep(1000);
       expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
@@ -560,7 +560,7 @@ describe('ExpenseApp:', () => {
   it('E5: should redirect to the expenses page and load cost-types', () => {
 
     element(by.name('expenses')).click().then(() => {
-      expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h5', ' Declaratie indienen '))),
+      expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h3', 'Declaratie indienen'))),
         20000, 'The redirect took too long').then(() => {
         browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
           expect(element.all(by.css('option')).count()).toEqual(29);
@@ -586,7 +586,7 @@ describe('ExpenseApp:', () => {
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     e2eList.push(e2eID);
 
-    element(by.id('submit-click')).click().then(() => {
+    element(by.id('submit-save-submit')).click().then(() => {
       browser.sleep(1000);
       expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
@@ -1020,7 +1020,7 @@ describe('ExpenseApp:', () => {
           browser.sleep(1000);
 
           element(by.cssContainingText('.btn-secondary', 'Exporteren')).click().then(() => {
-            browser.sleep(200);
+            browser.sleep(4000);
             browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
               expect(element(by.css('.btn-success')).getText()).toEqual('Exporteren');
               browser.get('/home');

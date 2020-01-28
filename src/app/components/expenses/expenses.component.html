@@ -1,8 +1,14 @@
 <div class="container">
-  <div class="row">
+  <form
+    class="row"
+    name="expenseForm"
+    (change)="addClaimSuccess.wrong = false"
+    (submit)="claimForm($event, expenseForm)"
+    (keydown.enter)="$event.preventDefault()"
+    #expenseForm="ngForm" >
     <div class="col col-sm-8" id="colstep">
       <div class="claim">
-        <h5> Declaratie indienen </h5>
+        <h3>Declaratie indienen</h3>
         <hr class="line-border">
       </div>
       <div class="alert alert-success" role="alert" id="succes-alert" *ngIf="addClaimSuccess.success === true">
@@ -12,189 +18,179 @@
         {{this.formError}}
       </div>
 
-      <form (change)="addClaimSuccess.wrong = false" name="expenseForm" #expenseForm="ngForm"
-            (ngSubmit)="claimForm(expenseForm)">
-        <div class="row">
-          <div class="col-sm-6">
-            <label for="amountinput">Bedrag:</label>
-            <div class="input-group">
-              <input id="amountinput"
-                     (click)="expensesAmount = true; ;"
-                     class="form-control"
-                     [ngClass]="{notFilled: notFilledClass(namount)}"
-                     type="number"
-                     step="0.01"
-                     min="0.01"
-                     name="amount"
-                     required
-                     [(ngModel)]="formAmount"
-                     #namount="ngModel">
-              <div class="input-group-append">
-                <span class="input-group-text" onclick="document.getElementById('amountinput').focus()">€ EUR</span>
-              </div>
-            </div>
-            <div class="fill-text"
-                 *ngIf="notFilledClass(namount)">
-              <small id="amountinputFill">Graag een geldig bedrag invullen</small>
-            </div>
-            <div class="mt-3"></div>
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <label class="input-group-text" for="typeinput">Soort:</label>
-              </div>
-              <select id="typeinput"
-                      (change)="onChangeType($event)"
-                      class="custom-select"
-                      [ngClass]="{notFilled: notFilledClass(ntype)}"
-                      [(ngModel)]="formType"
-                      name="cost_type"
-                      #ntype="ngModel"
-                      required>
-                <option value="" disabled>Kies een kost type</option>
-                <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">
-                  {{t.ctype}}
-                </option>
-              </select>
-            </div>
-            <div class="fill-text move-18"
-                 *ngIf="notFilledClass(ntype)">
-              <small id="typeinputFill">Graag een declaratiesoort kiezen</small>
-            </div>
-
-            <label for="dateinput">Datum bon:</label>
-            <div class="input-group">
-              <input id="dateinput"
-                     (click)="expenseTransDate = true; transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen'; ;"
-                     [ngClass]="{notFilled: notFilledClass(ntransdate)}"
-                     name="transaction_date"
-                     class="form-control"
-                     required
-                     [(ngModel)]="formTransDate"
-                     #ntransdate="ngModel"
-                     type="date">
-              <div class="input-group-append">
-                <span class="input-group-text" onclick="document.getElementById('dateinput').focus()">
-                  <i class=" fa fa-calendar-alt"></i> </span>
-              </div>
-            </div>
-            <div class="fill-text"
-                 *ngIf="notFilledClass(ntransdate)">
-              <small id="dateinputFill">{{transdateNotFilledMessage}}</small>
-            </div>
-            <div class="mb-3"></div>
-            <div class="form-group">
-              <label for="noteinput">Omschrijving:</label>
-              <textarea id="noteinput"
-                        (click)="expensesNote = true;"
-                        class="form-control"
-                        [ngClass]="{notFilled: notFilledClass(nnote)}"
-                        type="text"
-                        name="note"
-                        required minlength="1"
-                        [(ngModel)]="formNote"
-                        #nnote="ngModel">
-              </textarea>
-
-              <small *ngIf="formCostTypeMessage" id="noteMessage" class="form-text text-muted font-italic">
-                {{ formCostTypeMessage }}
-              </small>
-            </div>
-            <div class="fill-text move-18"
-                 *ngIf="notFilledClass(nnote)">
-              <small id="noteinputFill">
-                Graag een omschrijving invullen
-              </small>
+      <div class="row">
+        <div class="col-sm-6">
+          <label for="amountinput">Bedrag:</label>
+          <div class="input-group">
+            <input id="amountinput" (click)="expensesAmount = true; ;" class="form-control" [ngClass]="{notFilled: notFilledClass(namount)}" type="number" step="0.01" min="0.01" name="amount" required [(ngModel)]="formAmount" #namount="ngModel">
+            <div class="input-group-append">
+              <label class="input-group-text" for="amountinput">€ EUR</label>
             </div>
           </div>
-
-          <div class="col-sm-6">
-            <label for="attachmentinput">Bijlage:</label>
-            <div class="hidden">
-              <input id="attachmentinput"
-                     type="file"
-                     accept="application/pdf,image/png,image/jpeg,image/jpg"
-                     name="attachment"
-                     required
-                     (change)="onFileInput(fileInputHidden.files)"
-                     [(ngModel)]="formAttachment"
-                     #nattachment="ngModel"
-                     #fileInputHidden>
+          <div class="fill-text" *ngIf="notFilledClass(namount)">
+            <small id="amountinputFill">Graag een geldig bedrag invullen</small>
+          </div>
+          <div class="mt-3"></div>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="typeinput">Soort:</label>
             </div>
-            <div>
-              <ul class="list-group">
-                <li class="list-group-item d-flex justify-content-between align-items-center"
-                    id="upload"
-                    [ngClass]="{notFilledBtn: notFilledClass(nattachment)}"
-                    (click)="fileInputHidden.click(); expenseAttachment = true;">
-                  <span class="clickable new-file">Bestand toevoegen</span>
-                </li>
-                <li *ngFor="let item of attachmentList"
-                    class="list-group-item d-flex justify-content-between align-items-center">
-                  {{item[0].name}}
-                  <i class="fa fa-times clickable" (click)="removeFromAttachmentList(item)"></i>
-                </li>
-              </ul>
-            </div>
-            <div class="fill-text"
-                 *ngIf="notFilledClass(nattachment)">
-              <small id="attachmentinputFill">Graag een bijlage toevoegen</small>
-            </div>
+            <select id="typeinput" (change)="onChangeType($event)" class="custom-select" [ngClass]="{notFilled: notFilledClass(ntype)}" [(ngModel)]="formType" name="cost_type" #ntype="ngModel" required>
+              <option value="" disabled>Kies een kost type</option>
+              <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">
+                {{t.ctype}}
+              </option>
+            </select>
+          </div>
+          <div class="fill-text move-18" *ngIf="notFilledClass(ntype)">
+            <small id="typeinputFill">Graag een declaratiesoort kiezen</small>
           </div>
 
-          <div class="col-sm-12">
-            <small id="emailHelp" class="form-text text-muted">
-              Vragen of opmerkingen? Mail naar
-              <ng-container *ngIf="isDesktopDevice">
-                <a href="mailto:crediteuren@vwtelecom.com?subject=Vraag/opmerking Declaratie-app">crediteuren@vwtelecom.com</a>.
-              </ng-container>
-              <ng-container *ngIf="!isDesktopDevice">
-                crediteuren@vwtelecom.com.
-              </ng-container>
+          <label for="dateinput">Datum bon:</label>
+          <div class="input-group">
+            <input
+              id="dateinput"
+              (click)="expenseTransDate = true; transdateNotFilledMessage = 'Graag een geldige verwervingsdatum invullen'; ;"
+              [ngClass]="{notFilled: notFilledClass(ntransdate)}"
+              name="transaction_date"
+              class="form-control"
+              required
+              [(ngModel)]="formTransDate"
+              #ntransdate="ngModel"
+              type="date" >
+            <div class="input-group-append">
+              <label class="input-group-text" for="dateinput">
+                <i class=" fa fa-calendar-alt"></i></label>
+            </div>
+          </div>
+          <div class="fill-text" *ngIf="notFilledClass(ntransdate)">
+            <small id="dateinputFill">{{transdateNotFilledMessage}}</small>
+          </div>
+          <div class="mb-3"></div>
+          <div class="form-group">
+            <label for="noteinput">Omschrijving:</label>
+            <textarea
+              id="noteinput"
+              class="form-control"
+              type="text"
+              name="note"
+              required minlength="1"
+              (click)="expensesNote = true;"
+              [ngClass]="{notFilled: notFilledClass(nnote)}"
+              [(ngModel)]="formNote"
+              #nnote="ngModel" >
+            </textarea>
+
+            <small *ngIf="formCostTypeMessage" id="noteMessage" class="form-text text-muted font-italic">
+              {{ formCostTypeMessage }}
             </small>
           </div>
-
-          <input type="submit" id="submit-form" class="hidden"/>
-          <input type="submit" id="submit-form-next" class="hidden"/>
+          <div class="fill-text move-18" *ngIf="notFilledClass(nnote)">
+            <small id="noteinputFill">
+              Graag een omschrijving invullen
+            </small>
+          </div>
         </div>
-      </form>
+
+        <div class="col-sm-6">
+          <label for="attachmentinput">Bijlage:</label>
+          <div class="hidden">
+            <input
+              id="attachmentinput"
+              type="file"
+              accept="application/pdf,image/png,image/jpeg,image/jpg"
+              name="attachment"
+              required
+              (change)="onFileInput(fileInputHidden.files)"
+              [(ngModel)]="formAttachment"
+              #nattachment="ngModel"
+              #fileInputHidden >
+          </div>
+          <div>
+            <ul class="list-group">
+              <li class="list-group-item d-flex justify-content-between align-items-center" id="upload" [ngClass]="{notFilledBtn: notFilledClass(nattachment)}" (click)="fileInputHidden.click(); expenseAttachment = true;">
+                <span class="clickable new-file">Bestand toevoegen</span>
+              </li>
+              <li *ngFor="let item of attachmentList" class="list-group-item d-flex justify-content-between align-items-center">
+                {{item[0].name}}
+                <i class="fa fa-times clickable" (click)="removeFromAttachmentList(item)"></i>
+              </li>
+            </ul>
+          </div>
+          <div class="fill-text" *ngIf="notFilledClass(nattachment)">
+            <small id="attachmentinputFill">Graag een bijlage toevoegen</small>
+          </div>
+        </div>
+
+        <div class="col-sm-12">
+          <small id="emailHelp" class="form-text text-muted">
+            Vragen of opmerkingen? Mail naar
+            <ng-container *ngIf="isDesktopDevice">
+              <a href="mailto:crediteuren@vwtelecom.com?subject=Vraag/opmerking Declaratie-app">crediteuren@vwtelecom.com</a>.
+            </ng-container>
+            <ng-container *ngIf="!isDesktopDevice">
+              crediteuren@vwtelecom.com.
+            </ng-container>
+          </small>
+        </div>
+      </div>
     </div>
     <div class="col col-sm-1" id="linestep"></div>
     <div class="col col-sm-3" id="bodystep">
-      <div class="claim">
-        <h5 class="summary"> Samenvatting </h5>
+      <div class="claim d-none d-md-block">
+        <h3 class="summary">Samenvatting</h3>
         <hr class="line-border">
       </div>
 
-      <div class="row reason">
-        <div class="col-12 col-sm-4"><h5>Bedrag: <span class="form-amount">{{ formAmount | currency : 'EUR'}}</span>
-        </h5></div>
-        <div class="w-100"></div>
-        <div class="col-12 col-sm-4"><h5>Reden:</h5></div>
-        <div class="w-100"></div>
-        <div class="col-12 col-sm-4 typewriter"><textarea id="text" rows="4" maxlength="150" disabled
-                                                          value="{{ formNote }}"></textarea></div>
-        <div class="w-100"></div>
+      <div class="row reason mb-4 d-none d-md-block">
+        <div class="col-12 mb-2">
+          <h5>Bedrag</h5>
+          <span>{{ (formAmount | currency : 'EUR') || '€0.00' }}</span>
+        </div>
+        <div class="col-12">
+          <h5>Reden</h5>
+          <span>{{ formNote ||  '-' }}</span>
+        </div>
       </div>
 
       <div class="submit_button">
-        <label for="submit-form"
-               tabindex="0" class="btn btn-default deep_button"
-               id="submit-click"
-               (click)="this.wantsNext = 0"
-               [ngClass]="{disabledbtn: submitButtonController(nnote, namount, ntype, ntransdate, nattachment),
-                  success : addClaimSuccess.success,
-                  wrong : addClaimSuccess.wrong}">
-          Indienen <i *ngIf="loadingThings && this.wantsNext === 0" class="spinner-border text-light"></i>
-        </label>
-        <label for="submit-form-next"
-               tabindex="0" class="btn btn-default deep_button deep_button_new"
-               (click)="this.wantsNext = 1"
-               [ngClass]="{disabledbtn: submitButtonController(nnote, namount, ntype, ntransdate, nattachment),
-                  success : addClaimSuccess.success,
-                  wrong : addClaimSuccess.wrong}">
-          Indienen & Nieuwe<i *ngIf="loadingThings && this.wantsNext > 0" class="spinner-border text-light"></i>
-        </label>
+        <button
+          id="submit-save"
+          type="submit"
+          tabindex="0"
+          class="btn btn-secondary mb-2"
+          title="Opslaan als concept"
+          (click)="this.wantsNext = 0; this.wantsSubmit = 0"
+          [disabled]="submitButtonController(nnote, namount, ntype, ntransdate, nattachment)"
+          [ngClass]="{success : addClaimSuccess.success, wrong : addClaimSuccess.wrong}" >
+          Opslaan als concept <i *ngIf="loadingThings && this.wantsNext === 0 && this.wantsSubmit === 0" class="spinner-border text-light"></i>
+        </button>
+
+        <div class="btn-group-vertical" role="group">
+          <button
+            id="submit-save-submit"
+            type="submit"
+            tabindex="0"
+            class="btn btn-primary"
+            title="Opslaan en indienen"
+            (click)="this.wantsNext = 0; this.wantsSubmit = 1"
+            [disabled]="submitButtonController(nnote, namount, ntype, ntransdate, nattachment)"
+            [ngClass]="{success : addClaimSuccess.success, wrong : addClaimSuccess.wrong}" >
+            Indienen <i *ngIf="loadingThings && this.wantsNext === 0 && this.wantsSubmit > 0" class="spinner-border text-light"></i>
+          </button>
+          <button
+            id="submit-save-submit-new"
+            type="submit"
+            tabindex="0"
+            class="btn btn-primary"
+            title="Opslaan, indienen en nieuwe declaratie openen"
+            (click)="this.wantsNext = 1; this.wantsSubmit = 1"
+            [disabled]="submitButtonController(nnote, namount, ntype, ntransdate, nattachment)"
+            [ngClass]="{success : addClaimSuccess.success, wrong : addClaimSuccess.wrong}" >
+            Indienen & Nieuwe <i *ngIf="loadingThings && this.wantsNext > 0 && this.wantsSubmit > 0" class="spinner-border text-light"></i>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  </form>
 </div>

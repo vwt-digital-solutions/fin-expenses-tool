@@ -5,10 +5,7 @@
 .container {
   @include lg-phone-only {
     background-color: #fcfbfb;
-    height: 100vh;
     width: 100%;
-    bottom: 0;
-    top: -25px;
     position: relative;
   }
 }
@@ -21,39 +18,14 @@ div#landing_page {
   display: none;
 }
 
-label {
-  color: #3f8bb5;
-  font-weight: 600;
-}
-
 input, textarea, select {
   border-radius: 4px;
   outline: none;
   border: 1px solid #dce5eb;
 }
 
-.deep_button {
-  opacity: 1;
-  background-color: #3a89b4;
-  font-weight: normal;
-  color: white;
-  border: 1px solid #3a89b4;
-  outline: none;
-  border-radius: 4px;
+button.btn {
   width: 100%;
-
-  &:hover {
-    opacity: .8;
-    cursor: pointer;
-  }
-
-  @include lg-phone-only {
-    width: 100%;
-  }
-}
-
-.deep_button_new {
-  margin-top: 0 !important;
 }
 
 .tall-button {
@@ -94,6 +66,8 @@ input, textarea, select {
   margin-bottom: 0;
   height: 14ex;
   max-height: 200px;
+  min-height: 70px;
+
   @include lg-phone-only {
     max-width: none;
     height: 18ex;
@@ -118,9 +92,6 @@ input, textarea, select {
       rgba(255, 255, 255, 0) 100%);
   border-image-slice: 1;
   transform: translate(50%, 0);
-  @include lg-phone-only {
-    display: none;
-  }
 }
 
 #statictest {
@@ -138,7 +109,7 @@ input, textarea, select {
   @include lg-phone-only {
     background-color: #abdeef;
     width: 100%;
-    padding: 0 15px;
+    padding: 15px;
   }
 }
 
@@ -151,12 +122,6 @@ input, textarea, select {
 .wrong {
   @include lg-phone-only {
     background-color: #A63232 !important;
-  }
-}
-
-.alert {
-  @include lg-phone-only {
-    display: none;
   }
 }
 
@@ -247,16 +212,6 @@ input, textarea, select {
   color: #dc4444;
 }
 
-.disabledbtn {
-  opacity: .5;
-  width: 100%;
-  margin-top: 15px;
-}
-
-.disabledbtn:hover {
-  cursor: not-allowed;
-}
-
 .fill-text {
   padding: 0;
   margin: 0;
@@ -268,41 +223,35 @@ input, textarea, select {
   bottom: 18px;
 }
 
-.typewriter {
-  @include sm-phone-only {
-    overflow: visible;
-    padding: 1em;
-  }
-}
-
 .reason {
-  @include lg-phone-only {
-    display: none;
-  }
-
-  textarea#text {
-    border: 0 transparent;
-    background-color: transparent;
-    height: 8em; // To be Fixed@hardcorded with all fields
+  .typewriter {
+    width: 100%;
+    min-height: 100px;
+    max-height: 250px;
+    overflow-y: auto;
     font-size: small;
-    -webkit-appearance: none;
-    max-height: 200px;
-    @include lg-phone-only {
+
+    @include sm-phone-only {
+      overflow: visible;
+      padding: 1em;
+
       height: 6em;
       width: 22em;
       color: white;
       font-size: medium;
     }
   }
+
+  span {
+    width: 100%;
+    display:block;
+    word-wrap: break-word;
+    hyphens: auto;
+    min-height: 15px;
+  }
 }
 
 .claim {
-  @include lg-phone-only {
-    h5.summary {
-      display: none;
-    }
-  }
-
   h5 {
     color: $vwt_color_blue;
     font-weight: 100;
