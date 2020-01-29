@@ -74,6 +74,7 @@
               class="form-control"
               type="text"
               name="note"
+              placeholder="{{ formCostTypeMessage['short'] }}"
               required minlength="1"
               (click)="expensesNote = true;"
               [ngClass]="{notFilled: notFilledClass(nnote)}"
@@ -82,7 +83,7 @@
             </textarea>
 
             <small *ngIf="formCostTypeMessage" id="noteMessage" class="form-text text-muted font-italic">
-              {{ formCostTypeMessage }}
+              {{ formCostTypeMessage['long'] }}
             </small>
           </div>
           <div class="fill-text move-18" *ngIf="notFilledClass(nnote)">

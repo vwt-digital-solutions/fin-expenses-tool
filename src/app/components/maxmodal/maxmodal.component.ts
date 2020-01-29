@@ -35,7 +35,7 @@ export class MaxModalComponent implements OnInit {
   public isRejecting: boolean;
   public wantsDraft = 0;
   public rejectionNote: boolean;
-  public formCostTypeMessage: string;
+  public formCostTypeMessage = { short: '', long: '' };
 
   constructor(
     private expensesConfigService: ExpensesConfigService,
@@ -441,9 +441,9 @@ export class MaxModalComponent implements OnInit {
     for (const type of this.typeOptions) {
       if (event.target['value'].includes(type.cid)) {
         if (type.managertype === 'leasecoordinator') {
-          this.formCostTypeMessage = type.message;
+          this.formCostTypeMessage = type.message['nl'];
         } else {
-          this.formCostTypeMessage = '';
+          this.formCostTypeMessage = { short: '', long: '' };
         }
       }
     }

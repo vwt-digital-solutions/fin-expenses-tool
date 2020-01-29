@@ -18,7 +18,7 @@ import { DefaultImageService } from '../../services/default-image.service';
 })
 export class ExpensesComponent implements  OnInit {
   public formNote: any;
-  public formCostTypeMessage: string;
+  public formCostTypeMessage = { short: '', long: '' };
   public formAmount: any;
   public formType: any;
   public formError: string;
@@ -280,9 +280,9 @@ export class ExpensesComponent implements  OnInit {
     for (const type of this.typeOptions) {
       if (event.target['value'].includes(type.cid)) {
         if (type.managertype === 'leasecoordinator') {
-          this.formCostTypeMessage = type.message;
+          this.formCostTypeMessage = type.message['nl'];
         } else {
-          this.formCostTypeMessage = '';
+          this.formCostTypeMessage = { short: '', long: '' };
         }
       }
     }

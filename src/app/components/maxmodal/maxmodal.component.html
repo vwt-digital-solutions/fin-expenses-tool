@@ -123,9 +123,18 @@
           <div [ngClass]="{hidden: !isEditor}">
 
             <label for="expenseNote">Omschrijving:</label>
-            <textarea id="expenseNote" [ngClass]="{notFilled: !(note.valid)}" class="form-control" type="text" required minlength="1" [ngModel]="expenseData.note" name="note" #note="ngModel"></textarea>
-            <small *ngIf="formCostTypeMessage && isEditor" id="noteMessage" class="form-text text-muted font-italic">
-              {{ formCostTypeMessage }}
+            <textarea
+              id="expenseNote"
+              [ngClass]="{notFilled: !(note.valid)}"
+              class="form-control"
+              type="text"
+              placeholder="{{ formCostTypeMessage['short'] }}"
+              required minlength="1"
+              [ngModel]="expenseData.note"
+              name="note"
+              #note="ngModel" ></textarea>
+            <small *ngIf="formCostTypeMessage['long'] && isEditor" id="noteMessage" class="form-text text-muted font-italic">
+              {{ formCostTypeMessage['long'] }}
             </small>
             <div class="fill-text" *ngIf="!(note.valid) && isEditor">
               <small>Graag een geldige omschrijving invullen</small>
