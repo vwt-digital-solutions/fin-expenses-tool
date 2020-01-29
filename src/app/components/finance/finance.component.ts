@@ -25,6 +25,7 @@ export class FinanceComponent {
   public moveDirection = 'move-up';
 
   public dateExportForm;
+  public dateExportFormExported = false;
   public dateExportFormReponse = [];
 
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
@@ -291,6 +292,7 @@ export class FinanceComponent {
             this.dataExport = '';
           } else {
             this.dataExport = 'success';
+            this.dateExportFormExported = true;
             setTimeout(() => {
               this.dataExport = '';
             }, 2000);

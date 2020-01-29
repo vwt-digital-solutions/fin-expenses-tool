@@ -47,7 +47,7 @@
                   </div>
                   <button
                     type="submit"
-                    class="btn btn-{{dataExport ? dataExport : 'secondary'}}"
+                    class="btn btn-{{dataExport ? dataExport : 'secondary'}} {{ dateExportFormExported ? 'has-exported' : '' }}"
                     disabled="{{ dateExportForm.valid ? '' : 'disabled' }}"
                     title="Exporteer als csv">Exporteren
                     <i *ngIf="dataExport === 'warning'" class="fas fa-spinner fa-spin"></i>

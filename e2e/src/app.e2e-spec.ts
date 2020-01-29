@@ -1022,7 +1022,7 @@ describe('ExpenseApp:', () => {
           element(by.cssContainingText('.btn-secondary', 'Exporteren')).click().then(() => {
             browser.sleep(4000);
             browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-              expect(element(by.css('.btn-success')).getText()).toEqual('Exporteren');
+              expect(element(by.css('.btn.has-exported')).isPresent()).toBe(true);
               browser.get('/home');
             });
           });
