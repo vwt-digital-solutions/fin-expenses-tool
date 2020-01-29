@@ -84,6 +84,11 @@ span.ag-header-group-text {
 
 
 // BOOTSTRAP OVERRIDES
+.badge {
+  &.badge-warning {
+    color: $white;
+  }
+}
 .btn-group-vertical {
   width: 100%;
 }

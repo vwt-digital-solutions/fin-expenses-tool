@@ -125,9 +125,18 @@ describe('ExpenseApp:', () => {
     element(by.id('amountinput')).sendKeys(1.99);
 
     const typeList = element(by.id('typeinput')).all(by.tagName('option'));
-    typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
-      typeList.get(randomNumber + 1).click();
-    });
+    typeList.count().then(
+      numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(
+        randomNumber => {
+          const type = typeList.get(randomNumber + 1);
+          type.getText().then(option => {
+            if (!option.toLowerCase().includes('brandstofkosten')) {
+              typeList.get(randomNumber + 1).click();
+            } else {
+              typeList.get(randomNumber + 2).click();
+            }
+          })
+        });
 
     element(by.id('dateinput'))
       .sendKeys(`${todayMonth}/${todayDay}/${todayYear}`);
@@ -960,6 +969,8 @@ describe('ExpenseApp:', () => {
             const attachments = element.all(by.css('.fa-times'));
             expect(attachments.count()).toEqual(2);
             element(by.id('cancel-update-button')).click().then(() => {
+              browser.sleep(1000);
+              browser.switchTo().alert().accept();
               browser.sleep(1000);
             });
           });
