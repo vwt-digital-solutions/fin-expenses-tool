@@ -36,6 +36,8 @@ $theme-colors: (
   "light": $gray
 );
 
+$input-btn-focus-box-shadow: none;
+
 @-webkit-keyframes zoom {
   from {-webkit-transform:scale(0)}
   to {-webkit-transform:scale(1)}

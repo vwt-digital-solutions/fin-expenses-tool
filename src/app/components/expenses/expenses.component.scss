@@ -304,13 +304,20 @@ button.btn {
 
 .clickable {
   cursor: pointer;
-  color: $vwt_color_blue;
 
   &:hover {
-    opacity: .6;
+    color: $red-hover;
   }
 }
 
-.new-file {
-  color: #6495ed !important; // Override the original Span & Clickable
+#upload.upload-button {
+  background-color: $gray;
+
+  span {
+    color: $black;
+  }
+  &:hover {
+    background-color: $gray-hover;
+    cursor: pointer;
+  }
 }

@@ -84,6 +84,9 @@ span.ag-header-group-text {
 
 
 // BOOTSTRAP OVERRIDES
+.form-control:focus {
+  border-color: $gray-dark;
+}
 .badge {
   &.badge-warning {
     color: $white;
