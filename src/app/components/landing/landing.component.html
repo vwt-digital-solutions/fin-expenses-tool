@@ -12,11 +12,11 @@
         </li>
         <li *ngFor="let item of declarationData"
             (click)="clickExpense(item)"
-            [ngClass]="{rejected: isRejected(item)}"
+            [ngClass]="{rejected: isRejected(item), draft: isDraft(item)}"
             class="list-group-item d-flex justify-content-between align-items-center clickable">
           <p>{{decimalFormatter(item.amount)}} | {{dateFormatter(item.claim_date)}}</p>
-          <span class="badge badge-pill" [className]="statusClassing(item.status.text)">
-            {{statusFormatter(item.status.text)}}</span>
+          <span class="badge badge-pill" [className]="formatter.getStatusClassing(item.status.text)">
+            {{ formatter.getStatusFormatter(item.status.text) }}</span>
         </li>
       </ul>
     </div>

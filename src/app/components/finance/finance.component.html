@@ -7,15 +7,14 @@
             bestanden
             maken
           </button>
-          <div class="alert alert-success" role="alert" *ngIf="addBooking.success === true">
-            <i class="fas fa-check-circle"></i> Bestanden zijn aangemaakt.
+          <div class="alert alert-success p-2" role="alert" *ngIf="addBooking.success === true">
+            <small><i class="fas fa-check-circle"></i> Bestanden zijn aangemaakt.</small>
           </div>
-          <div class="alert alert-warning" role="alert" *ngIf="addBooking.wrong === true">
-            <i class="fa fa-exclamation-circle"></i> Er zijn geen openstaande declaraties. Bekijk de eerdere Booking
-            Files.
+          <div class="alert alert-warning p-2" role="alert" *ngIf="addBooking.wrong === true">
+            <small><i class="fa fa-exclamation-circle"></i> Er zijn geen openstaande declaraties. Bekijk de eerdere Booking Files.</small>
           </div>
-          <div class="alert alert-danger" role="alert" *ngIf="addBooking.error === true">
-            <i class="fa fa-exclamation-circle"></i> Er is iets fout gegaan. Probeer het later opnieuw.
+          <div class="alert alert-danger p-2" role="alert" *ngIf="addBooking.error === true">
+            <small><i class="fa fa-exclamation-circle"></i> Er is iets fout gegaan. Probeer het later opnieuw.</small>
           </div>
         </div>
 

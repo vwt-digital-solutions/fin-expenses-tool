@@ -1,7 +1,6 @@
 @import "src/assets/scss/mixins";
 @import "src/assets/scss/constants";
 
-
 #linestep {
   border-left: 1px solid #dee2e6;
   transform: translate(50%, 0);
@@ -40,6 +39,9 @@
 
 .rejected {
   background: #ffe2dd;
+}
+.draft {
+  background: $gray-light;
 }
 
 #stepstep {

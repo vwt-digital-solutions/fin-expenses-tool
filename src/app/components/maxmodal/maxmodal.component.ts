@@ -7,6 +7,8 @@ import {Attachment} from '../../models/attachment';
 import {ExpensesConfigService} from '../../services/config.service';
 import {IdentityService} from '../../services/identity.service';
 import {DefaultImageService} from '../../services/default-image.service';
+import { Observable } from 'rxjs';
+import { FormatterService } from 'src/app/services/formatter.service';
 
 @Component({
   selector: 'app-maxmodal',
@@ -31,13 +33,17 @@ export class MaxModalComponent implements OnInit {
   public isViewer: boolean;
   public isEditor: boolean;
   public isRejecting: boolean;
+  public wantsDraft = 0;
   public rejectionNote: boolean;
   public formCostTypeMessage: string;
 
-  constructor(private expensesConfigService: ExpensesConfigService,
-              private identityService: IdentityService,
-              private defaultImageService: DefaultImageService,
-              private route: ActivatedRoute) {
+  constructor(
+    private expensesConfigService: ExpensesConfigService,
+    private identityService: IdentityService,
+    private defaultImageService: DefaultImageService,
+    private route: ActivatedRoute,
+    public formatter: FormatterService
+  ) {
     if (window.location.pathname === '/home' || window.location.pathname === '/') {
       this.isEditor = true;
     } else if (window.location.pathname === '/expenses/manage') {
@@ -78,60 +84,31 @@ export class MaxModalComponent implements OnInit {
       this.isManager = false;
       this.isCreditor = false;
     }
+
     // Checks what role the user has and makes a specific request
+    let receiptRequest = new Observable();
     if (this.isCreditor) {
-      this.expensesConfigService.getFinanceAttachment(this.expenseData.id).subscribe((image: any) => {
-        this.receiptFiles = [];
-        for (const img of image) {
-          this.receiptFiles.push({
-            content: `${img.content}`,
-            content_type: img.content_type,
-            from_db: true,
-            db_name: img.name,
-            expense_id: this.expenseData.id
-          });
-        }
-      });
+      receiptRequest = this.expensesConfigService.getFinanceAttachment(this.expenseData.id);
     } else if (this.isManager) {
-      this.expensesConfigService.getManagerAttachment(this.expenseData.id).subscribe((image: any) => {
-        this.receiptFiles = [];
-        for (const img of image) {
-          this.receiptFiles.push({
-            content: `${img.content}`,
-            content_type: img.content_type,
-            from_db: true,
-            db_name: img.name,
-            expense_id: this.expenseData.id
-          });
-        }
-      });
+      receiptRequest = this.expensesConfigService.getManagerAttachment(this.expenseData.id);
     } else if (this.isEditor || this.forceViewer) {
-      this.expensesConfigService.getExpenseAttachment(this.expenseData.id).subscribe((image: any) => {
-        this.receiptFiles = [];
-        for (const img of image) {
-          this.receiptFiles.push({
-            content: `${img.content}`,
-            content_type: img.content_type,
-            from_db: true,
-            db_name: img.name,
-            expense_id: this.expenseData.id
-          });
-        }
-      });
+      receiptRequest = this.expensesConfigService.getExpenseAttachment(this.expenseData.id);
     } else if (this.isViewer) {
-      this.expensesConfigService.getControllerAttachment(this.expenseData.id).subscribe((image: any) => {
-        this.receiptFiles = [];
-        for (const img of image) {
-          this.receiptFiles.push({
-            content: `${img.content}`,
-            content_type: img.content_type,
-            from_db: true,
-            db_name: img.name,
-            expense_id: this.expenseData.id
-          });
-        }
-      });
+      receiptRequest = this.expensesConfigService.getControllerAttachment(this.expenseData.id);
     }
+
+    receiptRequest.subscribe((image: any) => {
+      this.receiptFiles = [];
+      for (const img of image) {
+        this.receiptFiles.push({
+          content: `${img.content}`,
+          content_type: img.content_type,
+          from_db: true,
+          db_name: img.name,
+          expense_id: this.expenseData.id
+        });
+      }
+    })
   }
 
   // BEGIN Subject to change
@@ -204,7 +181,8 @@ export class MaxModalComponent implements OnInit {
         dataVerified[prop] = data[prop];
       }
     }
-    dataVerified[`status`] = 'ready_for_manager';
+
+    dataVerified[`status`] = this.wantsDraft > 0 ? 'draft' : 'ready_for_manager';
     Object.keys(dataVerified).length !== 0 ?
       this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
         .subscribe(
@@ -281,10 +259,11 @@ export class MaxModalComponent implements OnInit {
 
   /** Only for the employee to cancel the expense */
   protected cancelExpense() {
-    const dataVerified = {};
-    const expenseId = this.expenseData.id;
-    dataVerified[`status`] = 'cancelled';
-    this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
+    if (confirm('Weet je zeker dat je de declaratie wilt annuleren?')) {
+      const dataVerified = {};
+      const expenseId = this.expenseData.id;
+      dataVerified[`status`] = 'cancelled';
+      this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
       .subscribe(
         result => {
           this.closeModal(true);
@@ -292,6 +271,7 @@ export class MaxModalComponent implements OnInit {
         error => {
           this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
         });
+    }
   }
 
   /** Used to close the modal (Could also control the animation) */
@@ -308,9 +288,13 @@ export class MaxModalComponent implements OnInit {
 
   /** Used to update the review action */
   protected updatingAction(event) {
+    this.wantsDraft = 0;
     this.action = event;
+
     if (event === 'rejecting') {
       this.isRejecting = true;
+    } else {
+      this.isRejecting = false;
     }
   }
 

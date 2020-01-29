@@ -80,20 +80,16 @@
 }
 
 .max-modal-footer {
-  padding: 5px 16px;
+  padding: 10px 15px;
   color: white;
-  text-align: right;
+  display: table;
+  width: 100%;
 }
 
 // Buttons
 .disabledbtn {
   opacity: .5;
   cursor: not-allowed;
-}
-
-.btn, .badge {
-  border-radius: 0 !important;
-  margin: 2px;
 }
 
 // Content

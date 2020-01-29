@@ -29,6 +29,7 @@ export class LandingComponent implements OnInit {
     private identityService: IdentityService,
     private modalService: NgbModal,
     private expenses: ExpensesConfigService,
+    public formatter: FormatterService
   ) {
     this.wantsNewModal = false;
   }
@@ -39,38 +40,6 @@ export class LandingComponent implements OnInit {
 
   dateFormatter(firstDate) {
     return FormatterService.getCorrectDate(firstDate);
-  }
-
-  statusClassing(status: string) {
-    if (status.includes('rejected')) {
-      return 'badge badge-pill badge-warning';
-    } else if (status.includes('cancelled')) {
-      return 'badge badge-pill badge-danger';
-    } else if (status === 'draft') {
-      return 'badge badge-pill badge-secondary';
-    } else if (status === 'approved') {
-      return 'badge badge-pill badge-success';
-    } else if (status === 'exported') {
-      return 'badge badge-pill badge-success';
-    } else {
-      return 'badge badge-pill badge-primary';
-    }
-  }
-
-  statusFormatter(status: string) {
-    if (status.includes('rejected')) {
-      return 'Aanpassing vereist';
-    } else if (status.includes('cancelled')) {
-      return 'Geannuleerd';
-    } else if (status === 'draft') {
-      return 'Concept';
-    } else if (status === 'approved') {
-      return 'Goedgekeurd';
-    } else if (status === 'exported') {
-      return 'Afgerond';
-    } else {
-      return 'In behandeling';
-    }
   }
 
   ngOnInit() {
@@ -108,7 +77,7 @@ export class LandingComponent implements OnInit {
   clickExpense(item: any) {
     this.expenseData = item;
     this.wantsNewModal = true;
-    this.forceViewer = !this.isRejected(item);
+    this.forceViewer = this.isRejected(item) || this.isDraft(item) ? false : true;
   }
 
   receiveMessage(message) {
@@ -120,5 +89,8 @@ export class LandingComponent implements OnInit {
 
   isRejected(item) {
     return item.status.text.toString().includes('rejected');
+  }
+  isDraft(item) {
+    return item.status.text.toString() === "draft";
   }
 }

@@ -1,29 +1,32 @@
 <div class="max-modal-overlay" id="maxModal">
-
   <div id="max-modal" class="{{this.moveDirection}} move-top">
-    <div class="max-modal-header">
-      <h2 class="header-text">Declaratie</h2>
-      <button id="modalClose"
-              (click)="closeModal(false, false)"
-              type="button">
-        <span>&times;</span>
-      </button>
-    </div>
-    <div class="max-modal-body">
-
-      <p class="employee-text" id="employeeText">{{ expenseData.employee }}</p>
-      <div class="employee-line"></div>
-      <div id="updateErrors" class="alert alert-danger" role="alert" *ngIf="errorMessage">
-        {{ errorMessage }}
+    <form
+      id="expenseForm"
+      (ngSubmit)="claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])"
+      #expenseForm="ngForm" >
+      <div class="max-modal-header">
+        <h2 class="header-text">Declaratie</h2>
+        <button id="modalClose" (click)="closeModal(false, false)" type="button">
+          <span>&times;</span>
+        </button>
       </div>
-      <form id="expenseForm" #expenseForm="ngForm"
-            (ngSubmit)="claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])">
+      <div class="max-modal-body">
+
+        <div class="d-table w-100">
+          <p class="employee-text float-left" id="employeeText">{{ expenseData.employee }}</p>
+          <span
+            class="{{ formatter.getStatusClassing(expenseData.status.text) }} float-right" >
+            {{ formatter.getStatusFormatter(expenseData.status.text) }}
+          </span>
+        </div>
+        <div class="employee-line"></div>
+        <div id="updateErrors" class="alert alert-danger" role="alert" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
 
         <div class="form-group">
           <!-- Form: Rejection Note-->
-          <div
-            *ngIf="checkRNoteVisibility(expenseData)"
-            class="alert alert-warning">
+          <div *ngIf="checkRNoteVisibility(expenseData)" class="alert alert-warning">
             Reden voor afkeuring: <strong>{{ expenseData.status.rnote }}</strong>
           </div>
           <!-- Form: END : Rejection Note-->
@@ -32,15 +35,8 @@
           <div [ngClass]="{hidden: !isEditor && !isCreditor}">
             <div class="input-group mb-3">
 
-              <label class="input-group-text"
-                     for="expenseCostType">Soort:</label>
-              <select id="expenseCostType"
-                      class="custom-select"
-                      (change)="onChangeType($event)"
-                      name="cost_type"
-                      required
-                      [ngModel]="expenseData.cost_type"
-                      #ntype="ngModel">
+              <label class="input-group-text" for="expenseCostType">Soort:</label>
+              <select id="expenseCostType" class="custom-select" (change)="onChangeType($event)" name="cost_type" required [ngModel]="expenseData.cost_type" #ntype="ngModel">
                 <option value="" disabled><kbd>Huidige:</kbd> {{ expenseData.cost_type.split(':')[0] }}</option>
                 <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">{{t.ctype}}</option>
               </select>
@@ -52,12 +48,7 @@
             <div class="form-group">
               <label for="expenseCostTypeRead">Soort:</label>
               <div class="input-group mb-3">
-                <input id="expenseCostTypeRead"
-                       class="form-control"
-                       type="text"
-                       name="cost_type"
-                       readonly
-                       value="{{expenseData.cost_type.split(':')[0]}}">
+                <input id="expenseCostTypeRead" class="form-control" type="text" name="cost_type" readonly value="{{expenseData.cost_type.split(':')[0]}}">
               </div>
             </div>
           </div>
@@ -68,17 +59,8 @@
 
             <label for="expenseAmount">Kosten:</label>
             <div class="input-group mb-3">
-              <input id="expenseAmount"
-                     class="form-control"
-                     [ngClass]="{notFilled: !(namount.valid)}"
-                     type="number"
-                     step="0.01"
-                     min="0.01"
-                     name="amount"
-                     required
-                     placeholder="{{expenseData.amount | currency: 'EUR' }}"
-                     [ngModel]="this.expenseData.amount"
-                     #namount="ngModel">
+              <input id="expenseAmount" class="form-control" [ngClass]="{notFilled: !(namount.valid)}" type="number" step="0.01" min="0.01" name="amount" required placeholder="{{expenseData.amount | currency: 'EUR' }}"
+                [ngModel]="this.expenseData.amount" #namount="ngModel">
             </div>
 
             <div class="fill-text move-18" *ngIf="!(namount.valid) && isEditor">
@@ -91,13 +73,7 @@
 
             <label for="expenseAmountRead">Kosten:</label>
             <div class="input-group mb-3">
-              <input id="expenseAmountRead"
-                     class="form-control"
-                     name="amount"
-                     readonly
-                     placeholder="{{expenseData.amount | currency: 'EUR' }}"
-                     [ngModel]="this.expenseData.amount"
-                     #namount="ngModel">
+              <input id="expenseAmountRead" class="form-control" name="amount" readonly placeholder="{{expenseData.amount | currency: 'EUR' }}" [ngModel]="this.expenseData.amount" #namount="ngModel">
             </div>
 
           </div>
@@ -109,18 +85,12 @@
             <label for="expenseDateOfTransaction">Datum bon:</label>
 
             <div class="input-group mb-3">
-              <input id="expenseDateOfTransaction"
-                     [ngClass]="{notFilled: !(ntransdate.valid)}"
-                     name="transaction_date"
-                     class="form-control"
-                     required
-                     [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"
-                     #ntransdate="ngModel" type="date">
+              <input id="expenseDateOfTransaction" [ngClass]="{notFilled: !(ntransdate.valid)}" name="transaction_date" class="form-control" required [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'" #ntransdate="ngModel" type="date">
 
               <div class="input-group-append">
 
-              <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
-                <i class=" fa fa-calendar-alt"></i> </span>
+                <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
+                  <i class=" fa fa-calendar-alt"></i> </span>
               </div>
 
             </div>
@@ -136,17 +106,12 @@
             <label for="expenseDateOfTransactionRead">Datum bon:</label>
 
             <div class="input-group mb-3">
-              <input id="expenseDateOfTransactionRead"
-                     name="transaction_date"
-                     class="form-control"
-                     readonly
-                     [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"
-                     #ntransdate="ngModel" type="date">
+              <input id="expenseDateOfTransactionRead" name="transaction_date" class="form-control" readonly [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'" #ntransdate="ngModel" type="date">
 
               <div class="input-group-append">
 
-              <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
-                <i class=" fa fa-calendar-alt"></i> </span>
+                <span class="input-group-text" onclick="document.getElementById('expenseDateOfTransaction').focus()">
+                  <i class=" fa fa-calendar-alt"></i> </span>
               </div>
 
             </div>
@@ -158,15 +123,7 @@
           <div [ngClass]="{hidden: !isEditor}">
 
             <label for="expenseNote">Omschrijving:</label>
-            <textarea id="expenseNote"
-                      [ngClass]="{notFilled: !(note.valid)}"
-                      class="form-control"
-                      type="text"
-                      required
-                      minlength="1"
-                      [ngModel]="expenseData.note"
-                      name="note"
-                      #note="ngModel"></textarea>
+            <textarea id="expenseNote" [ngClass]="{notFilled: !(note.valid)}" class="form-control" type="text" required minlength="1" [ngModel]="expenseData.note" name="note" #note="ngModel"></textarea>
             <small *ngIf="formCostTypeMessage && isEditor" id="noteMessage" class="form-text text-muted font-italic">
               {{ formCostTypeMessage }}
             </small>
@@ -179,11 +136,7 @@
           <div *ngIf="isManager || isCreditor || isViewer">
 
             <label for="expenseNoteRead">Omschrijving:</label>
-            <textarea id="expenseNoteRead"
-                      class="form-control"
-                      type="text"
-                      readonly
-                      [innerHTML]="expenseData.note | safeHtml: 'html'"></textarea>
+            <textarea id="expenseNoteRead" class="form-control" type="text" readonly [innerHTML]="expenseData.note | safeHtml: 'html'"></textarea>
 
           </div>
           <!-- Form: END : Note -->
@@ -191,23 +144,14 @@
           <!-- Form: Attachments -->
           <div [ngClass]="{hidden: !isEditor}">
             <label>Bestanden:</label>
-            <input id="attachmentinput"
-                   type="file"
-                   accept="application/pdf,image/*"
-                   name="attachment"
-                   required
-                   class="hidden"
-                   (change)="onFileInput(fileInput.files)"
-                   #fileInput capture="camera">
+            <input id="attachmentinput" type="file" accept="application/pdf,image/*" name="attachment" required class="hidden" (change)="onFileInput(fileInput.files)" #fileInput capture="camera">
             <ul class="list-group">
               <li class="list-group-item text-center clickable" (click)="fileInput.click()">
                 <span>Bestand toevoegen</span>
               </li>
-              <li *ngFor="let item of receiptFiles"
-                  class="list-group-item d-flex justify-content-between align-items-center">
-              <span class="clickable"
-                    (click)="this.openSanitizeFile(item.content_type, item.content)">
-                View File - {{item.db_name}}</span>
+              <li *ngFor="let item of receiptFiles" class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="clickable" (click)="this.openSanitizeFile(item.content_type, item.content)">
+                  View File - {{item.db_name}}</span>
                 <i class="fa fa-times clickable" (click)="removeFromAttachmentList(item)"></i>
               </li>
             </ul>
@@ -216,10 +160,8 @@
           <div *ngIf="isManager || isCreditor || isViewer">
             <label>Bestanden:</label>
             <ul class="list-group">
-              <li *ngFor="let item of receiptFiles"
-                  class="list-group-item d-flex justify-content-between align-items-center">
-                  <span class="clickable"
-                        (click)="this.openSanitizeFile(item.content_type, item.content)">View File - {{item.db_name}}</span>
+              <li *ngFor="let item of receiptFiles" class="list-group-item d-flex justify-content-between align-items-center">
+                <span class="clickable" (click)="this.openSanitizeFile(item.content_type, item.content)">View File - {{item.db_name}}</span>
               </li>
             </ul>
           </div>
@@ -230,71 +172,106 @@
             <div class="input-group-prepend">
               <label class="input-group-text" for="rnoteselect">Reden:</label>
             </div>
-            <select id="rnoteselect"
-                    class="custom-select"
-                    (change)="rejectionHit($event)"
-                    name="rnoteselect">
+            <select id="rnoteselect" class="custom-select" (change)="rejectionHit($event)" name="rnoteselect">
               <option>Deze kosten kun je declareren via Regweb (PSA)</option>
               <option>Deze kosten kun je declareren via de leasemaatschappij</option>
               <option>Deze kosten zijn al gedeclareerd</option>
               <option value="note">Anders, reden:</option>
             </select>
           </div>
-          <div class="form-group hidden"
-               id="rejection-note-group">
-                <textarea id="rnote"
-                          class="form-control"
-                          [ngClass]="{notFilled: (rnote.invalid && (rnote.dirty || rnote.touched))}"
-                          type="text"
-                          name="rnote"
-                          required minlength="1"
-                          [ngModel]="expenseData.status.rnote"
-                          #rnote="ngModel">
+          <div class="form-group hidden" id="rejection-note-group">
+            <textarea id="rnote" class="form-control" [ngClass]="{notFilled: (rnote.invalid && (rnote.dirty || rnote.touched))}" type="text" name="rnote" required minlength="1" [ngModel]="expenseData.status.rnote" #rnote="ngModel">
                 </textarea>
           </div>
-          <div class="fill-text move-18"
-               *ngIf="(rnote.invalid && (rnote.dirty || rnote.touched))"
-               [ngClass]="{hidden: !this.rejectionNote}">
+          <div class="fill-text move-18" *ngIf="(rnote.invalid && (rnote.dirty || rnote.touched))" [ngClass]="{hidden: !this.rejectionNote}">
             <small>Graag een geldige reden invullen</small>
           </div>
 
 
-          <input type="submit" id="submit-update-form" hidden #submitForm/>
+          <input type="submit" id="submit-update-form" hidden #submitForm />
         </div>
-      </form>
 
-
-    </div>
-    <div class="max-modal-footer">
-      <!-- Employee Modal Options -->
-      <div *ngIf="isEditor">
-        <button type="button" (click)="cancelExpense()" class="btn btn-danger" id="cancel-update-button">Declaratie Annuleren</button>
-        <button type="button" (click)="submitForm.click()" class="btn btn-primary" id="submit-update-button"
-                [ngClass]="{disabledbtn: submitButtonController(note, namount, ntype, ntransdate, undefined)}">Indienen
-        </button>
       </div>
-      <!-- END Employee Modal Options-->
+      <div class="max-modal-footer">
+        <!-- Employee Modal Options -->
+        <ng-container *ngIf="isEditor">
+          <div class="btn-group ml-2 float-md-right" role="group">
+            <button
+              type="button"
+              class="btn btn-outline-danger"
+              id="cancel-update-button"
+              title="Declaratie annuleren"
+              (click)="wantsDraft = 0; cancelExpense()" >
+              Annuleren
+            </button>
 
-      <!-- Viewer (Manager, Creditor) Modal Options-->
-      <div *ngIf="isManager || isCreditor">
-        <button type="button" *ngIf="!this.isRejecting" id="thumbs-up" class="btn btn-success"
-             (click)="updatingAction('approving'); this.claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])">
-          <a id="information-icon">Goedkeuren</a>
-        </button>
+            <button
+              *ngIf="expenseData.status.text === 'draft'"
+              id="submit-save-button"
+              type="submit"
+              class="btn btn-secondary"
+              [disabled]="submitButtonController(note, namount, ntype, ntransdate, undefined)"
+              (click)="wantsDraft = 1" >
+              Opslaan als concept
+            </button>
+            <button
+              id="submit-update-button"
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="submitButtonController(note, namount, ntype, ntransdate, undefined)"
+              (click)="wantsDraft = 0" >
+              Indienen
+            </button>
+          </div>
+        </ng-container>
+        <!-- END Employee Modal Options-->
 
-        <button type="button" *ngIf="!this.isRejecting" id="thumbs-down" class="btn btn-danger"
-             (click)="updatingAction('rejecting');">
-          <a id="information-icon-down">Afkeuren</a>
-        </button>
-        <button type="button" *ngIf="this.isRejecting" id="thumbs-down-rejecting" class="btn btn-danger"
-             (click)="updatingAction('rejecting'); this.claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])"
-             [ngClass]="{disabledbtn: submitButtonController(undefined,
-                 undefined, this.isCreditor ? ntype : undefined, undefined, rnote)}">
-          <a id="information-icon-down-rejecting">OK</a>
-        </button>
+        <!-- Viewer (Manager, Creditor) Modal Options-->
+        <ng-container *ngIf="isManager || isCreditor">
+          <div
+            *ngIf="!this.isRejecting"
+            class="btn-group float-right" role="group" >
+            <button
+              id="thumbs-up"
+              type="button"
+              class="btn btn-success"
+              (click)="updatingAction('approving'); this.claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])">
+              <a id="information-icon">Goedkeuren</a>
+            </button>
+            <button
+              *ngIf="!this.isRejecting"
+              id="thumbs-down"
+              type="button"
+              class="btn btn-danger"
+              (click)="updatingAction('rejecting');" >
+              <a id="information-icon-down">Afkeuren</a>
+            </button>
+          </div>
+
+          <div
+            *ngIf="this.isRejecting"
+            class="btn-group float-right" role="group" >
+            <button
+              id="thumbs-down-rejecting"
+              type="button"
+              class="btn btn-secondary"
+              [disabled]="submitButtonController(undefined, undefined, this.isCreditor ? ntype : undefined, undefined, rnote)"
+              (click)="updatingAction(null)" >
+              Annuleren
+            </button>
+            <button
+              id="thumbs-down-rejecting"
+              type="button"
+              class="btn btn-danger"
+              [disabled]="submitButtonController(undefined, undefined, this.isCreditor ? ntype : undefined, undefined, rnote)"
+              (click)="updatingAction('rejecting'); this.claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])" >
+              <a id="information-icon-down-rejecting">Bevestigen</a>
+            </button>
+          </div>
+        </ng-container>
+        <!-- END Viewer (Manager, Creditor) Modal Options -->
       </div>
-      <!-- END Viewer (Manager, Creditor) Modal Options -->
-    </div>
+    </form>
   </div>
 
 </div>
