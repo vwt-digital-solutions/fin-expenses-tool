@@ -84,6 +84,21 @@ span.ag-header-group-text {
 
 
 // BOOTSTRAP OVERRIDES
+input, select, textarea, li {
+  &.ng-invalid.ng-touched {
+    border-color: $red;
+  }
+}
+textarea {
+  max-height: 200px;
+  min-height: 70px;
+}
+select[disabled] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 0.01px;
+  text-overflow: '';
+}
 .form-control:focus {
   border-color: $gray-dark;
 }

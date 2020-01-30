@@ -72,11 +72,6 @@
 
 .max-modal-body {
   padding: 10px 16px;
-
-  label {
-    color: #3f8bb5;
-    font-weight: 600;
-  }
 }
 
 .max-modal-footer {
@@ -111,21 +106,24 @@
 
 .clickable {
   cursor: pointer;
+}
+i.clickable:hover {
+  color: $red-hover;
+}
+span.clickable {
   color: $vwt_color_blue;
-  padding: 0;
 
   &:hover {
-    opacity: .6;
+    color: $vwt_color_blue_hr;
   }
 }
 
-.form-control, .custom-select, .input-group-text, .list-group-item {
-  border-radius: 0 !important;
-}
-
-#expenseNote, #rejectionNoteRead {
-  height: 100px;
-  max-height: 250px;
+.list-group {
+  .list-group-item {
+    &:hover {
+      background-color: $gray-light;
+    }
+  }
 }
 
 // Not filled / Messages
@@ -143,6 +141,18 @@
 
 .move-18 {
   bottom: 18px;
+}
+
+#upload.upload-button {
+  background-color: $gray;
+
+  span {
+    color: $black;
+  }
+  &:hover {
+    background-color: $gray-hover;
+    cursor: pointer;
+  }
 }
 
 // Animation

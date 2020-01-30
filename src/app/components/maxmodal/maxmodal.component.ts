@@ -396,7 +396,8 @@ export class MaxModalComponent implements OnInit {
             this.receiptFiles.push({
               content: reader.result,
               content_type: 'application/pdf',
-              from_db: false
+              from_db: false,
+              db_name: file[0].name
             });
           } else if (file[0].type.split('/')[0] === 'image') {
             const img = new Image();
@@ -425,7 +426,8 @@ export class MaxModalComponent implements OnInit {
                     this.receiptFiles.push({
                       content: reader.result,
                       content_type: file[0].type,
-                      from_db: false
+                      from_db: false,
+                      db_name: file[0].name
                     });
                   };
                 }, file[0].type, 1);
@@ -447,5 +449,13 @@ export class MaxModalComponent implements OnInit {
         }
       }
     }
+  }
+
+  getFileTypeIcon(content_type: string) {
+    return content_type.includes('image') ? 'far fa-file-image' : 'far fa-file-pdf';
+  }
+
+  get isRejected() {
+    return this.expenseData.status.text.includes('rejected') ? true : false;
   }
 }
