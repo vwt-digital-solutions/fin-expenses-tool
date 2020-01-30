@@ -762,10 +762,12 @@ describe('ExpenseApp:', () => {
           browser.sleep(1000);
           browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
             expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-            expect(element(by.id('expenseNote')).getAttribute('value')).toEqual('E2E Addition ' + e2eID);
+            element(by.id('expenseNote')).getAttribute('value').then((value) => {
+              expect(value).toEqual('E2E Addition ' + e2eID);
+            });
             let attachments = element.all(by.css('.file-list-item'));
             expect(attachments.count()).toEqual(1);
-            element(by.css('.file-list-item')).click().then(() => {
+            element(by.css('.fa-trash')).click().then(() => {
               browser.sleep(2000);
               attachments = element.all(by.css('.file-list-item'));
               expect(attachments.count()).toEqual(2);
@@ -991,7 +993,9 @@ describe('ExpenseApp:', () => {
           browser.sleep(1000);
           browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
             expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-            expect(element(by.id('expenseNote')).getAttribute('value')).toEqual('E2E Addition ' + e2eID);
+            element(by.id('expenseNote')).getAttribute('value').then((value) => {
+              expect(value).toEqual('E2E Addition ' + e2eID);
+            });
             const attachments = element.all(by.css('.file-list-item'));
             expect(attachments.count()).toEqual(2);
             element(by.id('cancel-update-button')).click().then(() => {
@@ -1120,7 +1124,9 @@ describe('ExpenseApp:', () => {
             }
 
             expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-            expect(element(by.id('expenseNote')).getText()).toEqual('E2E Addition ' + e2eList[i]);
+            element(by.id('expenseNote')).getAttribute('value').then((value) => {
+              expect(value).toEqual('E2E Addition ' + e2eList[i]);
+            });
             browser.sleep(1000);
             const attachments = element.all(by.css('.file-list-item'));
             expect(attachments.count()).toBeGreaterThanOrEqual(1);
