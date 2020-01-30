@@ -120,7 +120,7 @@ span.clickable {
 
 .list-group {
   .list-group-item {
-    &:hover {
+    &:hover:not(.no-hover) {
       background-color: $gray-light;
     }
   }

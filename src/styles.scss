@@ -82,9 +82,8 @@ span.ag-header-group-text {
   color: $vwt_color_blue;
 }
 
-
 // BOOTSTRAP OVERRIDES
-input, select, textarea, li {
+input, select, textarea,  li {
   &.ng-invalid.ng-touched {
     border-color: $red;
   }
@@ -102,10 +101,8 @@ select[disabled] {
 .form-control:focus {
   border-color: $gray-dark;
 }
-.badge {
-  &.badge-warning {
-    color: $white;
-  }
+.btn.btn-warning, .badge.badge-warning {
+  color: $white;
 }
 .btn-group-vertical {
   width: 100%;

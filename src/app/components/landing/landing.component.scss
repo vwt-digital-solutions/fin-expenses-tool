@@ -10,12 +10,13 @@
 }
 
 #pickstep {
-  .btn {
-    margin-bottom: 5px;
-    width: 100%;
-    display: block;
-    padding: 10px;
-    border-radius: 0;
+  .btn-group-vertical {
+    .btn {
+      margin-top: 0;
+    }
+    button:not(:last-child) {
+      border-bottom: 1px solid $vwt_color_blue_dark !important;
+    }
   }
 }
 

@@ -22,24 +22,36 @@
     </div>
     <div class="col col-sm-1" id="linestep"></div>
     <div class="col col-sm-3" id="pickstep">
-      <button name="expenses"
-              [routerLink]="['/expenses/employee']"
-              class="btn btn-primary">Nieuwe Declaratie
-      </button>
-      <button name="expenses/process"
-              [routerLink]="['/expenses/process']"
-              [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('creditor'))}" class="btn btn-primary">Declaraties
-        Controleren
-      </button>
-      <button name="expenses/manage"
-              [routerLink]="['/expenses/manage']"
-              [ngClass]="{hidden: !(this.managerAmount > 0)}" class="btn btn-primary">Declaraties Beoordelen
-        <span class="badge badge-pill badge-light">{{this.managerAmount}}</span>
-      </button>
-      <button name="expenses/controller"
-              [routerLink]="['/expenses/controller']"
-              [ngClass]="{hidden: !(this.OurJaneDoeIs.includes('controller'))}" class="btn btn-primary">Controller
-      </button>
+      <div class="btn-group-vertical" role="group">
+        <button
+          name="expenses"
+          class="btn btn-primary w-100 py-2 py-md-3"
+          [routerLink]="['/expenses/employee']" >
+          Nieuwe Declaratie
+        </button>
+        <button
+          *ngIf="this.OurJaneDoeIs.includes('creditor')"
+          name="expenses/process"
+          class="btn btn-primary w-100 py-2 py-md-3"
+          [routerLink]="['/expenses/process']" >
+          Declaraties Controleren
+        </button>
+        <button
+          *ngIf="this.managerAmount > 0"
+          name="expenses/manage"
+          class="btn btn-primary w-100 py-2 py-md-3"
+          [routerLink]="['/expenses/manage']" >
+          Declaraties Beoordelen
+          <span class="badge badge-pill badge-light">{{this.managerAmount}}</span>
+        </button>
+        <button
+          *ngIf="this.OurJaneDoeIs.includes('controller')"
+          name="expenses/controller"
+          class="btn btn-primary w-100 py-2 py-md-3"
+          [routerLink]="['/expenses/controller']" >
+          Controller
+        </button>
+      </div>
     </div>
   </div>
 

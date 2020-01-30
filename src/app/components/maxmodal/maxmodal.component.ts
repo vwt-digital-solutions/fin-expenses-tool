@@ -141,7 +141,7 @@ export class MaxModalComponent implements OnInit {
     if (this.isEditor) {
       return nNote.invalid || nAmount.invalid || nType.invalid
         || nTransDate.invalid || (new Date(nTransDate.viewModel)
-          > this.today) || nAmount.viewModel < 0.01;
+          > this.today) || nAmount.viewModel < 0.01 || this.attachmentsIsInvalid;
     } else if (this.isManager) {
       if (this.rejectionNote) {
         return rNote.invalid;
@@ -457,5 +457,9 @@ export class MaxModalComponent implements OnInit {
 
   get isRejected() {
     return this.expenseData.status.text.includes('rejected') ? true : false;
+  }
+
+  get attachmentsIsInvalid() {
+    return this.receiptFiles && this.receiptFiles.length > 0 ? false : true
   }
 }
