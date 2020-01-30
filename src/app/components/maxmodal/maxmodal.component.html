@@ -150,7 +150,7 @@
                   capture="camera" >
               </div>
 
-              <ul class="list-group w-100">
+              <ul class="list-group file-list w-100">
                 <li
                   id="upload"
                   class="list-group-item d-flex justify-content-between align-items-center upload-button"
@@ -161,7 +161,7 @@
                 </li>
                 <li
                   *ngFor="let item of receiptFiles"
-                  class="list-group-item d-flex justify-content-between align-items-center">
+                  class="list-group-item file-list-item d-flex justify-content-between align-items-center">
                   <span
                     *ngIf="item.from_db; else fileNotViewable"
                     class="clickable"
@@ -185,10 +185,10 @@
             </ng-container>
 
             <ng-template #fileBoxDisabled>
-              <ul class="list-group w-100">
+              <ul class="list-group file-list w-100">
                 <li
                   *ngFor="let item of receiptFiles"
-                  class="list-group-item d-flex justify-content-between align-items-center clickable"
+                  class="list-group-item file-list-item d-flex justify-content-between align-items-center clickable"
                   title="Open bijlage"
                   (click)="this.openSanitizeFile(item.content_type, item.content)" >
                   <span>
