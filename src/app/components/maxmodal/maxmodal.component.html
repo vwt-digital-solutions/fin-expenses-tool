@@ -207,7 +207,7 @@
             <small *ngIf="attachmentsIsInvalid && isEditor && !hasDraftStatus" class="text-danger w-100" >
               Minimaal één bestand toevoegen
             </small>
-            <small *ngIf="isEditor && hasDraftStatus && this.receiptFiles && !this.receiptFiles.length > 0" class="text-muted font-italic w-100" >
+            <small *ngIf="isEditor && hasDraftStatus && this.receiptFiles && this.receiptFiles.length <= 0" class="text-muted font-italic w-100" >
               Voeg minimaal één bijlage bij om de declaratie in te dienen
             </small>
           </div>

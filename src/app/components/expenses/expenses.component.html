@@ -148,7 +148,7 @@
               </li>
             </ul>
 
-            <small *ngIf="this.attachmentList && !this.attachmentList.length > 0" id="attachmentinputFill" class="text-muted font-italic w-100" >
+            <small *ngIf="this.attachmentList && this.attachmentList.length <= 0" id="attachmentinputFill" class="text-muted font-italic w-100" >
               Voeg minimaal één bijlage bij om de declaratie in te dienen
             </small>
           </div>
