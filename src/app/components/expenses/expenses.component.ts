@@ -86,8 +86,13 @@ export class ExpensesComponent implements  OnInit {
   }
 
   private splitCheck() {
-    return (this.expensesNote && this.expensesAmount && this.expenseType && this.expenseTransDate && this.expenseAttachment
-      && this.addClaimSuccess.wrong === false);
+    return (
+      this.expensesNote &&
+      this.expensesAmount &&
+      this.expenseType &&
+      this.expenseTransDate &&
+      (this.wantsSubmit ? this.attachmentList.length > 0 : true) &&
+      this.addClaimSuccess.wrong === false);
   }
 
   private successfulClaim(form: NgForm) {
@@ -141,25 +146,26 @@ export class ExpensesComponent implements  OnInit {
     if (setClass.name === 'transaction_date') {
       starBool = this.expenseTransDate === false;
     }
-    if (setClass.name === 'attachment') {
-      starBool = this.expenseAttachment === false;
-      return starBool;
-    }
     return starBool || (setClass.invalid && (setClass.dirty || setClass.touched));
   }
 
-  submitButtonController(nnote: { invalid: any; },
-                         namount: { invalid: any; },
-                         ntype: { invalid: any; },
-                         ntransdate: { invalid: any; },
-                         nattachment: { invalid: any; }) {
-    if (this.identityService.isTesting()) {
-      nattachment = { invalid: false }
-    }
-
-    return this.expensesNote === false || this.expensesAmount === false || this.expenseType === false || this.expenseTransDate === false ||
-      this.expenseAttachment === false || nnote.invalid || namount.invalid || ntype.invalid || ntransdate.invalid ||
-      nattachment.invalid || this.addClaimSuccess.wrong === true;
+  submitButtonController(
+    toSubmit = true,
+    nnote: { invalid: any; },
+    namount: { invalid: any; },
+    ntype: { invalid: any; },
+    ntransdate: { invalid: any; }
+  ) {
+    return this.expensesNote === false ||
+      this.expensesAmount === false ||
+      this.expenseType === false ||
+      this.expenseTransDate === false ||
+      (toSubmit && this.attachmentList.length <= 0 ? true : false) ||
+      nnote.invalid ||
+      namount.invalid ||
+      ntype.invalid ||
+      ntransdate.invalid ||
+      this.addClaimSuccess.wrong === true;
   }
 
   onFileInput(file: FileList) {

@@ -132,16 +132,19 @@ export class MaxModalComponent implements OnInit {
   // END Subject to change
 
   /** Controls the submit buttons and UpdateForm: Checks every input needed. */
-  protected submitButtonController(nNote: { invalid: any; },
-                                   nAmount: { invalid: any; viewModel: number; },
-                                   nType: { invalid: any; },
-                                   nTransDate: { invalid: any; viewModel: string | number | Date; },
-                                   rNote: { invalid: boolean }) {
+  protected submitButtonController(
+    toSubmit = true,
+    nNote: { invalid: any; },
+    nAmount: { invalid: any; viewModel: number; },
+    nType: { invalid: any; },
+    nTransDate: { invalid: any; viewModel: string | number | Date; },
+    rNote: { invalid: boolean }
+  ) {
     // Checks what role the user has and verifies the inputs accordingly.
     if (this.isEditor) {
       return nNote.invalid || nAmount.invalid || nType.invalid
         || nTransDate.invalid || (new Date(nTransDate.viewModel)
-          > this.today) || nAmount.viewModel < 0.01 || this.attachmentsIsInvalid;
+          > this.today) || nAmount.viewModel < 0.01 || (toSubmit ? this.attachmentsIsInvalid : false);
     } else if (this.isManager) {
       if (this.rejectionNote) {
         return rNote.invalid;
@@ -158,7 +161,14 @@ export class MaxModalComponent implements OnInit {
   // BEGIN Subject to change
   /** Used to update the expense in form. Every role that can update has it's own part */
   claimUpdateForm(form: any, expenseId: any, instArray: any[]): void {
-    if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3], instArray[4])) {
+    if (!this.submitButtonController(
+      (this.wantsDraft > 0 ? false : true),
+      instArray[0],
+      instArray[1],
+      instArray[2],
+      instArray[3],
+      instArray[4]
+    )) {
       const dataVerified = {};
       const data = form.value;
 
@@ -461,5 +471,9 @@ export class MaxModalComponent implements OnInit {
 
   get attachmentsIsInvalid() {
     return this.receiptFiles && this.receiptFiles.length > 0 ? false : true
+  }
+
+  get hasDraftStatus() {
+    return this.expenseData.status.text === 'draft' ? true : false;
   }
 }

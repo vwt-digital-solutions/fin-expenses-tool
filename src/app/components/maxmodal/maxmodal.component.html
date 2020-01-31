@@ -143,8 +143,8 @@
                   type="file"
                   accept="application/pdf,image/png,image/jpeg,image/jpg"
                   name="attachment"
-                  required
                   class="hidden"
+                  [required]="!hasDraftStatus"
                   (change)="onFileInput(fileInput.files)"
                   #fileInput
                   capture="camera" >
@@ -154,7 +154,7 @@
                 <li
                   id="upload"
                   class="list-group-item d-flex justify-content-between align-items-center upload-button"
-                  [ngClass]="{'ng-invalid ng-touched': attachmentsIsInvalid}"
+                  [ngClass]="{'ng-invalid ng-touched': attachmentsIsInvalid && !hasDraftStatus}"
                   (click)="fileInput.click()" >
                   <span class="new-file">Bestand toevoegen</span>
                   <i class="fas fa-plus ml-1 float-right"></i>
@@ -204,8 +204,11 @@
               </ul>
             </ng-template>
 
-            <small *ngIf="attachmentsIsInvalid && isEditor" class="text-danger w-100" >
+            <small *ngIf="attachmentsIsInvalid && isEditor && !hasDraftStatus" class="text-danger w-100" >
               Minimaal één bestand toevoegen
+            </small>
+            <small *ngIf="isEditor && hasDraftStatus && this.receiptFiles && !this.receiptFiles.length > 0" class="text-muted font-italic w-100" >
+              Voeg minimaal één bijlage bij om de declaratie in te dienen
             </small>
           </div>
           <!-- Form: END : Attachments -->
@@ -253,7 +256,7 @@
               id="submit-save-button"
               type="submit"
               class="btn btn-secondary"
-              [disabled]="submitButtonController(note, namount, ntype, ntransdate, undefined)"
+              [disabled]="submitButtonController(false, note, namount, ntype, ntransdate, undefined)"
               (click)="wantsDraft = 1" >
               Opslaan als concept
             </button>
@@ -261,7 +264,7 @@
               id="submit-update-button"
               type="submit"
               class="btn btn-primary"
-              [disabled]="submitButtonController(note, namount, ntype, ntransdate, undefined)"
+              [disabled]="submitButtonController(true, note, namount, ntype, ntransdate, undefined)"
               (click)="wantsDraft = 0" >
               Indienen
             </button>
@@ -297,7 +300,7 @@
             <button
               type="button"
               class="btn btn-secondary"
-              [disabled]="submitButtonController(undefined, undefined, this.isCreditor ? ntype : undefined, undefined, rnote)"
+              [disabled]="submitButtonController(true, undefined, undefined, this.isCreditor ? ntype : undefined, undefined, rnote)"
               (click)="updatingAction(null)" >
               Annuleren
             </button>
@@ -305,7 +308,7 @@
               id="thumbs-down-rejecting"
               type="button"
               class="btn btn-danger"
-              [disabled]="submitButtonController(undefined, undefined, this.isCreditor ? ntype : undefined, undefined, rnote)"
+              [disabled]="submitButtonController(true, undefined, undefined, this.isCreditor ? ntype : undefined, undefined, rnote)"
               (click)="updatingAction('rejecting'); this.claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])" >
               <a id="information-icon-down-rejecting">Bevestigen</a>
             </button>

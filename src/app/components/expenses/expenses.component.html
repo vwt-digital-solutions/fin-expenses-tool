@@ -126,11 +126,11 @@
                 type="file"
                 accept="application/pdf,image/png,image/jpeg,image/jpg"
                 name="attachment"
-                required
                 (change)="onFileInput(fileInputHidden.files)"
                 [(ngModel)]="formAttachment"
                 #nattachment="ngModel"
-                #fileInputHidden >
+                #fileInputHidden
+                capture="camera" >
             </div>
 
             <ul class="list-group w-100">
@@ -148,8 +148,8 @@
               </li>
             </ul>
 
-            <small *ngIf="notFilledClass(nattachment)" id="attachmentinputFill" class="text-danger w-100" >
-              Graag een bijlage toevoegen
+            <small *ngIf="this.attachmentList && !this.attachmentList.length > 0" id="attachmentinputFill" class="text-muted font-italic w-100" >
+              Voeg minimaal één bijlage bij om de declaratie in te dienen
             </small>
           </div>
         </div>
@@ -193,7 +193,7 @@
           class="btn btn-secondary mb-2"
           title="Opslaan als concept"
           (click)="this.wantsNext = 0; this.wantsSubmit = 0"
-          [disabled]="submitButtonController(nnote, namount, ntype, ntransdate, nattachment)"
+          [disabled]="submitButtonController(false, nnote, namount, ntype, ntransdate)"
           [ngClass]="{success : addClaimSuccess.success, wrong : addClaimSuccess.wrong}" >
           Opslaan als concept <i *ngIf="loadingThings && this.wantsNext === 0 && this.wantsSubmit === 0" class="spinner-border text-light"></i>
         </button>
@@ -206,7 +206,7 @@
             class="btn btn-primary"
             title="Opslaan en indienen"
             (click)="this.wantsNext = 0; this.wantsSubmit = 1"
-            [disabled]="submitButtonController(nnote, namount, ntype, ntransdate, nattachment)"
+            [disabled]="submitButtonController(true, nnote, namount, ntype, ntransdate)"
             [ngClass]="{success : addClaimSuccess.success, wrong : addClaimSuccess.wrong}" >
             Indienen <i *ngIf="loadingThings && this.wantsNext === 0 && this.wantsSubmit > 0" class="spinner-border text-light"></i>
           </button>
@@ -217,7 +217,7 @@
             class="btn btn-primary"
             title="Opslaan, indienen en nieuwe declaratie openen"
             (click)="this.wantsNext = 1; this.wantsSubmit = 1"
-            [disabled]="submitButtonController(nnote, namount, ntype, ntransdate, nattachment)"
+            [disabled]="submitButtonController(true, nnote, namount, ntype, ntransdate)"
             [ngClass]="{success : addClaimSuccess.success, wrong : addClaimSuccess.wrong}" >
             Indienen & Nieuwe <i *ngIf="loadingThings && this.wantsNext > 0 && this.wantsSubmit > 0" class="spinner-border text-light"></i>
           </button>
