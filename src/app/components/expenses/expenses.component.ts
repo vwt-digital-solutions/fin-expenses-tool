@@ -91,7 +91,7 @@ export class ExpensesComponent implements  OnInit {
       this.expensesAmount &&
       this.expenseType &&
       this.expenseTransDate &&
-      (this.wantsSubmit ? this.attachmentList.length > 0 : true) &&
+      (this.wantsSubmit && !this.identityService.isTesting() ? this.attachmentList.length > 0 : true) &&
       this.addClaimSuccess.wrong === false);
   }
 
@@ -156,11 +156,12 @@ export class ExpensesComponent implements  OnInit {
     ntype: { invalid: any; },
     ntransdate: { invalid: any; }
   ) {
+
     return this.expensesNote === false ||
       this.expensesAmount === false ||
       this.expenseType === false ||
       this.expenseTransDate === false ||
-      (toSubmit && this.attachmentList.length <= 0 ? true : false) ||
+      (toSubmit && !this.identityService.isTesting() && this.attachmentList.length <= 0 ? true : false) ||
       nnote.invalid ||
       namount.invalid ||
       ntype.invalid ||

@@ -144,7 +144,7 @@ export class MaxModalComponent implements OnInit {
     if (this.isEditor) {
       return nNote.invalid || nAmount.invalid || nType.invalid
         || nTransDate.invalid || (new Date(nTransDate.viewModel)
-          > this.today) || nAmount.viewModel < 0.01 || (toSubmit ? this.attachmentsIsInvalid : false);
+          > this.today) || nAmount.viewModel < 0.01 || (toSubmit && !this.identityService.isTesting() ? this.attachmentsIsInvalid : false);
     } else if (this.isManager) {
       if (this.rejectionNote) {
         return rNote.invalid;
