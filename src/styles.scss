@@ -98,8 +98,10 @@ select[disabled] {
   text-indent: 0.01px;
   text-overflow: '';
 }
-.form-control:focus {
-  border-color: $gray-dark;
+.form-control, .custom-select{
+  &:focus{
+    border-color: $gray-dark;
+  }
 }
 .btn.btn-warning, .badge.badge-warning {
   color: $white;

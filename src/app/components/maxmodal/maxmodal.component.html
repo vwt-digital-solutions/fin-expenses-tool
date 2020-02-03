@@ -24,218 +24,216 @@
           {{ errorMessage }}
         </div>
 
+        <!-- Form: Rejection Note-->
+        <div *ngIf="checkRNoteVisibility(expenseData)" class="alert alert-{{ isRejected ? 'warning' : 'info' }}">
+          Reden voor afkeuring: <strong>{{ expenseData.status.rnote }}</strong>
+        </div>
+        <!-- Form: END : Rejection Note-->
+
+        <!-- Form: Costs -->
         <div class="form-group">
-          <!-- Form: Rejection Note-->
-          <div *ngIf="checkRNoteVisibility(expenseData)" class="alert alert-{{ isRejected ? 'warning' : 'info' }}">
-            Reden voor afkeuring: <strong>{{ expenseData.status.rnote }}</strong>
-          </div>
-          <!-- Form: END : Rejection Note-->
+          <label class="mb-1" for="expenseAmount">Bedrag</label>
 
-          <!-- Form: Costs -->
-          <div class="form-group">
-            <label class="mb-1" for="expenseAmount">Bedrag</label>
-
-            <div class="input-group">
-              <input
-                id="expenseAmount"
-                class="form-control"
-                type="number"
-                step="0.01"
-                min="0.01"
-                name="amount"
-                required
-                [placeholder]="expenseData.amount"
-                [disabled]="!isEditor"
-                [ngModel]="this.expenseData.amount"
-                #namount="ngModel" >
-              <div class="input-group-append">
-                <label class="input-group-text" for="expenseAmount">€ EUR</label>
-              </div>
-            </div>
-
-            <small *ngIf="!(namount.valid) && isEditor" class="text-danger w-100" >
-              Graag een geldig bedrag invullen
-            </small>
-          </div>
-          <!-- Form: END : Costs -->
-
-          <!-- Form: Cost Type -->
-          <div class="form-group">
-            <label class="mb-1" for="expenseCostType">Soort</label>
-
-            <select
-              id="expenseCostType"
-              name="cost_type"
+          <div class="input-group">
+            <input
+              id="expenseAmount"
               class="form-control"
-              (change)="onChangeType($event)"
-              [disabled]="!isEditor && !isCreditor"
-              [ngModel]="expenseData.cost_type"
-              #ntype="ngModel"
-              required >
-              <option disabled selected>-- Kies een declaratiesoort --</option>
-              <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">
-                {{t.ctype}}
-              </option>
-            </select>
-          </div>
-          <!-- Form: END : Cost Type -->
-
-          <!-- Form: Transaction Date -->
-          <div class="form-group">
-            <label class="mb-1" for="expenseDateOfTransaction">Datum bon</label>
-
-            <div class="input-group">
-              <input
-                id="expenseDateOfTransaction"
-                name="transaction_date"
-                class="form-control"
-                required
-                [disabled]="!isEditor"
-                [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"
-                #ntransdate="ngModel"
-                type="date" >
-              <div class="input-group-append">
-                <label class="input-group-text" for="expenseDateOfTransaction">
-                  <i class=" fa fa-calendar-alt"></i></label>
-              </div>
-            </div>
-
-            <small *ngIf="!(ntransdate.valid) && isEditor" class="text-danger w-100" >
-              Graag een geldige datum invullen
-            </small>
-          </div>
-          <!-- Form: END : Transaction Date -->
-
-          <!-- Form: Note -->
-          <div class="form-group">
-            <label class="mb-1" for="expenseNote">Omschrijving</label>
-
-            <textarea
-              id="expenseNote"
-              class="form-control"
-              type="text"
-              name="note"
-              placeholder="{{ formCostTypeMessage['short'] }}"
-              required minlength="1"
+              type="number"
+              step="0.01"
+              min="0.01"
+              name="amount"
+              required
+              [placeholder]="expenseData.amount"
               [disabled]="!isEditor"
-              [ngModel]="expenseData.note"
-              #note="ngModel" >
-            </textarea>
-
-            <small *ngIf="formCostTypeMessage['long'] && isEditor" class="form-text text-muted font-italic w-100">
-              {{ formCostTypeMessage['long'] }}
-            </small>
-
-            <small *ngIf="!(note.valid) && isEditor" class="text-danger w-100" >
-              Graag een omschrijving invullen
-            </small>
+              [ngModel]="this.expenseData.amount"
+              #namount="ngModel" >
+            <div class="input-group-append">
+              <label class="input-group-text" for="expenseAmount">€ EUR</label>
+            </div>
           </div>
-          <!-- Form: END : Note -->
 
-          <!-- Form: Attachments -->
-          <div class="form-group">
-            <label class="mb-1" for="attachmentinput">Bijlagen</label>
+          <small *ngIf="!(namount.valid) && isEditor" class="text-danger w-100" >
+            Graag een geldig bedrag invullen
+          </small>
+        </div>
+        <!-- Form: END : Costs -->
 
-            <ng-container *ngIf="isEditor; else fileBoxDisabled">
-              <div class="hidden">
-                <input
-                  id="attachmentinput"
-                  type="file"
-                  accept="application/pdf,image/png,image/jpeg,image/jpg"
-                  name="attachment"
-                  class="hidden"
-                  [required]="!hasDraftStatus"
-                  (change)="onFileInput(fileInput.files)"
-                  #fileInput
-                  capture="camera" >
-              </div>
+        <!-- Form: Cost Type -->
+        <div class="form-group">
+          <label class="mb-1" for="expenseCostType">Soort</label>
 
-              <ul class="list-group file-list w-100">
-                <li
-                  id="upload"
-                  class="list-group-item d-flex justify-content-between align-items-center upload-button"
-                  [ngClass]="{'ng-invalid ng-touched': attachmentsIsInvalid && !hasDraftStatus}"
-                  (click)="fileInput.click()" >
-                  <span class="new-file">Bestand toevoegen</span>
-                  <i class="fas fa-plus ml-1 float-right"></i>
-                </li>
-                <li
-                  *ngFor="let item of receiptFiles"
-                  class="list-group-item file-list-item d-flex justify-content-between align-items-center">
-                  <span
-                    *ngIf="item.from_db; else fileNotViewable"
-                    class="clickable"
-                    title="Open bijlage"
-                    (click)="this.openSanitizeFile(item.content_type, item.content)" >
-                    <i class="{{ getFileTypeIcon(item.content_type) }} mr-1"></i>
-                    {{ item.db_name }}
-                  </span>
+          <select
+            id="expenseCostType"
+            name="cost_type"
+            class="form-control"
+            (change)="onChangeType($event)"
+            [disabled]="!isEditor && !isCreditor"
+            [ngModel]="expenseData.cost_type"
+            #ntype="ngModel"
+            required >
+            <option disabled selected>-- Kies een declaratiesoort --</option>
+            <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">
+              {{t.ctype}}
+            </option>
+          </select>
+        </div>
+        <!-- Form: END : Cost Type -->
 
-                  <ng-template #fileNotViewable>
-                    <span>
-                      <i class="{{ getFileTypeIcon(item.content_type) }} mr-1"></i>
-                      {{ item.db_name }}
-                    </span>
-                  </ng-template>
+        <!-- Form: Transaction Date -->
+        <div class="form-group">
+          <label class="mb-1" for="expenseDateOfTransaction">Datum bon</label>
 
-                  <i *ngIf="item.from_db" class="fa fa-trash clickable" (click)="removeFromAttachmentList(item)" title="Verwijder bijlage"></i>
-                  <i *ngIf="!item.from_db" class="fa fa-times clickable" (click)="removeFromAttachmentList(item)" title="Annuleer bijlage"></i>
-                </li>
-              </ul>
-            </ng-container>
+          <div class="input-group">
+            <input
+              id="expenseDateOfTransaction"
+              name="transaction_date"
+              class="form-control"
+              required
+              [disabled]="!isEditor"
+              [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"
+              #ntransdate="ngModel"
+              type="date" >
+            <div class="input-group-append">
+              <label class="input-group-text" for="expenseDateOfTransaction">
+                <i class=" fa fa-calendar-alt"></i></label>
+            </div>
+          </div>
 
-            <ng-template #fileBoxDisabled>
-              <ul class="list-group file-list w-100">
-                <li
-                  *ngFor="let item of receiptFiles"
-                  class="list-group-item file-list-item d-flex justify-content-between align-items-center clickable"
+          <small *ngIf="!(ntransdate.valid) && isEditor" class="text-danger w-100" >
+            Graag een geldige datum invullen
+          </small>
+        </div>
+        <!-- Form: END : Transaction Date -->
+
+        <!-- Form: Note -->
+        <div class="form-group">
+          <label class="mb-1" for="expenseNote">Omschrijving</label>
+
+          <textarea
+            id="expenseNote"
+            class="form-control"
+            type="text"
+            name="note"
+            placeholder="{{ formCostTypeMessage['short'] }}"
+            required minlength="1"
+            [disabled]="!isEditor"
+            [ngModel]="expenseData.note"
+            #note="ngModel" >
+          </textarea>
+
+          <small *ngIf="formCostTypeMessage['long'] && isEditor" class="form-text text-muted font-italic w-100">
+            {{ formCostTypeMessage['long'] }}
+          </small>
+
+          <small *ngIf="!(note.valid) && isEditor" class="text-danger w-100" >
+            Graag een omschrijving invullen
+          </small>
+        </div>
+        <!-- Form: END : Note -->
+
+        <!-- Form: Attachments -->
+        <div class="form-group">
+          <label class="mb-1" for="attachmentinput">Bijlagen</label>
+
+          <ng-container *ngIf="isEditor; else fileBoxDisabled">
+            <div class="hidden">
+              <input
+                id="attachmentinput"
+                type="file"
+                accept="application/pdf,image/png,image/jpeg,image/jpg"
+                name="attachment"
+                class="hidden"
+                [required]="!hasDraftStatus"
+                (change)="onFileInput(fileInput.files)"
+                #fileInput
+                capture="camera" >
+            </div>
+
+            <ul class="list-group file-list w-100">
+              <li
+                id="upload"
+                class="list-group-item d-flex justify-content-between align-items-center upload-button"
+                [ngClass]="{'ng-invalid ng-touched': attachmentsIsInvalid && !hasDraftStatus}"
+                (click)="fileInput.click()" >
+                <span class="new-file">Bestand toevoegen</span>
+                <i class="fas fa-plus ml-1 float-right"></i>
+              </li>
+              <li
+                *ngFor="let item of receiptFiles"
+                class="list-group-item file-list-item d-flex justify-content-between align-items-center">
+                <span
+                  *ngIf="item.from_db; else fileNotViewable"
+                  class="clickable"
                   title="Open bijlage"
                   (click)="this.openSanitizeFile(item.content_type, item.content)" >
+                  <i class="{{ getFileTypeIcon(item.content_type) }} mr-1"></i>
+                  {{ item.db_name }}
+                </span>
+
+                <ng-template #fileNotViewable>
                   <span>
                     <i class="{{ getFileTypeIcon(item.content_type) }} mr-1"></i>
                     {{ item.db_name }}
                   </span>
-                  <i class="far fa-eye" title="Bekijk bijlage"></i>
-                </li>
+                </ng-template>
 
-                <ng-container *ngIf="receiptFiles && receiptFiles.length <= 0">
-                  <small class="text-muted font-italic p-2">Geen bestanden gevonden</small>
-                </ng-container>
-              </ul>
-            </ng-template>
+                <i *ngIf="item.from_db" class="fa fa-trash clickable" (click)="removeFromAttachmentList(item)" title="Verwijder bijlage"></i>
+                <i *ngIf="!item.from_db" class="fa fa-times clickable" (click)="removeFromAttachmentList(item)" title="Annuleer bijlage"></i>
+              </li>
+            </ul>
+          </ng-container>
 
-            <small *ngIf="attachmentsIsInvalid && isEditor && !hasDraftStatus" class="text-danger w-100" >
-              Minimaal één bestand toevoegen
-            </small>
-            <small *ngIf="isEditor && hasDraftStatus && this.receiptFiles && this.receiptFiles.length <= 0" class="text-muted font-italic w-100" >
-              Voeg minimaal één bijlage bij om de declaratie in te dienen
-            </small>
-          </div>
-          <!-- Form: END : Attachments -->
+          <ng-template #fileBoxDisabled>
+            <ul class="list-group file-list w-100">
+              <li
+                *ngFor="let item of receiptFiles"
+                class="list-group-item file-list-item d-flex justify-content-between align-items-center clickable"
+                title="Open bijlage"
+                (click)="this.openSanitizeFile(item.content_type, item.content)" >
+                <span>
+                  <i class="{{ getFileTypeIcon(item.content_type) }} mr-1"></i>
+                  {{ item.db_name }}
+                </span>
+                <i class="far fa-eye" title="Bekijk bijlage"></i>
+              </li>
 
-          <!-- Form: Rejection Note | Check submit-update-form label after every change -->
-          <div class="input-group mb-3" [ngClass]="{hidden: !this.isRejecting}">
-            <div class="input-group-prepend">
-              <label class="input-group-text" for="rnoteselect">Reden:</label>
-            </div>
-            <select id="rnoteselect" class="custom-select" (change)="rejectionHit($event)" name="rnoteselect">
-              <option>Deze kosten kun je declareren via Regweb (PSA)</option>
-              <option>Deze kosten kun je declareren via de leasemaatschappij</option>
-              <option>Deze kosten zijn al gedeclareerd</option>
-              <option value="note">Anders, reden:</option>
-            </select>
-          </div>
-          <div class="form-group hidden" id="rejection-note-group">
-            <textarea id="rnote" class="form-control" [ngClass]="{notFilled: (rnote.invalid && (rnote.dirty || rnote.touched))}" type="text" name="rnote" required minlength="1" [ngModel]="expenseData.status.rnote" #rnote="ngModel">
-                </textarea>
-          </div>
-          <div class="fill-text move-18" *ngIf="(rnote.invalid && (rnote.dirty || rnote.touched))" [ngClass]="{hidden: !this.rejectionNote}">
-            <small>Graag een geldige reden invullen</small>
-          </div>
+              <ng-container *ngIf="receiptFiles && receiptFiles.length <= 0">
+                <small class="text-muted font-italic p-2">Geen bestanden gevonden</small>
+              </ng-container>
+            </ul>
+          </ng-template>
 
-
-          <input type="submit" id="submit-update-form" hidden #submitForm />
+          <small *ngIf="attachmentsIsInvalid && isEditor && !hasDraftStatus" class="text-danger w-100" >
+            Minimaal één bestand toevoegen
+          </small>
+          <small *ngIf="isEditor && hasDraftStatus && this.receiptFiles && this.receiptFiles.length <= 0" class="text-muted font-italic w-100" >
+            Voeg minimaal één bijlage bij om de declaratie in te dienen
+          </small>
         </div>
+        <!-- Form: END : Attachments -->
+
+        <!-- Form: Rejection Note | Check submit-update-form label after every change -->
+        <div class="input-group mb-3" [ngClass]="{hidden: !this.isRejecting}">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="rnoteselect">Reden:</label>
+          </div>
+          <select id="rnoteselect" class="custom-select" (change)="rejectionHit($event)" name="rnoteselect">
+            <option>Deze kosten kun je declareren via Regweb (PSA)</option>
+            <option>Deze kosten kun je declareren via de leasemaatschappij</option>
+            <option>Deze kosten zijn al gedeclareerd</option>
+            <option value="note">Anders, reden:</option>
+          </select>
+        </div>
+        <div class="form-group" [ngClass]="{hidden: !this.isRejecting}" id="rejection-note-group">
+          <textarea id="rnote" class="form-control" [ngClass]="{notFilled: (rnote.invalid && (rnote.dirty || rnote.touched))}" type="text" name="rnote" required minlength="1" [ngModel]="expenseData.status.rnote" #rnote="ngModel">
+              </textarea>
+        </div>
+        <div class="fill-text move-18" *ngIf="(rnote.invalid && (rnote.dirty || rnote.touched))" [ngClass]="{hidden: !this.rejectionNote}">
+          <small>Graag een geldige reden invullen</small>
+        </div>
+
+
+        <input type="submit" id="submit-update-form" hidden #submitForm />
 
       </div>
       <div class="max-modal-footer">
@@ -310,7 +308,7 @@
               class="btn btn-danger"
               [disabled]="submitButtonController(true, undefined, undefined, this.isCreditor ? ntype : undefined, undefined, rnote)"
               (click)="updatingAction('rejecting'); this.claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])" >
-              <a id="information-icon-down-rejecting">Bevestigen</a>
+              <a id="information-icon-down-rejecting">Afkeuring bevestigen</a>
             </button>
           </div>
         </ng-container>

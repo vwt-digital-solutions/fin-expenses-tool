@@ -37,7 +37,9 @@ $theme-colors: (
   "light": $gray
 );
 
+$input-focus-box-shadow: none !important;
 $input-btn-focus-box-shadow: none !important;
+$custom-select-focus-box-shadow: none !important;
 
 @-webkit-keyframes zoom {
   from {-webkit-transform:scale(0)}

@@ -21,6 +21,16 @@ export class IdentityService {
     return claimJaneDoe.roles[0].split('.')[0];
   }
 
+  allRoles() {
+    const claims = this.oauthService.getIdentityClaims() as IClaimRoles;
+    const roles = [];
+
+    for (const role of claims.roles) {
+      roles.push(role.split('.')[0]);
+    }
+    return roles;
+  }
+
   allClaims(): IClaimRoles {
     const claims = this.oauthService.getIdentityClaims() as IClaimRoles;
     // handle non-privileged employee => roles array is absent

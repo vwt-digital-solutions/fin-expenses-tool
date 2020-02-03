@@ -76,6 +76,7 @@ export class MaxModalComponent implements OnInit {
 
   /** OnInit to get the expenses. Can be slow! Every role has it's own getAttachment. */
   ngOnInit(): void {
+    const OurJaneDoeRoles = this.identityService.allRoles();
     document.getElementById('modalClose').focus();
     // forceViewer can be called from parent to allow the EMPLOYEE (landing page) to only see the expense
     if (this.forceViewer || this.expenseData.status.text === 'approved') {
@@ -85,15 +86,16 @@ export class MaxModalComponent implements OnInit {
       this.isCreditor = false;
     }
 
+
     // Checks what role the user has and makes a specific request
     let receiptRequest = new Observable();
-    if (this.isCreditor) {
+    if (this.isCreditor || (this.isViewer && OurJaneDoeRoles.includes('creditor'))) {
       receiptRequest = this.expensesConfigService.getFinanceAttachment(this.expenseData.id);
     } else if (this.isManager) {
       receiptRequest = this.expensesConfigService.getManagerAttachment(this.expenseData.id);
     } else if (this.isEditor || this.forceViewer) {
       receiptRequest = this.expensesConfigService.getExpenseAttachment(this.expenseData.id);
-    } else if (this.isViewer) {
+    } else if (this.isViewer || (this.isViewer && OurJaneDoeRoles.includes('controller'))) {
       receiptRequest = this.expensesConfigService.getControllerAttachment(this.expenseData.id);
     }
 
