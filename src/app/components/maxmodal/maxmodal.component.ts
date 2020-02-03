@@ -175,7 +175,7 @@ export class MaxModalComponent implements OnInit {
       }
     }
 
-    dataVerified[`status`] = this.wantsDraft > 0 || this.wantsSubmit > 0 ? 'draft' : 'ready_for_manager';
+    dataVerified[`status`] = this.wantsDraft > 0 || (this.wantsSubmit > 0 && this.expenseData.status.text == 'draft' ) ? 'draft' : 'ready_for_manager';
     Object.keys(dataVerified).length !== 0 ?
       this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
         .subscribe(
@@ -199,9 +199,7 @@ export class MaxModalComponent implements OnInit {
     Object.keys(dataVerified).length !== 0 ?
       this.expensesConfigService.updateExpenseManager(dataVerified, expenseId)
         .subscribe(
-          result => {
-            this.closeModal(true);
-          },
+          result => this.closeModal(true),
           error => {
             console.log(error);
             this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
@@ -222,9 +220,7 @@ export class MaxModalComponent implements OnInit {
     Object.keys(dataVerified).length !== 0 ?
       this.expensesConfigService.updateExpenseFinance(dataVerified, expenseId)
         .subscribe(
-          result => {
-            this.closeModal(true);
-          },
+          result => this.closeModal(true),
           error => {
             console.log(error);
             this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
@@ -249,7 +245,7 @@ export class MaxModalComponent implements OnInit {
   }
 
   afterPostExpense(expenseID: number) {
-    if (this.receiptFiles.length > 0) {
+    if (this.receiptFiles.length > 0 && !this.receiptFiles.some(e => e.from_db)) {
       this.bulkAttachmentUpload(expenseID).subscribe(
         responseList => {
           console.log('>> POST ATTACHMENTS SUCCESS', responseList);
@@ -264,7 +260,7 @@ export class MaxModalComponent implements OnInit {
   }
 
   afterPostAttachments(expenseID: number) {
-    if (this.wantsSubmit > 0) {
+    if (this.expenseData.status.text == 'draft' && this.wantsSubmit > 0) {
       this.expensesConfigService.updateExpenseEmployee(
         { status: 'ready_for_manager' }, expenseID
       ).subscribe(
