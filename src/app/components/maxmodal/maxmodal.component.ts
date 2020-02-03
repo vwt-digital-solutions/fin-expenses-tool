@@ -7,7 +7,7 @@ import {Attachment} from '../../models/attachment';
 import {ExpensesConfigService} from '../../services/config.service';
 import {IdentityService} from '../../services/identity.service';
 import {DefaultImageService} from '../../services/default-image.service';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { FormatterService } from 'src/app/services/formatter.service';
 
 @Component({
@@ -34,6 +34,7 @@ export class MaxModalComponent implements OnInit {
   public isEditor: boolean;
   public isRejecting: boolean;
   public wantsDraft = 0;
+  public wantsSubmit = 0;
   public rejectionNote: boolean;
   public formCostTypeMessage = { short: '', long: '' };
 
@@ -113,26 +114,6 @@ export class MaxModalComponent implements OnInit {
     })
   }
 
-  // BEGIN Subject to change
-  /** Used to upload the attachments from the receiptFiles */
-  private uploadSingleAttachment(expenseId: any) {
-    if (this.receiptFiles.length > 0) {
-      const file: Attachment = this.receiptFiles.splice(0, 1)[0];
-      if (!file.from_db) {
-        this.expensesConfigService.uploadSingleAttachment(expenseId, {
-          name: '' + this.receiptFiles.length,
-          content: file.content
-        }).subscribe(() => {
-          this.uploadSingleAttachment(expenseId);
-        });
-      } else {
-        this.uploadSingleAttachment(expenseId);
-      }
-    }
-  }
-
-  // END Subject to change
-
   /** Controls the submit buttons and UpdateForm: Checks every input needed. */
   protected submitButtonController(
     toSubmit = true,
@@ -194,14 +175,11 @@ export class MaxModalComponent implements OnInit {
       }
     }
 
-    dataVerified[`status`] = this.wantsDraft > 0 ? 'draft' : 'ready_for_manager';
+    dataVerified[`status`] = this.wantsDraft > 0 || this.wantsSubmit > 0 ? 'draft' : 'ready_for_manager';
     Object.keys(dataVerified).length !== 0 ?
       this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
         .subscribe(
-          result => {
-            this.uploadSingleAttachment(expenseId);
-            this.closeModal(true);
-          },
+          result => this.afterPostExpense(expenseId),
           error => {
             console.log(error);
             this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
@@ -254,6 +232,52 @@ export class MaxModalComponent implements OnInit {
       : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
   }
 
+  bulkAttachmentUpload(expenseID: number) {
+    const fileRequests = [];
+    for (const count in this.receiptFiles) {
+      if (!this.receiptFiles[count].from_db) {
+        fileRequests.push(
+          this.expensesConfigService.uploadSingleAttachment(expenseID, {
+            name: count.toString(),
+            content: this.receiptFiles[count].content
+          })
+        );
+      }
+    }
+
+    return forkJoin(fileRequests);
+  }
+
+  afterPostExpense(expenseID: number) {
+    if (this.receiptFiles.length > 0) {
+      this.bulkAttachmentUpload(expenseID).subscribe(
+        responseList => {
+          console.log('>> POST ATTACHMENTS SUCCESS', responseList);
+          this.afterPostAttachments(expenseID);
+        }, error => {
+          this.errorMessage = 'Er is iets fout gegaan bij het uploaden van de bestanden, neem contact op met de crediteuren afdeling.';
+          console.error('>> POST ATTACHMENTS FAILED', error.message);
+        })
+    } else {
+      this.afterPostAttachments(expenseID);
+    }
+  }
+
+  afterPostAttachments(expenseID: number) {
+    if (this.wantsSubmit > 0) {
+      this.expensesConfigService.updateExpenseEmployee(
+        { status: 'ready_for_manager' }, expenseID
+      ).subscribe(
+        response => this.closeModal(true),
+        error => {
+          this.errorMessage = 'Er is iets fout gegaan bij het indienen van de declaratie, neem contact op met de crediteuren afdeling.';
+          console.error('>> PUT EXPENSE FAILED', error.message);
+        }
+      );
+    } else {
+      this.closeModal(true);
+    }
+  }
   // END Subject to change
 
   /** Used to update the rejection note with normal style change (works better on mobile) */

@@ -245,7 +245,7 @@
               class="btn btn-outline-danger"
               id="cancel-update-button"
               title="Declaratie annuleren"
-              (click)="wantsDraft = 0; cancelExpense()" >
+              (click)="wantsDraft = 0; wantsSubmit = 0; cancelExpense()" >
               Annuleren
             </button>
 
@@ -255,7 +255,7 @@
               type="submit"
               class="btn btn-secondary"
               [disabled]="submitButtonController(false, note, namount, ntype, ntransdate, undefined)"
-              (click)="wantsDraft = 1" >
+              (click)="wantsDraft = 1; wantsSubmit = 0" >
               Opslaan als concept
             </button>
             <button
@@ -263,7 +263,7 @@
               type="submit"
               class="btn btn-primary"
               [disabled]="submitButtonController(true, note, namount, ntype, ntransdate, undefined)"
-              (click)="wantsDraft = 0" >
+              (click)="wantsDraft = 0; wantsSubmit = 1" >
               Indienen
             </button>
           </div>
