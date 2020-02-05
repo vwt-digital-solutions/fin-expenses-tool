@@ -76,7 +76,6 @@ button.btn {
 
 #colstep {
   background-color: #fcfbfb;
-  padding: 2em;
   @include lg-phone-only {
     width: 100%;
     padding: 1em;
@@ -104,7 +103,6 @@ button.btn {
 
 #bodystep {
   background-color: #fcfbfb;
-  padding: 2.2em;
 
   @include lg-phone-only {
     background-color: #abdeef;
@@ -126,8 +124,6 @@ button.btn {
 }
 
 .row {
-  margin-top: 5ex;
-
   .hidden {
     display: none;
   }

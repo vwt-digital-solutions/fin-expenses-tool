@@ -16,10 +16,10 @@ export class LandingComponent implements OnInit {
   public OurJaneDoeIs: any[] | string[];
   public displayPersonName: string | string[];
   public personID: string;
-  public declarationData: Expense[];
+  public declarationData: Expense[] = [];
   public expenseData: Expense;
   public today: Date;
-  public hasNoExpenses: boolean;
+  public hasNoExpenses = true;
   public managerAmount: number;
 
   public wantsNewModal;
@@ -56,7 +56,7 @@ export class LandingComponent implements OnInit {
     this.expenses.getManagerExpenses()
       .subscribe(val => {
         // @ts-ignore
-        this.managerAmount = val.length;
+        this.managerAmount = val ? val.length : 0;
       });
     this.declarationCall();
     this.today = new Date();
@@ -65,12 +65,20 @@ export class LandingComponent implements OnInit {
   declarationCall() {
     this.expenses.getEmployeeExpenses(this.personID)
       .subscribe(
-        val => {
-          this.declarationData = val;
-          this.hasNoExpenses = (val.length < 1);
-          console.log('>> GET SUCCESS', val);
-        }, response => {
-          console.error('>> GET FAILED', response.message);
+        response => {
+          this.declarationData = [];
+          const newResponse = response;
+          for (var i = newResponse.length; i--;) {
+            if (newResponse[i].status.text.toString().includes('rejected')) {
+              this.declarationData.push(newResponse[i]);
+              newResponse.splice(i, 1);
+            }
+          }
+          this.declarationData = this.declarationData.concat(newResponse);
+          this.hasNoExpenses = (response.length < 1);
+          console.log('>> GET SUCCESS', response);
+        }, error => {
+          console.error('>> GET FAILED', error.message);
         });
   }
 
@@ -92,5 +100,20 @@ export class LandingComponent implements OnInit {
   }
   isDraft(item) {
     return item.status.text.toString() === "draft";
+  }
+  setClassStatus(item) {
+    if (item.status.text.toString().includes('rejected')) {
+      return 'rejected';
+    } else if (item.status.text.toString() === 'draft') {
+      return 'draft';
+    } else if (item.status.text.toString() === 'cancelled') {
+      return 'cancelled';
+    } else if (item.status.text.toString() === 'approved') {
+      return 'approved';
+    }else if (item.status.text.toString() === 'exported') {
+      return 'exported';
+    } else {
+      return 'processing';
+    }
   }
 }

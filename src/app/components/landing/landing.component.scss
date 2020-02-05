@@ -1,90 +1,156 @@
 @import "src/assets/scss/mixins";
 @import "src/assets/scss/constants";
 
-#linestep {
-  border-left: 1px solid #dee2e6;
-  transform: translate(50%, 0);
-  @include lg-phone-only {
-    display: none;
-  }
-}
+.app-landing {
+  @media (min-width: $breakpoint-tablet) and (min-height: 500px) {
+    height: 100vh;
 
-#pickstep {
-  .btn-group-vertical {
-    .btn {
-      margin-top: 0;
-    }
-    button:not(:last-child) {
-      border-bottom: 1px solid $vwt_color_blue_dark !important;
+    .row.row-100 {
+      height: calc(100% - 130px);
+      overflow: hidden;
     }
   }
-}
 
-.row {
-  @include lg-phone-only {
-    flex-direction: column-reverse !important;
-  }
-}
-
-.list-group-item {
-  padding: 0 15px;
-}
-
-.clickable {
-  cursor: pointer;
-
-  &:hover {
-    opacity: .6;
-  }
-}
-
-.rejected {
-  background: #ffe2dd;
-}
-.draft {
-  background: $gray-light;
-}
-
-#stepstep {
-  h1 {
-    font-weight: 300;
+  #linestep {
+    border-left: 1px solid #dee2e6;
+    transform: translate(50%, 0);
+    @include lg-phone-only {
+      display: none;
+    }
   }
 
-  small {
-    color: darkgrey;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-}
+  #pickstep {
+    .btn-group-vertical {
+      .btn {
+        margin-top: 0;
+      }
 
-#liststep {
-  @include lg-phone-only {
-    margin-top: 15px;
-  }
-}
-
-.list-group {
-  max-height: 25vw;
-  margin-bottom: 10px;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-
-  .list-group-item {
-    border-top-left-radius: 0!important;
-    border-top-right-radius: 0!important;
+      button:not(:last-child) {
+        border-bottom: 1px solid $vwt_color_blue_dark !important;
+      }
+    }
   }
 
-  p {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+  .row {
+    @include lg-phone-only {
+      flex-direction: column-reverse !important;
+    }
   }
 
-  @include lg-phone-only {
-    max-height: none;
-    margin-bottom: 0;
-  }
-}
+  .expenses-list {
+    padding: 0;
 
-.hidden {
-  display: none !important;
+    .expenses-list-item {
+      padding: 5px;
+
+      .item-inner {
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: 1px solid $gray;
+        width: 100%;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .1);
+        position: relative;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+        -webkit-transition: all 0.2s ease;
+
+        .status-pill {
+          position: absolute;
+          top: 10px;
+          right: 15px;
+        }
+
+        &:hover {
+          background-color: $gray-light;
+          cursor: pointer;
+        }
+      }
+
+      &.rejected .item-inner {
+        border: 2px solid $orange;
+
+        h3 {
+          color: $orange;
+        }
+
+        &:hover {
+          border: 2px solid $orange-hover;
+        }
+      }
+
+      &.cancelled .item-inner {
+        opacity: 0.5;
+
+        h3 {
+          color: $gray-dark;
+        }
+
+        &:hover {
+          opacity: 1;
+        }
+      }
+
+      &.draft .item-inner {
+        background: rgba($gray, .5);
+
+        h3 {
+          color: $gray-dark;
+        }
+
+        &:hover {
+          background: rgba($gray, .8) !important;
+        }
+      }
+    }
+  }
+
+  #stepstep {
+    small {
+      color: darkgrey;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+  }
+
+  #liststep {
+    @media (min-width: $breakpoint-tablet) and (min-height: 500px) {
+      overflow-y: auto;
+      padding: 10px 0;
+
+      background: linear-gradient(white 30%, rgba(255,255,255,0)), linear-gradient(rgba(255,255,255,0), white 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0,0,0,.2), rgba(0,0,0,0)), radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;
+      background: linear-gradient(white 30%, rgba(255,255,255,0)), linear-gradient(rgba(255,255,255,0), white 70%) 0 100%, radial-gradient(farthest-side at 50% 0, rgba(0,0,0,.2), rgba(0,0,0,0)), radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;
+      background-repeat: no-repeat;
+      background-color: white;
+      background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+      background-attachment: local, local, scroll, scroll;
+    }
+    @include lg-phone-only {
+      margin-top: 15px;
+    }
+  }
+
+  .list-group {
+    max-height: 25vw;
+    margin-bottom: 10px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+
+    .list-group-item {
+      border-top-left-radius: 0!important;
+      border-top-right-radius: 0!important;
+    }
+
+    p {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+    }
+    @include lg-phone-only {
+      max-height: none;
+      margin-bottom: 0;
+    }
+  }
+
+  .hidden {
+    display: none !important;
+  }
 }

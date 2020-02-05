@@ -85,7 +85,7 @@ describe('ExpenseApp:', () => {
     });
   });
 
-  it('E1 should get the list of expenses on the landing page (or none)', () => {
+  it('E1: should get the list of expenses on the landing page (or none)', () => {
 
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
       browser.sleep(1000);
@@ -94,8 +94,8 @@ describe('ExpenseApp:', () => {
 
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText('Small', 'Opensource E2E'))), 10, 'Name is not present'));
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'The API took too long to respond').then(() => {
-      const expensesList = element.all(by.css('li.list-group-item'));
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item'))), 20000, 'The API took too long to respond').then(() => {
+      const expensesList = element.all(by.css('li.expenses-list-item'));
       expensesListCount = expensesList.count();
       if (expensesListCount === 1) {
         expensesListCount = 0;
@@ -167,8 +167,8 @@ describe('ExpenseApp:', () => {
 
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText('Small', 'Opensource E2E'))), 10, 'Name is not present'));
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'The API took too long to respond').then(() => {
-      const expensesList = element.all(by.css('li.list-group-item'));
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item'))), 20000, 'The API took too long to respond').then(() => {
+      const expensesList = element.all(by.css('li.expenses-list-item'));
       expect(expensesList.count()).toBeGreaterThanOrEqual(expensesListCount);
       expensesListCount = expensesList.count();
     });
@@ -177,7 +177,7 @@ describe('ExpenseApp:', () => {
 
   it('E1: should open the expense and check the data', () => {
 
-    element.all(by.css('li.list-group-item')).first().click().then(() => {
+    element.all(by.css('li.expenses-list-item.processing')).first().click().then(() => {
       expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
         browser.sleep(1000);
         browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
@@ -299,8 +299,8 @@ describe('ExpenseApp:', () => {
 
   it('E2: should see that the expense has been approved', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'Return to landing took too long').then(() => {
-      expect(element(by.css('.badge')).getText()).toEqual('Goedgekeurd');
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.approved'))), 20000, 'Return to landing took too long').then(() => {
+      expect(element.all(by.css('li.expenses-list-item.approved')).first().element(by.css('.badge.badge-status')).getText()).toEqual('Goedgekeurd');
     });
 
   });
@@ -308,8 +308,8 @@ describe('ExpenseApp:', () => {
 
   it('E2: should open the expense and check the data', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'Return to landing took too long').then(() => {
-      element.all(by.css('li.list-group-item')).first().click().then(() => {
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.exported'))), 20000, 'Return to landing took too long').then(() => {
+      element.all(by.css('li.expenses-list-item.exported')).first().click().then(() => {
         expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
           browser.sleep(1000);
           browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
@@ -381,8 +381,8 @@ describe('ExpenseApp:', () => {
 
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText('Small', 'Opensource E2E'))), 10, 'Name is not present'));
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'The API took too long to respond').then(() => {
-      const expensesList = element.all(by.css('li.list-group-item'));
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item'))), 20000, 'The API took too long to respond').then(() => {
+      const expensesList = element.all(by.css('li.expenses-list-item'));
       expect(expensesList.count()).toBeGreaterThan(expensesListCount);
     });
 
@@ -390,7 +390,7 @@ describe('ExpenseApp:', () => {
 
   it('E3: should open the expense and check the data', () => {
 
-    element.all(by.css('li.list-group-item')).first().click().then(() => {
+    element.all(by.css('li.expenses-list-item.processing')).first().click().then(() => {
       expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
         browser.sleep(1000);
         browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
@@ -572,8 +572,8 @@ describe('ExpenseApp:', () => {
 
   it('E4: should see that the expense has been approved', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'Return to landing took too long').then(() => {
-      expect(element(by.css('.badge')).getText()).toEqual('Goedgekeurd');
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.approved'))), 20000, 'Return to landing took too long').then(() => {
+      expect(element.all(by.css('li.expenses-list-item.approved')).first().element(by.css('.badge.badge-status')).getText()).toEqual('Goedgekeurd');;
     });
 
   });
@@ -633,8 +633,8 @@ describe('ExpenseApp:', () => {
 
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText('Small', 'Opensource E2E'))), 10, 'Name is not present'));
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'The API took too long to respond').then(() => {
-      const expensesList = element.all(by.css('li.list-group-item'));
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item'))), 20000, 'The API took too long to respond').then(() => {
+      const expensesList = element.all(by.css('li.expenses-list-item'));
       expect(expensesList.count()).toBeGreaterThan(expensesListCount);
       expensesListCount = expensesList.count();
     });
@@ -643,7 +643,7 @@ describe('ExpenseApp:', () => {
 
   it('E5: should open the expense and check the data', () => {
 
-    element.all(by.css('li.list-group-item')).first().click().then(() => {
+    element.all(by.css('li.expenses-list-item.processing')).first().click().then(() => {
       expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
         browser.sleep(1000);
         browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
@@ -747,8 +747,8 @@ describe('ExpenseApp:', () => {
 
   it('E6: should see that the expense has been rejected', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'Return to landing took too long').then(() => {
-      expect(element(by.css('.badge')).getText()).toEqual('Aanpassing vereist');
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.rejected'))), 20000, 'Return to landing took too long').then(() => {
+      expect(element.all(by.css('li.expenses-list-item.rejected')).first().element(by.css('.badge.badge-status')).getText()).toEqual('Aanpassing vereist');
     });
 
   });
@@ -756,8 +756,8 @@ describe('ExpenseApp:', () => {
 
   it('E6: should open the expense, remove one attachment, add two and submit', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'Return to landing took too long').then(() => {
-      element.all(by.css('li.list-group-item')).first().click().then(() => {
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.rejected'))), 20000, 'Return to landing took too long').then(() => {
+      element.all(by.css('li.expenses-list-item.rejected')).first().click().then(() => {
         expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
           browser.sleep(1000);
           browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
@@ -776,7 +776,7 @@ describe('ExpenseApp:', () => {
                 expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
                   browser.sleep(1000);
                   browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-                    expect(element(by.css('.badge')).getText()).toEqual('In behandeling');
+                    expect(element(by.css('.badge.badge-status')).getText()).toEqual('In behandeling');
                     browser.sleep(1000);
                   });
                 }));
@@ -791,7 +791,7 @@ describe('ExpenseApp:', () => {
 
   it('E6: should open the expense and check the data after submit', () => {
 
-    element.all(by.css('li.list-group-item')).first().click().then(() => {
+    element.all(by.css('li.expenses-list-item.processing')).first().click().then(() => {
       expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
         browser.sleep(1000);
         browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
@@ -979,16 +979,16 @@ describe('ExpenseApp:', () => {
 
   it('E7: should see that the expense has been rejected', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'Return to landing took too long').then(() => {
-      expect(element(by.css('.badge')).getText()).toEqual('Aanpassing vereist');
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.rejected'))), 20000, 'Return to landing took too long').then(() => {
+      expect(element.all(by.css('li.expenses-list-item.rejected')).first().element(by.css('.badge.badge-status')).getText()).toEqual('Aanpassing vereist');
     });
 
   });
 
   it('E7: should open the expense and cancel', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'Return to landing took too long').then(() => {
-      element.all(by.css('li.list-group-item')).first().click().then(() => {
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item'))), 20000, 'Return to landing took too long').then(() => {
+      element.all(by.css('li.expenses-list-item.rejected')).first().click().then(() => {
         expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
           browser.sleep(1000);
           browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
@@ -1015,7 +1015,7 @@ describe('ExpenseApp:', () => {
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
       browser.sleep(1000);
       browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-        expect(element(by.css('.badge')).getText()).toEqual('Geannuleerd');
+        expect(element(by.css('.badge.badge-status')).getText()).toEqual('Geannuleerd');
         browser.sleep(1000);
       });
     }));

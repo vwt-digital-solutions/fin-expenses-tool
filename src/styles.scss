@@ -19,7 +19,6 @@ $fa-font-path: "~src/assets/fonts/font-awesome";
 
 body {
   font-family: $vwt_font_family !important;
-  margin: 70px 0 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -58,6 +57,11 @@ h6 {
   font-weight: 700;
   color: #008BB8;
   text-transform: uppercase;
+}
+
+.app-container {
+  padding-top: 70px;
+  box-sizing: border-box;
 }
 
 .landing_page_container {

@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container app-container">
   <form
     class="row"
     name="expenseForm"
@@ -6,7 +6,7 @@
     (submit)="claimForm($event, expenseForm)"
     (keydown.enter)="$event.preventDefault()"
     #expenseForm="ngForm" >
-    <div class="col-12 col-sm-8" id="colstep">
+    <div class="col-12 col-sm-8 py-2 px-4" id="colstep">
       <div class="claim">
         <h3>Declaratie indienen</h3>
         <hr class="line-border">
@@ -168,7 +168,7 @@
       </div>
     </div>
     <div class="col-12 col-sm-1" id="linestep"></div>
-    <div class="col-12 col-sm-3" id="bodystep">
+    <div class="col-12 col-sm-3 py-2 px-4" id="bodystep">
       <div class="claim d-none d-md-block">
         <h3 class="summary">Samenvatting</h3>
         <hr class="line-border">
