@@ -72,6 +72,14 @@
 
 .max-modal-body {
   padding: 10px 16px;
+
+  .expense-flags {
+    a {
+      &:not(:last-child):after {
+        content: ", ";
+      }
+    }
+  }
 }
 
 .max-modal-footer {

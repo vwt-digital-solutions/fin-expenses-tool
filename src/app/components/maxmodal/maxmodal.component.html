@@ -28,6 +28,19 @@
         <div *ngIf="checkRNoteVisibility(expenseData)" class="alert alert-{{ isRejected ? 'warning' : 'info' }}">
           Reden voor afkeuring: <strong>{{ expenseData.status.rnote }}</strong>
         </div>
+
+        <ng-container *ngIf="expenseFlags">
+          <div
+            *ngFor="let flag of expenseFlags"
+            class="alert alert-warning expense-flags" >
+            <strong class="mr-2"><i class="fas fa-flag"></i></strong>
+            {{ flag.description }}:
+            <a
+              *ngFor="let expense_id of flag.values"
+              class="alert-link"
+              target="_blank" ><strong>{{ expense_id }}</strong></a>
+          </div>
+        </ng-container>
         <!-- Form: END : Rejection Note-->
 
         <!-- Form: Costs -->
