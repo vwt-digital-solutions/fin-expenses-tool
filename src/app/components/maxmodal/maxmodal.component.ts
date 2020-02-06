@@ -500,16 +500,16 @@ export class MaxModalComponent implements OnInit {
   }
 
   get expenseFlags() {
-    if (Object.keys(this.expenseData.flags).length > 0) {
+    if (this.expenseData['flags'] && Object.keys(this.expenseData['flags']).length > 0) {
       const flags = []
-      for (const key in this.expenseData.flags) {
+      for (const key in this.expenseData['flags']) {
         const flag = {}
         if (key == 'duplicates') {
           flag['name'] = 'duplicates';
           flag['description'] = 'Er zijn dubbele declaraties gevonden';
         }
 
-        flag['values'] = this.expenseData.flags[key];
+        flag['values'] = this.expenseData['flags'][key];
         flags.push(flag);
       }
       return flags;
