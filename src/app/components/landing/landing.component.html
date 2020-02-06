@@ -24,7 +24,7 @@
               <span>{{ dateFormatter(item.claim_date )}}</span><span class="text-muted ml-2">{{ item.cost_type.split(':')[0] }}</span>
             </div>
             <div class="status-pill">
-              <span class="badge badge-pill badge-status" [className]="formatter.getStatusClassing(item.status.text)">
+              <span class="badge badge-pill" [className]="formatter.getStatusClassing(item.status.text)">
                 {{ formatter.getStatusFormatter(item.status.text) }}
               </span>
             </div>

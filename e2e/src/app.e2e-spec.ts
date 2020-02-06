@@ -300,7 +300,7 @@ describe('ExpenseApp:', () => {
   it('E2: should see that the expense has been approved', () => {
 
     browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.approved'))), 20000, 'Return to landing took too long').then(() => {
-      expect(element.all(by.css('li.expenses-list-item.approved')).first().element(by.css('.badge.badge-status')).getText()).toEqual('Goedgekeurd');
+      expect(element.all(by.css('li.expenses-list-item.approved')).first().element(by.css('.status-pill .badge')).getText()).toEqual('Goedgekeurd');
     });
 
   });
@@ -573,7 +573,7 @@ describe('ExpenseApp:', () => {
   it('E4: should see that the expense has been approved', () => {
 
     browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.approved'))), 20000, 'Return to landing took too long').then(() => {
-      expect(element.all(by.css('li.expenses-list-item.approved')).first().element(by.css('.badge.badge-status')).getText()).toEqual('Goedgekeurd');;
+      expect(element.all(by.css('li.expenses-list-item.approved')).first().element(by.css('.status-pill .badge')).getText()).toEqual('Goedgekeurd');;
     });
 
   });
@@ -748,7 +748,7 @@ describe('ExpenseApp:', () => {
   it('E6: should see that the expense has been rejected', () => {
 
     browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.rejected'))), 20000, 'Return to landing took too long').then(() => {
-      expect(element.all(by.css('li.expenses-list-item.rejected')).first().element(by.css('.badge.badge-status')).getText()).toEqual('Aanpassing vereist');
+      expect(element.all(by.css('li.expenses-list-item.rejected')).first().element(by.css('.status-pill .badge')).getText()).toEqual('Aanpassing vereist');
     });
 
   });
@@ -776,7 +776,7 @@ describe('ExpenseApp:', () => {
                 expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
                   browser.sleep(1000);
                   browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-                    expect(element(by.css('.badge.badge-status')).getText()).toEqual('In behandeling');
+                    expect(element(by.css('.status-pill .badge')).getText()).toEqual('In behandeling');
                     browser.sleep(1000);
                   });
                 }));
@@ -980,7 +980,7 @@ describe('ExpenseApp:', () => {
   it('E7: should see that the expense has been rejected', () => {
 
     browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.rejected'))), 20000, 'Return to landing took too long').then(() => {
-      expect(element.all(by.css('li.expenses-list-item.rejected')).first().element(by.css('.badge.badge-status')).getText()).toEqual('Aanpassing vereist');
+      expect(element.all(by.css('li.expenses-list-item.rejected')).first().element(by.css('.status-pill .badge')).getText()).toEqual('Aanpassing vereist');
     });
 
   });
@@ -1015,7 +1015,7 @@ describe('ExpenseApp:', () => {
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
       browser.sleep(1000);
       browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-        expect(element(by.css('.badge.badge-status')).getText()).toEqual('Geannuleerd');
+        expect(element(by.css('.status-pill .badge')).getText()).toEqual('Geannuleerd');
         browser.sleep(1000);
       });
     }));
