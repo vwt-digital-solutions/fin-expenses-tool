@@ -308,8 +308,8 @@ describe('ExpenseApp:', () => {
 
   it('E2: should open the expense and check the data', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.exported'))), 20000, 'Return to landing took too long').then(() => {
-      element.all(by.css('li.expenses-list-item.exported')).first().click().then(() => {
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.approved'))), 20000, 'Return to landing took too long').then(() => {
+      element.all(by.css('li.expenses-list-item.approved')).first().click().then(() => {
         expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
           browser.sleep(1000);
           browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
