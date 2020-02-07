@@ -230,21 +230,38 @@
           <div class="input-group-prepend">
             <label class="input-group-text" for="rnoteselect">Reden:</label>
           </div>
-          <select id="rnoteselect" class="custom-select" (change)="rejectionHit($event)" name="rnoteselect">
+          <select
+            id="rnoteselect"
+            class="custom-select"
+            name="rnoteselect"
+            (change)="rejectionHit($event)" >
             <option>Deze kosten kun je declareren via Regweb (PSA)</option>
             <option>Deze kosten kun je declareren via de leasemaatschappij</option>
             <option>Deze kosten zijn al gedeclareerd</option>
             <option value="note">Anders, reden:</option>
           </select>
         </div>
-        <div class="form-group" [ngClass]="{hidden: !this.isRejecting}" id="rejection-note-group">
-          <textarea id="rnote" class="form-control" [ngClass]="{notFilled: (rnote.invalid && (rnote.dirty || rnote.touched))}" type="text" name="rnote" required minlength="1" [ngModel]="expenseData.status.rnote" #rnote="ngModel">
-              </textarea>
-        </div>
-        <div class="fill-text move-18" *ngIf="(rnote.invalid && (rnote.dirty || rnote.touched))" [ngClass]="{hidden: !this.rejectionNote}">
-          <small>Graag een geldige reden invullen</small>
-        </div>
+        <div
+          id="rejection-note-group"
+          class="form-group"
+          [ngClass]="{hidden: !(rejectionNoteVisible && isRejecting)}" >
+          <textarea
+            id="rnote"
+            class="form-control"
+            type="text"
+            name="rnote"
+            required minlength="1"
+            [ngClass]="{notFilled: (rnote.invalid && (rnote.dirty || rnote.touched))}"
+            [ngModel]="expenseData.status.rnote"
+            #rnote="ngModel" ></textarea>
 
+          <small
+            *ngIf="(rnote.invalid && (rnote.dirty || rnote.touched))"
+            class="text-danger w-100"
+            [ngClass]="{hidden: !this.rejectionNote}" >
+            Graag een geldige reden invullen
+          </small>
+        </div>
 
         <input type="submit" id="submit-update-form" hidden #submitForm />
 
@@ -311,7 +328,6 @@
             <button
               type="button"
               class="btn btn-secondary"
-              [disabled]="submitButtonController(true, undefined, undefined, this.isCreditor ? ntype : undefined, undefined, rnote)"
               (click)="updatingAction(null)" >
               Annuleren
             </button>

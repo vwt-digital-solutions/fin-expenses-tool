@@ -28,6 +28,7 @@ export class MaxModalComponent implements OnInit {
   private readonly today: Date;
   private action: string;
   private selectedRejection: any;
+  public rejectionNoteVisible = false;
   public isCreditor: boolean;
   public isManager: boolean;
   public isViewer: boolean;
@@ -281,11 +282,9 @@ export class MaxModalComponent implements OnInit {
     this.rejectionNote = (event.target.value === 'note');
     this.selectedRejection = event.target.value;
     if (this.rejectionNote) {
-      document.getElementById('rejection-note-group').style.visibility = 'visible';
-      document.getElementById('rejection-note-group').style.display = 'block';
+      this.rejectionNoteVisible = true;
     } else {
-      document.getElementById('rejection-note-group').style.visibility = 'hidden';
-      document.getElementById('rejection-note-group').style.display = 'none';
+      this.rejectionNoteVisible = false;
     }
   }
 
@@ -327,6 +326,7 @@ export class MaxModalComponent implements OnInit {
       this.isRejecting = true;
     } else {
       this.isRejecting = false;
+      this.rejectionNote = false;
     }
   }
 
