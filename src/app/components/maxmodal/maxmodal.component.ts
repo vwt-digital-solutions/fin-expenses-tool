@@ -507,10 +507,9 @@ export class MaxModalComponent implements OnInit {
         if (key == 'duplicates') {
           flag['name'] = 'duplicates';
           flag['description'] = 'Er zijn dubbele declaraties gevonden';
+          flag['values'] = this.expenseData['flags'][key];
+          flags.push(flag);
         }
-
-        flag['values'] = this.expenseData['flags'][key];
-        flags.push(flag);
       }
       return flags;
     }
