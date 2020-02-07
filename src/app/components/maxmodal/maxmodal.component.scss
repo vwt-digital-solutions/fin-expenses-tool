@@ -74,7 +74,10 @@
   padding: 10px 16px;
 
   .expense-flags {
-    a {
+    a.popover-link {
+      cursor: pointer;
+      text-decoration: underline;
+
       &:not(:last-child):after {
         content: ", ";
       }

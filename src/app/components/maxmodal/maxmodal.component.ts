@@ -9,6 +9,9 @@ import {IdentityService} from '../../services/identity.service';
 import {DefaultImageService} from '../../services/default-image.service';
 import { Observable, forkJoin } from 'rxjs';
 import { FormatterService } from 'src/app/services/formatter.service';
+import { Endpoint } from 'src/app/models/endpoint.enum';
+import { HttpClient } from '@angular/common/http';
+import { EnvService } from 'src/app/services/env.service';
 
 @Component({
   selector: 'app-maxmodal',
@@ -40,6 +43,8 @@ export class MaxModalComponent implements OnInit {
   public formCostTypeMessage = { short: '', long: '' };
 
   constructor(
+    private httpClient: HttpClient,
+    private env: EnvService,
     private expensesConfigService: ExpensesConfigService,
     private identityService: IdentityService,
     private defaultImageService: DefaultImageService,
@@ -88,6 +93,7 @@ export class MaxModalComponent implements OnInit {
       this.isCreditor = false;
     }
 
+    this.expenseData['flags'] = this.processExpenseFlags();
 
     // Checks what role the user has and makes a specific request
     let receiptRequest = new Observable();
@@ -487,6 +493,35 @@ export class MaxModalComponent implements OnInit {
     return content_type.includes('image') ? 'far fa-file-image' : 'far fa-file-pdf';
   }
 
+  processExpenseFlags() {
+    const flags = [];
+    if (this.expenseData['flags'] && Object.keys(this.expenseData['flags']).length > 0) {
+      for (const key in this.expenseData['flags']) {
+        if (key == 'duplicates') {
+          flags.push({
+            'name': 'duplicates',
+            'description': 'Er zijn dubbele declaraties gevonden',
+            'values': this.expenseData['flags'][key]
+          });
+        }
+      }
+    }
+    return flags;
+  }
+
+  toggleExpensePopover(popover, expense_id: number) {
+    if (popover.isOpen()) {
+      popover.close();
+    } else {
+      this.httpClient.get(
+        this.env.apiUrl + Endpoint.employee + `/${expense_id}`
+      ).subscribe(
+        response => popover.open({context: response}),
+        error => popover.open({context: error})
+      );
+    }
+  }
+
   get isRejected() {
     return this.expenseData.status.text.includes('rejected') ? true : false;
   }
@@ -497,22 +532,5 @@ export class MaxModalComponent implements OnInit {
 
   get hasDraftStatus() {
     return this.expenseData.status.text === 'draft' ? true : false;
-  }
-
-  get expenseFlags() {
-    if (this.expenseData['flags'] && Object.keys(this.expenseData['flags']).length > 0) {
-      const flags = []
-      for (const key in this.expenseData['flags']) {
-        if (key == 'duplicates') {
-          flags.push({
-            'name': 'duplicates',
-            'description': 'Er zijn dubbele declaraties gevonden',
-            'values': this.expenseData['flags'][key]
-          });
-        }
-      }
-      return flags;
-    }
-    return false;
   }
 }
