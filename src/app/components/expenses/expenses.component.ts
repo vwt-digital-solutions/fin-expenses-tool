@@ -204,7 +204,7 @@ export class ExpensesComponent implements  OnInit {
         response => {
           this.expenseID = response;
           console.log('>> POST EXPENSE SUCCESS', response);
-          this.afterPostExpense(response, form);
+          this.afterPostExpense(response['id'], form);
         }, error => {
           if (error.status === 403) {
             this.wrongfulClaim('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
