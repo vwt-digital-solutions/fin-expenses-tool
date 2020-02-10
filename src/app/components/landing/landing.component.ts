@@ -66,6 +66,7 @@ export class LandingComponent implements OnInit {
     this.expenses.getEmployeeExpenses(this.personID)
       .subscribe(
         response => {
+          console.log('>> GET SUCCESS', response);
           this.declarationData = [];
           const newResponse = response;
           for (var i = newResponse.length; i--;) {
@@ -76,7 +77,6 @@ export class LandingComponent implements OnInit {
           }
           this.declarationData = this.declarationData.concat(newResponse);
           this.hasNoExpenses = (response.length < 1);
-          console.log('>> GET SUCCESS', response);
         }, error => {
           console.error('>> GET FAILED', error.message);
         });

@@ -101,6 +101,20 @@
           background: rgba($gray, .8) !important;
         }
       }
+
+      &.nonexistent .item-inner {
+        background: rgba($gray, .5);
+        box-shadow: none;
+        cursor: default;
+
+        h3 {
+          color: $gray-dark;
+        }
+
+        &:hover {
+          cursor: default;
+        }
+      }
     }
   }
 
