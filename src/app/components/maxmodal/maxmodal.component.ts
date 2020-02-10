@@ -31,6 +31,7 @@ export class MaxModalComponent implements OnInit {
   private readonly today: Date;
   private action: string;
   private selectedRejection: any;
+  private OurJaneDoeRoles: any;
   public rejectionNoteVisible = false;
   public isCreditor: boolean;
   public isManager: boolean;
@@ -84,7 +85,7 @@ export class MaxModalComponent implements OnInit {
 
   /** OnInit to get the expenses. Can be slow! Every role has it's own getAttachment. */
   ngOnInit(): void {
-    const OurJaneDoeRoles = this.identityService.allRoles();
+    this.OurJaneDoeRoles = this.identityService.allRoles();
     document.getElementById('modalClose').focus();
     // forceViewer can be called from parent to allow the EMPLOYEE (landing page) to only see the expense
     if (this.forceViewer || this.expenseData.status.text === 'approved') {
@@ -98,13 +99,13 @@ export class MaxModalComponent implements OnInit {
 
     // Checks what role the user has and makes a specific request
     let receiptRequest = new Observable();
-    if (this.isCreditor || (this.isViewer && OurJaneDoeRoles.includes('creditor'))) {
+    if (this.isCreditor || (this.isViewer && this.OurJaneDoeRoles.includes('creditor'))) {
       receiptRequest = this.expensesConfigService.getFinanceAttachment(this.expenseData.id);
     } else if (this.isManager) {
       receiptRequest = this.expensesConfigService.getManagerAttachment(this.expenseData.id);
     } else if (this.isEditor || this.forceViewer) {
       receiptRequest = this.expensesConfigService.getExpenseAttachment(this.expenseData.id);
-    } else if (this.isViewer || (this.isViewer && OurJaneDoeRoles.includes('controller'))) {
+    } else if (this.isViewer || (this.isViewer && this.OurJaneDoeRoles.includes('controller'))) {
       receiptRequest = this.expensesConfigService.getControllerAttachment(this.expenseData.id);
     }
 
@@ -532,8 +533,17 @@ export class MaxModalComponent implements OnInit {
     if (popover.isOpen()) {
       popover.close();
     } else {
+      let requestEndpoint = Endpoint.employee;
+      if (this.isCreditor || (this.isViewer && this.OurJaneDoeRoles.includes('creditor'))) {
+        requestEndpoint = Endpoint.finance;
+      } else if (this.isManager) {
+        requestEndpoint = Endpoint.manager;
+      } else if (this.isViewer || (this.isViewer && this.OurJaneDoeRoles.includes('controller'))) {
+        requestEndpoint = Endpoint.controller;
+      }
+
       this.httpClient.get(
-        this.env.apiUrl + Endpoint.employee + `/${expense_id}`
+        this.env.apiUrl + requestEndpoint + `/${expense_id}`
       ).subscribe(
         response => popover.open({context: response}),
         error => popover.open({context: error})
