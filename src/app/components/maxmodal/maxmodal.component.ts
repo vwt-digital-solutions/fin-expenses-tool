@@ -184,10 +184,10 @@ export class MaxModalComponent implements OnInit {
       }
     }
 
-    dataVerified[`status`] = this.wantsDraft > 0 ||
-      (this.wantsSubmit > 0 && this.expenseData.status.text == 'draft' ) ?
-      'draft' :
-      'ready_for_manager';
+    dataVerified[`status`] = this.expenseData.status.text == 'draft' ||
+      this.expenseData.status.text.includes('rejected') ?
+        this.expenseData.status.text :
+        'ready_for_manager';
 
     Object.keys(dataVerified).length !== 0 ?
     this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
@@ -278,7 +278,11 @@ export class MaxModalComponent implements OnInit {
       confirm('Deze declaratie lijkt eerder ingediend te zijn, weet u zeker dat u deze wilt indienen?') :
       true;
 
-    if (this.expenseData.status.text == 'draft' && this.wantsSubmit > 0 && isDuplicateAccepted) {
+    if (
+      (this.expenseData.status.text == 'draft' || this.expenseData.status.text.includes('rejected')) &&
+      this.wantsSubmit > 0 &&
+      isDuplicateAccepted
+    ) {
       this.expensesConfigService.updateExpenseEmployee(
         { status: 'ready_for_manager' }, expense['id']
       ).subscribe(
