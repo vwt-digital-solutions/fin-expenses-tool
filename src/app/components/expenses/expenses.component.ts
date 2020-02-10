@@ -256,7 +256,7 @@ export class ExpensesComponent implements  OnInit {
   afterPostAttachments(expenseResponse: object, form: NgForm) {
     const isDuplicateAccepted = (
       this.wantsSubmit > 0 && expenseResponse['flags'] && expenseResponse['flags']['duplicates']) ?
-      confirm('Dit is een dubbele declaratie, weet u zeker dat u deze wilt indienen?') :
+      confirm('Deze declaratie lijkt eerder ingediend te zijn, weet u zeker dat u deze wilt indienen?') :
       true;
 
     if (this.wantsSubmit > 0 && isDuplicateAccepted) {

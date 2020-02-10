@@ -99,13 +99,13 @@ export class MaxModalComponent implements OnInit {
 
     // Checks what role the user has and makes a specific request
     let receiptRequest = new Observable();
-    if (this.isCreditor || (this.isViewer && this.OurJaneDoeRoles.includes('creditor'))) {
-      receiptRequest = this.expensesConfigService.getFinanceAttachment(this.expenseData.id);
-    } else if (this.isManager) {
-      receiptRequest = this.expensesConfigService.getManagerAttachment(this.expenseData.id);
-    } else if (this.isEditor || this.forceViewer) {
+    if (window.location.pathname === '/home' || window.location.pathname === '/') {
       receiptRequest = this.expensesConfigService.getExpenseAttachment(this.expenseData.id);
-    } else if (this.isViewer || (this.isViewer && this.OurJaneDoeRoles.includes('controller'))) {
+    } else if (window.location.pathname === '/expenses/manage') {
+      receiptRequest = this.expensesConfigService.getManagerAttachment(this.expenseData.id);
+    } else if (window.location.pathname === '/expenses/process') {
+      receiptRequest = this.expensesConfigService.getFinanceAttachment(this.expenseData.id);
+    } else {
       receiptRequest = this.expensesConfigService.getControllerAttachment(this.expenseData.id);
     }
 
@@ -275,7 +275,7 @@ export class MaxModalComponent implements OnInit {
   afterPostAttachments(expense: object) {
     const isDuplicateAccepted = (
       this.wantsSubmit > 0 && expense['flags'] && expense['flags']['duplicates']) ?
-      confirm('Dit is een dubbele declaratie, weet u zeker dat u deze wilt indienen?') :
+      confirm('Deze declaratie lijkt eerder ingediend te zijn, weet u zeker dat u deze wilt indienen?') :
       true;
 
     if (this.expenseData.status.text == 'draft' && this.wantsSubmit > 0 && isDuplicateAccepted) {
