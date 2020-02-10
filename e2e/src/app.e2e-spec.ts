@@ -1,4 +1,5 @@
 import {browser, protractor, by, element} from 'protractor/built';
+import { ExpensesForm } from './app.po';
 
 const request = require('request');
 const fs = require('fs');
@@ -39,6 +40,7 @@ let updateType;
 const isOnBuild = process.env.isOnBuild || false;
 
 let e2eList = [];
+let expenseForm: ExpensesForm;
 
 describe('ExpenseApp:', () => {
   let originalTimeout;
@@ -59,6 +61,7 @@ describe('ExpenseApp:', () => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
     browser.manage().window().setSize(1600, 1200);
     browser.waitForAngularEnabled(false);
+    expenseForm = new ExpensesForm();
   });
 
   it('should login and authenticate', () => {
@@ -146,11 +149,7 @@ describe('ExpenseApp:', () => {
     e2eList.push(e2eID);
 
     element(by.id('submit-save-submit')).click().then(async () => {
-      browser.waitForAngularEnabled(false);
-      await browser.wait(protractor.ExpectedConditions.alertIsPresent(), 10000);
-      await browser.switchTo().alert().then(alert => alert.accept());
-      await browser.sleep(1000);
-      browser.waitForAngularEnabled(true);
+      await expenseForm.acceptAlertBox();
 
       expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
@@ -365,11 +364,7 @@ describe('ExpenseApp:', () => {
     e2eList.push(e2eID);
 
     element(by.id('submit-save-submit')).click().then(async () => {
-      browser.waitForAngularEnabled(false);
-      await browser.wait(protractor.ExpectedConditions.alertIsPresent(), 10000);
-      await browser.switchTo().alert().then(alert => alert.accept());
-      await browser.sleep(1000);
-      browser.waitForAngularEnabled(true);
+      await expenseForm.acceptAlertBox();
 
       expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
@@ -622,11 +617,7 @@ describe('ExpenseApp:', () => {
     e2eList.push(e2eID);
 
     element(by.id('submit-save-submit')).click().then(async () => {
-      browser.waitForAngularEnabled(false);
-      await browser.wait(protractor.ExpectedConditions.alertIsPresent(), 10000);
-      await browser.switchTo().alert().then(alert => alert.accept());
-      await browser.sleep(1000);
-      browser.waitForAngularEnabled(true);
+      await expenseForm.acceptAlertBox();
 
       expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
@@ -787,11 +778,7 @@ describe('ExpenseApp:', () => {
               attachments = element.all(by.css('.file-list-item'));
               expect(attachments.count()).toEqual(2);
               element(by.id('submit-update-button')).click().then(async () => {
-                browser.waitForAngularEnabled(false);
-                await browser.wait(protractor.ExpectedConditions.alertIsPresent(), 10000);
-                await browser.switchTo().alert().then(alert => alert.accept());
-                await browser.sleep(1000);
-                browser.waitForAngularEnabled(true);
+                await expenseForm.acceptAlertBox();
 
                 expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
                   browser.sleep(1000);
