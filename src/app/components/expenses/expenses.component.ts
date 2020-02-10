@@ -204,7 +204,7 @@ export class ExpensesComponent implements  OnInit {
         response => {
           this.expenseID = response;
           console.log('>> POST EXPENSE SUCCESS', response);
-          this.afterPostExpense(response['id'], form);
+          this.afterPostExpense(response, form);
         }, error => {
           if (error.status === 403) {
             this.wrongfulClaim('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
@@ -235,12 +235,12 @@ export class ExpensesComponent implements  OnInit {
     return forkJoin(fileRequests);
   }
 
-  afterPostExpense(expenseID: number, form: NgForm) {
+  afterPostExpense(expenseResponse: object, form: NgForm) {
     if (this.locatedFile.length > 0) {
-      this.bulkAttachmentUpload(expenseID).subscribe(
+      this.bulkAttachmentUpload(expenseResponse['id']).subscribe(
         responseList => {
           console.log('>> POST ATTACHMENTS SUCCESS', responseList);
-          this.afterPostAttachments(expenseID, form);
+          this.afterPostAttachments(expenseResponse, form);
         }, error => {
           this.wrongfulClaim('Er is iets fout gegaan bij het uploaden van de bestanden, neem contact op met de crediteuren afdeling.');
           console.error('>> POST ATTACHMENTS FAILED', error.message);
@@ -249,14 +249,19 @@ export class ExpensesComponent implements  OnInit {
           }, 4000);
         })
     } else {
-      this.afterPostAttachments(expenseID, form);
+      this.afterPostAttachments(expenseResponse, form);
     }
   }
 
-  afterPostAttachments(expenseID: number, form: NgForm) {
-    if (this.wantsSubmit > 0) {
+  afterPostAttachments(expenseResponse: object, form: NgForm) {
+    const isDuplicateAccepted = (
+      this.wantsSubmit > 0 && expenseResponse['flags'] && expenseResponse['flags']['duplicates']) ?
+      confirm('Dit is een dubbele declaratie, weet u zeker dat u deze wilt indienen?') :
+      true;
+
+    if (this.wantsSubmit > 0 && isDuplicateAccepted) {
       this.expenses.updateExpenseEmployee(
-        { status: 'ready_for_manager' }, expenseID
+        { status: 'ready_for_manager' }, expenseResponse['id']
       ).subscribe(
         response => this.successfulClaim(form),
         error => {

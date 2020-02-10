@@ -41,6 +41,7 @@ export class MaxModalComponent implements OnInit {
   public wantsSubmit = 0;
   public rejectionNote: boolean;
   public formCostTypeMessage = { short: '', long: '' };
+  public expenseFlags = [];
 
   constructor(
     private httpClient: HttpClient,
@@ -93,7 +94,7 @@ export class MaxModalComponent implements OnInit {
       this.isCreditor = false;
     }
 
-    this.expenseData['flags'] = this.processExpenseFlags();
+    this.expenseFlags = this.processExpenseFlags();
 
     // Checks what role the user has and makes a specific request
     let receiptRequest = new Observable();
@@ -182,16 +183,29 @@ export class MaxModalComponent implements OnInit {
       }
     }
 
-    dataVerified[`status`] = this.wantsDraft > 0 || (this.wantsSubmit > 0 && this.expenseData.status.text == 'draft' ) ? 'draft' : 'ready_for_manager';
-    Object.keys(dataVerified).length !== 0 ?
+    dataVerified[`status`] = this.wantsDraft > 0 ||
+      (this.wantsSubmit > 0 && this.expenseData.status.text == 'draft' ) ?
+      'draft' :
+      'ready_for_manager';
+    const isDuplicateAccepted = (
+      this.wantsSubmit > 0 &&
+      this.expenseData['flags'] &&
+      this.expenseData['flags']['duplicates'] &&
+      this.expenseData.status.text != 'draft') ?
+      confirm('Dit is een dubbele declaratie, weet u zeker dat u deze wilt indienen?') :
+      true;
+
+    if (isDuplicateAccepted) {
+      Object.keys(dataVerified).length !== 0 ?
       this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
-        .subscribe(
-          result => this.afterPostExpense(expenseId),
-          error => {
-            console.log(error);
-            this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
-          })
-      : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
+      .subscribe(
+        result => this.afterPostExpense(result),
+        error => {
+          console.log(error);
+          this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+        })
+        : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
+    }
   }
 
   claimForManager(dataVerified, expenseId, data) {
@@ -251,25 +265,30 @@ export class MaxModalComponent implements OnInit {
     return forkJoin(fileRequests);
   }
 
-  afterPostExpense(expenseID: number) {
+  afterPostExpense(expense: object) {
     if (this.receiptFiles.length > 0 && !this.receiptFiles.some(e => e.from_db)) {
-      this.bulkAttachmentUpload(expenseID).subscribe(
+      this.bulkAttachmentUpload(expense['id']).subscribe(
         responseList => {
           console.log('>> POST ATTACHMENTS SUCCESS', responseList);
-          this.afterPostAttachments(expenseID);
+          this.afterPostAttachments(expense);
         }, error => {
           this.errorMessage = 'Er is iets fout gegaan bij het uploaden van de bestanden, neem contact op met de crediteuren afdeling.';
           console.error('>> POST ATTACHMENTS FAILED', error.message);
         })
     } else {
-      this.afterPostAttachments(expenseID);
+      this.afterPostAttachments(expense);
     }
   }
 
-  afterPostAttachments(expenseID: number) {
-    if (this.expenseData.status.text == 'draft' && this.wantsSubmit > 0) {
+  afterPostAttachments(expense: object) {
+    const isDuplicateAccepted = (
+      this.wantsSubmit > 0 && expense['flags'] && expense['flags']['duplicates']) ?
+      confirm('Dit is een dubbele declaratie, weet u zeker dat u deze wilt indienen?') :
+      true;
+
+    if (this.expenseData.status.text == 'draft' && this.wantsSubmit > 0 && isDuplicateAccepted) {
       this.expensesConfigService.updateExpenseEmployee(
-        { status: 'ready_for_manager' }, expenseID
+        { status: 'ready_for_manager' }, expense['id']
       ).subscribe(
         response => this.closeModal(true),
         error => {
