@@ -188,25 +188,16 @@ export class MaxModalComponent implements OnInit {
       (this.wantsSubmit > 0 && this.expenseData.status.text == 'draft' ) ?
       'draft' :
       'ready_for_manager';
-    const isDuplicateAccepted = (
-      this.wantsSubmit > 0 &&
-      this.expenseData['flags'] &&
-      this.expenseData['flags']['duplicates'] &&
-      this.expenseData.status.text != 'draft') ?
-      confirm('Dit is een dubbele declaratie, weet u zeker dat u deze wilt indienen?') :
-      true;
 
-    if (isDuplicateAccepted) {
-      Object.keys(dataVerified).length !== 0 ?
-      this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
-      .subscribe(
-        result => this.afterPostExpense(result),
-        error => {
-          console.log(error);
-          this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
-        })
-        : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
-    }
+    Object.keys(dataVerified).length !== 0 ?
+    this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
+    .subscribe(
+      result => this.afterPostExpense(result),
+      error => {
+        console.log(error);
+        this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+      })
+      : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
   }
 
   claimForManager(dataVerified, expenseId, data) {
