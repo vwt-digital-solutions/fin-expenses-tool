@@ -12,10 +12,10 @@
         <hr class="line-border">
       </div>
       <div class="alert alert-success" role="alert" id="succes-alert" *ngIf="addClaimSuccess.success === true">
-        Declaratie is successvol ingediend
+        {{ formSuccess }}
       </div>
       <div class="alert alert-danger" role="alert" *ngIf="addClaimSuccess.wrong === true">
-        {{this.formError}}
+        {{ formError }}
       </div>
 
       <div class="row">

@@ -22,6 +22,7 @@ export class ExpensesComponent implements  OnInit {
   public formAmount: any;
   public formType: any;
   public formError: string;
+  public formSuccess: string;
   public formTransDate: any;
   public formAttachment: any;
   public expensesAmount: boolean;
@@ -61,6 +62,7 @@ export class ExpensesComponent implements  OnInit {
     this.attachmentList = [];
     this.transdateNotFilledMessage = 'Graag een geldige datum invullen';
     this.formError = 'Er is iets fout gegaan. Probeer het later opnieuw.';
+    this.formSuccess = 'Declaratie is successvol ingediend';
   }
 
   static getNavigator() {
@@ -95,7 +97,8 @@ export class ExpensesComponent implements  OnInit {
       this.addClaimSuccess.wrong === false);
   }
 
-  private successfulClaim(form: NgForm) {
+  private successfulClaim(form: NgForm, text = null) {
+    this.formSuccess = text ? text : this.formSuccess;
     this.addClaimSuccess.success = true;
     this.loadingThings = false;
 
@@ -108,9 +111,9 @@ export class ExpensesComponent implements  OnInit {
          this.addClaimSuccess = { success: false, wrong: false }
       }, 4000);
     } else {
-        setTimeout(() => {
+      setTimeout(() => {
         this.router.navigate(['/']);
-      }, 1000);
+      }, 2000);
     }
   }
 
@@ -273,7 +276,7 @@ export class ExpensesComponent implements  OnInit {
         }
       );
     } else {
-      this.successfulClaim(form);
+      this.successfulClaim(form, 'Declaratie is successvol opgeslagen als concept');
     }
   }
 
