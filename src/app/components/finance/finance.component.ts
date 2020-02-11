@@ -21,7 +21,7 @@ export class FinanceComponent {
   public rowSelection;
   private currentRowIndex: number;
   public wantsNewModal: boolean;
-  public dataExport = 'invisible';
+  public dataExport = 'secondary';
   public moveDirection = 'move-up';
 
   public dateExportForm;
@@ -84,9 +84,6 @@ export class FinanceComponent {
     ];
     this.rowSelection = 'single';
     this.addBooking = {success: false, wrong: false, error: false};
-    if (this.env.featureToggle) {
-      this.dataExport = 'secondary';
-    }
   }
 
   public expenseData: Expense;
