@@ -179,28 +179,27 @@
           <label class="mb-1" for="attachmentinput">Bijlagen</label>
 
           <ng-container *ngIf="isEditor; else fileBoxDisabled">
-            <div class="hidden">
+            <div class="upload-button w-100">
               <input
                 id="attachmentinput"
                 type="file"
                 accept="application/pdf,image/png,image/jpeg,image/jpg"
                 name="attachment"
-                class="hidden"
+                title="Bestand toevoegen"
                 [required]="!hasDraftStatus"
                 (change)="onFileInput(fileInput.files)"
-                #fileInput
-                capture="camera" >
+                #fileInput >
+              <button
+                id="upload"
+                class="btn btn-light d-flex justify-content-between align-items-center w-100 px-3 py-2"
+                type="button"
+                [ngClass]="{'ng-invalid ng-touched': attachmentsIsInvalid && !hasDraftStatus}" >
+                <span class="new-file">Bestand toevoegen</span>
+                <i class="fas fa-plus ml-1 float-right"></i>
+              </button>
             </div>
 
             <ul class="list-group file-list w-100">
-              <li
-                id="upload"
-                class="list-group-item d-flex justify-content-between align-items-center upload-button"
-                [ngClass]="{'ng-invalid ng-touched': attachmentsIsInvalid && !hasDraftStatus}"
-                (click)="fileInput.click()" >
-                <span class="new-file">Bestand toevoegen</span>
-                <i class="fas fa-plus ml-1 float-right"></i>
-              </li>
               <li
                 *ngFor="let item of receiptFiles"
                 class="list-group-item file-list-item d-flex justify-content-between align-items-center">

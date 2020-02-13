@@ -119,29 +119,29 @@
         <div class="col-12 col-md-6">
           <div class="form-group">
             <label class="mb-1" for="attachmentinput">Bijlagen</label>
-
-            <div class="hidden">
+            <div class="upload-button">
               <input
                 id="attachmentinput"
                 type="file"
                 accept="application/pdf,image/png,image/jpeg,image/jpg"
                 name="attachment"
+                title="Bestand toevoegen"
                 (change)="onFileInput(fileInputHidden.files)"
+                (click)="expenseAttachment = true;"
                 [(ngModel)]="formAttachment"
                 #nattachment="ngModel"
-                #fileInputHidden
-                capture="camera" >
+                #fileInputHidden >
+              <button
+                id="upload"
+                class="btn btn-light d-flex justify-content-between align-items-center px-3 py-2"
+                type="button"
+                [ngClass]="{notFilledBtn: notFilledClass(nattachment)}" >
+                <span class="new-file">Bestand toevoegen</span>
+                <i class="fas fa-plus ml-1 float-right"></i>
+              </button>
             </div>
 
             <ul class="list-group w-100">
-              <li
-                id="upload"
-                class="list-group-item d-flex justify-content-between align-items-center upload-button"
-                [ngClass]="{notFilledBtn: notFilledClass(nattachment)}"
-                (click)="fileInputHidden.click(); expenseAttachment = true;" >
-                <span class="new-file">Bestand toevoegen</span>
-                <i class="fas fa-plus ml-1 float-right"></i>
-              </li>
               <li *ngFor="let item of attachmentList" class="list-group-item d-flex justify-content-between align-items-center">
                 {{item[0].name}}
                 <i class="fa fa-times clickable" (click)="removeFromAttachmentList(item)"></i>
