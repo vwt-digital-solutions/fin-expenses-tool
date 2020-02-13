@@ -91,7 +91,7 @@ export class ExpensesConfigService {
     const response1 = this.http.get(
       this.env.apiUrl + '/finances/expenses?expenses_list=expenses_all', options);
     const response2 = this.http.get(
-      this.env.apiUrl + '/finances/expenses/journal', options);
+      this.env.apiUrl + '/finances/expenses/journals', options);
     return forkJoin([response1, response2]);
   }
 

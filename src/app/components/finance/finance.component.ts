@@ -274,13 +274,13 @@ export class FinanceComponent {
 
           for (const response of responseList) {
             if (response.status === 200 && 'body' in response) {
-              const fileName = response.url.includes('journal') ?
-                `expenses_journal_${dateFormat}.csv` :
+              const fileName = response.url.includes('journals') ?
+                `expenses_journals_${dateFormat}.csv` :
                 `expenses_${dateFormat}.csv`;
               saveAs(response.body, fileName);
             } else {
               emptyResponseStatuses.push(
-                response.url.includes('journal') ? 'logboek' : 'declaraties');
+                response.url.includes('journals') ? 'logboek' : 'declaraties');
             }
           }
 
