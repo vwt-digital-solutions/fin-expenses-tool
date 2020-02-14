@@ -21,10 +21,11 @@ export class FinanceComponent {
   public rowSelection;
   private currentRowIndex: number;
   public wantsNewModal: boolean;
-  public dataExport = 'invisible';
+  public dataExport = 'secondary';
   public moveDirection = 'move-up';
 
   public dateExportForm;
+  public dateExportFormExported = false;
   public dateExportFormReponse = [];
 
   private readonly paymentfilecoldef = '<i class="fas fa-credit-card" style="color: #4eb7da; font-size: 20px;"></i>';
@@ -83,9 +84,6 @@ export class FinanceComponent {
     ];
     this.rowSelection = 'single';
     this.addBooking = {success: false, wrong: false, error: false};
-    if (this.env.featureToggle) {
-      this.dataExport = 'secondary';
-    }
   }
 
   public expenseData: Expense;
@@ -276,13 +274,13 @@ export class FinanceComponent {
 
           for (const response of responseList) {
             if (response.status === 200 && 'body' in response) {
-              const fileName = response.url.includes('journal') ?
-                `expenses_journal_${dateFormat}.csv` :
+              const fileName = response.url.includes('journals') ?
+                `expenses_journals_${dateFormat}.csv` :
                 `expenses_${dateFormat}.csv`;
               saveAs(response.body, fileName);
             } else {
               emptyResponseStatuses.push(
-                response.url.includes('journal') ? 'logboek' : 'declaraties');
+                response.url.includes('journals') ? 'logboek' : 'declaraties');
             }
           }
 
@@ -291,6 +289,7 @@ export class FinanceComponent {
             this.dataExport = '';
           } else {
             this.dataExport = 'success';
+            this.dateExportFormExported = true;
             setTimeout(() => {
               this.dataExport = '';
             }, 2000);

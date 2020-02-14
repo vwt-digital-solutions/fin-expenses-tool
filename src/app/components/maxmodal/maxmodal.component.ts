@@ -7,6 +7,11 @@ import {Attachment} from '../../models/attachment';
 import {ExpensesConfigService} from '../../services/config.service';
 import {IdentityService} from '../../services/identity.service';
 import {DefaultImageService} from '../../services/default-image.service';
+import { Observable, forkJoin } from 'rxjs';
+import { FormatterService } from 'src/app/services/formatter.service';
+import { Endpoint } from 'src/app/models/endpoint.enum';
+import { HttpClient } from '@angular/common/http';
+import { EnvService } from 'src/app/services/env.service';
 
 @Component({
   selector: 'app-maxmodal',
@@ -26,18 +31,28 @@ export class MaxModalComponent implements OnInit {
   private readonly today: Date;
   private action: string;
   private selectedRejection: any;
+  private OurJaneDoeRoles: any;
+  public rejectionNoteVisible = false;
   public isCreditor: boolean;
   public isManager: boolean;
   public isViewer: boolean;
   public isEditor: boolean;
   public isRejecting: boolean;
+  public wantsDraft = 0;
+  public wantsSubmit = 0;
   public rejectionNote: boolean;
-  public formCostTypeMessage: string;
+  public formCostTypeMessage = { short: '', long: '' };
+  public expenseFlags = [];
 
-  constructor(private expensesConfigService: ExpensesConfigService,
-              private identityService: IdentityService,
-              private defaultImageService: DefaultImageService,
-              private route: ActivatedRoute) {
+  constructor(
+    private httpClient: HttpClient,
+    private env: EnvService,
+    private expensesConfigService: ExpensesConfigService,
+    private identityService: IdentityService,
+    private defaultImageService: DefaultImageService,
+    private route: ActivatedRoute,
+    public formatter: FormatterService
+  ) {
     if (window.location.pathname === '/home' || window.location.pathname === '/') {
       this.isEditor = true;
     } else if (window.location.pathname === '/expenses/manage') {
@@ -70,6 +85,7 @@ export class MaxModalComponent implements OnInit {
 
   /** OnInit to get the expenses. Can be slow! Every role has it's own getAttachment. */
   ngOnInit(): void {
+    this.OurJaneDoeRoles = this.identityService.allRoles();
     document.getElementById('modalClose').focus();
     // forceViewer can be called from parent to allow the EMPLOYEE (landing page) to only see the expense
     if (this.forceViewer || this.expenseData.status.text === 'approved') {
@@ -78,93 +94,49 @@ export class MaxModalComponent implements OnInit {
       this.isManager = false;
       this.isCreditor = false;
     }
+
+    this.expenseFlags = this.processExpenseFlags();
+
     // Checks what role the user has and makes a specific request
-    if (this.isCreditor) {
-      this.expensesConfigService.getFinanceAttachment(this.expenseData.id).subscribe((image: any) => {
-        this.receiptFiles = [];
-        for (const img of image) {
-          this.receiptFiles.push({
-            content: `${img.content}`,
-            content_type: img.content_type,
-            from_db: true,
-            db_name: img.name,
-            expense_id: this.expenseData.id
-          });
-        }
-      });
-    } else if (this.isManager) {
-      this.expensesConfigService.getManagerAttachment(this.expenseData.id).subscribe((image: any) => {
-        this.receiptFiles = [];
-        for (const img of image) {
-          this.receiptFiles.push({
-            content: `${img.content}`,
-            content_type: img.content_type,
-            from_db: true,
-            db_name: img.name,
-            expense_id: this.expenseData.id
-          });
-        }
-      });
-    } else if (this.isEditor || this.forceViewer) {
-      this.expensesConfigService.getExpenseAttachment(this.expenseData.id).subscribe((image: any) => {
-        this.receiptFiles = [];
-        for (const img of image) {
-          this.receiptFiles.push({
-            content: `${img.content}`,
-            content_type: img.content_type,
-            from_db: true,
-            db_name: img.name,
-            expense_id: this.expenseData.id
-          });
-        }
-      });
-    } else if (this.isViewer) {
-      this.expensesConfigService.getControllerAttachment(this.expenseData.id).subscribe((image: any) => {
-        this.receiptFiles = [];
-        for (const img of image) {
-          this.receiptFiles.push({
-            content: `${img.content}`,
-            content_type: img.content_type,
-            from_db: true,
-            db_name: img.name,
-            expense_id: this.expenseData.id
-          });
-        }
-      });
+    let receiptRequest = new Observable();
+    if (window.location.pathname === '/home' || window.location.pathname === '/') {
+      receiptRequest = this.expensesConfigService.getExpenseAttachment(this.expenseData.id);
+    } else if (window.location.pathname === '/expenses/manage') {
+      receiptRequest = this.expensesConfigService.getManagerAttachment(this.expenseData.id);
+    } else if (window.location.pathname === '/expenses/process') {
+      receiptRequest = this.expensesConfigService.getFinanceAttachment(this.expenseData.id);
+    } else {
+      receiptRequest = this.expensesConfigService.getControllerAttachment(this.expenseData.id);
     }
-  }
 
-  // BEGIN Subject to change
-  /** Used to upload the attachments from the receiptFiles */
-  private uploadSingleAttachment(expenseId: any) {
-    if (this.receiptFiles.length > 0) {
-      const file: Attachment = this.receiptFiles.splice(0, 1)[0];
-      if (!file.from_db) {
-        this.expensesConfigService.uploadSingleAttachment(expenseId, {
-          name: '' + this.receiptFiles.length,
-          content: file.content
-        }).subscribe(() => {
-          this.uploadSingleAttachment(expenseId);
+    receiptRequest.subscribe((image: any) => {
+      this.receiptFiles = [];
+      for (const img of image) {
+        this.receiptFiles.push({
+          content: `${img.content}`,
+          content_type: img.content_type,
+          from_db: true,
+          db_name: img.name,
+          expense_id: this.expenseData.id
         });
-      } else {
-        this.uploadSingleAttachment(expenseId);
       }
-    }
+    })
   }
-
-  // END Subject to change
 
   /** Controls the submit buttons and UpdateForm: Checks every input needed. */
-  protected submitButtonController(nNote: { invalid: any; },
-                                   nAmount: { invalid: any; viewModel: number; },
-                                   nType: { invalid: any; },
-                                   nTransDate: { invalid: any; viewModel: string | number | Date; },
-                                   rNote: { invalid: boolean }) {
+  protected submitButtonController(
+    toSubmit = true,
+    nNote: { invalid: any; },
+    nAmount: { invalid: any; viewModel: number; },
+    nType: { invalid: any; },
+    nTransDate: { invalid: any; viewModel: string | number | Date; },
+    rNote: { invalid: boolean }
+  ) {
     // Checks what role the user has and verifies the inputs accordingly.
     if (this.isEditor) {
       return nNote.invalid || nAmount.invalid || nType.invalid
         || nTransDate.invalid || (new Date(nTransDate.viewModel)
-          > this.today) || nAmount.viewModel < 0.01;
+          > this.today) || nAmount.viewModel < 0.01 || (toSubmit && !this.identityService.isTesting() ? this.attachmentsIsInvalid : false);
     } else if (this.isManager) {
       if (this.rejectionNote) {
         return rNote.invalid;
@@ -181,7 +153,14 @@ export class MaxModalComponent implements OnInit {
   // BEGIN Subject to change
   /** Used to update the expense in form. Every role that can update has it's own part */
   claimUpdateForm(form: any, expenseId: any, instArray: any[]): void {
-    if (!this.submitButtonController(instArray[0], instArray[1], instArray[2], instArray[3], instArray[4])) {
+    if (!this.submitButtonController(
+      (this.wantsDraft > 0 ? false : true),
+      instArray[0],
+      instArray[1],
+      instArray[2],
+      instArray[3],
+      instArray[4]
+    )) {
       const dataVerified = {};
       const data = form.value;
 
@@ -204,18 +183,20 @@ export class MaxModalComponent implements OnInit {
         dataVerified[prop] = data[prop];
       }
     }
-    dataVerified[`status`] = 'ready_for_manager';
+
+    dataVerified[`status`] = this.expenseData.status.text == 'draft' ||
+      this.expenseData.status.text.includes('rejected') ?
+        this.expenseData.status.text :
+        'ready_for_manager';
+
     Object.keys(dataVerified).length !== 0 ?
-      this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
-        .subscribe(
-          result => {
-            this.uploadSingleAttachment(expenseId);
-            this.closeModal(true);
-          },
-          error => {
-            console.log(error);
-            this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
-          })
+    this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
+    .subscribe(
+      result => this.afterPostExpense(result),
+      error => {
+        console.log(error);
+        this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+      })
       : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
   }
 
@@ -231,9 +212,7 @@ export class MaxModalComponent implements OnInit {
     Object.keys(dataVerified).length !== 0 ?
       this.expensesConfigService.updateExpenseManager(dataVerified, expenseId)
         .subscribe(
-          result => {
-            this.closeModal(true);
-          },
+          result => this.closeModal(true),
           error => {
             console.log(error);
             this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
@@ -254,9 +233,7 @@ export class MaxModalComponent implements OnInit {
     Object.keys(dataVerified).length !== 0 ?
       this.expensesConfigService.updateExpenseFinance(dataVerified, expenseId)
         .subscribe(
-          result => {
-            this.closeModal(true);
-          },
+          result => this.closeModal(true),
           error => {
             console.log(error);
             this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
@@ -264,6 +241,61 @@ export class MaxModalComponent implements OnInit {
       : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
   }
 
+  bulkAttachmentUpload(expenseID: number) {
+    const fileRequests = [];
+    for (const count in this.receiptFiles) {
+      if (!this.receiptFiles[count].from_db) {
+        fileRequests.push(
+          this.expensesConfigService.uploadSingleAttachment(expenseID, {
+            name: count.toString(),
+            content: this.receiptFiles[count].content
+          })
+        );
+      }
+    }
+
+    return forkJoin(fileRequests);
+  }
+
+  afterPostExpense(expense: object) {
+    if (this.receiptFiles.length > 0 && !this.receiptFiles.some(e => e.from_db)) {
+      this.bulkAttachmentUpload(expense['id']).subscribe(
+        responseList => {
+          console.log('>> POST ATTACHMENTS SUCCESS', responseList);
+          this.afterPostAttachments(expense);
+        }, error => {
+          this.errorMessage = 'Er is iets fout gegaan bij het uploaden van de bestanden, neem contact op met de crediteuren afdeling.';
+          console.error('>> POST ATTACHMENTS FAILED', error.message);
+        })
+    } else {
+      this.afterPostAttachments(expense);
+    }
+  }
+
+  afterPostAttachments(expense: object) {
+    const isDuplicateAccepted = (
+      this.wantsSubmit > 0 && expense['flags'] && expense['flags']['duplicates']) ?
+      confirm('Deze declaratie lijkt eerder ingediend te zijn, weet u zeker dat u deze wilt indienen?') :
+      true;
+
+    if (
+      (this.expenseData.status.text == 'draft' || this.expenseData.status.text.includes('rejected')) &&
+      this.wantsSubmit > 0 &&
+      isDuplicateAccepted
+    ) {
+      this.expensesConfigService.updateExpenseEmployee(
+        { status: 'ready_for_manager' }, expense['id']
+      ).subscribe(
+        response => this.closeModal(true),
+        error => {
+          this.errorMessage = 'Er is iets fout gegaan bij het indienen van de declaratie, neem contact op met de crediteuren afdeling.';
+          console.error('>> PUT EXPENSE FAILED', error.message);
+        }
+      );
+    } else {
+      this.closeModal(true);
+    }
+  }
   // END Subject to change
 
   /** Used to update the rejection note with normal style change (works better on mobile) */
@@ -271,20 +303,19 @@ export class MaxModalComponent implements OnInit {
     this.rejectionNote = (event.target.value === 'note');
     this.selectedRejection = event.target.value;
     if (this.rejectionNote) {
-      document.getElementById('rejection-note-group').style.visibility = 'visible';
-      document.getElementById('rejection-note-group').style.display = 'block';
+      this.rejectionNoteVisible = true;
     } else {
-      document.getElementById('rejection-note-group').style.visibility = 'hidden';
-      document.getElementById('rejection-note-group').style.display = 'none';
+      this.rejectionNoteVisible = false;
     }
   }
 
   /** Only for the employee to cancel the expense */
   protected cancelExpense() {
-    const dataVerified = {};
-    const expenseId = this.expenseData.id;
-    dataVerified[`status`] = 'cancelled';
-    this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
+    if (confirm('Weet je zeker dat je de declaratie wilt annuleren?')) {
+      const dataVerified = {};
+      const expenseId = this.expenseData.id;
+      dataVerified[`status`] = 'cancelled';
+      this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
       .subscribe(
         result => {
           this.closeModal(true);
@@ -292,6 +323,7 @@ export class MaxModalComponent implements OnInit {
         error => {
           this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
         });
+    }
   }
 
   /** Used to close the modal (Could also control the animation) */
@@ -308,9 +340,14 @@ export class MaxModalComponent implements OnInit {
 
   /** Used to update the review action */
   protected updatingAction(event) {
+    this.wantsDraft = 0;
     this.action = event;
+
     if (event === 'rejecting') {
       this.isRejecting = true;
+    } else {
+      this.isRejecting = false;
+      this.rejectionNote = false;
     }
   }
 
@@ -412,7 +449,8 @@ export class MaxModalComponent implements OnInit {
             this.receiptFiles.push({
               content: reader.result,
               content_type: 'application/pdf',
-              from_db: false
+              from_db: false,
+              db_name: file[0].name
             });
           } else if (file[0].type.split('/')[0] === 'image') {
             const img = new Image();
@@ -441,7 +479,8 @@ export class MaxModalComponent implements OnInit {
                     this.receiptFiles.push({
                       content: reader.result,
                       content_type: file[0].type,
-                      from_db: false
+                      from_db: false,
+                      db_name: file[0].name
                     });
                   };
                 }, file[0].type, 1);
@@ -457,11 +496,65 @@ export class MaxModalComponent implements OnInit {
     for (const type of this.typeOptions) {
       if (event.target['value'].includes(type.cid)) {
         if (type.managertype === 'leasecoordinator') {
-          this.formCostTypeMessage = type.message;
+          this.formCostTypeMessage = type.message['nl'];
         } else {
-          this.formCostTypeMessage = '';
+          this.formCostTypeMessage = { short: '', long: '' };
         }
       }
     }
+  }
+
+  getFileTypeIcon(content_type: string) {
+    return content_type.includes('image') ? 'far fa-file-image' : 'far fa-file-pdf';
+  }
+
+  processExpenseFlags() {
+    const flags = [];
+    if (this.expenseData['flags'] && Object.keys(this.expenseData['flags']).length > 0) {
+      for (const key in this.expenseData['flags']) {
+        if (key == 'duplicates') {
+          flags.push({
+            'name': 'duplicates',
+            'description': 'Er zijn dubbele declaraties gevonden',
+            'values': this.expenseData['flags'][key]
+          });
+        }
+      }
+    }
+    return flags;
+  }
+
+  toggleExpensePopover(popover, expense_id: number) {
+    if (popover.isOpen()) {
+      popover.close();
+    } else {
+      let requestEndpoint = Endpoint.employee;
+      if (this.isCreditor || (this.isViewer && this.OurJaneDoeRoles.includes('creditor'))) {
+        requestEndpoint = Endpoint.finance;
+      } else if (this.isManager) {
+        requestEndpoint = Endpoint.manager;
+      } else if (this.isViewer || (this.isViewer && this.OurJaneDoeRoles.includes('controller'))) {
+        requestEndpoint = Endpoint.controller;
+      }
+
+      this.httpClient.get(
+        this.env.apiUrl + requestEndpoint + `/${expense_id}`
+      ).subscribe(
+        response => popover.open({context: response}),
+        error => popover.open({context: error})
+      );
+    }
+  }
+
+  get isRejected() {
+    return this.expenseData.status.text.includes('rejected') ? true : false;
+  }
+
+  get attachmentsIsInvalid() {
+    return this.receiptFiles && this.receiptFiles.length > 0 ? false : true
+  }
+
+  get hasDraftStatus() {
+    return this.expenseData.status.text === 'draft' ? true : false;
   }
 }

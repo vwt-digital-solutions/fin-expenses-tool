@@ -1,4 +1,5 @@
 import {browser, protractor, by, element} from 'protractor/built';
+import { ExpensesForm } from './app.po';
 
 const request = require('request');
 const fs = require('fs');
@@ -39,6 +40,7 @@ let updateType;
 const isOnBuild = process.env.isOnBuild || false;
 
 let e2eList = [];
+let expenseForm: ExpensesForm;
 
 describe('ExpenseApp:', () => {
   let originalTimeout;
@@ -59,6 +61,7 @@ describe('ExpenseApp:', () => {
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 100000;
     browser.manage().window().setSize(1600, 1200);
     browser.waitForAngularEnabled(false);
+    expenseForm = new ExpensesForm();
   });
 
   it('should login and authenticate', () => {
@@ -85,7 +88,7 @@ describe('ExpenseApp:', () => {
     });
   });
 
-  it('E1 should get the list of expenses on the landing page (or none)', () => {
+  it('E1: should get the list of expenses on the landing page (or none)', () => {
 
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
       browser.sleep(1000);
@@ -94,8 +97,8 @@ describe('ExpenseApp:', () => {
 
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText('Small', 'Opensource E2E'))), 10, 'Name is not present'));
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'The API took too long to respond').then(() => {
-      const expensesList = element.all(by.css('li.list-group-item'));
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item'))), 20000, 'The API took too long to respond').then(() => {
+      const expensesList = element.all(by.css('li.expenses-list-item'));
       expensesListCount = expensesList.count();
       if (expensesListCount === 1) {
         expensesListCount = 0;
@@ -110,7 +113,7 @@ describe('ExpenseApp:', () => {
   it('E1: should redirect to the expenses page and load cost-types', () => {
 
     element(by.name('expenses')).click().then(() => {
-      expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h5', ' Declaratie indienen '))),
+      expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h3', 'Declaratie indienen'))),
         20000, 'The redirect took too long').then(() => {
         browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
           expect(element.all(by.css('option')).count()).toEqual(29);
@@ -125,9 +128,18 @@ describe('ExpenseApp:', () => {
     element(by.id('amountinput')).sendKeys(1.99);
 
     const typeList = element(by.id('typeinput')).all(by.tagName('option'));
-    typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
-      typeList.get(randomNumber + 1).click();
-    });
+    typeList.count().then(
+      numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(
+        randomNumber => {
+          const type = typeList.get(randomNumber + 1);
+          type.getText().then(option => {
+            if (!option.toLowerCase().includes('brandstofkosten')) {
+              typeList.get(randomNumber + 1).click();
+            } else {
+              typeList.get(randomNumber + 2).click();
+            }
+          })
+        });
 
     element(by.id('dateinput'))
       .sendKeys(`${todayMonth}/${todayDay}/${todayYear}`);
@@ -136,8 +148,9 @@ describe('ExpenseApp:', () => {
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     e2eList.push(e2eID);
 
-    element(by.id('submit-click')).click().then(() => {
-      browser.sleep(1000);
+    element(by.id('submit-save-submit')).click().then(async () => {
+      await expenseForm.acceptAlertBox();
+
       expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('dateinputFill'))), 10, 'Date input went wrong'));
@@ -158,8 +171,8 @@ describe('ExpenseApp:', () => {
 
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText('Small', 'Opensource E2E'))), 10, 'Name is not present'));
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'The API took too long to respond').then(() => {
-      const expensesList = element.all(by.css('li.list-group-item'));
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item'))), 20000, 'The API took too long to respond').then(() => {
+      const expensesList = element.all(by.css('li.expenses-list-item'));
       expect(expensesList.count()).toBeGreaterThanOrEqual(expensesListCount);
       expensesListCount = expensesList.count();
     });
@@ -168,14 +181,16 @@ describe('ExpenseApp:', () => {
 
   it('E1: should open the expense and check the data', () => {
 
-    element.all(by.css('li.list-group-item')).first().click().then(() => {
+    element.all(by.css('li.expenses-list-item.processing')).first().click().then(() => {
       expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
         browser.sleep(1000);
         browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
           expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-          expect(element(by.id('expenseNoteRead')).getText()).toEqual('E2E Addition ' + e2eID);
+          element(by.id('expenseNote')).getAttribute('value').then((value) => {
+            expect(value).toEqual('E2E Addition ' + e2eID);
+          });
           browser.sleep(1000);
-          const attachments = element.all(by.css('.fa-times'));
+          const attachments = element.all(by.css('.file-list-item'));
           expect(attachments.count()).toEqual(1);
         });
       }));
@@ -239,9 +254,11 @@ describe('ExpenseApp:', () => {
           }
 
           expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-          expect(element(by.id('expenseNoteRead')).getText()).toEqual('E2E Addition ' + e2eID);
+          element(by.id('expenseNote')).getAttribute('value').then((value) => {
+            expect(value).toEqual('E2E Addition ' + e2eID);
+          });
           browser.sleep(1000);
-          const attachments = element.all(by.css('.fa-times'));
+          const attachments = element.all(by.css('.file-list-item'));
           expect(attachments.count()).toEqual(1);
         });
       }));
@@ -263,7 +280,9 @@ describe('ExpenseApp:', () => {
             if (ret === step[1]) {
               selection();
             } else {
-              updateType = typeList.get(randomNumber + 1).getText();
+              typeList.get(randomNumber + 1).getText().then((value) => {
+                updateType = value.trim();
+              });
               typeList.get(randomNumber + 1).click();
             }
           });
@@ -284,8 +303,8 @@ describe('ExpenseApp:', () => {
 
   it('E2: should see that the expense has been approved', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'Return to landing took too long').then(() => {
-      expect(element(by.css('.badge')).getText()).toEqual('Goedgekeurd');
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.approved'))), 20000, 'Return to landing took too long').then(() => {
+      expect(element.all(by.css('li.expenses-list-item.approved')).first().element(by.css('.status-pill .badge')).getText()).toEqual('Goedgekeurd');
     });
 
   });
@@ -293,15 +312,19 @@ describe('ExpenseApp:', () => {
 
   it('E2: should open the expense and check the data', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'Return to landing took too long').then(() => {
-      element.all(by.css('li.list-group-item')).first().click().then(() => {
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.approved'))), 20000, 'Return to landing took too long').then(() => {
+      element.all(by.css('li.expenses-list-item.approved')).first().click().then(() => {
         expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
           browser.sleep(1000);
           browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
             expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-            expect(element(by.id('expenseNoteRead')).getText()).toEqual('E2E Addition ' + e2eID);
-            expect(element(by.id('expenseCostTypeRead')).getAttribute('value')).toEqual(updateType);
-            const attachments = element.all(by.css('.fa-times'));
+            element(by.id('expenseNote')).getAttribute('value').then((value) => {
+              expect(value).toEqual('E2E Addition ' + e2eID);
+            });
+            element(by.id('expenseCostType')).getAttribute('value').then((value) => {
+              expect(value).toContain(updateType);
+            });
+            const attachments = element.all(by.css('.file-list-item'));
             expect(attachments.count()).toEqual(1);
           });
         }));
@@ -314,7 +337,7 @@ describe('ExpenseApp:', () => {
 
     element(by.id('modalClose')).click();
     element(by.name('expenses')).click().then(() => {
-      expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h5', ' Declaratie indienen '))),
+      expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h3', 'Declaratie indienen'))),
         20000, 'The redirect took too long').then(() => {
         browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
           expect(element.all(by.css('option')).count()).toEqual(29);
@@ -340,8 +363,9 @@ describe('ExpenseApp:', () => {
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     e2eList.push(e2eID);
 
-    element(by.id('submit-click')).click().then(() => {
-      browser.sleep(1000);
+    element(by.id('submit-save-submit')).click().then(async () => {
+      await expenseForm.acceptAlertBox();
+
       expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('dateinputFill'))), 10, 'Date input went wrong'));
@@ -362,8 +386,8 @@ describe('ExpenseApp:', () => {
 
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText('Small', 'Opensource E2E'))), 10, 'Name is not present'));
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'The API took too long to respond').then(() => {
-      const expensesList = element.all(by.css('li.list-group-item'));
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item'))), 20000, 'The API took too long to respond').then(() => {
+      const expensesList = element.all(by.css('li.expenses-list-item'));
       expect(expensesList.count()).toBeGreaterThan(expensesListCount);
     });
 
@@ -371,14 +395,16 @@ describe('ExpenseApp:', () => {
 
   it('E3: should open the expense and check the data', () => {
 
-    element.all(by.css('li.list-group-item')).first().click().then(() => {
+    element.all(by.css('li.expenses-list-item.processing')).first().click().then(() => {
       expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
         browser.sleep(1000);
         browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
           expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-          expect(element(by.id('expenseNoteRead')).getText()).toEqual('E2E Addition ' + e2eID);
+          element(by.id('expenseNote')).getAttribute('value').then((value) => {
+            expect(value).toEqual('E2E Addition ' + e2eID);
+          });
           browser.sleep(1000);
-          const attachments = element.all(by.css('.fa-times'));
+          const attachments = element.all(by.css('.file-list-item'));
           expect(attachments.count()).toEqual(1);
         });
       }));
@@ -442,9 +468,11 @@ describe('ExpenseApp:', () => {
           }
 
           expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-          expect(element(by.id('expenseNoteRead')).getText()).toEqual('E2E Addition ' + e2eID);
+          element(by.id('expenseNote')).getAttribute('value').then((value) => {
+            expect(value).toEqual('E2E Addition ' + e2eID);
+          });
           browser.sleep(1000);
-          const attachments = element.all(by.css('.fa-times'));
+          const attachments = element.all(by.css('.file-list-item'));
           expect(attachments.count()).toEqual(1);
         });
       }));
@@ -521,9 +549,11 @@ describe('ExpenseApp:', () => {
           }
 
           expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-          expect(element(by.id('expenseNoteRead')).getText()).toEqual('E2E Addition ' + e2eID);
+          element(by.id('expenseNote')).getAttribute('value').then((value) => {
+            expect(value).toEqual('E2E Addition ' + e2eID);
+          });
           browser.sleep(1000);
-          const attachments = element.all(by.css('.fa-times'));
+          const attachments = element.all(by.css('.file-list-item'));
           expect(attachments.count()).toEqual(1);
         });
       }));
@@ -547,8 +577,8 @@ describe('ExpenseApp:', () => {
 
   it('E4: should see that the expense has been approved', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'Return to landing took too long').then(() => {
-      expect(element(by.css('.badge')).getText()).toEqual('Goedgekeurd');
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.approved'))), 20000, 'Return to landing took too long').then(() => {
+      expect(element.all(by.css('li.expenses-list-item.approved')).first().element(by.css('.status-pill .badge')).getText()).toEqual('Goedgekeurd');;
     });
 
   });
@@ -560,7 +590,7 @@ describe('ExpenseApp:', () => {
   it('E5: should redirect to the expenses page and load cost-types', () => {
 
     element(by.name('expenses')).click().then(() => {
-      expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h5', ' Declaratie indienen '))),
+      expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h3', 'Declaratie indienen'))),
         20000, 'The redirect took too long').then(() => {
         browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
           expect(element.all(by.css('option')).count()).toEqual(29);
@@ -586,8 +616,9 @@ describe('ExpenseApp:', () => {
     element(by.id('noteinput')).sendKeys('E2E Addition ' + e2eID);
     e2eList.push(e2eID);
 
-    element(by.id('submit-click')).click().then(() => {
-      browser.sleep(1000);
+    element(by.id('submit-save-submit')).click().then(async () => {
+      await expenseForm.acceptAlertBox();
+
       expect(browser.wait(until.invisibilityOf(element(by.id('amountinputFill'))), 10, 'Amount input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('typeinputFill'))), 10, 'Type input went wrong'));
       expect(browser.wait(until.invisibilityOf(element(by.id('dateinputFill'))), 10, 'Date input went wrong'));
@@ -608,8 +639,8 @@ describe('ExpenseApp:', () => {
 
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText('Small', 'Opensource E2E'))), 10, 'Name is not present'));
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'The API took too long to respond').then(() => {
-      const expensesList = element.all(by.css('li.list-group-item'));
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item'))), 20000, 'The API took too long to respond').then(() => {
+      const expensesList = element.all(by.css('li.expenses-list-item'));
       expect(expensesList.count()).toBeGreaterThan(expensesListCount);
       expensesListCount = expensesList.count();
     });
@@ -618,14 +649,16 @@ describe('ExpenseApp:', () => {
 
   it('E5: should open the expense and check the data', () => {
 
-    element.all(by.css('li.list-group-item')).first().click().then(() => {
+    element.all(by.css('li.expenses-list-item.processing')).first().click().then(() => {
       expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
         browser.sleep(1000);
         browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
           expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-          expect(element(by.id('expenseNoteRead')).getText()).toEqual('E2E Addition ' + e2eID);
+          element(by.id('expenseNote')).getAttribute('value').then((value) => {
+            expect(value).toEqual('E2E Addition ' + e2eID);
+          });
           browser.sleep(1000);
-          const attachments = element.all(by.css('.fa-times'));
+          const attachments = element.all(by.css('.file-list-item'));
           expect(attachments.count()).toEqual(1);
         });
       }));
@@ -689,9 +722,11 @@ describe('ExpenseApp:', () => {
           }
 
           expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-          expect(element(by.id('expenseNoteRead')).getText()).toEqual('E2E Addition ' + e2eID);
+          element(by.id('expenseNote')).getAttribute('value').then((value) => {
+            expect(value).toEqual('E2E Addition ' + e2eID);
+          });
           browser.sleep(1000);
-          const attachments = element.all(by.css('.fa-times'));
+          const attachments = element.all(by.css('.file-list-item'));
           expect(attachments.count()).toEqual(1);
         });
       }));
@@ -718,8 +753,8 @@ describe('ExpenseApp:', () => {
 
   it('E6: should see that the expense has been rejected', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'Return to landing took too long').then(() => {
-      expect(element(by.css('.badge')).getText()).toEqual('Aanpassing vereist');
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.rejected'))), 20000, 'Return to landing took too long').then(() => {
+      expect(element.all(by.css('li.expenses-list-item.rejected')).first().element(by.css('.status-pill .badge')).getText()).toEqual('Aanpassing vereist');
     });
 
   });
@@ -727,25 +762,28 @@ describe('ExpenseApp:', () => {
 
   it('E6: should open the expense, remove one attachment, add two and submit', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'Return to landing took too long').then(() => {
-      element.all(by.css('li.list-group-item')).first().click().then(() => {
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.rejected'))), 20000, 'Return to landing took too long').then(() => {
+      element.all(by.css('li.expenses-list-item.rejected')).first().click().then(() => {
         expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
           browser.sleep(1000);
           browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
             expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-            expect(element(by.id('expenseNote')).getAttribute('value')).toEqual('E2E Addition ' + e2eID);
-            let attachments = element.all(by.css('.fa-times'));
+            element(by.id('expenseNote')).getAttribute('value').then((value) => {
+              expect(value).toEqual('E2E Addition ' + e2eID);
+            });
+            let attachments = element.all(by.css('.file-list-item'));
             expect(attachments.count()).toEqual(1);
-            element(by.css('.fa-times')).click().then(() => {
+            element(by.css('.fa-trash')).click().then(() => {
               browser.sleep(2000);
-              attachments = element.all(by.css('.fa-times'));
+              attachments = element.all(by.css('.file-list-item'));
               expect(attachments.count()).toEqual(2);
-              element(by.id('submit-update-button')).click().then(() => {
-                browser.sleep(1000);
+              element(by.id('submit-update-button')).click().then(async () => {
+                await expenseForm.acceptAlertBox();
+
                 expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
                   browser.sleep(1000);
                   browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-                    expect(element(by.css('.badge')).getText()).toEqual('In behandeling');
+                    expect(element(by.css('.status-pill .badge')).getText()).toEqual('In behandeling');
                     browser.sleep(1000);
                   });
                 }));
@@ -760,14 +798,16 @@ describe('ExpenseApp:', () => {
 
   it('E6: should open the expense and check the data after submit', () => {
 
-    element.all(by.css('li.list-group-item')).first().click().then(() => {
+    element.all(by.css('li.expenses-list-item.processing')).first().click().then(() => {
       expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
         browser.sleep(1000);
         browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
           expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-          expect(element(by.id('expenseNoteRead')).getText()).toEqual('E2E Addition ' + e2eID);
+          element(by.id('expenseNote')).getAttribute('value').then((value) => {
+            expect(value).toEqual('E2E Addition ' + e2eID);
+          });
           browser.sleep(1000);
-          const attachments = element.all(by.css('.fa-times'));
+          const attachments = element.all(by.css('.file-list-item'));
           expect(attachments.count()).toEqual(2);
         });
       }));
@@ -833,9 +873,11 @@ describe('ExpenseApp:', () => {
           }
 
           expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-          expect(element(by.id('expenseNoteRead')).getText()).toEqual('E2E Addition ' + e2eID);
+          element(by.id('expenseNote')).getAttribute('value').then((value) => {
+            expect(value).toEqual('E2E Addition ' + e2eID);
+          });
           browser.sleep(1000);
-          const attachments = element.all(by.css('.fa-times'));
+          const attachments = element.all(by.css('.file-list-item'));
           expect(attachments.count()).toEqual(2);
         });
       }));
@@ -913,9 +955,11 @@ describe('ExpenseApp:', () => {
           }
 
           expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-          expect(element(by.id('expenseNoteRead')).getText()).toEqual('E2E Addition ' + e2eID);
+          element(by.id('expenseNote')).getAttribute('value').then((value) => {
+            expect(value).toEqual('E2E Addition ' + e2eID);
+          });
           browser.sleep(1000);
-          const attachments = element.all(by.css('.fa-times'));
+          const attachments = element.all(by.css('.file-list-item'));
           expect(attachments.count()).toEqual(2);
         });
       }));
@@ -942,24 +986,28 @@ describe('ExpenseApp:', () => {
 
   it('E7: should see that the expense has been rejected', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'Return to landing took too long').then(() => {
-      expect(element(by.css('.badge')).getText()).toEqual('Aanpassing vereist');
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.rejected'))), 20000, 'Return to landing took too long').then(() => {
+      expect(element.all(by.css('li.expenses-list-item.rejected')).first().element(by.css('.status-pill .badge')).getText()).toEqual('Aanpassing vereist');
     });
 
   });
 
   it('E7: should open the expense and cancel', () => {
 
-    browser.wait(until.visibilityOf(element(by.css('li.list-group-item'))), 20000, 'Return to landing took too long').then(() => {
-      element.all(by.css('li.list-group-item')).first().click().then(() => {
+    browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item'))), 20000, 'Return to landing took too long').then(() => {
+      element.all(by.css('li.expenses-list-item.rejected')).first().click().then(() => {
         expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
           browser.sleep(1000);
           browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
             expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-            expect(element(by.id('expenseNote')).getAttribute('value')).toEqual('E2E Addition ' + e2eID);
-            const attachments = element.all(by.css('.fa-times'));
+            element(by.id('expenseNote')).getAttribute('value').then((value) => {
+              expect(value).toEqual('E2E Addition ' + e2eID);
+            });
+            const attachments = element.all(by.css('.file-list-item'));
             expect(attachments.count()).toEqual(2);
             element(by.id('cancel-update-button')).click().then(() => {
+              browser.sleep(1000);
+              browser.switchTo().alert().accept();
               browser.sleep(1000);
             });
           });
@@ -974,7 +1022,7 @@ describe('ExpenseApp:', () => {
     expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
       browser.sleep(1000);
       browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-        expect(element(by.css('.badge')).getText()).toEqual('Geannuleerd');
+        expect(element(by.css('.status-pill .badge')).getText()).toEqual('Geannuleerd');
         browser.sleep(1000);
       });
     }));
@@ -1020,9 +1068,9 @@ describe('ExpenseApp:', () => {
           browser.sleep(1000);
 
           element(by.cssContainingText('.btn-secondary', 'Exporteren')).click().then(() => {
-            browser.sleep(200);
+            browser.sleep(4000);
             browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-              expect(element(by.css('.btn-success')).getText()).toEqual('Exporteren');
+              expect(element(by.css('.btn.has-exported')).isPresent()).toBe(true);
               browser.get('/home');
             });
           });
@@ -1083,9 +1131,11 @@ describe('ExpenseApp:', () => {
             }
 
             expect(element(by.id('employeeText')).getText()).toEqual('E2E, Opensource');
-            expect(element(by.id('expenseNoteRead')).getText()).toEqual('E2E Addition ' + e2eList[i]);
+            element(by.id('expenseNote')).getAttribute('value').then((value) => {
+              expect(value).toEqual('E2E Addition ' + e2eList[i]);
+            });
             browser.sleep(1000);
-            const attachments = element.all(by.css('.fa-times'));
+            const attachments = element.all(by.css('.file-list-item'));
             expect(attachments.count()).toBeGreaterThanOrEqual(1);
           });
         }));

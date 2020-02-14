@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i");
-@import "~bootstrap/dist/css/bootstrap.css";
-@import "/assets/scss/mixins";
 @import "/assets/scss/constants";
+@import "~bootstrap/scss/bootstrap";
+@import "/assets/scss/mixins";
 
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-material.css";
@@ -19,26 +19,49 @@ $fa-font-path: "~src/assets/fonts/font-awesome";
 
 body {
   font-family: $vwt_font_family !important;
-  margin: 5em 0 0;
 }
+
+h1, h2, h3, h4, h5, h6 {
+  color: #008BB8;
+  margin: 0;
+}
+
 h1 {
   font-size: 30px;
-  margin: 0;
   font-weight: 700;
-  color: #008BB8;
   text-transform: uppercase;
 }
 h2 {
   font-size: 25px;
-  margin: 0;
   font-weight: 700;
-  color: #008BB8;
 }
 h3 {
   font-size: 20px;
-  margin: 0;
   font-weight: 500;
   color: #008BB8;
+}
+h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #008BB8;
+  text-transform: uppercase;
+}
+h5 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #008BB8;
+  text-transform: uppercase;
+}
+h6 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #008BB8;
+  text-transform: uppercase;
+}
+
+.app-container {
+  padding-top: 70px;
+  box-sizing: border-box;
 }
 
 .landing_page_container {
@@ -62,3 +85,44 @@ span.ag-header-group-text {
   font-weight: 300;
   color: $vwt_color_blue;
 }
+
+// BOOTSTRAP OVERRIDES
+input, select, textarea,  li {
+  &.ng-invalid.ng-touched {
+    border-color: $red;
+  }
+}
+textarea {
+  max-height: 200px;
+  min-height: 70px;
+}
+select[disabled] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-indent: 0.01px;
+  text-overflow: '';
+}
+.form-control, .custom-select{
+  &:focus{
+    border-color: $gray-dark;
+  }
+}
+.btn.btn-warning, .badge.badge-warning {
+  color: $white;
+}
+.btn-group-vertical {
+  width: 100%;
+}
+
+.btn {
+  &:disabled {
+    background-color: $form-disabled !important;
+    border-color: $form-disabled-border !important;
+    color: $form-text !important;
+
+    &:hover{
+      cursor: default !important;
+    }
+  }
+}
+// END BOOTSTRAP OVERRIDES

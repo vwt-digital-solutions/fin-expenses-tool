@@ -1,7 +1,46 @@
 $vwt_color_blue: #008BB8;
-$vwt_color_blue_hr: #008bb859;
+$vwt_color_blue_hr: #007da5;
+$vwt_color_blue_dark: #003749;
 $vwt_mobile_background_color_blue: #028ab875;
 $vwt_font_family: 'Poppins', sans-serif;
+
+$white:                   #fff;
+$black:                   #000;
+
+$gray:                    #e5e5e5;
+$gray-hover:              #cecece;
+$gray-light:              #f2f2f2;
+$gray-light-hover:        #d9d9d9;
+$gray-dark:               #7f7f7f;
+$gray-dark-hover:         #727272;
+
+$green:                   #27ae60;
+$green-hover:             #239c56;
+
+$red:                     #c0392b;
+$red-hover:               #ac3326;
+
+$orange:                  #f39c12;
+$orange-hover:            #da8c10;
+
+$form-text:               #495057;
+$form-disabled:           #e9ecef;
+$form-disabled-opacity:   rgba(233, 236, 239, .65);
+$form-disabled-border:    #ced4da;
+
+$theme-colors: (
+  "primary": $vwt_color_blue,
+  "secondary": $gray-dark,
+  "success": $green,
+  "danger": $red,
+  "warning": $orange,
+  "light": $gray
+);
+
+$input-focus-box-shadow: none !important;
+$input-btn-focus-box-shadow: none !important;
+$custom-select-focus-box-shadow: none !important;
+
 @-webkit-keyframes zoom {
   from {-webkit-transform:scale(0)}
   to {-webkit-transform:scale(1)}

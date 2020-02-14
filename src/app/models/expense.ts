@@ -11,4 +11,5 @@ export interface Expense {
     rnote: string;
     text: string;
   };
+  flags: object;
 }
