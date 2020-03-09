@@ -514,10 +514,10 @@ export class MaxModalComponent implements OnInit {
       const new_time = new Date(event.target['value']).setHours(0,0,0,0);
       const cur_time = new Date().setHours(0,0,0,0);
 
-      if (new_time < cur_time && new_time > 0) {
+      if (new_time <= cur_time && new_time > 0) {
         this.expenseTransDate = true;
         return;
-      } else if (new_time >= cur_time) {
+      } else if (new_time > cur_time) {
         this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de aankoop';
       }
     }
