@@ -21,7 +21,7 @@ import { NgForm } from '@angular/forms';
   styleUrls: ['./maxmodal.component.scss']
 })
 export class MaxModalComponent implements OnInit {
-  @ViewChild(NgForm) expenseForm: NgForm;
+  @ViewChild(NgForm, { static: true }) expenseForm: NgForm;
 
   @Input() expenseData: Expense;
   @Input() forceViewer: boolean;
