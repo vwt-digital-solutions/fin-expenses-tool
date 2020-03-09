@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Expense} from '../../models/expense';
 import {CostType} from '../../models/cost-type';
 import {ActivatedRoute} from '@angular/router';
@@ -12,6 +12,8 @@ import { FormatterService } from 'src/app/services/formatter.service';
 import { Endpoint } from 'src/app/models/endpoint.enum';
 import { HttpClient } from '@angular/common/http';
 import { EnvService } from 'src/app/services/env.service';
+import { formatDate } from '@angular/common';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-maxmodal',
@@ -19,6 +21,7 @@ import { EnvService } from 'src/app/services/env.service';
   styleUrls: ['./maxmodal.component.scss']
 })
 export class MaxModalComponent implements OnInit {
+  @ViewChild(NgForm) expenseForm: NgForm;
 
   @Input() expenseData: Expense;
   @Input() forceViewer: boolean;
@@ -43,6 +46,8 @@ export class MaxModalComponent implements OnInit {
   public rejectionNote: boolean;
   public formCostTypeMessage = { short: '', long: '' };
   public expenseFlags = [];
+  public transdateNotFilledMessage;
+  public expenseTransDate = true;
 
   constructor(
     private httpClient: HttpClient,
@@ -64,6 +69,7 @@ export class MaxModalComponent implements OnInit {
     }
 
     this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
+    this.transdateNotFilledMessage = 'Graag een geldige datum invullen';
 
     window.onmousedown = event => {
       if (event.target === document.getElementById('maxModal')) {
@@ -502,6 +508,22 @@ export class MaxModalComponent implements OnInit {
         }
       }
     }
+  }
+  onChangeDate(event: Event) {
+    if (!isNaN(Date.parse(event.target['value']))) {
+      const new_time = new Date(event.target['value']).setHours(0,0,0,0);
+      const cur_time = new Date().setHours(0,0,0,0);
+
+      if (new_time < cur_time && new_time > 0) {
+        this.expenseTransDate = true;
+        return;
+      } else if (new_time >= cur_time) {
+        this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de aankoop';
+      }
+    }
+
+    this.expenseForm.controls[event.target['name']].setErrors({'incorrect': true});
+    this.expenseTransDate = false;
   }
 
   getFileTypeIcon(content_type: string) {
