@@ -126,7 +126,7 @@ export class MaxModalComponent implements OnInit {
           expense_id: this.expenseData.id
         });
       }
-    })
+    });
   }
 
   /** Controls the submit buttons and UpdateForm: Checks every input needed. */
@@ -190,7 +190,7 @@ export class MaxModalComponent implements OnInit {
       }
     }
 
-    dataVerified[`status`] = this.expenseData.status.text == 'draft' ||
+    dataVerified[`status`] = this.expenseData.status.text === 'draft' ||
       this.expenseData.status.text.includes('rejected') ?
         this.expenseData.status.text :
         'ready_for_manager';
@@ -272,7 +272,7 @@ export class MaxModalComponent implements OnInit {
         }, error => {
           this.errorMessage = 'Er is iets fout gegaan bij het uploaden van de bestanden, neem contact op met de crediteuren afdeling.';
           console.error('>> POST ATTACHMENTS FAILED', error.message);
-        })
+        });
     } else {
       this.afterPostAttachments(expense);
     }
@@ -285,7 +285,7 @@ export class MaxModalComponent implements OnInit {
       true;
 
     if (
-      (this.expenseData.status.text == 'draft' || this.expenseData.status.text.includes('rejected')) &&
+      (this.expenseData.status.text === 'draft' || this.expenseData.status.text.includes('rejected')) &&
       this.wantsSubmit > 0 &&
       isDuplicateAccepted
     ) {
@@ -511,34 +511,34 @@ export class MaxModalComponent implements OnInit {
   }
   onChangeDate(event: Event) {
     if (!isNaN(Date.parse(event.target['value']))) {
-      const new_time = new Date(event.target['value']).setHours(0,0,0,0);
-      const cur_time = new Date().setHours(0,0,0,0);
+      const newTime = new Date(event.target['value']).setHours(0, 0, 0, 0);
+      const curTime = new Date().setHours(0, 0, 0, 0);
 
-      if (new_time <= cur_time && new_time > 0) {
+      if (newTime <= curTime && newTime > 0) {
         this.expenseTransDate = true;
         return;
-      } else if (new_time > cur_time) {
+      } else if (newTime > curTime) {
         this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de aankoop';
       }
     }
 
-    this.expenseForm.controls[event.target['name']].setErrors({'incorrect': true});
+    this.expenseForm.controls[event.target['name']].setErrors({incorrect: true});
     this.expenseTransDate = false;
   }
 
-  getFileTypeIcon(content_type: string) {
-    return content_type.includes('image') ? 'far fa-file-image' : 'far fa-file-pdf';
+  getFileTypeIcon(contentType: string) {
+    return contentType.includes('image') ? 'far fa-file-image' : 'far fa-file-pdf';
   }
 
   processExpenseFlags() {
     const flags = [];
     if (this.expenseData['flags'] && Object.keys(this.expenseData['flags']).length > 0) {
       for (const key in this.expenseData['flags']) {
-        if (key == 'duplicates') {
+        if (key === 'duplicates') {
           flags.push({
-            'name': 'duplicates',
-            'description': 'Er zijn dubbele declaraties gevonden',
-            'values': this.expenseData['flags'][key]
+            name: 'duplicates',
+            description: 'Er zijn dubbele declaraties gevonden',
+            values: this.expenseData['flags'][key]
           });
         }
       }
@@ -546,7 +546,7 @@ export class MaxModalComponent implements OnInit {
     return flags;
   }
 
-  toggleExpensePopover(popover, expense_id: number) {
+  toggleExpensePopover(popover, expenseId: number) {
     if (popover.isOpen()) {
       popover.close();
     } else {
@@ -560,7 +560,7 @@ export class MaxModalComponent implements OnInit {
       }
 
       this.httpClient.get(
-        this.env.apiUrl + requestEndpoint + `/${expense_id}`
+        this.env.apiUrl + requestEndpoint + `/${expenseId}`
       ).subscribe(
         response => popover.open({context: response}),
         error => popover.open({context: error})
@@ -573,7 +573,7 @@ export class MaxModalComponent implements OnInit {
   }
 
   get attachmentsIsInvalid() {
-    return this.receiptFiles && this.receiptFiles.length > 0 ? false : true
+    return this.receiptFiles && this.receiptFiles.length > 0 ? false : true;
   }
 
   get hasDraftStatus() {

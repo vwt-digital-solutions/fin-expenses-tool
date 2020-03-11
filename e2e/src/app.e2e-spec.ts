@@ -138,7 +138,7 @@ describe('ExpenseApp:', () => {
             } else {
               typeList.get(randomNumber + 2).click();
             }
-          })
+          });
         });
 
     element(by.id('dateinput'))
@@ -578,7 +578,7 @@ describe('ExpenseApp:', () => {
   it('E4: should see that the expense has been approved', () => {
 
     browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.approved'))), 20000, 'Return to landing took too long').then(() => {
-      expect(element.all(by.css('li.expenses-list-item.approved')).first().element(by.css('.status-pill .badge')).getText()).toEqual('Goedgekeurd');;
+      expect(element.all(by.css('li.expenses-list-item.approved')).first().element(by.css('.status-pill .badge')).getText()).toEqual('Goedgekeurd');
     });
 
   });
