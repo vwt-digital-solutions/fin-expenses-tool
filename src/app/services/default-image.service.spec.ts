@@ -10,7 +10,7 @@ describe('DefaultImageService', () => {
   }));
 
   it('should be created', () => {
-    const service: DefaultImageService = TestBed.get(DefaultImageService);
+    const service: DefaultImageService = TestBed.inject(DefaultImageService);
     expect(service).toBeTruthy();
   });
 });

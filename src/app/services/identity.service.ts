@@ -25,6 +25,10 @@ export class IdentityService {
     const claims = this.oauthService.getIdentityClaims() as IClaimRoles;
     const roles = [];
 
+    if (!claims.roles) {
+      claims.roles = ['.'];
+    }
+
     for (const role of claims.roles) {
       roles.push(role.split('.')[0]);
     }

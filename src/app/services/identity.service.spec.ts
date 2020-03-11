@@ -10,7 +10,7 @@ describe('IdentityService', () => {
   }));
 
   it('should be created', () => {
-    const service: IdentityService = TestBed.get(IdentityService);
+    const service: IdentityService = TestBed.inject(IdentityService);
     expect(service).toBeTruthy();
   });
 });

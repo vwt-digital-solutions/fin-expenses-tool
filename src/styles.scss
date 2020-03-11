@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css?family=Poppins:300,300i,400,400i,500,500i,600,600i,700,700i,800,800i");
-@import "/assets/scss/constants";
+@import "~src/assets/scss/constants";
 @import "~bootstrap/scss/bootstrap";
-@import "/assets/scss/mixins";
+@import "~src/assets/scss/mixins";
 
 @import "~ag-grid-community/dist/styles/ag-grid.css";
 @import "~ag-grid-community/dist/styles/ag-theme-material.css";

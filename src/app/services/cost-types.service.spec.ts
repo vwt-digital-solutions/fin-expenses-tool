@@ -10,7 +10,7 @@ describe('CostTypesService', () => {
   }));
 
   it('should be created', () => {
-    const service: CostTypesService = TestBed.get(CostTypesService);
+    const service: CostTypesService = TestBed.inject(CostTypesService);
     expect(service).toBeTruthy();
   });
 });

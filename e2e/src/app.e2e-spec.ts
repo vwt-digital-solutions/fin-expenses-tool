@@ -116,7 +116,7 @@ describe('ExpenseApp:', () => {
       expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h3', 'Declaratie indienen'))),
         20000, 'The redirect took too long').then(() => {
         browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
-          expect(element.all(by.css('option')).count()).toEqual(29);
+          expect(element.all(by.css('option')).count()).toEqual(18);
         });
       }));
     });
@@ -138,7 +138,7 @@ describe('ExpenseApp:', () => {
             } else {
               typeList.get(randomNumber + 2).click();
             }
-          })
+          });
         });
 
     element(by.id('dateinput'))
@@ -340,7 +340,7 @@ describe('ExpenseApp:', () => {
       expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h3', 'Declaratie indienen'))),
         20000, 'The redirect took too long').then(() => {
         browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
-          expect(element.all(by.css('option')).count()).toEqual(29);
+          expect(element.all(by.css('option')).count()).toEqual(18);
         });
       }));
     });
@@ -578,7 +578,7 @@ describe('ExpenseApp:', () => {
   it('E4: should see that the expense has been approved', () => {
 
     browser.wait(until.visibilityOf(element(by.css('li.expenses-list-item.approved'))), 20000, 'Return to landing took too long').then(() => {
-      expect(element.all(by.css('li.expenses-list-item.approved')).first().element(by.css('.status-pill .badge')).getText()).toEqual('Goedgekeurd');;
+      expect(element.all(by.css('li.expenses-list-item.approved')).first().element(by.css('.status-pill .badge')).getText()).toEqual('Goedgekeurd');
     });
 
   });
@@ -593,7 +593,7 @@ describe('ExpenseApp:', () => {
       expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h3', 'Declaratie indienen'))),
         20000, 'The redirect took too long').then(() => {
         browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
-          expect(element.all(by.css('option')).count()).toEqual(29);
+          expect(element.all(by.css('option')).count()).toEqual(18);
         });
       }));
     });

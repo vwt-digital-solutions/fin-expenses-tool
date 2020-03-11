@@ -133,6 +133,7 @@
               class="form-control"
               required
               [disabled]="!isEditor"
+              (change)="onChangeDate($event)"
               [ngModel]="expenseData.transaction_date | date:'yyyy-MM-dd'"
               #ntransdate="ngModel"
               type="date" >
@@ -142,8 +143,8 @@
             </div>
           </div>
 
-          <small *ngIf="!(ntransdate.valid) && isEditor" class="text-danger w-100" >
-            Graag een geldige datum invullen
+          <small *ngIf="(!(ntransdate.valid) || !expenseTransDate) && isEditor" class="text-danger w-100" >
+            {{ transdateNotFilledMessage }}
           </small>
         </div>
         <!-- Form: END : Transaction Date -->

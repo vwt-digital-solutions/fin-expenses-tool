@@ -10,7 +10,7 @@ describe('EnvService', () => {
   }));
 
   it('should be created', () => {
-    const service: EnvService = TestBed.get(EnvService);
+    const service: EnvService = TestBed.inject(EnvService);
     expect(service).toBeTruthy();
   });
 });

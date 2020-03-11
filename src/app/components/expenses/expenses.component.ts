@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
+import { formatDate } from '@angular/common';
 import { NgForm } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -108,7 +109,7 @@ export class ExpensesComponent implements  OnInit {
       this.locatedFile = [];
 
       setTimeout(() => {
-         this.addClaimSuccess = { success: false, wrong: false }
+         this.addClaimSuccess = { success: false, wrong: false };
       }, 4000);
     } else {
       setTimeout(() => {
@@ -262,12 +263,14 @@ export class ExpensesComponent implements  OnInit {
   bulkAttachmentUpload(expenseID: number) {
     const fileRequests = [];
     for (const count in this.locatedFile) {
-      fileRequests.push(
-        this.expenses.uploadSingleAttachment(expenseID, {
-          name: count.toString(),
-          content: this.locatedFile[count]
-        })
-      );
+      if (count in this.locatedFile) {
+        fileRequests.push(
+          this.expenses.uploadSingleAttachment(expenseID, {
+            name: count.toString(),
+            content: this.locatedFile[count]
+          })
+        );
+      }
     }
 
     return forkJoin(fileRequests);
@@ -285,7 +288,7 @@ export class ExpensesComponent implements  OnInit {
           setTimeout(() => {
             this.router.navigate(['home']);
           }, 4000);
-        })
+        });
     } else {
       this.afterPostAttachments(expenseResponse, form);
     }
@@ -336,5 +339,21 @@ export class ExpensesComponent implements  OnInit {
         }
       }
     }
+  }
+  onChangeDate(event: Event) {
+    if (!isNaN(Date.parse(event.target['value']))) {
+      const newTime = new Date(event.target['value']).setHours(0, 0, 0, 0);
+      const curTime = new Date().setHours(0, 0, 0, 0);
+
+      if (newTime <= curTime && newTime > 0) {
+        this.expenseTransDate = true;
+        this.formTransDate = formatDate(newTime, 'yyyy-MM-dd', 'nl');
+        return;
+      } else if (newTime > curTime) {
+        this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de aankoop';
+      }
+    }
+
+    this.expenseTransDate = false;
   }
 }

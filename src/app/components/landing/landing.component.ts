@@ -69,7 +69,7 @@ export class LandingComponent implements OnInit {
           console.log('>> GET SUCCESS', response);
           this.declarationData = [];
           const newResponse = response;
-          for (var i = newResponse.length; i--;) {
+          for (let i = newResponse.length; i--;) {
             if (newResponse[i].status.text.toString().includes('rejected')) {
               this.declarationData.push(newResponse[i]);
               newResponse.splice(i, 1);
@@ -99,7 +99,7 @@ export class LandingComponent implements OnInit {
     return item.status.text.toString().includes('rejected');
   }
   isDraft(item) {
-    return item.status.text.toString() === "draft";
+    return item.status.text.toString() === 'draft';
   }
   setClassStatus(item) {
     if (item.status.text.toString().includes('rejected')) {
@@ -110,7 +110,7 @@ export class LandingComponent implements OnInit {
       return 'cancelled';
     } else if (item.status.text.toString() === 'approved') {
       return 'approved';
-    }else if (item.status.text.toString() === 'exported') {
+    } else if (item.status.text.toString() === 'exported') {
       return 'exported';
     } else {
       return 'processing';

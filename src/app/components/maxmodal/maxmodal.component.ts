@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {Expense} from '../../models/expense';
 import {CostType} from '../../models/cost-type';
 import {ActivatedRoute} from '@angular/router';
@@ -12,6 +12,8 @@ import { FormatterService } from 'src/app/services/formatter.service';
 import { Endpoint } from 'src/app/models/endpoint.enum';
 import { HttpClient } from '@angular/common/http';
 import { EnvService } from 'src/app/services/env.service';
+import { formatDate } from '@angular/common';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-maxmodal',
@@ -19,6 +21,7 @@ import { EnvService } from 'src/app/services/env.service';
   styleUrls: ['./maxmodal.component.scss']
 })
 export class MaxModalComponent implements OnInit {
+  @ViewChild(NgForm, { static: true }) expenseForm: NgForm;
 
   @Input() expenseData: Expense;
   @Input() forceViewer: boolean;
@@ -43,6 +46,8 @@ export class MaxModalComponent implements OnInit {
   public rejectionNote: boolean;
   public formCostTypeMessage = { short: '', long: '' };
   public expenseFlags = [];
+  public transdateNotFilledMessage;
+  public expenseTransDate = true;
 
   constructor(
     private httpClient: HttpClient,
@@ -64,6 +69,7 @@ export class MaxModalComponent implements OnInit {
     }
 
     this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
+    this.transdateNotFilledMessage = 'Graag een geldige datum invullen';
 
     window.onmousedown = event => {
       if (event.target === document.getElementById('maxModal')) {
@@ -120,7 +126,7 @@ export class MaxModalComponent implements OnInit {
           expense_id: this.expenseData.id
         });
       }
-    })
+    });
   }
 
   /** Controls the submit buttons and UpdateForm: Checks every input needed. */
@@ -184,7 +190,7 @@ export class MaxModalComponent implements OnInit {
       }
     }
 
-    dataVerified[`status`] = this.expenseData.status.text == 'draft' ||
+    dataVerified[`status`] = this.expenseData.status.text === 'draft' ||
       this.expenseData.status.text.includes('rejected') ?
         this.expenseData.status.text :
         'ready_for_manager';
@@ -266,7 +272,7 @@ export class MaxModalComponent implements OnInit {
         }, error => {
           this.errorMessage = 'Er is iets fout gegaan bij het uploaden van de bestanden, neem contact op met de crediteuren afdeling.';
           console.error('>> POST ATTACHMENTS FAILED', error.message);
-        })
+        });
     } else {
       this.afterPostAttachments(expense);
     }
@@ -279,7 +285,7 @@ export class MaxModalComponent implements OnInit {
       true;
 
     if (
-      (this.expenseData.status.text == 'draft' || this.expenseData.status.text.includes('rejected')) &&
+      (this.expenseData.status.text === 'draft' || this.expenseData.status.text.includes('rejected')) &&
       this.wantsSubmit > 0 &&
       isDuplicateAccepted
     ) {
@@ -503,20 +509,36 @@ export class MaxModalComponent implements OnInit {
       }
     }
   }
+  onChangeDate(event: Event) {
+    if (!isNaN(Date.parse(event.target['value']))) {
+      const newTime = new Date(event.target['value']).setHours(0, 0, 0, 0);
+      const curTime = new Date().setHours(0, 0, 0, 0);
 
-  getFileTypeIcon(content_type: string) {
-    return content_type.includes('image') ? 'far fa-file-image' : 'far fa-file-pdf';
+      if (newTime <= curTime && newTime > 0) {
+        this.expenseTransDate = true;
+        return;
+      } else if (newTime > curTime) {
+        this.transdateNotFilledMessage = 'Declaraties kunnen alleen gedaan worden na de aankoop';
+      }
+    }
+
+    this.expenseForm.controls[event.target['name']].setErrors({incorrect: true});
+    this.expenseTransDate = false;
+  }
+
+  getFileTypeIcon(contentType: string) {
+    return contentType.includes('image') ? 'far fa-file-image' : 'far fa-file-pdf';
   }
 
   processExpenseFlags() {
     const flags = [];
     if (this.expenseData['flags'] && Object.keys(this.expenseData['flags']).length > 0) {
       for (const key in this.expenseData['flags']) {
-        if (key == 'duplicates') {
+        if (key === 'duplicates') {
           flags.push({
-            'name': 'duplicates',
-            'description': 'Er zijn dubbele declaraties gevonden',
-            'values': this.expenseData['flags'][key]
+            name: 'duplicates',
+            description: 'Er zijn dubbele declaraties gevonden',
+            values: this.expenseData['flags'][key]
           });
         }
       }
@@ -524,7 +546,7 @@ export class MaxModalComponent implements OnInit {
     return flags;
   }
 
-  toggleExpensePopover(popover, expense_id: number) {
+  toggleExpensePopover(popover, expenseId: number) {
     if (popover.isOpen()) {
       popover.close();
     } else {
@@ -538,7 +560,7 @@ export class MaxModalComponent implements OnInit {
       }
 
       this.httpClient.get(
-        this.env.apiUrl + requestEndpoint + `/${expense_id}`
+        this.env.apiUrl + requestEndpoint + `/${expenseId}`
       ).subscribe(
         response => popover.open({context: response}),
         error => popover.open({context: error})
@@ -551,7 +573,7 @@ export class MaxModalComponent implements OnInit {
   }
 
   get attachmentsIsInvalid() {
-    return this.receiptFiles && this.receiptFiles.length > 0 ? false : true
+    return this.receiptFiles && this.receiptFiles.length > 0 ? false : true;
   }
 
   get hasDraftStatus() {
