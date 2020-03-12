@@ -16,6 +16,7 @@ export class ManagerComponent {
   public rowSelection;
   public expenseData: Expense;
   public moveDirection = 'move-up';
+  public overlayNoRowsTemplate = '<span>Geen declaraties gevonden</span>';
 
   public wantsNewModal;
   private gridApi;
@@ -107,7 +108,17 @@ export class ManagerComponent {
   }
 
   onGridReady(params: any) {
+    params.api.showLoadingOverlay();
+
     // @ts-ignore
-    this.expenses.getManagerExpenses().subscribe((data) => this.rowData = [...data]);
+    this.expenses.getManagerExpenses().subscribe((data) => {
+      this.rowData = data;
+
+      if (params.api.getDisplayedRowCount() <= 0 ) {
+        params.api.showNoRowsOverlay();
+      } else {
+        params.api.hideOverlay();
+      }
+    });
   }
 }
