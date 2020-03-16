@@ -132,8 +132,9 @@ describe('ExpenseApp:', () => {
       numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(
         randomNumber => {
           const type = typeList.get(randomNumber + 1);
-          type.getText().then(option => {
-            if (!option.toLowerCase().includes('brandstofkosten')) {
+          type.getAttribute('value').then(option => {
+            console.log(option);
+            if (!option.toLowerCase().includes('414020')) {
               typeList.get(randomNumber + 1).click();
             } else {
               typeList.get(randomNumber + 2).click();
@@ -272,11 +273,11 @@ describe('ExpenseApp:', () => {
       function selection() {
         typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
           // tslint:disable-next-line:no-shadowed-variable
-          typeList.get(randomNumber + 1).getText().then((ret) => {
+          typeList.get(randomNumber + 1).getAttribute('value').then((ret) => {
             if (ret === step[1]) {
               selection();
             } else {
-              typeList.get(randomNumber + 1).getText().then((value) => {
+              typeList.get(randomNumber + 1).getAttribute('value').then((value) => {
                 updateType = value.trim();
               });
               typeList.get(randomNumber + 1).click();
