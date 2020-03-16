@@ -53,6 +53,7 @@ export class ExpensesComponent implements  OnInit {
     private identityService: IdentityService,
     private defaultImageService: DefaultImageService,
   ) {
+    this.route.data.pipe(map(data => data.costTypes)).subscribe(costTypes => this.typeOptions = costTypes);
     this.isDesktopDevice = this.deviceService.isDesktop();
 
     this.addClaimSuccess = {success: false, wrong: false};
@@ -127,10 +128,6 @@ export class ExpensesComponent implements  OnInit {
   }
 
   ngOnInit(): void {
-    this.route.data.pipe(
-      map(data => data.costTypes)
-    ).subscribe(costTypes => this.typeOptions = [...costTypes]);
-
     if (this.identityService.isTesting()) {
       this.locatedFile.push(this.defaultImageService.getDefaultImageForTest());
     }
@@ -330,12 +327,14 @@ export class ExpensesComponent implements  OnInit {
 
   onChangeType(event: Event) {
     this.expenseType = true;
-    for (const type of this.typeOptions) {
-      if (event.target['value'].includes(type.cid)) {
-        if (type.managertype === 'leasecoordinator') {
-          this.formCostTypeMessage = type.message['nl'];
-        } else {
-          this.formCostTypeMessage = { short: '', long: '' };
+    for (const type in this.typeOptions) {
+      if (type in this.typeOptions) {
+        if (event.target['value'].includes(this.typeOptions[type].cid)) {
+          if (this.typeOptions[type].managertype === 'leasecoordinator') {
+            this.formCostTypeMessage = this.typeOptions[type].message['nl'];
+          } else {
+            this.formCostTypeMessage = { short: '', long: '' };
+          }
         }
       }
     }

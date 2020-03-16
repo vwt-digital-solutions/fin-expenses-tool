@@ -22,12 +22,13 @@
             class="item-inner"
             (click)="clickExpense(item)" >
             <div class="d-table float-left">
-              <h3><strong>{{ decimalFormatter(item.amount) }}</strong></h3>
-              <span>{{ dateFormatter(item.claim_date )}}</span><span class="text-muted ml-2">{{ item.cost_type.split(':')[0] }}</span>
+              <h3><strong>{{ item.amount | currency:'EUR':'&euro;' }}</strong></h3>
+              <span>{{ item.claim_date | date:'dd-MM-yyyy' }}</span>
+              <span class="text-muted ml-2">{{ item.cost_type | costType:typeOptions }}</span>
             </div>
             <div class="status-pill">
-              <span class="badge badge-pill" [className]="formatter.getStatusClassing(item.status.text)">
-                {{ formatter.getStatusFormatter(item.status.text) }}
+              <span class="badge badge-pill" [className]="item.status.text | expenseStatus: 'class'">
+                {{ item.status.text | expenseStatus:'text' }}
               </span>
             </div>
           </div>

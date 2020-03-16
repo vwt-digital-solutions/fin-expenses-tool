@@ -222,10 +222,6 @@ describe('ExpenseApp:', () => {
 
   it('CG1: should see the created expense on the process page', () => {
 
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
-    element(by.css('div[col-id=claim_date]')).click(); // Twice
-    browser.sleep(500);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
       'E2E Addition ' + e2eID))), 10000, 'Expense not present'));
 
@@ -436,8 +432,6 @@ describe('ExpenseApp:', () => {
 
   it('MG2: should see the created expense on the manager page', () => {
 
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(500);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
@@ -517,10 +511,6 @@ describe('ExpenseApp:', () => {
 
   it('CG2: should see the created expense on the process page', () => {
 
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
-    element(by.css('div[col-id=claim_date]')).click(); // Twice
-    browser.sleep(500);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
       'E2E Addition ' + e2eID))), 10000, 'Expense not present'));
 
@@ -690,8 +680,6 @@ describe('ExpenseApp:', () => {
 
   it('MR1: should see the created expense on the manager page', () => {
 
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(500);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
@@ -841,8 +829,6 @@ describe('ExpenseApp:', () => {
 
   it('MR2: should see the created expense on the manager page', () => {
 
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(500);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
@@ -923,10 +909,6 @@ describe('ExpenseApp:', () => {
 
   it('CR1: should see the created expense on the process page', () => {
 
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
-    element(by.css('div[col-id=claim_date]')).click(); // Twice
-    browser.sleep(500);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
       'E2E Addition ' + e2eID))), 10000, 'Expense not present'));
 
@@ -1103,10 +1085,6 @@ describe('ExpenseApp:', () => {
 
   it('CON1: should see all the expenses on the controller page', () => {
 
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
-    element(by.css('div[col-id=claim_date]')).click(); // Twice
-    browser.sleep(500);
     const expenses = element.all(by.cssContainingText(`[role='gridcell'][col-id='employee']`,
       'E2E, Opensource'));
     // tslint:disable-next-line

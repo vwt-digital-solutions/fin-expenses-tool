@@ -56,8 +56,8 @@
               [(ngModel)]="formType"
               #ntype="ngModel"
               required >
-              <option disabled selected>-- Kies een declaratiesoort --</option>
-              <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">
+              <option disabled selected value="">-- Kies een declaratiesoort --</option>
+              <option *ngFor="let t of typeOptions | keys" [ngValue]="t.cid">
                 {{t.ctype}}
               </option>
             </select>
@@ -177,7 +177,7 @@
       <div class="row reason mb-4 d-none d-md-block">
         <div class="col-12 mb-2">
           <h5>Bedrag</h5>
-          <span>{{ (formAmount | currency : 'EUR') || '€0.00' }}</span>
+          <span>{{ (formAmount || 0 ) | currency:'EUR':'&euro;' }}</span>
         </div>
         <div class="col-12">
           <h5>Reden</h5>

@@ -1,6 +1,5 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild, AfterContentChecked} from '@angular/core';
 import {Expense} from '../../models/expense';
-import {CostType} from '../../models/cost-type';
 import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
 import {Attachment} from '../../models/attachment';
@@ -8,27 +7,28 @@ import {ExpensesConfigService} from '../../services/config.service';
 import {IdentityService} from '../../services/identity.service';
 import {DefaultImageService} from '../../services/default-image.service';
 import { Observable, forkJoin } from 'rxjs';
-import { FormatterService } from 'src/app/services/formatter.service';
 import { Endpoint } from 'src/app/models/endpoint.enum';
 import { HttpClient } from '@angular/common/http';
 import { EnvService } from 'src/app/services/env.service';
 import { formatDate } from '@angular/common';
 import { NgForm } from '@angular/forms';
+import { KeysPipe } from 'src/app/pipes/keys.pipe';
 
 @Component({
   selector: 'app-maxmodal',
   templateUrl: './maxmodal.component.html',
-  styleUrls: ['./maxmodal.component.scss']
+  styleUrls: ['./maxmodal.component.scss'],
+  providers: [KeysPipe]
 })
-export class MaxModalComponent implements OnInit {
-  @ViewChild(NgForm, { static: true }) expenseForm: NgForm;
+export class MaxModalComponent implements OnInit, AfterContentChecked {
+  @ViewChild('expenseForm', { static: true }) expenseForm: NgForm;
 
   @Input() expenseData: Expense;
   @Input() forceViewer: boolean;
   @Input() moveDirection: string;
   @Output() messageEvent = new EventEmitter<boolean[]>();
 
-  public typeOptions: CostType[];
+  public typeOptions: any;
   public receiptFiles: Attachment[];
   public errorMessage: string;
   private readonly today: Date;
@@ -46,8 +46,10 @@ export class MaxModalComponent implements OnInit {
   public rejectionNote: boolean;
   public formCostTypeMessage = { short: '', long: '' };
   public expenseFlags = [];
-  public transdateNotFilledMessage;
+  public transdateNotFilledMessage: string;
   public expenseTransDate = true;
+  public expenseCostType = '';
+  private costTypeIsChecked = false;
 
   constructor(
     private httpClient: HttpClient,
@@ -55,9 +57,10 @@ export class MaxModalComponent implements OnInit {
     private expensesConfigService: ExpensesConfigService,
     private identityService: IdentityService,
     private defaultImageService: DefaultImageService,
-    private route: ActivatedRoute,
-    public formatter: FormatterService
+    private route: ActivatedRoute
   ) {
+    this.route.data.pipe(map(data => data.costTypes)).subscribe(costTypes => this.typeOptions = costTypes);
+
     if (window.location.pathname === '/home' || window.location.pathname === '/') {
       this.isEditor = true;
     } else if (window.location.pathname === '/expenses/manage') {
@@ -83,9 +86,6 @@ export class MaxModalComponent implements OnInit {
       }
     };
 
-    this.route.data.pipe(
-      map(data => data.costTypes)
-    ).subscribe(costTypes => this.typeOptions = [...costTypes]);
     this.today = new Date();
   }
 
@@ -127,6 +127,25 @@ export class MaxModalComponent implements OnInit {
         });
       }
     });
+  }
+
+  ngAfterContentChecked(): void {
+    if (
+      (this.isEditor || this.isCreditor) &&
+      !this.costTypeIsChecked &&
+      'cost_type' in this.expenseForm.control.controls
+    ) {
+      this.costTypeIsChecked = true;
+      for (const type in this.typeOptions) {
+        if (type === this.expenseData.cost_type) {
+          this.expenseForm.form.patchValue({cost_type: this.typeOptions[type].cid});
+          return;
+        }
+      }
+      this.expenseForm.form.patchValue({cost_type: ''});
+      this.expenseForm.form.controls['cost_type'].setErrors({incorrect: true});
+      this.expenseForm.form.controls['cost_type'].markAsTouched();
+    }
   }
 
   /** Controls the submit buttons and UpdateForm: Checks every input needed. */
@@ -499,12 +518,14 @@ export class MaxModalComponent implements OnInit {
   }
 
   onChangeType(event: Event) {
-    for (const type of this.typeOptions) {
-      if (event.target['value'].includes(type.cid)) {
-        if (type.managertype === 'leasecoordinator') {
-          this.formCostTypeMessage = type.message['nl'];
-        } else {
-          this.formCostTypeMessage = { short: '', long: '' };
+    for (const type in this.typeOptions) {
+      if (type in this.typeOptions) {
+        if (event.target['value'].includes(this.typeOptions[type].cid)) {
+          if (this.typeOptions[type].managertype === 'leasecoordinator') {
+            this.formCostTypeMessage = this.typeOptions[type].message['nl'];
+          } else {
+            this.formCostTypeMessage = { short: '', long: '' };
+          }
         }
       }
     }

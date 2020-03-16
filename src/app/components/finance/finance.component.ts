@@ -1,17 +1,20 @@
 import {Component} from '@angular/core';
 import {HttpClient, HttpResponse, HttpParams} from '@angular/common/http';
 import {ExpensesConfigService} from '../../services/config.service';
-import {FormatterService} from 'src/app/services/formatter.service';
 import {Expense} from '../../models/expense';
 import {saveAs} from 'file-saver';
-import {formatDate} from '@angular/common';
+import {formatDate, DatePipe, CurrencyPipe} from '@angular/common';
 import {EnvService} from '../../services/env.service';
 import {FormGroup, FormControl, Validators, AbstractControl} from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { CostTypePipe } from 'src/app/pipes/cost-type.pipe';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-expenses',
   templateUrl: './finance.component.html',
-  styleUrls: ['./finance.component.scss']
+  styleUrls: ['./finance.component.scss'],
+  providers: [DatePipe, CurrencyPipe, CostTypePipe]
 })
 
 export class FinanceComponent {
@@ -20,6 +23,7 @@ export class FinanceComponent {
   public columnDefs;
   public rowSelection;
   private currentRowIndex: number;
+  private typeOptions: any;
   public wantsNewModal: boolean;
   public dataExport = 'secondary';
   public moveDirection = 'move-up';
@@ -33,8 +37,13 @@ export class FinanceComponent {
   constructor(
     private expenses: ExpensesConfigService,
     private http: HttpClient,
-    private env: EnvService
+    private env: EnvService,
+    private route: ActivatedRoute,
+    private datePipe: DatePipe,
+    private currencyPipe: CurrencyPipe,
+    private costTypePipe: CostTypePipe
   ) {
+    this.route.data.pipe(map(data => data.costTypes)).subscribe(costTypes => this.typeOptions = costTypes);
     this.setUpForm();
 
     this.columnDefs = [
@@ -46,23 +55,35 @@ export class FinanceComponent {
             field: 'claim_date',
             sortable: true,
             filter: true,
-            cellRenderer: params => {
-              return FormatterService.getCorrectDateTime(params.value);
-            },
+            sort: 'desc',
+            valueFormatter: (params: any) => {
+              if (!isNaN(Date.parse(params.value))) {
+                return datePipe.transform(params.value, 'dd-MM-yyyy HH:mm');
+              } else {
+                return 'N/B';
+              }
+            }
           },
           {
             headerName: 'Werknemer', field: 'employee',
             sortable: true, filter: true, width: 180, resizable: true
           },
           {
-            headerName: 'Kosten', field: 'amount', valueFormatter: FormatterService.decimalFormatter,
+            headerName: 'Kosten', field: 'amount', cellRenderer: (params: any) => currencyPipe.transform(params.value, 'EUR', '&euro;'),
             sortable: true, filter: true, width: 120, cellStyle: {'text-align': 'right'}
           },
           {
             headerName: 'Soort', field: 'cost_type',
             sortable: true, filter: true, resizable: true, width: 200,
-            cellRenderer: params => {
-              return params.value.split(':')[0];
+            valueFormatter: (params: any) => {
+              const splitValue = params.value.split(':');
+              if (splitValue.length > 1) {
+                return splitValue[0];
+              } else if (splitValue.length === 1) {
+                return costTypePipe.transform(splitValue[0], this.typeOptions);
+              } else {
+                return 'Onbekend';
+              }
             }
           },
           {
@@ -71,8 +92,12 @@ export class FinanceComponent {
           {
             headerName: 'Bondatum', field: 'transaction_date',
             sortable: true, filter: true, width: 150,
-            cellRenderer: params => {
-              return FormatterService.getCorrectDate(params.value);
+            valueFormatter: (params: any) => {
+              if (!isNaN(Date.parse(params.value))) {
+                return datePipe.transform(params.value, 'dd-MM-yyyy');
+              } else {
+                return 'N/B';
+              }
             }
           },
           {
@@ -97,8 +122,12 @@ export class FinanceComponent {
           headerName: '', field: 'export_date',
           sortable: true, filter: true,
           suppressMovable: true, width: 170,
-          cellRenderer: params => {
-            return FormatterService.getCorrectDateTime(params.value);
+          valueFormatter: (params: any) => {
+            if (!isNaN(Date.parse(params.value))) {
+              return this.datePipe.transform(params.value, 'dd-MM-yyyy HH:mm:ss');
+            } else {
+              return 'N/B';
+            }
           }
         },
         {
@@ -137,7 +166,7 @@ export class FinanceComponent {
           document.body.appendChild(a);
           const url = window.URL.createObjectURL(blob);
           a.href = url;
-          a.download = FormatterService.getCorrectDateTime(event.data.export_date) + downloadType;
+          a.download = this.datePipe.transform(event.data.export_date, 'dd-MM-yyyy HH:mm:ss') + downloadType;
           a.click();
           window.URL.revokeObjectURL(url);
           console.log('>> GET SUCCESS');

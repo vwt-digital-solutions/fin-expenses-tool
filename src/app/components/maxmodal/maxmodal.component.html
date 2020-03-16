@@ -15,8 +15,8 @@
         <div class="d-table w-100">
           <p class="employee-text float-left" id="employeeText">{{ expenseData.employee }}</p>
           <span
-            class="{{ formatter.getStatusClassing(expenseData.status.text) }} float-right" >
-            {{ formatter.getStatusFormatter(expenseData.status.text) }}
+            class="{{ expenseData.status.text | expenseStatus:'class' }} float-right" >
+            {{ expenseData.status.text | expenseStatus:'text' }}
           </span>
         </div>
         <div class="employee-line"></div>
@@ -48,14 +48,14 @@
             <ng-template #popContent let-context="context">
               <ng-container *ngIf="!context['error']; else popContentError">
                 <div class="d-table float-left">
-                  <h3><strong>{{ context['amount'] | currency : 'EUR' }}</strong></h3>
+                  <h3><strong>{{ context['amount'] | currency:'EUR':'&euro;' }}</strong></h3>
                   <span class="d-table">Ingediend op: <strong>{{ context['claim_date'] | date: 'dd-MM-yyyy' }}</strong></span>
-                  <span class="d-table text-muted">{{ context['cost_type'].split(':')[0] }}</span>
+                  <span class="d-table text-muted">{{ context['cost_type'] | costType:typeOptions }}</span>
                   <span class="d-table">{{ context['note'] }}</span>
                 </div>
                 <div class="status-pill">
-                  <span class="badge badge-pill" [className]="formatter.getStatusClassing(context['status'])">
-                    {{ formatter.getStatusFormatter(context['status']) }}
+                  <span class="badge badge-pill" [className]="context['status'] | expenseStatus:'class'">
+                    {{ context['status'] | expenseStatus:'text' }}
                   </span>
                 </div>
               </ng-container>
@@ -85,10 +85,11 @@
               step="0.01"
               min="0.01"
               name="amount"
+              lang="nl"
               required
               [placeholder]="expenseData.amount"
               [disabled]="!isEditor"
-              [ngModel]="this.expenseData.amount"
+              [ngModel]="expenseData.amount"
               #namount="ngModel" >
             <div class="input-group-append">
               <label class="input-group-text" for="expenseAmount">€ EUR</label>
@@ -114,11 +115,22 @@
             [ngModel]="expenseData.cost_type"
             #ntype="ngModel"
             required >
-            <option disabled selected>-- Kies een declaratiesoort --</option>
-            <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">
-              {{t.ctype}}
-            </option>
+            <ng-container *ngIf="isEditor || isCreditor; else costTypeDisabled">
+              <option disabled selected value="">-- Kies een declaratiesoort --</option>
+              <option *ngFor="let t of typeOptions | keys" [ngValue]="t.cid">
+                {{ t.ctype }}
+              </option>
+            </ng-container>
+            <ng-template #costTypeDisabled>
+              <option disabled selected [ngValue]="expenseData.cost_type">
+                {{ expenseData.cost_type | costType:typeOptions }}
+              </option>
+            </ng-template>
           </select>
+
+          <small *ngIf="!ntype.valid && isEditor" class="text-danger w-100" >
+            Selecteer een juiste kostensoort
+          </small>
         </div>
         <!-- Form: END : Cost Type -->
 
