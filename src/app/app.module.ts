@@ -31,6 +31,7 @@ import { PageNotFoundComponent } from './components/page-not-found/page-not-foun
 import { DeviceDetectorModule } from 'ngx-device-detector';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { CostTypePipe } from './pipes/cost-type.pipe';
+import { CostTypeActiveFilterPipe } from './pipes/cost-type-active-filter.pipe';
 import { ExpenseStatusPipe } from './pipes/expense-status.pipe';
 import { MaxModalComponent } from './components/maxmodal/maxmodal.component';
 import { KeysPipe } from './pipes/keys.pipe';
@@ -50,6 +51,7 @@ import { KeysPipe } from './pipes/keys.pipe';
     PageNotFoundComponent,
     SafeHtmlPipe,
     CostTypePipe,
+    CostTypeActiveFilterPipe,
     KeysPipe,
     ExpenseStatusPipe,
     MaxModalComponent
@@ -77,6 +79,7 @@ import { KeysPipe } from './pipes/keys.pipe';
     ExpensesConfigService,
     AuthGuard,
     CostTypePipe,
+    CostTypeActiveFilterPipe,
     ExpenseStatusPipe,
     KeysPipe,
     SafeHtmlPipe,
