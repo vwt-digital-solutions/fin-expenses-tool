@@ -183,7 +183,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
       if (this.rejectionNote) {
         return rNote.invalid;
       }
-      return !(this.selectedRejection);
+      return (this.isRejecting ? !(this.selectedRejection !== undefined && this.selectedRejection !== null) : false);
     } else if (this.isCreditor) {
       if (this.rejectionNote) {
         return nType.invalid || rNote.invalid;
