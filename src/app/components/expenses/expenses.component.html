@@ -57,7 +57,7 @@
               #ntype="ngModel"
               required >
               <option disabled selected value="">-- Kies een declaratiesoort --</option>
-              <option *ngFor="let t of typeOptions | keys" value="{{t.cid}}">
+              <option *ngFor="let t of typeOptions | keys | costTypeActiveFilter:true" value="{{t.cid}}">
                 {{t.ctype}}
               </option>
             </select>
