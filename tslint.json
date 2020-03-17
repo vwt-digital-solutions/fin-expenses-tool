@@ -88,6 +88,6 @@
     "no-string-literal": false
   },
   "rulesDirectory": [
-    "../node_modules/codelyzer"
+    "node_modules/codelyzer"
   ]
 }
