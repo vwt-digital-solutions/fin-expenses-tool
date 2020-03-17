@@ -277,9 +277,13 @@
             class="custom-select"
             name="rnoteselect"
             (change)="rejectionHit($event)" >
-            <option>Deze kosten kun je declareren via Regweb (PSA)</option>
-            <option>Deze kosten kun je declareren via de leasemaatschappij</option>
-            <option>Deze kosten zijn al gedeclareerd</option>
+            <option disabled selected value="">-- Kies een reden --</option>
+            <option
+              *ngFor="let note of rejectionNotes"
+              value="{{ note['translations'].nl }}"
+              [selected]="expenseData.status.rnote == note['translations'].nl" >
+              {{ note['translations'].nl }}
+            </option>
             <option value="note">Anders, reden:</option>
           </select>
         </div>

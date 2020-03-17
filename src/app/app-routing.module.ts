@@ -10,12 +10,13 @@ import { AuthGuard } from './auth/auth.guard';
 import { AuthComponent } from './auth/auth.component';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { CostTypesResolver } from './services/cost-types.resolver';
+import { RejectionNotesResolver } from './services/rejection-notes.resolver';
 
 const routes: Routes = [
   {
     path: 'expenses',
     canActivate: [AuthGuard],
-    resolve: { costTypes: CostTypesResolver },
+    resolve: { costTypes: CostTypesResolver, rejectionNotes: RejectionNotesResolver },
     children: [
       {
         path: 'employee',
@@ -63,7 +64,8 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
   providers: [
-    CostTypesResolver
+    CostTypesResolver,
+    RejectionNotesResolver
   ]
 })
 export class AppRoutingModule { }

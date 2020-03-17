@@ -28,12 +28,13 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
   @Input() moveDirection: string;
   @Output() messageEvent = new EventEmitter<boolean[]>();
 
+  public rejectionNotes: any;
   public typeOptions: any;
   public receiptFiles: Attachment[];
   public errorMessage: string;
   private readonly today: Date;
   private action: string;
-  private selectedRejection: any;
+  private selectedRejection: string;
   private OurJaneDoeRoles: any;
   public rejectionNoteVisible = false;
   public isCreditor: boolean;
@@ -59,7 +60,10 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
     private defaultImageService: DefaultImageService,
     private route: ActivatedRoute
   ) {
-    this.route.data.pipe(map(data => data.costTypes)).subscribe(costTypes => this.typeOptions = costTypes);
+    this.route.data.subscribe(data => {
+      this.typeOptions = data['costTypes'];
+      this.rejectionNotes = data['rejectionNotes'];
+    });
 
     if (window.location.pathname === '/home' || window.location.pathname === '/') {
       this.isEditor = true;
@@ -71,7 +75,6 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
       this.isViewer = true;
     }
 
-    this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
     this.transdateNotFilledMessage = 'Graag een geldige datum invullen';
 
     window.onmousedown = event => {
@@ -101,7 +104,21 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
       this.isCreditor = false;
     }
 
+    this.selectedRejection = this.expenseData['status']['rnote'] ? this.expenseData['status']['rnote'] : null;
     this.expenseFlags = this.processExpenseFlags();
+
+    if (this.expenseData['status']['rnote'] && this.rejectionNotes) {
+      for (const rnote of this.rejectionNotes) {
+        for (const lan in rnote.translations) {
+          if (
+            lan in rnote.translations &&
+            this.expenseData['status']['rnote'] === rnote.translations[lan]
+          ) {
+            this.expenseData['status']['rnote'] = rnote.translations.nl;
+          }
+        }
+      }
+    }
 
     // Checks what role the user has and makes a specific request
     let receiptRequest = new Observable();
@@ -166,6 +183,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
       if (this.rejectionNote) {
         return rNote.invalid;
       }
+      return !(this.selectedRejection);
     } else if (this.isCreditor) {
       if (this.rejectionNote) {
         return nType.invalid || rNote.invalid;
@@ -173,6 +191,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
         return nType.invalid;
       }
     }
+    return true;
   }
 
   // BEGIN Subject to change
