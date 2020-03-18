@@ -139,7 +139,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
     ) {
       this.costTypeIsChecked = true;
       for (const type in this.typeOptions) {
-        if (type === this.expenseData.cost_type) {
+        if (type === this.expenseData.cost_type && this.typeOptions[type].active) {
           this.expenseForm.form.patchValue({cost_type: this.typeOptions[type].cid});
           return;
         }
