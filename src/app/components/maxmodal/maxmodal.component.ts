@@ -215,7 +215,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
         'ready_for_manager';
 
     Object.keys(dataVerified).length !== 0 ?
-    this.expensesConfigService.updateExpenseEmployee(dataVerified, 123)
+    this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
     .subscribe(
       result => this.afterPostExpense(result),
       error => {
