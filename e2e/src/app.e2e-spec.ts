@@ -727,7 +727,7 @@ describe('ExpenseApp:', () => {
 
     expect(element(by.id('thumbs-down')).isDisplayed());
     element(by.id('thumbs-down')).click().then(() => {
-      element(by.id('rnoteselect')).all(by.tagName('option')).then((options) => {
+      element(by.id('rnote_id')).all(by.tagName('option')).then((options) => {
         options[1].click();
 
         element(by.id('thumbs-down-rejecting')).click().then(() => {
@@ -958,7 +958,7 @@ describe('ExpenseApp:', () => {
 
     expect(element(by.id('thumbs-down')).isDisplayed());
     element(by.id('thumbs-down')).click().then(() => {
-      element(by.id('rnoteselect')).all(by.tagName('option')).then((options) => {
+      element(by.id('rnote_id')).all(by.tagName('option')).then((options) => {
         options[1].click();
 
         element(by.id('thumbs-down-rejecting')).click().then(() => {
