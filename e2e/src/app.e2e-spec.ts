@@ -727,14 +727,18 @@ describe('ExpenseApp:', () => {
 
     expect(element(by.id('thumbs-down')).isDisplayed());
     element(by.id('thumbs-down')).click().then(() => {
-      element(by.id('thumbs-down-rejecting')).click().then(() => {
-        browser.sleep(1000);
-        expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+      element(by.id('rnoteselect')).all(by.tagName('option')).then((options) => {
+        options[1].click();
+
+        element(by.id('thumbs-down-rejecting')).click().then(() => {
           browser.sleep(1000);
-          browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-            browser.get('/home');
-          });
-        }));
+          expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+            browser.sleep(1000);
+            browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+              browser.get('/home');
+            });
+          }));
+        });
       });
     });
 
@@ -954,14 +958,18 @@ describe('ExpenseApp:', () => {
 
     expect(element(by.id('thumbs-down')).isDisplayed());
     element(by.id('thumbs-down')).click().then(() => {
-      element(by.id('thumbs-down-rejecting')).click().then(() => {
-        browser.sleep(1000);
-        expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+      element(by.id('rnoteselect')).all(by.tagName('option')).then((options) => {
+        options[1].click();
+
+        element(by.id('thumbs-down-rejecting')).click().then(() => {
           browser.sleep(1000);
-          browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-            browser.get('/home');
-          });
-        }));
+          expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+            browser.sleep(1000);
+            browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+              browser.get('/home');
+            });
+          }));
+        });
       });
     });
 
