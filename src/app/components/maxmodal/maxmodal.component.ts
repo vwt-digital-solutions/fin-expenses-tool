@@ -34,7 +34,6 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
   public errorMessage: string;
   private readonly today: Date;
   private action: string;
-  private selectedRejection: string;
   private OurJaneDoeRoles: any;
   public rejectionNoteVisible = false;
   public isCreditor: boolean;
@@ -104,21 +103,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
       this.isCreditor = false;
     }
 
-    this.selectedRejection = this.expenseData['status']['rnote'] ? this.expenseData['status']['rnote'] : null;
     this.expenseFlags = this.processExpenseFlags();
-
-    if (this.expenseData['status']['rnote'] && this.rejectionNotes) {
-      for (const rnote of this.rejectionNotes) {
-        for (const lan in rnote.translations) {
-          if (
-            lan in rnote.translations &&
-            this.expenseData['status']['rnote'] === rnote.translations[lan]
-          ) {
-            this.expenseData['status']['rnote'] = rnote.translations.nl;
-          }
-        }
-      }
-    }
 
     // Checks what role the user has and makes a specific request
     let receiptRequest = new Observable();
@@ -172,24 +157,19 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
     nAmount: { invalid: any; viewModel: number; },
     nType: { invalid: any; },
     nTransDate: { invalid: any; viewModel: string | number | Date; },
-    rNote: { invalid: boolean }
+    rNoteId: { value: string },
+    rNote: { value: string }
   ) {
     // Checks what role the user has and verifies the inputs accordingly.
     if (this.isEditor) {
       return nNote.invalid || nAmount.invalid || nType.invalid
         || nTransDate.invalid || (new Date(nTransDate.viewModel)
           > this.today) || nAmount.viewModel < 0.01 || (toSubmit && !this.identityService.isTesting() ? this.attachmentsIsInvalid : false);
-    } else if (this.isManager) {
-      if (this.rejectionNote) {
-        return rNote.invalid;
+    } else if (this.isManager || this.isCreditor) {
+      if (this.isRejecting && (!rNoteId.value || this.checkRNoteRequired(Number(rNoteId.value)) && !rNote.value)) {
+        return true;
       }
-      return (this.isRejecting ? !(this.selectedRejection !== undefined && this.selectedRejection !== null) : false);
-    } else if (this.isCreditor) {
-      if (this.rejectionNote) {
-        return nType.invalid || rNote.invalid;
-      } else {
-        return nType.invalid;
-      }
+      return nType ? nType.invalid : false;
     }
     return true;
   }
@@ -203,7 +183,8 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
       instArray[1],
       instArray[2],
       instArray[3],
-      instArray[4]
+      instArray[4],
+      instArray[5]
     )) {
       const dataVerified = {};
       const data = form.value;
@@ -223,7 +204,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
     data.amount = Number((data.amount).toFixed(2));
     data.transaction_date = new Date(data.transaction_date).toISOString();
     for (const prop in data) {
-      if (prop.length !== 0) {
+      if (prop.length !== 0 && prop !== 'rnote' && prop !== 'rnote_id') {
         dataVerified[prop] = data[prop];
       }
     }
@@ -245,14 +226,17 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
   }
 
   claimForManager(dataVerified, expenseId, data) {
-    dataVerified[`rnote`] = data.rnote;
+    if (this.action === 'rejecting') {
+      dataVerified[`rnote_id`] = Number(data.rnote_id);
 
-    if (!(this.rejectionNote) && this.action === 'rejecting') {
-      dataVerified[`rnote`] = this.selectedRejection;
+      if (this.checkRNoteRequired(Number(data.rnote_id))) {
+        dataVerified[`rnote`] = data.rnote;
+      }
     }
 
     dataVerified[`status`] = this.action === 'approving' ? `ready_for_creditor` :
       this.action === 'rejecting' ? `rejected_by_manager` : null;
+
     Object.keys(dataVerified).length !== 0 ?
       this.expensesConfigService.updateExpenseManager(dataVerified, expenseId)
         .subscribe(
@@ -265,11 +249,14 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
   }
 
   claimForCreditor(dataVerified, expenseId, data) {
-    dataVerified[`rnote`] = data.rnote;
     dataVerified[`cost_type`] = data.cost_type;
 
-    if (!(this.rejectionNote) && this.action === 'rejecting') {
-      dataVerified[`rnote`] = this.selectedRejection;
+    if (this.action === 'rejecting') {
+      dataVerified[`rnote_id`] = Number(data.rnote_id);
+
+      if (this.checkRNoteRequired(Number(data.rnote_id))) {
+        dataVerified[`rnote`] = data.rnote;
+      }
     }
 
     dataVerified[`status`] = this.action === 'approving' ? `approved` :
@@ -344,8 +331,14 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
 
   /** Used to update the rejection note with normal style change (works better on mobile) */
   rejectionHit(event: any) {
-    this.rejectionNote = (event.target.value === 'note');
-    this.selectedRejection = event.target.value;
+    this.rejectionNote = false;
+
+    for (const rejection of this.rejectionNotes) {
+      if (rejection['rnote_id'] === Number(event.target.value) && rejection['form'] === 'dynamic') {
+        this.rejectionNote = true;
+      }
+    }
+
     if (this.rejectionNote) {
       this.rejectionNoteVisible = true;
     } else {
@@ -435,6 +428,15 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
       rNoteStatuses.includes(expense.status.text)
     ) {
       return true;
+    }
+    return false;
+  }
+
+  checkRNoteRequired(rNoteId: number) {
+    for (const rejection of this.rejectionNotes) {
+      if (rejection['rnote_id'] === rNoteId && rejection['form'] === 'dynamic') {
+        return true;
+      }
     }
     return false;
   }

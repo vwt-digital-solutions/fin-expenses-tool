@@ -270,21 +270,21 @@
         <!-- Form: Rejection Note | Check submit-update-form label after every change -->
         <div class="input-group mb-3" [ngClass]="{hidden: !this.isRejecting}">
           <div class="input-group-prepend">
-            <label class="input-group-text" for="rnoteselect">Reden:</label>
+            <label class="input-group-text" for="rnote_id">Reden:</label>
           </div>
           <select
-            id="rnoteselect"
+            id="rnote_id"
             class="custom-select"
-            name="rnoteselect"
-            (change)="rejectionHit($event)" >
+            name="rnote_id"
+            (change)="rejectionHit($event)"
+            [ngModel]="expenseData.status.rnote_id"
+            #rnote_id="ngModel" >
             <option disabled selected value="">-- Kies een reden --</option>
             <option
               *ngFor="let note of rejectionNotes"
-              value="{{ note['translations'].nl }}"
-              [selected]="expenseData.status.rnote == note['translations'].nl" >
+              value="{{ note.rnote_id }}" >
               {{ note['translations'].nl }}
             </option>
-            <option value="note">Anders, reden:</option>
           </select>
         </div>
         <div
@@ -381,8 +381,8 @@
               id="thumbs-down-rejecting"
               type="button"
               class="btn btn-danger"
-              [disabled]="submitButtonController(true, undefined, undefined, this.isCreditor ? ntype : undefined, undefined, rnote)"
-              (click)="updatingAction('rejecting'); this.claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])" >
+              [disabled]="submitButtonController(true, undefined, undefined, this.isCreditor ? ntype : undefined, undefined, rnote_id, rnote)"
+              (click)="updatingAction('rejecting'); this.claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote_id, rnote])" >
               <a id="information-icon-down-rejecting">Afkeuring bevestigen</a>
             </button>
           </div>
