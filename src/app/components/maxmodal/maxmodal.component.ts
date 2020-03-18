@@ -215,12 +215,12 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
         'ready_for_manager';
 
     Object.keys(dataVerified).length !== 0 ?
-    this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
+    this.expensesConfigService.updateExpenseEmployee(dataVerified, 123)
     .subscribe(
       result => this.afterPostExpense(result),
       error => {
         console.log(error);
-        this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+        this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
       })
       : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
   }
@@ -243,7 +243,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
           result => this.closeModal(true),
           error => {
             console.log(error);
-            this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+            this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
           })
       : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
   }
@@ -267,7 +267,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
           result => this.closeModal(true),
           error => {
             console.log(error);
-            this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+            this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
           })
       : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
   }
@@ -358,7 +358,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
           this.closeModal(true);
         },
         error => {
-          this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+          this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
         });
     }
   }

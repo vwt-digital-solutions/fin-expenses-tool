@@ -247,10 +247,8 @@ export class ExpensesComponent implements  OnInit {
             if (ExpensesComponent.getNavigator()) {
               alert('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
             }
-          } else if (error.status === 400) {
-            this.wrongfulClaim(error.error);
           } else {
-            this.wrongfulClaim();
+            this.wrongfulClaim(error.error.detail ? error.error.detail.nl : error.error);
           }
           console.error('>> POST EXPENSE FAILED', error.message);
         });

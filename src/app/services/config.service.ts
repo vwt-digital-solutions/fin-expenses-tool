@@ -29,11 +29,12 @@ export class ExpensesConfigService {
   }
 
   static handleError(error: HttpErrorResponse) {
+    const errorMessage = error.error['detail'] ? error.error['detail'].nl : error.error;
     if (error.error instanceof ErrorEvent) {
-      console.error('An error occurred:', error.error.message);
+      console.error('An error occurred:', errorMessage);
     } else {
       console.error(
-        `Backend returned code ${error.status}, body was: ${error.error}`);
+        `Backend returned code ${error.status}, body was: ${errorMessage}`);
     }
     return throwError(error);
   }
