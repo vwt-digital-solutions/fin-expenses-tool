@@ -9,6 +9,7 @@ export interface Expense {
   status: {
     export_date: string;
     rnote: string;
+    rnote_id: number;
     text: string;
   };
   flags: object;

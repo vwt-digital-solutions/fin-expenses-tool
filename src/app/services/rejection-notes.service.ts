@@ -8,23 +8,14 @@ import { catchError, map } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
-export class CostTypesService {
+export class RejectionNotesService {
 
   constructor(private http: HttpClient,
               private env: EnvService) { }
 
-  getAllCostTypes(): Observable<any> {
-    return this.http.get(this.env.apiUrl + '/employees/cost-types')
+  getAllRejectionNotes(): Observable<any> {
+    return this.http.get(this.env.apiUrl + '/managers/rejection-notes')
     .pipe(
-      map(costTypes => {
-        const costTypesObject = {};
-        for (const type in costTypes) {
-          if (type in costTypes) {
-            costTypesObject[costTypes[type].cid] = costTypes[type];
-          }
-        }
-        return costTypesObject;
-      }),
       ExpensesConfigService.retry(2),
       catchError(ExpensesConfigService.handleError)
     );

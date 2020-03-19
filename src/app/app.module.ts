@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
@@ -30,24 +30,32 @@ import { AgGridModule } from 'ag-grid-angular';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { DeviceDetectorModule } from 'ngx-device-detector';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
-import {MaxModalComponent} from './components/maxmodal/maxmodal.component';
+import { CostTypePipe } from './pipes/cost-type.pipe';
+import { CostTypeActiveFilterPipe } from './pipes/cost-type-active-filter.pipe';
+import { ExpenseStatusPipe } from './pipes/expense-status.pipe';
+import { MaxModalComponent } from './components/maxmodal/maxmodal.component';
+import { KeysPipe } from './pipes/keys.pipe';
 
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        HeaderComponent,
-        AuthComponent,
-        LoaderComponent,
-        LandingComponent,
-        FinanceComponent,
-        ControllerComponent,
-        ManagerComponent,
-        ExpensesComponent,
-        PageNotFoundComponent,
-        SafeHtmlPipe,
-        MaxModalComponent
-    ],
+  declarations: [
+    AppComponent,
+    HeaderComponent,
+    AuthComponent,
+    LoaderComponent,
+    LandingComponent,
+    FinanceComponent,
+    ControllerComponent,
+    ManagerComponent,
+    ExpensesComponent,
+    PageNotFoundComponent,
+    SafeHtmlPipe,
+    CostTypePipe,
+    CostTypeActiveFilterPipe,
+    KeysPipe,
+    ExpenseStatusPipe,
+    MaxModalComponent
+  ],
   imports: [
     BrowserModule,
     FormsModule,
@@ -61,7 +69,6 @@ import {MaxModalComponent} from './components/maxmodal/maxmodal.component';
     NgbModule,
     DeviceDetectorModule.forRoot()
   ],
-
   exports: [
     PageNotFoundComponent,
     FormsModule,
@@ -71,8 +78,16 @@ import {MaxModalComponent} from './components/maxmodal/maxmodal.component';
     EnvServiceProvider,
     ExpensesConfigService,
     AuthGuard,
+    CostTypePipe,
+    CostTypeActiveFilterPipe,
+    ExpenseStatusPipe,
+    KeysPipe,
     SafeHtmlPipe,
     OAuthService,
+    {
+      provide: LOCALE_ID,
+      useValue: 'nl-NL'
+    },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenInterceptor,

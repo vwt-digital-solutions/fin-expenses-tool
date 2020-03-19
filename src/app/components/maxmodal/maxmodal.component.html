@@ -15,12 +15,13 @@
         <div class="d-table w-100">
           <p class="employee-text float-left" id="employeeText">{{ expenseData.employee }}</p>
           <span
-            class="{{ formatter.getStatusClassing(expenseData.status.text) }} float-right" >
-            {{ formatter.getStatusFormatter(expenseData.status.text) }}
+            class="{{ expenseData.status.text | expenseStatus:'class' }} float-right" >
+            {{ expenseData.status.text | expenseStatus:'text' }}
           </span>
         </div>
         <div class="employee-line"></div>
         <div id="updateErrors" class="alert alert-danger" role="alert" *ngIf="errorMessage">
+          <strong><i class="fas fa-exclamation-triangle"></i></strong>
           {{ errorMessage }}
         </div>
 
@@ -48,14 +49,14 @@
             <ng-template #popContent let-context="context">
               <ng-container *ngIf="!context['error']; else popContentError">
                 <div class="d-table float-left">
-                  <h3><strong>{{ context['amount'] | currency : 'EUR' }}</strong></h3>
+                  <h3><strong>{{ context['amount'] | currency:'EUR':'&euro;' }}</strong></h3>
                   <span class="d-table">Ingediend op: <strong>{{ context['claim_date'] | date: 'dd-MM-yyyy' }}</strong></span>
-                  <span class="d-table text-muted">{{ context['cost_type'].split(':')[0] }}</span>
+                  <span class="d-table text-muted">{{ context['cost_type'] | costType:typeOptions }}</span>
                   <span class="d-table">{{ context['note'] }}</span>
                 </div>
                 <div class="status-pill">
-                  <span class="badge badge-pill" [className]="formatter.getStatusClassing(context['status'])">
-                    {{ formatter.getStatusFormatter(context['status']) }}
+                  <span class="badge badge-pill" [className]="context['status'] | expenseStatus:'class'">
+                    {{ context['status'] | expenseStatus:'text' }}
                   </span>
                 </div>
               </ng-container>
@@ -85,10 +86,11 @@
               step="0.01"
               min="0.01"
               name="amount"
+              lang="nl"
               required
               [placeholder]="expenseData.amount"
               [disabled]="!isEditor"
-              [ngModel]="this.expenseData.amount"
+              [ngModel]="expenseData.amount"
               #namount="ngModel" >
             <div class="input-group-append">
               <label class="input-group-text" for="expenseAmount">€ EUR</label>
@@ -114,11 +116,22 @@
             [ngModel]="expenseData.cost_type"
             #ntype="ngModel"
             required >
-            <option disabled selected>-- Kies een declaratiesoort --</option>
-            <option *ngFor="let t of typeOptions" value="{{t.ctype}}:{{t.cid}}">
-              {{t.ctype}}
-            </option>
+            <ng-container *ngIf="isEditor || isCreditor; else costTypeDisabled">
+              <option disabled selected value="">-- Kies een declaratiesoort --</option>
+              <option *ngFor="let t of typeOptions | keys | costTypeActiveFilter:true" value="{{t.cid}}">
+                {{ t.ctype }}
+              </option>
+            </ng-container>
+            <ng-template #costTypeDisabled>
+              <option disabled selected [ngValue]="expenseData.cost_type">
+                {{ expenseData.cost_type | costType:typeOptions }}
+              </option>
+            </ng-template>
           </select>
+
+          <small *ngIf="!ntype.valid && isEditor" class="text-danger w-100" >
+            Selecteer een juiste kostensoort
+          </small>
         </div>
         <!-- Form: END : Cost Type -->
 
@@ -258,17 +271,21 @@
         <!-- Form: Rejection Note | Check submit-update-form label after every change -->
         <div class="input-group mb-3" [ngClass]="{hidden: !this.isRejecting}">
           <div class="input-group-prepend">
-            <label class="input-group-text" for="rnoteselect">Reden:</label>
+            <label class="input-group-text" for="rnote_id">Reden:</label>
           </div>
           <select
-            id="rnoteselect"
+            id="rnote_id"
             class="custom-select"
-            name="rnoteselect"
-            (change)="rejectionHit($event)" >
-            <option>Deze kosten kun je declareren via Regweb (PSA)</option>
-            <option>Deze kosten kun je declareren via de leasemaatschappij</option>
-            <option>Deze kosten zijn al gedeclareerd</option>
-            <option value="note">Anders, reden:</option>
+            name="rnote_id"
+            (change)="rejectionHit($event)"
+            [ngModel]="expenseData.status.rnote_id"
+            #rnote_id="ngModel" >
+            <option disabled selected value="">-- Kies een reden --</option>
+            <option
+              *ngFor="let note of rejectionNotes"
+              value="{{ note.rnote_id }}" >
+              {{ note['translations'].nl }}
+            </option>
           </select>
         </div>
         <div
@@ -365,8 +382,8 @@
               id="thumbs-down-rejecting"
               type="button"
               class="btn btn-danger"
-              [disabled]="submitButtonController(true, undefined, undefined, this.isCreditor ? ntype : undefined, undefined, rnote)"
-              (click)="updatingAction('rejecting'); this.claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote])" >
+              [disabled]="submitButtonController(true, undefined, undefined, this.isCreditor ? ntype : undefined, undefined, rnote_id, rnote)"
+              (click)="updatingAction('rejecting'); this.claimUpdateForm(expenseForm, expenseData.id, [note, namount, ntype, ntransdate, rnote_id, rnote])" >
               <a id="information-icon-down-rejecting">Afkeuring bevestigen</a>
             </button>
           </div>

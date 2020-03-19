@@ -1,13 +1,17 @@
 import {Component} from '@angular/core';
 import {ExpensesConfigService} from '../../services/config.service';
-import {FormatterService} from 'src/app/services/formatter.service';
 import {Expense} from '../../models/expense';
+import { map } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
+import { DatePipe, CurrencyPipe } from '@angular/common';
+import { CostTypePipe } from 'src/app/pipes/cost-type.pipe';
 
 
 @Component({
   selector: 'app-expenses',
   templateUrl: './manager.component.html',
-  styleUrls: ['./manager.component.scss']
+  styleUrls: ['./manager.component.scss'],
+  providers: [DatePipe, CurrencyPipe, CostTypePipe]
 })
 
 export class ManagerComponent {
@@ -16,13 +20,21 @@ export class ManagerComponent {
   public rowSelection;
   public expenseData: Expense;
   public moveDirection = 'move-up';
+  public overlayNoRowsTemplate = '<span>Geen declaraties gevonden</span>';
 
   public wantsNewModal;
   private gridApi;
+  private typeOptions: any;
 
   constructor(
-    private expenses: ExpensesConfigService
+    private expenses: ExpensesConfigService,
+    private route: ActivatedRoute,
+    private datePipe: DatePipe,
+    private currencyPipe: CurrencyPipe,
+    private costTypePipe: CostTypePipe
   ) {
+    this.route.data.pipe(map(data => data.costTypes)).subscribe(costTypes => this.typeOptions = costTypes);
+
     this.columnDefs = [
       {
         headerName: 'Declaraties Overzicht',
@@ -32,23 +44,35 @@ export class ManagerComponent {
             field: 'claim_date',
             sortable: true,
             filter: true,
-            cellRenderer: params => {
-              return FormatterService.getCorrectDateTime(params.value);
-            },
+            sort: 'asc',
+            valueFormatter: (params: any) => {
+              if (!isNaN(Date.parse(params.value))) {
+                return datePipe.transform(params.value, 'dd-MM-yyyy HH:mm');
+              } else {
+                return 'N/B';
+              }
+            }
           },
           {
             headerName: 'Werknemer', field: 'employee',
             sortable: true, filter: true, width: 200, resizable: true
           },
           {
-            headerName: 'Kosten', field: 'amount', valueFormatter: FormatterService.decimalFormatter,
+            headerName: 'Kosten', field: 'amount', cellRenderer: (params: any) => currencyPipe.transform(params.value, 'EUR', '&euro;'),
             sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
           },
           {
             headerName: 'Soort', field: 'cost_type',
             sortable: true, filter: true, resizable: true, width: 200,
-            cellRenderer: params => {
-              return params.value.split(':')[0];
+            valueFormatter: params => {
+              const splitValue = params.value.split(':');
+              if (splitValue.length > 1) {
+                return splitValue[0];
+              } else if (splitValue.length === 1) {
+                return costTypePipe.transform(splitValue[0], this.typeOptions);
+              } else {
+                return 'Onbekend';
+              }
             }
           },
           {
@@ -57,14 +81,14 @@ export class ManagerComponent {
           {
             headerName: 'Bondatum', field: 'transaction_date',
             sortable: true, filter: true, width: 150,
-            cellRenderer: params => {
-              return FormatterService.getCorrectDate(params.value);
+            valueFormatter: (params: any) => {
+              if (!isNaN(Date.parse(params.value))) {
+                return datePipe.transform(params.value, 'dd-MM-yyyy');
+              } else {
+                return 'N/B';
+              }
             }
-          },
-          {
-            headerName: 'Status', field: 'status.text',
-            sortable: true, width: 250
-          },
+          }
         ]
       }
     ];
@@ -107,7 +131,17 @@ export class ManagerComponent {
   }
 
   onGridReady(params: any) {
+    params.api.showLoadingOverlay();
+
     // @ts-ignore
-    this.expenses.getManagerExpenses().subscribe((data) => this.rowData = [...data]);
+    this.expenses.getManagerExpenses().subscribe((data) => {
+      this.rowData = data;
+
+      if (params.api.getDisplayedRowCount() <= 0 ) {
+        params.api.showNoRowsOverlay();
+      } else {
+        params.api.hideOverlay();
+      }
+    });
   }
 }

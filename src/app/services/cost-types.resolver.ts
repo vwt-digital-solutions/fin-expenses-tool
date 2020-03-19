@@ -3,14 +3,13 @@ import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/r
 import { Observable, of } from 'rxjs';
 import { CostTypesService } from './cost-types.service';
 import { tap } from 'rxjs/operators';
-import { CostType } from '../models/cost-type';
 
 @Injectable({
     providedIn: 'root'
 })
-export class CostTypesResolver implements Resolve<Observable<CostType[]>> {
+export class CostTypesResolver implements Resolve<Observable<any>> {
 
-    private costTypesCache: CostType[] = undefined;
+    private costTypesCache: any = undefined;
 
     constructor(
         private costTypesService: CostTypesService
@@ -20,10 +19,10 @@ export class CostTypesResolver implements Resolve<Observable<CostType[]>> {
     public resolve(
         route: ActivatedRouteSnapshot,
         state: RouterStateSnapshot
-    ): Observable<CostType[]> {
+    ): Observable<any> {
         if (this.costTypesCache) {
             return of(this.costTypesCache);
         }
-        return this.costTypesService.getAllCostTypes().pipe(tap(costTypes => this.costTypesCache = [...costTypes]));
+        return this.costTypesService.getAllCostTypes().pipe(tap(costTypes => this.costTypesCache = costTypes));
     }
 }

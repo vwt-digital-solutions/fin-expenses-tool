@@ -1,6 +1,5 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, ViewChild, AfterContentChecked} from '@angular/core';
 import {Expense} from '../../models/expense';
-import {CostType} from '../../models/cost-type';
 import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
 import {Attachment} from '../../models/attachment';
@@ -8,32 +7,33 @@ import {ExpensesConfigService} from '../../services/config.service';
 import {IdentityService} from '../../services/identity.service';
 import {DefaultImageService} from '../../services/default-image.service';
 import { Observable, forkJoin } from 'rxjs';
-import { FormatterService } from 'src/app/services/formatter.service';
 import { Endpoint } from 'src/app/models/endpoint.enum';
 import { HttpClient } from '@angular/common/http';
 import { EnvService } from 'src/app/services/env.service';
 import { formatDate } from '@angular/common';
 import { NgForm } from '@angular/forms';
+import { KeysPipe } from 'src/app/pipes/keys.pipe';
 
 @Component({
   selector: 'app-maxmodal',
   templateUrl: './maxmodal.component.html',
-  styleUrls: ['./maxmodal.component.scss']
+  styleUrls: ['./maxmodal.component.scss'],
+  providers: [KeysPipe]
 })
-export class MaxModalComponent implements OnInit {
-  @ViewChild(NgForm, { static: true }) expenseForm: NgForm;
+export class MaxModalComponent implements OnInit, AfterContentChecked {
+  @ViewChild('expenseForm', { static: true }) expenseForm: NgForm;
 
   @Input() expenseData: Expense;
   @Input() forceViewer: boolean;
   @Input() moveDirection: string;
   @Output() messageEvent = new EventEmitter<boolean[]>();
 
-  public typeOptions: CostType[];
+  public rejectionNotes: any;
+  public typeOptions: any;
   public receiptFiles: Attachment[];
   public errorMessage: string;
   private readonly today: Date;
   private action: string;
-  private selectedRejection: any;
   private OurJaneDoeRoles: any;
   public rejectionNoteVisible = false;
   public isCreditor: boolean;
@@ -46,8 +46,10 @@ export class MaxModalComponent implements OnInit {
   public rejectionNote: boolean;
   public formCostTypeMessage = { short: '', long: '' };
   public expenseFlags = [];
-  public transdateNotFilledMessage;
+  public transdateNotFilledMessage: string;
   public expenseTransDate = true;
+  public expenseCostType = '';
+  private formLoaded = false;
 
   constructor(
     private httpClient: HttpClient,
@@ -55,9 +57,13 @@ export class MaxModalComponent implements OnInit {
     private expensesConfigService: ExpensesConfigService,
     private identityService: IdentityService,
     private defaultImageService: DefaultImageService,
-    private route: ActivatedRoute,
-    public formatter: FormatterService
+    private route: ActivatedRoute
   ) {
+    this.route.data.subscribe(data => {
+      this.typeOptions = data['costTypes'];
+      this.rejectionNotes = data['rejectionNotes'];
+    });
+
     if (window.location.pathname === '/home' || window.location.pathname === '/') {
       this.isEditor = true;
     } else if (window.location.pathname === '/expenses/manage') {
@@ -68,7 +74,6 @@ export class MaxModalComponent implements OnInit {
       this.isViewer = true;
     }
 
-    this.selectedRejection = 'Deze kosten kun je declareren via Regweb (PSA)';
     this.transdateNotFilledMessage = 'Graag een geldige datum invullen';
 
     window.onmousedown = event => {
@@ -83,9 +88,6 @@ export class MaxModalComponent implements OnInit {
       }
     };
 
-    this.route.data.pipe(
-      map(data => data.costTypes)
-    ).subscribe(costTypes => this.typeOptions = [...costTypes]);
     this.today = new Date();
   }
 
@@ -129,6 +131,35 @@ export class MaxModalComponent implements OnInit {
     });
   }
 
+  ngAfterContentChecked(): void {
+    if (!this.formLoaded &&
+      'cost_type' in this.expenseForm.control.controls &&
+      'rnote' in this.expenseForm.control.controls &&
+      'rnote_id' in this.expenseForm.control.controls) {
+      if ((this.isEditor || this.isCreditor)) {
+        let isFound = false;
+        for (const type in this.typeOptions) {
+          if (type === this.expenseData.cost_type.split(':').pop() && this.typeOptions[type].active) {
+            this.expenseForm.form.patchValue({cost_type: this.typeOptions[type].cid});
+            isFound = true;
+          }
+        }
+        if (!isFound) {
+          this.expenseForm.form.patchValue({cost_type: ''});
+          this.expenseForm.form.controls['cost_type'].setErrors({incorrect: true});
+          this.expenseForm.form.controls['cost_type'].markAsTouched();
+        }
+      }
+
+      if ((this.isCreditor || this.isManager) && ('rnote' in this.expenseData.status || 'rnote_id' in this.expenseData.status)) {
+        this.expenseForm.form.patchValue({rnote: ''});
+        this.expenseForm.form.patchValue({rnote_id: ''});
+      }
+
+      this.formLoaded = true;
+    }
+  }
+
   /** Controls the submit buttons and UpdateForm: Checks every input needed. */
   protected submitButtonController(
     toSubmit = true,
@@ -136,24 +167,21 @@ export class MaxModalComponent implements OnInit {
     nAmount: { invalid: any; viewModel: number; },
     nType: { invalid: any; },
     nTransDate: { invalid: any; viewModel: string | number | Date; },
-    rNote: { invalid: boolean }
+    rNoteId: { value: string },
+    rNote: { value: string }
   ) {
     // Checks what role the user has and verifies the inputs accordingly.
     if (this.isEditor) {
       return nNote.invalid || nAmount.invalid || nType.invalid
         || nTransDate.invalid || (new Date(nTransDate.viewModel)
           > this.today) || nAmount.viewModel < 0.01 || (toSubmit && !this.identityService.isTesting() ? this.attachmentsIsInvalid : false);
-    } else if (this.isManager) {
-      if (this.rejectionNote) {
-        return rNote.invalid;
+    } else if (this.isManager || this.isCreditor) {
+      if (this.isRejecting && (!rNoteId.value || this.checkRNoteRequired(Number(rNoteId.value)) && !rNote.value)) {
+        return true;
       }
-    } else if (this.isCreditor) {
-      if (this.rejectionNote) {
-        return nType.invalid || rNote.invalid;
-      } else {
-        return nType.invalid;
-      }
+      return nType ? nType.invalid : false;
     }
+    return true;
   }
 
   // BEGIN Subject to change
@@ -165,7 +193,8 @@ export class MaxModalComponent implements OnInit {
       instArray[1],
       instArray[2],
       instArray[3],
-      instArray[4]
+      instArray[4],
+      instArray[5]
     )) {
       const dataVerified = {};
       const data = form.value;
@@ -185,7 +214,7 @@ export class MaxModalComponent implements OnInit {
     data.amount = Number((data.amount).toFixed(2));
     data.transaction_date = new Date(data.transaction_date).toISOString();
     for (const prop in data) {
-      if (prop.length !== 0) {
+      if (prop.length !== 0 && prop !== 'rnote' && prop !== 'rnote_id') {
         dataVerified[prop] = data[prop];
       }
     }
@@ -201,37 +230,43 @@ export class MaxModalComponent implements OnInit {
       result => this.afterPostExpense(result),
       error => {
         console.log(error);
-        this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+        this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
       })
       : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
   }
 
   claimForManager(dataVerified, expenseId, data) {
-    dataVerified[`rnote`] = data.rnote;
+    if (this.action === 'rejecting') {
+      dataVerified[`rnote_id`] = Number(data.rnote_id);
 
-    if (!(this.rejectionNote) && this.action === 'rejecting') {
-      dataVerified[`rnote`] = this.selectedRejection;
+      if (this.checkRNoteRequired(Number(data.rnote_id))) {
+        dataVerified[`rnote`] = data.rnote;
+      }
     }
 
     dataVerified[`status`] = this.action === 'approving' ? `ready_for_creditor` :
       this.action === 'rejecting' ? `rejected_by_manager` : null;
+
     Object.keys(dataVerified).length !== 0 ?
       this.expensesConfigService.updateExpenseManager(dataVerified, expenseId)
         .subscribe(
           result => this.closeModal(true),
           error => {
             console.log(error);
-            this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+            this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
           })
       : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
   }
 
   claimForCreditor(dataVerified, expenseId, data) {
-    dataVerified[`rnote`] = data.rnote;
     dataVerified[`cost_type`] = data.cost_type;
 
-    if (!(this.rejectionNote) && this.action === 'rejecting') {
-      dataVerified[`rnote`] = this.selectedRejection;
+    if (this.action === 'rejecting') {
+      dataVerified[`rnote_id`] = Number(data.rnote_id);
+
+      if (this.checkRNoteRequired(Number(data.rnote_id))) {
+        dataVerified[`rnote`] = data.rnote;
+      }
     }
 
     dataVerified[`status`] = this.action === 'approving' ? `approved` :
@@ -242,7 +277,7 @@ export class MaxModalComponent implements OnInit {
           result => this.closeModal(true),
           error => {
             console.log(error);
-            this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+            this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
           })
       : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
   }
@@ -306,8 +341,19 @@ export class MaxModalComponent implements OnInit {
 
   /** Used to update the rejection note with normal style change (works better on mobile) */
   rejectionHit(event: any) {
-    this.rejectionNote = (event.target.value === 'note');
-    this.selectedRejection = event.target.value;
+    this.rejectionNote = false;
+    if ('rnote' in this.expenseForm.form.controls) {
+      this.expenseForm.form.patchValue({rnote: ''});
+      this.expenseForm.form.controls['rnote'].markAsUntouched();
+      this.expenseForm.form.controls['rnote'].markAsPristine();
+    }
+
+    for (const rejection of this.rejectionNotes) {
+      if (rejection['rnote_id'] === Number(event.target.value) && rejection['form'] === 'dynamic') {
+        this.rejectionNote = true;
+      }
+    }
+
     if (this.rejectionNote) {
       this.rejectionNoteVisible = true;
     } else {
@@ -327,7 +373,7 @@ export class MaxModalComponent implements OnInit {
           this.closeModal(true);
         },
         error => {
-          this.errorMessage = error.error.detail !== undefined ? error.error.detail : error.error;
+          this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
         });
     }
   }
@@ -397,6 +443,15 @@ export class MaxModalComponent implements OnInit {
       rNoteStatuses.includes(expense.status.text)
     ) {
       return true;
+    }
+    return false;
+  }
+
+  checkRNoteRequired(rNoteId: number) {
+    for (const rejection of this.rejectionNotes) {
+      if (rejection['rnote_id'] === rNoteId && rejection['form'] === 'dynamic') {
+        return true;
+      }
     }
     return false;
   }
@@ -499,12 +554,14 @@ export class MaxModalComponent implements OnInit {
   }
 
   onChangeType(event: Event) {
-    for (const type of this.typeOptions) {
-      if (event.target['value'].includes(type.cid)) {
-        if (type.managertype === 'leasecoordinator') {
-          this.formCostTypeMessage = type.message['nl'];
-        } else {
-          this.formCostTypeMessage = { short: '', long: '' };
+    for (const type in this.typeOptions) {
+      if (type in this.typeOptions) {
+        if (event.target['value'].includes(this.typeOptions[type].cid)) {
+          if (this.typeOptions[type].managertype === 'leasecoordinator') {
+            this.formCostTypeMessage = this.typeOptions[type].message['nl'];
+          } else {
+            this.formCostTypeMessage = { short: '', long: '' };
+          }
         }
       }
     }

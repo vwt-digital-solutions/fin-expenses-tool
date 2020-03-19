@@ -132,8 +132,9 @@ describe('ExpenseApp:', () => {
       numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(
         randomNumber => {
           const type = typeList.get(randomNumber + 1);
-          type.getText().then(option => {
-            if (!option.toLowerCase().includes('brandstofkosten')) {
+          type.getAttribute('value').then(option => {
+            console.log(option);
+            if (!option.toLowerCase().includes('414020')) {
               typeList.get(randomNumber + 1).click();
             } else {
               typeList.get(randomNumber + 2).click();
@@ -222,10 +223,6 @@ describe('ExpenseApp:', () => {
 
   it('CG1: should see the created expense on the process page', () => {
 
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
-    element(by.css('div[col-id=claim_date]')).click(); // Twice
-    browser.sleep(500);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
       'E2E Addition ' + e2eID))), 10000, 'Expense not present'));
 
@@ -276,11 +273,11 @@ describe('ExpenseApp:', () => {
       function selection() {
         typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
           // tslint:disable-next-line:no-shadowed-variable
-          typeList.get(randomNumber + 1).getText().then((ret) => {
+          typeList.get(randomNumber + 1).getAttribute('value').then((ret) => {
             if (ret === step[1]) {
               selection();
             } else {
-              typeList.get(randomNumber + 1).getText().then((value) => {
+              typeList.get(randomNumber + 1).getAttribute('value').then((value) => {
                 updateType = value.trim();
               });
               typeList.get(randomNumber + 1).click();
@@ -436,8 +433,6 @@ describe('ExpenseApp:', () => {
 
   it('MG2: should see the created expense on the manager page', () => {
 
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(500);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
@@ -517,10 +512,6 @@ describe('ExpenseApp:', () => {
 
   it('CG2: should see the created expense on the process page', () => {
 
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
-    element(by.css('div[col-id=claim_date]')).click(); // Twice
-    browser.sleep(500);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
       'E2E Addition ' + e2eID))), 10000, 'Expense not present'));
 
@@ -690,8 +681,6 @@ describe('ExpenseApp:', () => {
 
   it('MR1: should see the created expense on the manager page', () => {
 
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(500);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
@@ -738,14 +727,18 @@ describe('ExpenseApp:', () => {
 
     expect(element(by.id('thumbs-down')).isDisplayed());
     element(by.id('thumbs-down')).click().then(() => {
-      element(by.id('thumbs-down-rejecting')).click().then(() => {
-        browser.sleep(1000);
-        expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+      element(by.id('rnote_id')).all(by.tagName('option')).then((options) => {
+        options[1].click();
+
+        element(by.id('thumbs-down-rejecting')).click().then(() => {
           browser.sleep(1000);
-          browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-            browser.get('/home');
-          });
-        }));
+          expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+            browser.sleep(1000);
+            browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+              browser.get('/home');
+            });
+          }));
+        });
       });
     });
 
@@ -841,8 +834,6 @@ describe('ExpenseApp:', () => {
 
   it('MR2: should see the created expense on the manager page', () => {
 
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
     element(by.css('div[col-id=claim_date]')).click(); // Twice
     browser.sleep(500);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
@@ -923,10 +914,6 @@ describe('ExpenseApp:', () => {
 
   it('CR1: should see the created expense on the process page', () => {
 
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
-    element(by.css('div[col-id=claim_date]')).click(); // Twice
-    browser.sleep(500);
     expect(browser.wait(until.visibilityOf(element(by.cssContainingText(`[role='gridcell'][col-id='note']`,
       'E2E Addition ' + e2eID))), 10000, 'Expense not present'));
 
@@ -971,14 +958,18 @@ describe('ExpenseApp:', () => {
 
     expect(element(by.id('thumbs-down')).isDisplayed());
     element(by.id('thumbs-down')).click().then(() => {
-      element(by.id('thumbs-down-rejecting')).click().then(() => {
-        browser.sleep(1000);
-        expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+      element(by.id('rnote_id')).all(by.tagName('option')).then((options) => {
+        options[1].click();
+
+        element(by.id('thumbs-down-rejecting')).click().then(() => {
           browser.sleep(1000);
-          browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
-            browser.get('/home');
-          });
-        }));
+          expect(browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+            browser.sleep(1000);
+            browser.wait(until.invisibilityOf(element(by.css('.overlay'))), 20000, 'The loader is showing too long').then(() => {
+              browser.get('/home');
+            });
+          }));
+        });
       });
     });
 
@@ -1103,10 +1094,6 @@ describe('ExpenseApp:', () => {
 
   it('CON1: should see all the expenses on the controller page', () => {
 
-    element(by.css('div[col-id=claim_date]')).click(); // Once
-    browser.sleep(500);
-    element(by.css('div[col-id=claim_date]')).click(); // Twice
-    browser.sleep(500);
     const expenses = element.all(by.cssContainingText(`[role='gridcell'][col-id='employee']`,
       'E2E, Opensource'));
     // tslint:disable-next-line

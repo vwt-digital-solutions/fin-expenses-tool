@@ -3,7 +3,8 @@ import {ExpensesConfigService} from '../../services/config.service';
 import {Expense} from '../../models/expense';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {IdentityService} from 'src/app/services/identity.service';
-import {FormatterService} from '../../services/formatter.service';
+import { map } from 'rxjs/operators';
+import { ActivatedRoute } from '@angular/router';
 
 
 @Component({
@@ -17,6 +18,7 @@ export class LandingComponent implements OnInit {
   public displayPersonName: string | string[];
   public personID: string;
   public declarationData: Expense[] = [];
+  public typeOptions: any;
   public expenseData: Expense;
   public today: Date;
   public hasNoExpenses = true;
@@ -29,17 +31,11 @@ export class LandingComponent implements OnInit {
     private identityService: IdentityService,
     private modalService: NgbModal,
     private expenses: ExpensesConfigService,
-    public formatter: FormatterService
+    private route: ActivatedRoute
   ) {
     this.wantsNewModal = false;
-  }
 
-  decimalFormatter(amount: any) {
-    return FormatterService.decimalFormatter(amount);
-  }
-
-  dateFormatter(firstDate) {
-    return FormatterService.getCorrectDate(firstDate);
+    this.route.data.pipe(map(data => data.costTypes)).subscribe(costTypes => this.typeOptions = costTypes);
   }
 
   ngOnInit() {
@@ -70,6 +66,9 @@ export class LandingComponent implements OnInit {
           this.declarationData = [];
           const newResponse = response;
           for (let i = newResponse.length; i--;) {
+            if ('cost_type' in newResponse[i]) {
+              newResponse[i]['cost_type'] = newResponse[i]['cost_type'].split(':').pop();
+            }
             if (newResponse[i].status.text.toString().includes('rejected')) {
               this.declarationData.push(newResponse[i]);
               newResponse.splice(i, 1);
