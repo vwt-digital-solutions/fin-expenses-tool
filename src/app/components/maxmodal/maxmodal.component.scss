@@ -60,13 +60,6 @@
     background: transparent;
     color: white;
     font-size: x-large;
-    -webkit-transition: -webkit-transform .6s ease-in-out;
-    transition: transform .6s ease-in-out;
-
-    &:hover {
-      -webkit-transform: rotate(270deg);
-      transform: rotate(270deg);
-    }
   }
 }
 

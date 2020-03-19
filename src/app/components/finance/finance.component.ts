@@ -267,7 +267,7 @@ export class FinanceComponent {
     this.expenses.createBookingFile({observe: 'response'})
       .subscribe(
         (response: HttpResponse<any>) => {
-          if (response.body.hasOwnProperty('Info')) {
+          if (response.status === 204) {
             this.noExpenses();
           } else {
             // @ts-ignore
