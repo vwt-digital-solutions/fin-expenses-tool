@@ -49,7 +49,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
   public transdateNotFilledMessage: string;
   public expenseTransDate = true;
   public expenseCostType = '';
-  private costTypeIsChecked = false;
+  private formLoaded = false;
 
   constructor(
     private httpClient: HttpClient,
@@ -132,21 +132,31 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
   }
 
   ngAfterContentChecked(): void {
-    if (
-      (this.isEditor || this.isCreditor) &&
-      !this.costTypeIsChecked &&
-      'cost_type' in this.expenseForm.control.controls
-    ) {
-      this.costTypeIsChecked = true;
-      for (const type in this.typeOptions) {
-        if (type === this.expenseData.cost_type.split(':').pop() && this.typeOptions[type].active) {
-          this.expenseForm.form.patchValue({cost_type: this.typeOptions[type].cid});
-          return;
+    if (!this.formLoaded &&
+      'cost_type' in this.expenseForm.control.controls &&
+      'rnote' in this.expenseForm.control.controls &&
+      'rnote_id' in this.expenseForm.control.controls) {
+      if ((this.isEditor || this.isCreditor)) {
+        let isFound = false;
+        for (const type in this.typeOptions) {
+          if (type === this.expenseData.cost_type.split(':').pop() && this.typeOptions[type].active) {
+            this.expenseForm.form.patchValue({cost_type: this.typeOptions[type].cid});
+            isFound = true;
+          }
+        }
+        if (!isFound) {
+          this.expenseForm.form.patchValue({cost_type: ''});
+          this.expenseForm.form.controls['cost_type'].setErrors({incorrect: true});
+          this.expenseForm.form.controls['cost_type'].markAsTouched();
         }
       }
-      this.expenseForm.form.patchValue({cost_type: ''});
-      this.expenseForm.form.controls['cost_type'].setErrors({incorrect: true});
-      this.expenseForm.form.controls['cost_type'].markAsTouched();
+
+      if ((this.isCreditor || this.isManager) && ('rnote' in this.expenseData.status || 'rnote_id' in this.expenseData.status)) {
+        this.expenseForm.form.patchValue({rnote: ''});
+        this.expenseForm.form.patchValue({rnote_id: ''});
+      }
+
+      this.formLoaded = true;
     }
   }
 
@@ -332,6 +342,11 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
   /** Used to update the rejection note with normal style change (works better on mobile) */
   rejectionHit(event: any) {
     this.rejectionNote = false;
+    if ('rnote' in this.expenseForm.form.controls) {
+      this.expenseForm.form.patchValue({rnote: ''});
+      this.expenseForm.form.controls['rnote'].markAsUntouched();
+      this.expenseForm.form.controls['rnote'].markAsPristine();
+    }
 
     for (const rejection of this.rejectionNotes) {
       if (rejection['rnote_id'] === Number(event.target.value) && rejection['form'] === 'dynamic') {
