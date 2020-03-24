@@ -55,8 +55,8 @@
                   <span class="d-table">{{ context['note'] }}</span>
                 </div>
                 <div class="status-pill">
-                  <span class="badge badge-pill" [className]="context['status'] | expenseStatus:'class'">
-                    {{ context['status'] | expenseStatus:'text' }}
+                  <span class="badge badge-pill" [className]="context['status']['text'] | expenseStatus:'class'">
+                    {{ context['status']['text'] | expenseStatus:'text' }}
                   </span>
                 </div>
               </ng-container>
