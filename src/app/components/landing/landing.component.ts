@@ -51,6 +51,7 @@ export class LandingComponent implements OnInit {
     // Control the manager button
     this.expenses.getManagerExpenses()
       .subscribe(val => {
+        // @ts-ignore
         this.managerAmount = val ? val.length : 0;
       });
     this.declarationCall();

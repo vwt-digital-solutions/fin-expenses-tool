@@ -128,7 +128,8 @@ export class ControllerComponent {
 
   onGridReady(params: any) {
     this.gridApi = params.api;
-    this.expenses.getControllerExpenses().subscribe((data) => this.rowData = [...data]);
+    // @ts-ignore
+    this.expenses.getControllerExpenses().subscribe((data) => this.rowData = [...data]); // eslint-disable-line
   }
 
   onBtExport() {

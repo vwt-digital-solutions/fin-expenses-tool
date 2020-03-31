@@ -477,6 +477,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
         alert('Please use Chrome or Firefox to view this file');
       } else {
         const win = window.open();
+        // @ts-ignore
         // tslint:disable-next-line:max-line-length
         win.document.write('<img src="' + this.sanitizer.bypassSecurityTrustUrl('data:' + type + ';base64,' + encodeURI(file)).changingThisBreaksApplicationSecurity + '" alt="">');
       }
