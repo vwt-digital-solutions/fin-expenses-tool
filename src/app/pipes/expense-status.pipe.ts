@@ -4,9 +4,9 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class ExpenseStatusPipe implements PipeTransform {
   transform(status: string, type: string): any {
     if (type === 'class') {
-      return getStatusClassing(status);
+      return getStatusClassing(status); // eslint-disable-line
     } else if (type === 'text') {
-      return getStatusFormatter(status);
+      return getStatusFormatter(status);  // eslint-disable-line
     } else {
       return status;
     }

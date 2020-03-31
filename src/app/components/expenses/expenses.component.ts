@@ -31,7 +31,7 @@ export class ExpensesComponent implements  OnInit {
   public expenseType: boolean;
   public expenseTransDate: boolean;
   public expenseAttachment: boolean;
-  public addClaimSuccess: { success: any; wrong: any; };
+  public addClaimSuccess: { success: any; wrong: any };
   public typeOptions: any[];
   public today: Date;
   public notaData: string;
@@ -133,7 +133,7 @@ export class ExpensesComponent implements  OnInit {
     }
   }
 
-  notFilledClass(setClass: { name: string; invalid: any; dirty: any; touched: any; }) {
+  notFilledClass(setClass: { name: string; invalid: any; dirty: any; touched: any }) {
     let starBool: boolean;
     if (setClass.name === 'amount') {
       starBool = this.expensesAmount === false;
@@ -152,10 +152,10 @@ export class ExpensesComponent implements  OnInit {
 
   submitButtonController(
     toSubmit = true,
-    nnote: { invalid: any; },
-    namount: { invalid: any; },
-    ntype: { invalid: any; },
-    ntransdate: { invalid: any; }
+    nnote: { invalid: any },
+    namount: { invalid: any },
+    ntype: { invalid: any },
+    ntransdate: { invalid: any }
   ) {
 
     return this.expensesNote === false ||
@@ -232,7 +232,7 @@ export class ExpensesComponent implements  OnInit {
       this.loadingThings = true;
       // Format Values
       form.value.amount = Number((form.value.amount).toFixed(2));
-      form.value.transaction_date = new Date(form.value.transaction_date).toISOString();
+      form.value.transaction_date = new Date(form.value.transaction_date).toISOString(); // eslint-disable-line
       const obj = JSON.parse(JSON.stringify(form.value));
       // End Format Values
 

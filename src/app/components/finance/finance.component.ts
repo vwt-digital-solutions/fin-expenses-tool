@@ -222,7 +222,6 @@ export class FinanceComponent {
     this.wantsNewModal = false;
     if (message[0]) {
       this.expenses.getExpenses().subscribe((response) => {
-        // @ts-ignore
         this.rowData = [...response];
         if (message[1]) {
           this.getNextExpense(true);
@@ -240,7 +239,6 @@ export class FinanceComponent {
   }
 
   onGridReady(params: any) {
-    // @ts-ignore
     this.expenses.getExpenses().subscribe((data) => this.rowData = [...data]);
   }
 
@@ -270,7 +268,6 @@ export class FinanceComponent {
           if (response.status === 204) {
             this.noExpenses();
           } else {
-            // @ts-ignore
             this.historyRowData.unshift(response.body.file_list[0]);
             this.historyGridApi.setRowData(this.historyRowData);
             this.successfulDownload();

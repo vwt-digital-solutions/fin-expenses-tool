@@ -119,7 +119,6 @@ export class ManagerComponent {
     this.wantsNewModal = false;
     if (message[0]) {
       this.expenses.getManagerExpenses().subscribe((response) => {
-        // @ts-ignore
         this.rowData = [...response];
         if (message[1]) {
           this.getNextExpense();
@@ -133,7 +132,6 @@ export class ManagerComponent {
   onGridReady(params: any) {
     params.api.showLoadingOverlay();
 
-    // @ts-ignore
     this.expenses.getManagerExpenses().subscribe((data) => {
       this.rowData = data;
 

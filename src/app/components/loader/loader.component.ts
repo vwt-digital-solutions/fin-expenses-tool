@@ -1,7 +1,7 @@
 import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import { LoaderService } from 'src/app/services/loader.service';
 
-interface IClaimsEmail {
+interface ClaimsEmail {
   email: any;
 }
 

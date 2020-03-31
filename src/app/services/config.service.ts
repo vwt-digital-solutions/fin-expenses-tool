@@ -39,7 +39,7 @@ export class ExpensesConfigService {
     return throwError(error);
   }
 
-  static retry(maxRetry: number = 5, delayMs: number = 2000) {
+  static retry(maxRetry = 5, delayMs = 2000) {
     return (src: Observable<any>) => src.pipe(
       retryWhen(_ => {
         console.log(`Retyring ${count} of ${maxRetry}`);
