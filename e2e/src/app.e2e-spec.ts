@@ -2,8 +2,7 @@
 import {browser, protractor, by, element} from 'protractor/built';
 import { ExpensesForm } from './app.po';
 
-import request from 'request';
-
+const request = require('request'); // eslint-disable-line
 const fs = require('fs'); // eslint-disable-line
 const requestOptions = {
   method: 'GET',
@@ -270,8 +269,9 @@ describe('ExpenseApp:', () => {
     const typeList = element(by.id('expenseCostType')).all(by.tagName('option'));
     typeList.first().getText().then((ret) => {
       const step = ret.split(': ');
+      selection(); // eslint-disable-line
 
-      const selection = () => {
+      function selection() {
         typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
           // tslint:disable-next-line:no-shadowed-variable
           typeList.get(randomNumber + 1).getAttribute('value').then((ret) => {
@@ -285,7 +285,7 @@ describe('ExpenseApp:', () => {
             }
           });
         });
-      };
+      }
     });
     expect(element(by.id('thumbs-up')).isDisplayed());
     element(by.id('thumbs-up')).click().then(() => {
