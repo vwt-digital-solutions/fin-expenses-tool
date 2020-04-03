@@ -133,7 +133,6 @@ export class ManagerComponent {
   onGridReady(params: any) {
     params.api.showLoadingOverlay();
 
-    // @ts-ignore
     this.expenses.getManagerExpenses().subscribe((data) => {
       this.rowData = data;
 

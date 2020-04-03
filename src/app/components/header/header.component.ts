@@ -3,11 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { EnvService } from 'src/app/services/env.service';
 import { OAuthService } from 'angular-oauth2-oidc';
 
-interface IClaimsEmail {
+interface ClaimsEmail {
   email: any;
 }
 
-declare var $: any;
+declare let $: any;
 
 @Component({
   selector: 'app-header',
@@ -43,7 +43,7 @@ export class HeaderComponent implements OnInit {
   }
 
   get email() {
-    const claims = this.oauthService.getIdentityClaims() as IClaimsEmail;
+    const claims = this.oauthService.getIdentityClaims() as ClaimsEmail;
     if (!claims) {
       return null;
     }

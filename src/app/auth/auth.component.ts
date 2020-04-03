@@ -9,6 +9,7 @@ import {JwtHelperService} from '@auth0/angular-jwt';
   template: ''
 })
 export class AuthComponent {
+  /*eslint-disable */
   private sessionStorageItems = {
     access_token: '',
     granted_scopes: ['https://vwt-d-gew1-fin-expenses-e2e/.default'],
@@ -19,6 +20,7 @@ export class AuthComponent {
     id_token_expires_at: new Date().getTime(),
     id_token_stored_at: new Date().getTime()
   };
+  /*eslint-enable */
 
   constructor(
     private route: ActivatedRoute,
@@ -40,6 +42,7 @@ export class AuthComponent {
           const expiresIn = authBody.expires_in;
 
           // SAVE ACCESS TOKEN
+          /*eslint-disable */
           this.sessionStorageItems.id_token_claims_obj = helper.decodeToken(accessToken);
           (this.sessionStorageItems as any).id_token_claims_obj.roles = ['creditor.write', 'manager.write', 'controller.write', 'leasecoordinator.write'];
           (this.sessionStorageItems as any).id_token_claims_obj.email = 'opensource.e2e@vwtelecom.com';
@@ -52,7 +55,7 @@ export class AuthComponent {
           const expiresAt = (expiresIn.toString().length <= 6 ? expiresIn * 1000 : expiresIn);
           this.sessionStorageItems.expires_at = this.sessionStorageItems.expires_at + expiresAt;
           this.sessionStorageItems.id_token_expires_at = this.sessionStorageItems.id_token_expires_at + expiresAt;
-
+          /*eslint-enable */
           this.fillSessionStorage();
 
           // CHECK IF ACCESS TOKEN IS VALID
@@ -74,6 +77,7 @@ export class AuthComponent {
   private fillSessionStorage() {
     // SAVE TO SESSION STORAGE
     for (const key in this.sessionStorageItems) {
+      // eslint-disable-next-line no-prototype-builtins
       if (this.sessionStorageItems.hasOwnProperty(key)) {
         const value = (
           typeof this.sessionStorageItems[key] === 'string'
@@ -87,6 +91,7 @@ export class AuthComponent {
 
   private fillFromSessionStorage() {
     for (const key in this.sessionStorageItems) {
+      // eslint-disable-next-line no-prototype-builtins
       if (this.sessionStorageItems.hasOwnProperty(key)) {
         const value = (
           typeof this.sessionStorageItems[key] === 'string'

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { OAuthService } from 'angular-oauth2-oidc';
 
-export interface IClaimRoles {
+export interface ClaimRoles {
   roles: string[];
   email?: string;
   name?: string;
@@ -22,7 +22,7 @@ export class IdentityService {
   }
 
   allRoles() {
-    const claims = this.oauthService.getIdentityClaims() as IClaimRoles;
+    const claims = this.oauthService.getIdentityClaims() as ClaimRoles;
     const roles = [];
 
     if (!claims.roles) {
@@ -35,8 +35,8 @@ export class IdentityService {
     return roles;
   }
 
-  allClaims(): IClaimRoles {
-    const claims = this.oauthService.getIdentityClaims() as IClaimRoles;
+  allClaims(): ClaimRoles {
+    const claims = this.oauthService.getIdentityClaims() as ClaimRoles;
     // handle non-privileged employee => roles array is absent
     if (!claims.roles) {
       claims.roles = ['.'];

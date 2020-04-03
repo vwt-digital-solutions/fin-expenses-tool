@@ -270,7 +270,6 @@ export class FinanceComponent {
           if (response.status === 204) {
             this.noExpenses();
           } else {
-            // @ts-ignore
             this.historyRowData.unshift(response.body.file_list[0]);
             this.historyGridApi.setRowData(this.historyRowData);
             this.successfulDownload();

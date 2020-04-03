@@ -120,6 +120,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
     receiptRequest.subscribe((image: any) => {
       this.receiptFiles = [];
       for (const img of image) {
+        /*eslint-disable */
         this.receiptFiles.push({
           content: `${img.content}`,
           content_type: img.content_type,
@@ -127,6 +128,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
           db_name: img.name,
           expense_id: this.expenseData.id
         });
+        /*eslint-enable */
       }
     });
   }
@@ -140,12 +142,12 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
         let isFound = false;
         for (const type in this.typeOptions) {
           if (type === this.expenseData.cost_type.split(':').pop() && this.typeOptions[type].active) {
-            this.expenseForm.form.patchValue({cost_type: this.typeOptions[type].cid});
+            this.expenseForm.form.patchValue({cost_type: this.typeOptions[type].cid}); // eslint-disable-line
             isFound = true;
           }
         }
         if (!isFound) {
-          this.expenseForm.form.patchValue({cost_type: ''});
+          this.expenseForm.form.patchValue({cost_type: ''}); // eslint-disable-line
           this.expenseForm.form.controls['cost_type'].setErrors({incorrect: true});
           this.expenseForm.form.controls['cost_type'].markAsTouched();
         }
@@ -153,7 +155,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
 
       if ((this.isCreditor || this.isManager) && ('rnote' in this.expenseData.status || 'rnote_id' in this.expenseData.status)) {
         this.expenseForm.form.patchValue({rnote: ''});
-        this.expenseForm.form.patchValue({rnote_id: ''});
+        this.expenseForm.form.patchValue({rnote_id: ''}); // eslint-disable-line
       }
 
       this.formLoaded = true;
@@ -163,10 +165,10 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
   /** Controls the submit buttons and UpdateForm: Checks every input needed. */
   protected submitButtonController(
     toSubmit = true,
-    nNote: { invalid: any; },
-    nAmount: { invalid: any; viewModel: number; },
-    nType: { invalid: any; },
-    nTransDate: { invalid: any; viewModel: string | number | Date; },
+    nNote: { invalid: any },
+    nAmount: { invalid: any; viewModel: number },
+    nType: { invalid: any },
+    nTransDate: { invalid: any; viewModel: string | number | Date },
     rNoteId: { value: string },
     rNote: { value: string }
   ) {
@@ -212,7 +214,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
 
   claimForEditor(dataVerified, expenseId, data) {
     data.amount = Number((data.amount).toFixed(2));
-    data.transaction_date = new Date(data.transaction_date).toISOString();
+    data.transaction_date = new Date(data.transaction_date).toISOString(); // eslint-disable-line
     for (const prop in data) {
       if (prop.length !== 0 && prop !== 'rnote' && prop !== 'rnote_id') {
         dataVerified[prop] = data[prop];
@@ -409,13 +411,13 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
     if (this.identityService.isTesting()) {
       this.receiptFiles.push({
         content: this.defaultImageService.getDefaultImageForTest(),
-        content_type: 'image/png',
-        from_db: false
+        content_type: 'image/png', // eslint-disable-line
+        from_db: false // eslint-disable-line
       });
       this.receiptFiles.push({
         content: this.defaultImageService.getDefaultImageForTest(),
-        content_type: 'image/png',
-        from_db: false
+        content_type: 'image/png', // eslint-disable-line
+        from_db: false // eslint-disable-line
       });
     }
 
@@ -507,12 +509,14 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
         reader.readAsDataURL(file[0]);
         reader.onload = () => {
           if (file[0].type === 'application/pdf') {
+            /*eslint-disable */
             this.receiptFiles.push({
               content: reader.result,
               content_type: 'application/pdf',
               from_db: false,
               db_name: file[0].name
             });
+            /*eslint-enable */
           } else if (file[0].type.split('/')[0] === 'image') {
             const img = new Image();
             if (typeof reader.result === 'string') {
@@ -537,12 +541,14 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
                   });
                   reader.readAsDataURL(filla);
                   reader.onload = () => {
+                    /*eslint-disable */
                     this.receiptFiles.push({
                       content: reader.result,
                       content_type: file[0].type,
                       from_db: false,
                       db_name: file[0].name
                     });
+                    /*eslint-enable */
                   };
                 }, file[0].type, 1);
               }, reader.onerror = Error => console.error(Error);

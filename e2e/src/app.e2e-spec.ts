@@ -1,8 +1,9 @@
+
 import {browser, protractor, by, element} from 'protractor/built';
 import { ExpensesForm } from './app.po';
 
-const request = require('request');
-const fs = require('fs');
+const request = require('request'); // eslint-disable-line
+const fs = require('fs'); // eslint-disable-line
 const requestOptions = {
   method: 'GET',
   url: browser.params.login.token,
@@ -10,10 +11,10 @@ const requestOptions = {
     'content-type': 'application/json'
   },
   form: {
-    grant_type: 'client_credentials',
-    client_id: browser.params.login.clientId,
-    client_secret: browser.params.login.clientSecret,
-    scope: browser.params.login.scope
+    grant_type: 'client_credentials', // eslint-disable-line
+    client_id: browser.params.login.clientId, // eslint-disable-line
+    client_secret: browser.params.login.clientSecret, // eslint-disable-line
+    scope: browser.params.login.scope // eslint-disable-line camelcase
   }
 };
 const get = (options: any): any => {
@@ -268,7 +269,7 @@ describe('ExpenseApp:', () => {
     const typeList = element(by.id('expenseCostType')).all(by.tagName('option'));
     typeList.first().getText().then((ret) => {
       const step = ret.split(': ');
-      selection();
+      selection(); // eslint-disable-line
 
       function selection() {
         typeList.count().then(numberOfItems => Math.floor(Math.random() * (numberOfItems - 1))).then(randomNumber => {
