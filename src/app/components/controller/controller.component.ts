@@ -103,14 +103,6 @@ export class ControllerComponent {
 
   rowData = null;
 
-  static processExcelCellCallback(param) {
-    if (param.column.colDef.cellRenderer) {
-      return (param.column.colDef.cellRenderer(param));
-    } else {
-      return param.value;
-    }
-  }
-
   onRowClicked(event: any) {
     if (event === null || event === undefined) {
       return false;
@@ -134,8 +126,7 @@ export class ControllerComponent {
 
   onBtExport() {
     const params1 = {
-      allColumns: true,
-      processCellCallback: ControllerComponent.processExcelCellCallback.bind(this)
+      allColumns: true
     };
     this.gridApi.exportDataAsExcel(params1);
   }
