@@ -242,13 +242,9 @@ export class ExpensesComponent implements  OnInit {
           console.log('>> POST EXPENSE SUCCESS', response);
           this.afterPostExpense(response, form);
         }, error => {
-          if (error.status === 403) {
-            this.wrongfulClaim('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
-            if (ExpensesComponent.getNavigator()) {
-              alert('Je bent niet bekend bij de personeelsadministratie. Neem contact op met je manager.');
-            }
-          } else {
-            this.wrongfulClaim(error.error.detail ? error.error.detail.nl : error.error);
+          this.wrongfulClaim(error.error.detail ? error.error.detail.nl : error.error);
+          if (ExpensesComponent.getNavigator()) {
+            alert(error.error.detail ? error.error.detail.nl : error.error);
           }
           console.error('>> POST EXPENSE FAILED', error.message);
         });
