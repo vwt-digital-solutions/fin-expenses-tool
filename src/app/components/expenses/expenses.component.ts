@@ -324,7 +324,7 @@ export class ExpensesComponent implements  OnInit {
     for (const type in this.typeOptions) {
       if (type in this.typeOptions) {
         if (event.target['value'].includes(this.typeOptions[type].cid)) {
-          if (this.typeOptions[type].managertype === 'leasecoordinator') {
+          if (Object.keys(this.typeOptions[type].message).length > 0) {
             this.formCostTypeMessage = this.typeOptions[type].message['nl'];
           } else {
             this.formCostTypeMessage = { short: '', long: '' };
