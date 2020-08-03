@@ -117,7 +117,7 @@ describe('ExpenseApp:', () => {
       expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h3', 'Declaratie indienen'))),
         20000, 'The redirect took too long').then(() => {
         browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
-          expect(element.all(by.css('option')).count()).toEqual(18);
+          expect(element.all(by.css('option')).count()).toEqual(20);
         });
       }));
     });
@@ -338,7 +338,7 @@ describe('ExpenseApp:', () => {
       expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h3', 'Declaratie indienen'))),
         20000, 'The redirect took too long').then(() => {
         browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
-          expect(element.all(by.css('option')).count()).toEqual(18);
+          expect(element.all(by.css('option')).count()).toEqual(20);
         });
       }));
     });
@@ -585,7 +585,7 @@ describe('ExpenseApp:', () => {
       expect(browser.wait(until.visibilityOf(element(by.cssContainingText('h3', 'Declaratie indienen'))),
         20000, 'The redirect took too long').then(() => {
         browser.wait(until.visibilityOf(element(by.css('option'))), 20000, 'The API took too long to respond').then(() => {
-          expect(element.all(by.css('option')).count()).toEqual(18);
+          expect(element.all(by.css('option')).count()).toEqual(20);
         });
       }));
     });
