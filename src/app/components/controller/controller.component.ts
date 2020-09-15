@@ -96,6 +96,18 @@ export class ControllerComponent {
             headerName: 'Status', field: 'status.text',
             sortable: true, width: 250
           },
+          {
+            headerName: 'Bedrijfsnaam', field: 'company_name',
+            sortable: true, filter: true, resizable: true
+          },
+          {
+            headerName: 'Afdelingscode', field: 'department_code',
+            sortable: true, filter: true, resizable: true
+          },
+          {
+            headerName: 'Afdelingsomschrijving', field: 'department_descr',
+            sortable: true, filter: true, width: 300, resizable: true
+          }
         ]
       }
     ];
