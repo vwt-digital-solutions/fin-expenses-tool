@@ -105,6 +105,12 @@ export class FinanceComponent {
             sortable: true, width: 180
           },
           {
+            headerName: 'Automatisch goedgekeurd', field: 'auto_approved',
+            sortable: true, width: 180,
+            valueFormatter: (params: any) => (
+              params.value.toLowerCase() === 'yes') ? 'Ja' : 'Nee'
+          },
+          {
             headerName: 'Bedrijfsnaam', field: 'company_name',
             sortable: true, filter: true, resizable: true
           },
