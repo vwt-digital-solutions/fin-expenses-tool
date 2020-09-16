@@ -75,8 +75,8 @@ export class FinanceComponent {
           {
             headerName: 'Soort', field: 'cost_type',
             sortable: true, filter: true, resizable: true, width: 200,
-            valueFormatter: (params: any) => {
-              const splitValue = params.value.split(':');
+            valueGetter: params => {
+              const splitValue = params.data.cost_type.split(':');
               if (splitValue.length > 1) {
                 return splitValue[0];
               } else if (splitValue.length === 1) {
