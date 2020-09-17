@@ -1,12 +1,6 @@
 @import "src/assets/scss/mixins";
 @import "src/assets/scss/constants";
 
-.grid-paymentfiles {
-  @include for-desktop-up {
-    width: 500px;
-  }
-}
-
 .btn-toolbar {
   button {
     &:focus {

@@ -53,7 +53,7 @@ export class FinanceComponent {
         filter: true,
         editable: false,
         resizable: true,
-        minWidth: 100
+        width: 150
       },
       domLayout: 'autoHeight',
       paginationPageSize: 25,
@@ -116,7 +116,8 @@ export class FinanceComponent {
       },
       {
         headerName: 'Status', field: 'status.text',
-        valueFormatter: (params: any) => params.value.replace(/_/g, ' ')
+        valueFormatter: (params: any) => params.value.replace(/_/g, ' '),
+        cellStyle: { 'text-transform': 'capitalize' }
       },
       {
         headerName: 'Automatisch goedgekeurd', field: 'auto_approved',

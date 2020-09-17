@@ -39,7 +39,7 @@ export class ControllerComponent {
         filter: true,
         editable: false,
         resizable: true,
-        minWidth: 100
+        width: 150
       },
       domLayout: 'autoHeight',
       paginationPageSize: 30,
@@ -106,7 +106,8 @@ export class ControllerComponent {
       },
       {
         headerName: 'Status', field: 'status.text',
-        valueFormatter: (params: any) => params.value.replace(/_/g, ' ')
+        valueFormatter: (params: any) => params.value.replace(/_/g, ' '),
+        cellStyle: { 'text-transform': 'capitalize' }
       },
       { headerName: 'Bedrijfsnaam', field: 'company_name' },
       { headerName: 'Afdelingscode', field: 'department_code' },
