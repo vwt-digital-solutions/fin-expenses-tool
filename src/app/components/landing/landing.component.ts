@@ -25,10 +25,10 @@ export class LandingComponent implements OnInit {
   public forceViewer;
 
   constructor(
-    public identityService: IdentityService,
     private modalService: NgbModal,
     private expenses: ExpensesConfigService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public identityService: IdentityService
   ) {
     this.wantsNewModal = false;
 
@@ -47,7 +47,7 @@ export class LandingComponent implements OnInit {
   }
 
   declarationCall() {
-    this.expenses.getEmployeeExpenses(this.identityService.personID)
+    this.expenses.getEmployeeExpenses(this.identityService.whoAmI().id)
       .subscribe(
         response => {
           console.log('>> GET SUCCESS', response);

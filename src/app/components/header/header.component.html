@@ -29,11 +29,11 @@
           <a [routerLink]="['expenses', 'manage']">Goedkeuren</a>
         </li>
         <li class="nav-item" [routerLinkActive]="['active']"
-          *ngIf="this.identityService.OurJaneDoeIs.includes('controller')">
+          *ngIf="this.identityService.allRoles().includes('controller')">
           <a [routerLink]="['expenses', 'controller']">Controller</a>
         </li>
         <li class="nav-item" [routerLinkActive]="['active']"
-          *ngIf="this.identityService.OurJaneDoeIs.includes('creditor')">
+          *ngIf="this.identityService.allRoles().includes('creditor')">
           <a [routerLink]="['expenses', 'process']">Crediteur</a>
         </li>
 

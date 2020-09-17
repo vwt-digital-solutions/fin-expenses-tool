@@ -13,50 +13,44 @@ export interface ClaimRoles {
   providedIn: 'root'
 })
 export class IdentityService {
-  public OurJaneDoeIs: string[] = [];
-  public claimJaneDoe: ClaimRoles;
-  public personID: string;
-  public displayPersonName = 'Onbekend';
+  constructor(private oauthService: OAuthService) { }
 
-  constructor(private oauthService: OAuthService) {
-    this.claimJaneDoe = this.allClaims();
-
-    for (const role of this.claimJaneDoe.roles) {
-      this.OurJaneDoeIs.push(role.split('.')[0]);
-    }
-
-    if (this.claimJaneDoe.name) {
-      const name = this.claimJaneDoe.name.split(',');
-      this.displayPersonName = (`${name[1]} ${name[0]}`).substring(1);
-    }
-  }
-
-  whoAmI(): string {
+  whoAmI() {
+    const whoAmI = {name: 'Onbekend', id: null};
     const claimJaneDoe = this.allClaims();
-    return claimJaneDoe.roles[0].split('.')[0];
+
+    whoAmI.id = claimJaneDoe.email ? claimJaneDoe.email.split('@')[0].toLowerCase() : 'UNDEFINED';
+    if (claimJaneDoe.name) {
+      const name = claimJaneDoe.name.split(',');
+      whoAmI.name = (`${name[1]} ${name[0]}`).substring(1);
+    }
+
+    return whoAmI;
   }
 
   allRoles() {
     const claims = this.oauthService.getIdentityClaims() as ClaimRoles;
     const roles = [];
 
-    if (!claims.roles) {
-      claims.roles = ['.'];
-    }
-
-    for (const role of claims.roles) {
-      roles.push(role.split('.')[0]);
+    if (claims && claims['roles']) {
+      for (const role of claims['roles']) {
+        roles.push(role.split('.')[0]);
+      }
     }
     return roles;
   }
 
   allClaims(): ClaimRoles {
     const claims = this.oauthService.getIdentityClaims() as ClaimRoles;
-    // handle non-privileged employee => roles array is absent
-    if (!claims.roles) {
-      claims.roles = ['.'];
+    if (claims) {
+      // handle non-privileged employee => roles array is absent
+      if (!claims.roles) {
+        claims.roles = ['.'];
+      }
+      return claims;
+    } else {
+      return null;
     }
-    return claims;
   }
 
   isTesting(): boolean {
