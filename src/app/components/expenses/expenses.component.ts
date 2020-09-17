@@ -239,7 +239,7 @@ export class ExpensesComponent implements  OnInit {
       this.expenses.createExpenses(obj).subscribe(
         response => {
           this.expenseID = response;
-          console.log('>> POST EXPENSE SUCCESS', response);
+          // console.log('>> POST EXPENSE SUCCESS', response);
           this.afterPostExpense(response, form);
         }, error => {
           this.wrongfulClaim(error.error.detail ? error.error.detail.nl : error.error);
@@ -271,7 +271,7 @@ export class ExpensesComponent implements  OnInit {
     if (this.locatedFile.length > 0) {
       this.bulkAttachmentUpload(expenseResponse['id']).subscribe(
         responseList => {
-          console.log('>> POST ATTACHMENTS SUCCESS', responseList);
+          // console.log('>> POST ATTACHMENTS SUCCESS', responseList);
           this.afterPostAttachments(expenseResponse, form);
         }, error => {
           this.wrongfulClaim('Er is iets fout gegaan bij het uploaden van de bestanden, neem contact op met de crediteuren afdeling.');

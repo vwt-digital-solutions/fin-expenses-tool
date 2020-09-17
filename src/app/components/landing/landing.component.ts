@@ -50,7 +50,7 @@ export class LandingComponent implements OnInit {
     this.expenses.getEmployeeExpenses(this.identityService.whoAmI().id)
       .subscribe(
         response => {
-          console.log('>> GET SUCCESS', response);
+          // console.log('>> GET SUCCESS', response);
           this.declarationData = [];
           const newResponse = response;
           for (let i = newResponse.length; i--;) {

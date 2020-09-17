@@ -45,12 +45,12 @@ export class AuthGuard implements CanActivate {
       }
 
       if (!isAuthorisedRoute) {
-        console.log('Requested role not granted');
+        // console.log('Requested role not granted');
         this.router.navigate(['/home']);
         return false;
       }
     }
-    console.log('No role requested');
+    // console.log('No role requested');
     return true;
   }
 }

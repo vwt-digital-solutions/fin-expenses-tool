@@ -206,7 +206,7 @@ export class FinanceComponent {
           a.download = this.datePipe.transform(event.data.export_date, 'dd-MM-yyyy HH:mm:ss') + downloadType;
           a.click();
           window.URL.revokeObjectURL(url);
-          console.log('>> GET SUCCESS');
+          // console.log('>> GET SUCCESS');
         }, response => {
           this.errorBooking();
           console.error('>> GET FAILED', response.message);
@@ -313,7 +313,7 @@ export class FinanceComponent {
             this.historyGridApi.setRowData(this.historyRowData);
             this.successfulDownload();
           }
-          console.log('>> POST SUCCESS');
+          // console.log('>> POST SUCCESS');
         }, response => {
           this.errorBooking();
           console.error('>> POST FAILED', response.message);
