@@ -45,6 +45,7 @@
           Nieuwe declaratie
         </button>
         <button
+          *ngIf="this.managerAmount > 0"
           name="expenses/manage"
           class="btn btn-primary w-100 py-2 py-md-3"
           [routerLink]="['/expenses/manage']" >

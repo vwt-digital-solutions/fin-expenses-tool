@@ -25,9 +25,6 @@
         <li class="nav-item" [routerLinkActive]="['active']" >
           <a routerLink="home">Mijn declaraties</a>
         </li>
-        <li class="nav-item" [routerLinkActive]="['active']" >
-          <a [routerLink]="['expenses', 'manage']">Goedkeuren</a>
-        </li>
         <li class="nav-item" [routerLinkActive]="['active']"
           *ngIf="this.identityService.allRoles().includes('controller')">
           <a [routerLink]="['expenses', 'controller']">Controller</a>
