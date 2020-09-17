@@ -259,10 +259,12 @@ export class FinanceComponent {
     this.wantsNewModal = false;
     if (message[0]) {
       this.expenses.getExpenses().subscribe((response) => {
-        // @ts-ignore
-        this.rowData = [...response];
-        if (message[1]) {
-          this.getNextExpense(true);
+        if (response) {
+          // @ts-ignore
+          this.rowData = [...response];
+          if (message[1]) {
+            this.getNextExpense(true);
+          }
         }
       });
     } else if (message[1]) {

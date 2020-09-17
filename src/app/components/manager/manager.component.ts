@@ -114,10 +114,12 @@ export class ManagerComponent {
     this.wantsNewModal = false;
     if (message[0]) {
       this.expenses.getManagerExpenses().subscribe((response) => {
-        // @ts-ignore
-        this.rowData = [...response];
-        if (message[1]) {
-          this.getNextExpense();
+        if (response) {
+          // @ts-ignore
+          this.rowData = [...response];
+          if (message[1]) {
+            this.getNextExpense();
+          }
         }
       });
     } else if (message[1]) {
