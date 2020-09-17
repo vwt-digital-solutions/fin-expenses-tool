@@ -265,6 +265,8 @@ export class FinanceComponent {
           if (message[1]) {
             this.getNextExpense(true);
           }
+        } else {
+          this.gridApi.setRowData([]);
         }
       });
     } else if (message[1]) {

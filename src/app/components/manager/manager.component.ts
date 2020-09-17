@@ -120,6 +120,8 @@ export class ManagerComponent {
           if (message[1]) {
             this.getNextExpense();
           }
+        } else {
+          this.gridApi.setRowData([]);
         }
       });
     } else if (message[1]) {
