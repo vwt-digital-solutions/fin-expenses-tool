@@ -1,29 +1,13 @@
 @import "src/assets/scss/mixins";
 @import "src/assets/scss/constants";
 
-#expensestable {
-  width: 100%;
-  height: 750px;
-  overflow: hidden;
-  @include md-phone-only {
-    height: 30rem;
-  }
-}
-
-#historytable {
-  width: 100%;
-  overflow: hidden;
-  height: 750px;
-  @include sm-phone-only {
-    height: 10rem;
+.grid-paymentfiles {
+  @include for-desktop-up {
+    width: 500px;
   }
 }
 
 .btn-toolbar {
-  border-bottom: 1px solid $vwt_color_blue_hr;
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-
   button {
     &:focus {
       outline: none;
@@ -33,6 +17,16 @@
     i {
       margin-left: 5px;
     }
+  }
+
+  .bookfile-creation-top {
+    .alert {
+      padding: 6px 5px;
+    }
+  }
+
+  span.btn-link {
+    cursor: pointer;
   }
 
   .alert {
@@ -57,25 +51,5 @@
     small.description-text {
       padding: 0 1.5rem;
     }
-  }
-}
-
-.empty-creation-top {
-  border-bottom: 1px solid $vwt_color_blue_hr;
-  margin-bottom: 10px;
-  margin-top: 48px;
-}
-
-#linestep {
-  border-left: 1px solid #80808052;
-  border-image: linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(2, 138, 184, 0.4) 48%,
-      rgba(255, 255, 255, 0) 100%);
-  border-image-slice: 1;
-  transform: translate(50%, 0);
-  @include lg-phone-only {
-    display: none;
   }
 }
