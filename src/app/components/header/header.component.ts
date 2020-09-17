@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { EnvService } from 'src/app/services/env.service';
 import { OAuthService } from 'angular-oauth2-oidc';
+import { IdentityService } from 'src/app/services/identity.service';
 
 interface ClaimsEmail {
   email: any;
@@ -19,7 +20,8 @@ export class HeaderComponent implements OnInit {
 
   constructor(
     private env: EnvService,
-    private oauthService: OAuthService
+    private oauthService: OAuthService,
+    public identityService: IdentityService
   ) {}
 
   ngOnInit() {

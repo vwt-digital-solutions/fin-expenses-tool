@@ -14,9 +14,6 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class LandingComponent implements OnInit {
 
-  public OurJaneDoeIs: any[] | string[];
-  public displayPersonName: string | string[];
-  public personID: string;
   public declarationData: Expense[] = [];
   public typeOptions: any;
   public expenseData: Expense;
@@ -28,7 +25,7 @@ export class LandingComponent implements OnInit {
   public forceViewer;
 
   constructor(
-    private identityService: IdentityService,
+    public identityService: IdentityService,
     private modalService: NgbModal,
     private expenses: ExpensesConfigService,
     private route: ActivatedRoute
@@ -39,15 +36,6 @@ export class LandingComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.OurJaneDoeIs = [];
-    const claimJaneDoe = this.identityService.allClaims();
-    for (const role of claimJaneDoe.roles) {
-      this.OurJaneDoeIs.push(role.split('.')[0]);
-    }
-    this.personID = claimJaneDoe.email ? claimJaneDoe.email.split('@')[0].toLowerCase() : 'UNDEFINED';
-    this.displayPersonName = claimJaneDoe.name ? claimJaneDoe.name.split(',') : ['UNDEFINED', 'UNDEFINED'];
-    this.displayPersonName = (this.displayPersonName[1] + ' ' + this.displayPersonName[0]).substring(1);
-
     // Control the manager button
     this.expenses.getManagerExpenses()
       .subscribe(val => {
@@ -59,7 +47,7 @@ export class LandingComponent implements OnInit {
   }
 
   declarationCall() {
-    this.expenses.getEmployeeExpenses(this.personID)
+    this.expenses.getEmployeeExpenses(this.identityService.personID)
       .subscribe(
         response => {
           console.log('>> GET SUCCESS', response);

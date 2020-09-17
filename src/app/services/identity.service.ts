@@ -13,8 +13,23 @@ export interface ClaimRoles {
   providedIn: 'root'
 })
 export class IdentityService {
+  public OurJaneDoeIs: string[] = [];
+  public claimJaneDoe: ClaimRoles;
+  public personID: string;
+  public displayPersonName = 'Onbekend';
 
-  constructor(private oauthService: OAuthService) { }
+  constructor(private oauthService: OAuthService) {
+    this.claimJaneDoe = this.allClaims();
+
+    for (const role of this.claimJaneDoe.roles) {
+      this.OurJaneDoeIs.push(role.split('.')[0]);
+    }
+
+    if (this.claimJaneDoe.name) {
+      const name = this.claimJaneDoe.name.split(',');
+      this.displayPersonName = (`${name[1]} ${name[0]}`).substring(1);
+    }
+  }
 
   whoAmI(): string {
     const claimJaneDoe = this.allClaims();
