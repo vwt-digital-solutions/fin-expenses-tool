@@ -4,7 +4,7 @@
 @import "~src/assets/scss/mixins";
 
 @import "~ag-grid-community/dist/styles/ag-grid.css";
-@import "~ag-grid-community/dist/styles/ag-theme-material.css";
+@import "~ag-grid-community/dist/styles/ag-theme-balham.css";
 
 $vwt_font_family: 'Poppins', sans-serif;
 
@@ -82,12 +82,6 @@ h6 {
 #information-icon, #verifyIcon, #EditIcon {
   cursor: pointer;
   width: inherit;
-}
-
-span.ag-header-group-text {
-  font-size: 3em;
-  font-weight: 300;
-  color: $vwt_color_blue;
 }
 
 // BOOTSTRAP OVERRIDES

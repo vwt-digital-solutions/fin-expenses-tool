@@ -1,25 +1,24 @@
-<div class="container-fluid app-container">
-  <div class="row">
-    <div class="col col-sm-8">
-      <div class="row btn-toolbar">
-        <div class="col col-md-6 col-sm-12 bookfile-creation-top">
-          <button type="button" id="createBookingFile" (click)="createBookingFile()" class="btn btn-primary">Nieuwe
-            bestanden
-            maken
-          </button>
-          <div class="alert alert-success p-2" role="alert" *ngIf="addBooking.success === true">
-            <small><i class="fas fa-check-circle"></i> Bestanden zijn aangemaakt.</small>
+<div class="container-fluid app-container pb-2">
+  <ul ngbNav #nav="ngbNav" [destroyOnHide]="false" class="nav-tabs">
+    <li [ngbNavItem]="1">
+      <a ngbNavLink>Declaraties</a>
+      <ng-template ngbNavContent>
+        <div class="row btn-toolbar my-2 py-2">
+          <div class="col col-md-8 col-sm-12 bookfile-creation-top">
+            <button type="button" id="createBookingFile" (click)="createBookingFile()" class="btn btn-primary d-table float-left m-0">
+              Nieuwe betaalbestanden maken
+            </button>
+            <div class="alert alert-success d-table float-left m-0 ml-2" role="alert" *ngIf="addBooking.success === true">
+              <small><i class="fas fa-check-circle"></i> Bestanden zijn aangemaakt, bekijk ze <span class="btn-link" (click)="nav.select(2)">hier</span></small>
+            </div>
+            <div class="alert alert-warning d-table float-left m-0 ml-2" role="alert" *ngIf="addBooking.wrong === true">
+              <small><i class="fa fa-exclamation-circle"></i> Er zijn geen openstaande declaraties. Bekijk eerdere bestanden <span class="btn-link" (click)="nav.select(2)">hier</span>.</small>
+            </div>
+            <div class="alert alert-danger d-table float-left m-0 ml-2" role="alert" *ngIf="addBooking.error === true">
+              <small><i class="fa fa-exclamation-circle"></i> Er is iets fout gegaan. Probeer het later opnieuw.</small>
+            </div>
           </div>
-          <div class="alert alert-warning p-2" role="alert" *ngIf="addBooking.wrong === true">
-            <small><i class="fa fa-exclamation-circle"></i> Er zijn geen openstaande declaraties. Bekijk de eerdere Booking Files.</small>
-          </div>
-          <div class="alert alert-danger p-2" role="alert" *ngIf="addBooking.error === true">
-            <small><i class="fa fa-exclamation-circle"></i> Er is iets fout gegaan. Probeer het later opnieuw.</small>
-          </div>
-        </div>
-
-        <ng-container *ngIf="dataExport != 'invisible'">
-          <div class="col col-md-6 col-sm-12 data-export-top text-md-right">
+          <div class="col col-md-4 col-sm-12 text-md-right">
             <div class="dropdown">
               <button
                 class="btn btn-secondary dropdown-toggle"
@@ -73,38 +72,58 @@
               </div>
             </div>
           </div>
-        </ng-container>
-      </div>
+        </div>
 
-      <!-- START AG-GRID EXPENSES -->
-      <ag-grid-angular
-        id="expensestable"
-        class="ag-theme-material"
-        [rowData]="rowData"
-        [columnDefs]="columnDefs"
-        [rowSelection]="rowSelection"
-        (rowClicked)="onRowClicked($event)"
-        (gridReady)="onGridReady($event)">
-      </ag-grid-angular>
-      <!-- END AG-GRID EXPENSES -->
-    </div>
-    <div class="col col-sm-1" id="linestep">
-    </div>
-    <div class="col col-sm-3">
-      <div class="empty-creation-top"></div>
-      <!-- START AG-GRID HISTORY -->
-      <ag-grid-angular
-        (cellClicked)="historyHit($event)"
-        id="historytable"
-        class="ag-theme-material"
-        [rowData]="historyRowData"
-        [columnDefs]="historyColumnDefs"
-        (gridReady)="onHistoryGridReady($event)"
-      >
-      </ag-grid-angular>
-      <!-- END AG-GRID HISTORY -->
-    </div>
-  </div>
+        <!-- START AG-GRID EXPENSES -->
+        <div class="row">
+          <div class="col-12">
+            <ag-grid-angular
+              class="ag-theme-balham grid-expenses"
+              [gridOptions]="gridOptions"
+              [columnDefs]="columnDefs"
+              [rowData]="rowData"
+              (rowClicked)="onRowClicked($event)"
+              (gridReady)="onGridReady($event)">
+            </ag-grid-angular>
+          </div>
+        </div>
+        <!-- END AG-GRID EXPENSES -->
+      </ng-template>
+    </li>
+
+    <li [ngbNavItem]="2">
+      <a ngbNavLink>Betaalbestanden</a>
+      <ng-template ngbNavContent>
+        <div class="row btn-toolbar mb-2 py-2">
+          <div class="col-12">
+            <div class="alert alert-info m-0 p-2" role="alert">
+              <small>
+                <strong><i class="fas fa-info-circle"></i></strong>
+                Het genereren van nieuwe betaalbestanden kan <span class="btn-link" (click)="nav.select(1)">hier</span>
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- START AG-GRID HISTORY -->
+        <div class="row">
+          <div class="col-12">
+            <ag-grid-angular
+            (cellClicked)="historyHit($event)"
+            class="ag-theme-balham grid-paymentfiles"
+            [columnDefs]="historyColumnDefs"
+            [gridOptions]="gridOptions"
+            [rowData]="historyRowData"
+            (gridReady)="onHistoryGridReady($event)">
+          </ag-grid-angular>
+          </div>
+        </div>
+        <!-- END AG-GRID HISTORY -->
+      </ng-template>
+    </li>
+  </ul>
+
+  <div [ngbNavOutlet]="nav" class="mt-2"></div>
 </div>
 
 <app-maxmodal *ngIf="wantsNewModal"

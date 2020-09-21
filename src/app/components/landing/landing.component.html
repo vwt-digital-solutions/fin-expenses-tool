@@ -1,7 +1,7 @@
 <div class="container app-container app-landing">
   <div class="pb-2 border-bottom" id="stepstep">
     <h1>mijn declaraties</h1>
-    <small>{{this.displayPersonName}}</small>
+    <small>{{this.identityService.whoAmI().name}}</small>
   </div>
   <br>
   <div class="row row-100">
@@ -42,29 +42,29 @@
           name="expenses"
           class="btn btn-primary w-100 py-2 py-md-3"
           [routerLink]="['/expenses/employee']" >
-          Nieuwe Declaratie
-        </button>
-        <button
-          *ngIf="this.OurJaneDoeIs.includes('creditor')"
-          name="expenses/process"
-          class="btn btn-primary w-100 py-2 py-md-3"
-          [routerLink]="['/expenses/process']" >
-          Declaraties Controleren
+          Nieuwe declaratie
         </button>
         <button
           *ngIf="this.managerAmount > 0"
           name="expenses/manage"
           class="btn btn-primary w-100 py-2 py-md-3"
           [routerLink]="['/expenses/manage']" >
-          Declaraties Beoordelen
+          Declaraties goedkeuren
           <span class="badge badge-pill badge-light">{{this.managerAmount}}</span>
         </button>
         <button
-          *ngIf="this.OurJaneDoeIs.includes('controller')"
+          *ngIf="this.identityService.allRoles().includes('controller')"
           name="expenses/controller"
           class="btn btn-primary w-100 py-2 py-md-3"
           [routerLink]="['/expenses/controller']" >
-          Controller
+          Controller pagina
+        </button>
+        <button
+          *ngIf="this.identityService.allRoles().includes('creditor')"
+          name="expenses/process"
+          class="btn btn-primary w-100 py-2 py-md-3"
+          [routerLink]="['/expenses/process']" >
+          Crediteuren pagina
         </button>
       </div>
     </div>

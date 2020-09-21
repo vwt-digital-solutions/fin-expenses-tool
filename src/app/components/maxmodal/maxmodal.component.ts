@@ -231,7 +231,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
     .subscribe(
       result => this.afterPostExpense(result),
       error => {
-        console.log(error);
+        console.error(error);
         this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
       })
       : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
@@ -254,7 +254,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
         .subscribe(
           result => this.closeModal(true),
           error => {
-            console.log(error);
+            console.error(error);
             this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
           })
       : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
@@ -278,7 +278,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
         .subscribe(
           result => this.closeModal(true),
           error => {
-            console.log(error);
+            console.error(error);
             this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
           })
       : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
@@ -304,7 +304,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
     if (this.receiptFiles.length > 0 && !this.receiptFiles.some(e => e.from_db)) {
       this.bulkAttachmentUpload(expense['id']).subscribe(
         responseList => {
-          console.log('>> POST ATTACHMENTS SUCCESS', responseList);
+          // console.log('>> POST ATTACHMENTS SUCCESS', responseList);
           this.afterPostAttachments(expense);
         }, error => {
           this.errorMessage = 'Er is iets fout gegaan bij het uploaden van de bestanden, neem contact op met de crediteuren afdeling.';

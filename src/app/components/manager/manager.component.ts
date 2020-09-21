@@ -37,59 +37,54 @@ export class ManagerComponent {
 
     this.columnDefs = [
       {
-        headerName: 'Declaraties Overzicht',
-        children: [
-          {
-            headerName: 'Declaratiedatum',
-            field: 'claim_date',
-            sortable: true,
-            filter: true,
-            sort: 'asc',
-            valueFormatter: (params: any) => {
-              if (!isNaN(Date.parse(params.value))) {
-                return datePipe.transform(params.value, 'dd-MM-yyyy HH:mm');
-              } else {
-                return 'N/B';
-              }
-            }
-          },
-          {
-            headerName: 'Werknemer', field: 'employee',
-            sortable: true, filter: true, width: 200, resizable: true
-          },
-          {
-            headerName: 'Kosten', field: 'amount', cellRenderer: (params: any) => currencyPipe.transform(params.value, 'EUR', '&euro;'),
-            sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
-          },
-          {
-            headerName: 'Soort', field: 'cost_type',
-            sortable: true, filter: true, resizable: true, width: 200,
-            valueFormatter: params => {
-              const splitValue = params.value.split(':');
-              if (splitValue.length > 1) {
-                return splitValue[0];
-              } else if (splitValue.length === 1) {
-                return costTypePipe.transform(splitValue[0], this.typeOptions);
-              } else {
-                return 'Onbekend';
-              }
-            }
-          },
-          {
-            headerName: 'Beschrijving', field: 'note', resizable: true
-          },
-          {
-            headerName: 'Bondatum', field: 'transaction_date',
-            sortable: true, filter: true, width: 150,
-            valueFormatter: (params: any) => {
-              if (!isNaN(Date.parse(params.value))) {
-                return datePipe.transform(params.value, 'dd-MM-yyyy');
-              } else {
-                return 'N/B';
-              }
-            }
+        headerName: 'Declaratiedatum',
+        field: 'claim_date',
+        sortable: true,
+        filter: true,
+        sort: 'asc',
+        valueFormatter: (params: any) => {
+          if (!isNaN(Date.parse(params.value))) {
+            return datePipe.transform(params.value, 'dd-MM-yyyy HH:mm');
+          } else {
+            return 'N/B';
           }
-        ]
+        }
+      },
+      {
+        headerName: 'Werknemer', field: 'employee',
+        sortable: true, filter: true, width: 200, resizable: true
+      },
+      {
+        headerName: 'Kosten', field: 'amount', cellRenderer: (params: any) => currencyPipe.transform(params.value, 'EUR', '&euro;'),
+        sortable: true, filter: true, width: 150, cellStyle: {'text-align': 'right'}
+      },
+      {
+        headerName: 'Soort', field: 'cost_type',
+        sortable: true, filter: true, resizable: true, width: 200,
+        valueFormatter: params => {
+          const splitValue = params.value.split(':');
+          if (splitValue.length > 1) {
+            return splitValue[0];
+          } else if (splitValue.length === 1) {
+            return costTypePipe.transform(splitValue[0], this.typeOptions);
+          } else {
+            return 'Onbekend';
+          }
+        }
+      },
+      {
+        headerName: 'Beschrijving', field: 'note', resizable: true
+      },
+      {
+        headerName: 'Bondatum', field: 'transaction_date',
+        sortable: true, filter: true, width: 150,
+        valueFormatter: (params: any) => {
+          if (!isNaN(Date.parse(params.value))) {
+            return datePipe.transform(params.value, 'dd-MM-yyyy');
+          } else {
+            return 'N/B';
+          }
+        }
       }
     ];
     this.rowSelection = 'single';
@@ -119,10 +114,14 @@ export class ManagerComponent {
     this.wantsNewModal = false;
     if (message[0]) {
       this.expenses.getManagerExpenses().subscribe((response) => {
-        // @ts-ignore
-        this.rowData = [...response];
-        if (message[1]) {
-          this.getNextExpense();
+        if (response) {
+          // @ts-ignore
+          this.rowData = [...response];
+          if (message[1]) {
+            this.getNextExpense();
+          }
+        } else {
+          this.gridApi.setRowData([]);
         }
       });
     } else if (message[1]) {

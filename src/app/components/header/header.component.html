@@ -22,10 +22,16 @@
 
     <div class="collapse navbar-collapse" id="navbarCollapse">
       <ul class="nav navbar-nav ml-auto">
-        <li
-          class="nav-item"
-          [routerLinkActive]="['active']" >
-          <a routerLink="home">Home</a>
+        <li class="nav-item" [routerLinkActive]="['active']" >
+          <a routerLink="home">Mijn declaraties</a>
+        </li>
+        <li class="nav-item" [routerLinkActive]="['active']"
+          *ngIf="this.identityService.allRoles().includes('controller')">
+          <a [routerLink]="['expenses', 'controller']">Controller</a>
+        </li>
+        <li class="nav-item" [routerLinkActive]="['active']"
+          *ngIf="this.identityService.allRoles().includes('creditor')">
+          <a [routerLink]="['expenses', 'process']">Crediteur</a>
         </li>
 
         <li

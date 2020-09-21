@@ -27,7 +27,6 @@ export class AuthComponent {
     private router: Router,
     private oauthService: OAuthService
   ) {
-    console.log('e2e auth helper initializing');
     const helper = new JwtHelperService();
     let isAuthorised = false;
 

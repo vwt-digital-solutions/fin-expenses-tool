@@ -9,6 +9,7 @@ import {FormGroup, FormControl, Validators, AbstractControl} from '@angular/form
 import { ActivatedRoute } from '@angular/router';
 import { CostTypePipe } from 'src/app/pipes/cost-type.pipe';
 import { map } from 'rxjs/operators';
+import { GridOptions } from 'ag-grid-community';
 
 @Component({
   selector: 'app-expenses',
@@ -20,8 +21,8 @@ import { map } from 'rxjs/operators';
 export class FinanceComponent {
   private gridApi;
   private historyGridApi;
+  public gridOptions: GridOptions;
   public columnDefs;
-  public rowSelection;
   private currentRowIndex: number;
   private typeOptions: any;
   public wantsNewModal: boolean;
@@ -46,68 +47,91 @@ export class FinanceComponent {
     this.route.data.pipe(map(data => data.costTypes)).subscribe(costTypes => this.typeOptions = costTypes);
     this.setUpForm();
 
-    this.columnDefs = [
-      {
-        headerName: 'Declaraties Overzicht',
-        children: [
-          {
-            headerName: 'Declaratiedatum',
-            field: 'claim_date',
-            sortable: true,
-            filter: true,
-            sort: 'desc',
-            valueFormatter: (params: any) => {
-              if (!isNaN(Date.parse(params.value))) {
-                return datePipe.transform(params.value, 'dd-MM-yyyy HH:mm');
-              } else {
-                return 'N/B';
-              }
-            }
-          },
-          {
-            headerName: 'Werknemer', field: 'employee',
-            sortable: true, filter: true, width: 180, resizable: true
-          },
-          {
-            headerName: 'Kosten', field: 'amount', cellRenderer: (params: any) => currencyPipe.transform(params.value, 'EUR', '&euro;'),
-            sortable: true, filter: true, width: 120, cellStyle: {'text-align': 'right'}
-          },
-          {
-            headerName: 'Soort', field: 'cost_type',
-            sortable: true, filter: true, resizable: true, width: 200,
-            valueFormatter: (params: any) => {
-              const splitValue = params.value.split(':');
-              if (splitValue.length > 1) {
-                return splitValue[0];
-              } else if (splitValue.length === 1) {
-                return costTypePipe.transform(splitValue[0], this.typeOptions);
-              } else {
-                return 'Onbekend';
-              }
-            }
-          },
-          {
-            headerName: 'Beschrijving', field: 'note', resizable: true
-          },
-          {
-            headerName: 'Bondatum', field: 'transaction_date',
-            sortable: true, filter: true, width: 150,
-            valueFormatter: (params: any) => {
-              if (!isNaN(Date.parse(params.value))) {
-                return datePipe.transform(params.value, 'dd-MM-yyyy');
-              } else {
-                return 'N/B';
-              }
-            }
-          },
-          {
-            headerName: 'Status', field: 'status.text',
-            sortable: true, width: 180
-          },
+    this.gridOptions = {
+      defaultColDef: {
+        sortable: true,
+        filter: true,
+        editable: false,
+        resizable: true,
+        width: 150
+      },
+      domLayout: 'autoHeight',
+      paginationPageSize: 25,
+      pagination: true,
+      enableBrowserTooltips: true,
+      rowSelection: 'single',
+      statusBar: {
+        statusPanels: [
+          { statusPanel: 'agTotalRowCountComponent', align: 'left' },
+          { statusPanel: 'agFilteredRowCountComponent', align: 'left' }
         ]
       }
+    };
+
+    this.columnDefs = [
+      {
+        headerName: 'Declaratiedatum',
+        field: 'claim_date',
+        sort: 'desc',
+        valueFormatter: (params: any) => {
+          if (!isNaN(Date.parse(params.value))) {
+            return datePipe.transform(params.value, 'dd-MM-yyyy HH:mm');
+          } else {
+            return 'N/B';
+          }
+        }
+      },
+      {
+        headerName: 'Werknemer', field: 'employee',
+      },
+      {
+        headerName: 'Kosten', field: 'amount', cellStyle: {'text-align': 'right'},
+        cellRenderer: (params: any) => currencyPipe.transform(params.value, 'EUR', '&euro;')
+      },
+      {
+        headerName: 'Soort', field: 'cost_type',
+        tooltipField: 'cost_type', valueGetter: params => {
+          const splitValue = params.data.cost_type.split(':');
+          if (splitValue.length > 1) {
+            return splitValue[0];
+          } else if (splitValue.length === 1) {
+            return costTypePipe.transform(splitValue[0], this.typeOptions);
+          } else {
+            return 'Onbekend';
+          }
+        }
+      },
+      {
+        headerName: 'Beschrijving', field: 'note', tooltipField: 'note'
+      },
+      {
+        headerName: 'Bondatum', field: 'transaction_date',
+        valueFormatter: (params: any) => {
+          if (!isNaN(Date.parse(params.value))) {
+            return datePipe.transform(params.value, 'dd-MM-yyyy');
+          } else {
+            return 'N/B';
+          }
+        }
+      },
+      {
+        headerName: 'Status', field: 'status.text',
+        valueFormatter: (params: any) => params.value.replace(/_/g, ' '),
+        cellStyle: { 'text-transform': 'capitalize' }
+      },
+      {
+        headerName: 'Automatisch goedgekeurd', field: 'auto_approved',
+        valueFormatter: (params: any) => (
+          params.value.toLowerCase() === 'yes') ? 'Ja' : 'Nee'
+      },
+      { headerName: 'Bedrijfsnaam', field: 'company_name' },
+      { headerName: 'Afdelingscode', field: 'department_code' },
+      {
+        headerName: 'Afdelingsomschrijving', field: 'department_descr',
+        width: 300, tooltipField: 'department_descr'
+      }
     ];
-    this.rowSelection = 'single';
+
     this.addBooking = {success: false, wrong: false, error: false};
   }
 
@@ -116,29 +140,43 @@ export class FinanceComponent {
 
   historyColumnDefs = [
     {
-      headerName: '',
+      headerName: 'Export datum',
       children: [
         {
-          headerName: '', field: 'export_date',
-          sortable: true, filter: true,
-          suppressMovable: true, width: 170,
+          headerName: 'Datum',
+          field: 'export_date',
+          sort: 'desc',
+          suppressMovable: true,
           valueFormatter: (params: any) => {
             if (!isNaN(Date.parse(params.value))) {
-              return this.datePipe.transform(params.value, 'dd-MM-yyyy HH:mm:ss');
+              return this.datePipe.transform(params.value, 'dd-MM-yyyy');
             } else {
               return 'N/B';
             }
           }
         },
         {
-          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 75,
-          template: '<i class="fas fa-book" style="color: #4eb7da; font-size: 20px;"></i>'
-        },
-        {
-          headerName: '', field: '', cellStyle: {cursor: 'pointer'}, width: 75,
-          template: this.paymentfilecoldef
+          headerName: 'Tijdstip',
+          field: 'export_date',
+          sort: 'desc',
+          suppressMovable: true,
+          valueFormatter: (params: any) => {
+            if (!isNaN(Date.parse(params.value))) {
+              return this.datePipe.transform(params.value, 'HH:mm:ss');
+            } else {
+              return 'N/B';
+            }
+          }
         }
       ]
+    },
+    {
+      headerName: 'Boekingsbestand', field: '', cellStyle: {cursor: 'pointer'},
+      template: '<i class="fas fa-book" style="color: #4eb7da; font-size: 20px;"></i>'
+    },
+    {
+      headerName: 'Betaalbestand', field: '', cellStyle: {cursor: 'pointer'},
+      template: this.paymentfilecoldef
     }
   ];
 
@@ -169,7 +207,7 @@ export class FinanceComponent {
           a.download = this.datePipe.transform(event.data.export_date, 'dd-MM-yyyy HH:mm:ss') + downloadType;
           a.click();
           window.URL.revokeObjectURL(url);
-          console.log('>> GET SUCCESS');
+          // console.log('>> GET SUCCESS');
         }, response => {
           this.errorBooking();
           console.error('>> GET FAILED', response.message);
@@ -222,10 +260,14 @@ export class FinanceComponent {
     this.wantsNewModal = false;
     if (message[0]) {
       this.expenses.getExpenses().subscribe((response) => {
-        // @ts-ignore
-        this.rowData = [...response];
-        if (message[1]) {
-          this.getNextExpense(true);
+        if (response) {
+          // @ts-ignore
+          this.rowData = [...response];
+          if (message[1]) {
+            this.getNextExpense(true);
+          }
+        } else {
+          this.gridApi.setRowData([]);
         }
       });
     } else if (message[1]) {
@@ -274,7 +316,7 @@ export class FinanceComponent {
             this.historyGridApi.setRowData(this.historyRowData);
             this.successfulDownload();
           }
-          console.log('>> POST SUCCESS');
+          // console.log('>> POST SUCCESS');
         }, response => {
           this.errorBooking();
           console.error('>> POST FAILED', response.message);

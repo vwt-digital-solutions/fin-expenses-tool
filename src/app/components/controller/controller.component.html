@@ -1,16 +1,21 @@
-<div class="container-fluid app-container compact">
-  <button type="button" class="btn btn-primary" (click)="onBtExport()">Export to Excel</button>
-  <!-- START AG-GRID EXPENSES -->
-  <ag-grid-angular
-    id="expensestable"
-    class="ag-theme-material"
-    [rowData]="rowData"
-    [columnDefs]="columnDefs"
-    (rowClicked)="onRowClicked($event)"
-    (gridReady)="onGridReady($event)">
-  </ag-grid-angular>
-  <!-- END AG-GRID EXPENSES -->
-
+<div class="container-fluid app-container">
+  <div class="row">
+    <div class="col-12 mb-4">
+      <button type="button" class="btn btn-primary" (click)="onBtExport()">Exporteren naar Excel</button>
+    </div>
+    <div class="col-12">
+      <!-- START AG-GRID EXPENSES -->
+      <ag-grid-angular
+        class="ag-theme-balham"
+        [gridOptions]="gridOptions"
+        [rowData]="rowData"
+        [columnDefs]="columnDefs"
+        (rowClicked)="onRowClicked($event)"
+        (gridReady)="onGridReady($event)">
+      </ag-grid-angular>
+      <!-- END AG-GRID EXPENSES -->
+    </div>
+  </div>
 </div>
 
 <app-maxmodal *ngIf="wantsNewModal"
