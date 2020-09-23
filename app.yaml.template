@@ -18,8 +18,8 @@ automatic_scaling:
   min_instances: 0
   max_instances: 2
   max_idle_instances: 1
-  min_pending_latency = 1s
-  max_pending_latency = 5s
+  min_pending_latency: 1s
+  max_pending_latency: 5s
 
 handlers:
 - url: /(.*\.(gif|png|jpeg|jpg|css|js|ico|svg|json|eot|woff|woff2))$
