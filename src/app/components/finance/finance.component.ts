@@ -265,7 +265,7 @@ export class FinanceComponent {
     switch (result.action) {
       case MaxModalAction.Approved:
       case MaxModalAction.Rejected:
-        this.rowData.filter(expense => expense !== this.expenseData)
+        this.rowData = this.rowData.filter(expense => expense !== this.expenseData)
         // this.getNextExpense(true) ?
         break;
     }

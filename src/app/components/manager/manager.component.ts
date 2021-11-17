@@ -117,7 +117,7 @@ export class ManagerComponent {
     switch (result.action) {
       case MaxModalAction.Approved:
       case MaxModalAction.Rejected:
-        this.rowData.filter(expense => expense !== this.expenseData)
+        this.rowData = this.rowData.filter(expense => expense !== this.expenseData)
         break;
     }
   }
