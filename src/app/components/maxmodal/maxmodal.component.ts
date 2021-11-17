@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output, ViewChild, AfterContentC
 import {Expense} from '../../models/expense';
 import {ActivatedRoute} from '@angular/router';
 import {map} from 'rxjs/operators';
+import { MaxModalResult, MaxModalAction } from '../../models/maxmodal';
 import {Attachment} from '../../models/attachment';
 import {ExpensesConfigService} from '../../services/config.service';
 import {IdentityService} from '../../services/identity.service';
@@ -26,24 +27,22 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
   @Input() expenseData: Expense;
   @Input() forceViewer: boolean;
   @Input() moveDirection: string;
-  @Output() messageEvent = new EventEmitter<boolean[]>();
+  @Output() messageEvent = new EventEmitter<MaxModalResult>();
 
   public rejectionNotes: any;
   public typeOptions: any;
   public receiptFiles: Attachment[];
   public errorMessage: string;
   private readonly today: Date;
-  private action: string;
+  private action: MaxModalAction = MaxModalAction.None;
   private OurJaneDoeRoles: any;
   public rejectionNoteVisible = false;
   public isCreditor: boolean;
   public isManager: boolean;
   public isViewer: boolean;
   public isEditor: boolean;
-  public isRejecting: boolean;
   public wantsDraft = 0;
   public wantsSubmit = 0;
-  public rejectionNote: boolean;
   public formCostTypeMessage = { short: '', long: '' };
   public expenseFlags = [];
   public transdateNotFilledMessage: string;
@@ -78,13 +77,13 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
 
     window.onmousedown = event => {
       if (event.target === document.getElementById('maxModal')) {
-        this.closeModal(false, false);
+        this.closeModal(MaxModalAction.None);
       }
     };
 
     window.onkeydown = event => {
       if (event.key === 'Escape') {
-        this.closeModal(false, false);
+        this.closeModal(MaxModalAction.None);
       }
     };
 
@@ -178,7 +177,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
         || nTransDate.invalid || (new Date(nTransDate.viewModel)
           > this.today) || nAmount.viewModel < 0.01 || (toSubmit && !this.identityService.isTesting() ? this.attachmentsIsInvalid : false);
     } else if (this.isManager || this.isCreditor) {
-      if (this.isRejecting && (!rNoteId.value || this.checkRNoteRequired(Number(rNoteId.value)) && !rNote.value)) {
+      if (this.action === MaxModalAction.Rejected && (!rNoteId.value || this.checkRNoteRequired(Number(rNoteId.value)) && !rNote.value)) {
         return true;
       }
       return nType ? nType.invalid : false;
@@ -238,7 +237,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
   }
 
   claimForManager(dataVerified, expenseId, data) {
-    if (this.action === 'rejecting') {
+    if (this.action === MaxModalAction.Rejected) {
       dataVerified[`rnote_id`] = Number(data.rnote_id);
 
       if (this.checkRNoteRequired(Number(data.rnote_id))) {
@@ -246,13 +245,18 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
       }
     }
 
-    dataVerified[`status`] = this.action === 'approving' ? `ready_for_creditor` :
-      this.action === 'rejecting' ? `rejected_by_manager` : null;
+    if (this.action === MaxModalAction.Approved) {
+      dataVerified[`status`] = `ready_for_creditor`;
+    } else if (this.action === MaxModalAction.Rejected) {
+      dataVerified[`status`] = `rejected_by_manager`;
+    } else {
+      dataVerified[`status`] = null;
+    }
 
     Object.keys(dataVerified).length !== 0 ?
       this.expensesConfigService.updateExpenseManager(dataVerified, expenseId)
         .subscribe(
-          result => this.closeModal(true),
+          result => this.closeModal(this.action),
           error => {
             console.error(error);
             this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
@@ -263,7 +267,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
   claimForCreditor(dataVerified, expenseId, data) {
     dataVerified[`cost_type`] = data.cost_type;
 
-    if (this.action === 'rejecting') {
+    if (this.action === MaxModalAction.Rejected) {
       dataVerified[`rnote_id`] = Number(data.rnote_id);
 
       if (this.checkRNoteRequired(Number(data.rnote_id))) {
@@ -271,12 +275,18 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
       }
     }
 
-    dataVerified[`status`] = this.action === 'approving' ? `approved` :
-      this.action === 'rejecting' ? `rejected_by_creditor` : null;
+    if (this.action === MaxModalAction.Approved) {
+      dataVerified[`status`] = `approved`;
+    } else if (this.action === MaxModalAction.Rejected) {
+      dataVerified[`status`] = `rejected_by_creditor`;
+    } else {
+      dataVerified[`status`] = null;
+    }
+
     Object.keys(dataVerified).length !== 0 ?
       this.expensesConfigService.updateExpenseFinance(dataVerified, expenseId)
         .subscribe(
-          result => this.closeModal(true),
+          result => this.closeModal(this.action),
           error => {
             console.error(error);
             this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
@@ -329,21 +339,21 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
       this.expensesConfigService.updateExpenseEmployee(
         { status: 'ready_for_manager' }, expense['id']
       ).subscribe(
-        response => this.closeModal(true),
+        response => this.closeModal(MaxModalAction.Submit),
         error => {
           this.errorMessage = 'Er is iets fout gegaan bij het indienen van de declaratie, neem contact op met de crediteuren afdeling.';
           console.error('>> PUT EXPENSE FAILED', error.message);
         }
       );
     } else {
-      this.closeModal(true);
+      this.closeModal(MaxModalAction.None);
     }
   }
   // END Subject to change
 
   /** Used to update the rejection note with normal style change (works better on mobile) */
   rejectionHit(event: any) {
-    this.rejectionNote = false;
+    this.rejectionNoteVisible = false;
     if ('rnote' in this.expenseForm.form.controls) {
       this.expenseForm.form.patchValue({rnote: ''});
       this.expenseForm.form.controls['rnote'].markAsUntouched();
@@ -352,14 +362,8 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
 
     for (const rejection of this.rejectionNotes) {
       if (rejection['rnote_id'] === Number(event.target.value) && rejection['form'] === 'dynamic') {
-        this.rejectionNote = true;
+        this.rejectionNoteVisible = true;
       }
-    }
-
-    if (this.rejectionNote) {
-      this.rejectionNoteVisible = true;
-    } else {
-      this.rejectionNoteVisible = false;
     }
   }
 
@@ -372,7 +376,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
       this.expensesConfigService.updateExpenseEmployee(dataVerified, expenseId)
       .subscribe(
         result => {
-          this.closeModal(true);
+          this.closeModal(MaxModalAction.Cancel);
         },
         error => {
           this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
@@ -381,27 +385,40 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
   }
 
   /** Used to close the modal (Could also control the animation) */
-  closeModal(reload, next = true): void {
-    if (reload && !this.isViewer && !this.isEditor) {
-      document.getElementById('max-modal').className = 'move-right';
-    } else {
-      document.getElementById('max-modal').className = 'move-bottom';
+  closeModal(action: MaxModalAction): void {
+    let animation;
+    switch (action) {
+      case MaxModalAction.Approved:
+      case MaxModalAction.Rejected:
+        animation = 'move-right';
+        break;
+      default:
+        animation = 'move-bottom';
     }
+
     setTimeout(() => {
-      this.messageEvent.emit([reload, next]);
+      const message: MaxModalResult = {
+        action: action,
+        expense: this.expenseData
+      }
+
+      this.messageEvent.emit(message);
     }, 300);
   }
 
   /** Used to update the review action */
-  protected updatingAction(event) {
+  protected updatingAction(action: string) {
     this.wantsDraft = 0;
-    this.action = event;
-
-    if (event === 'rejecting') {
-      this.isRejecting = true;
-    } else {
-      this.isRejecting = false;
-      this.rejectionNote = false;
+    switch (action) {
+      case 'rejecting':
+        this.action = MaxModalAction.Rejected;
+        break;
+      case 'approving':
+        this.action = MaxModalAction.Approved;
+        break;
+      default:
+        this.action = MaxModalAction.None;
+        break;
     }
   }
 
