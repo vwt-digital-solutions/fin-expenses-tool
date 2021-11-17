@@ -41,6 +41,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
   public isManager: boolean;
   public isViewer: boolean;
   public isEditor: boolean;
+  public isRejecting: boolean;
   public wantsDraft = 0;
   public wantsSubmit = 0;
   public formCostTypeMessage = { short: '', long: '' };
@@ -385,7 +386,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
   }
 
   /** Used to close the modal (Could also control the animation) */
-  closeModal(action: MaxModalAction): void {
+  closeModal(action: MaxModalAction = MaxModalAction.None): void {
     let animation;
     switch (action) {
       case MaxModalAction.Approved:
@@ -412,12 +413,15 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
     switch (action) {
       case 'rejecting':
         this.action = MaxModalAction.Rejected;
+        this.isRejecting = true;
         break;
       case 'approving':
         this.action = MaxModalAction.Approved;
+        this.isRejecting = false;
         break;
       default:
         this.action = MaxModalAction.None;
+        this.isRejecting = false;
         break;
     }
   }
