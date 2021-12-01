@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 import { CostTypePipe } from 'src/app/pipes/cost-type.pipe';
+import { MaxModalAction, MaxModalResult } from '../../models/maxmodal';
 
 
 @Component({
@@ -110,22 +111,14 @@ export class ManagerComponent {
     }, 100);
   }
 
-  receiveMessage(message) {
+  receiveMessage(result: MaxModalResult) {
     this.wantsNewModal = false;
-    if (message[0]) {
-      this.expenses.getManagerExpenses().subscribe((response) => {
-        if (response) {
-          // @ts-ignore
-          this.rowData = [...response];
-          if (message[1]) {
-            this.getNextExpense();
-          }
-        } else {
-          this.gridApi.setRowData([]);
-        }
-      });
-    } else if (message[1]) {
-      this.getNextExpense();
+
+    switch (result.action) {
+      case MaxModalAction.Approved:
+      case MaxModalAction.Rejected:
+        this.rowData = this.rowData.filter(expense => expense !== this.expenseData)
+        break;
     }
   }
 

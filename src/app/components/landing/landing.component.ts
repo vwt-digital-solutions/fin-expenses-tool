@@ -5,6 +5,7 @@ import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {IdentityService} from 'src/app/services/identity.service';
 import { map } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
+import { MaxModalAction, MaxModalResult } from '../../models/maxmodal';
 
 
 @Component({
@@ -75,10 +76,17 @@ export class LandingComponent implements OnInit {
     this.forceViewer = this.isRejected(item) || this.isDraft(item) ? false : true;
   }
 
-  receiveMessage(message) {
+  receiveMessage(result: MaxModalResult) {
     this.wantsNewModal = false;
-    if (message[0]) {
-      this.declarationCall();
+
+    switch (result.action) {
+      case MaxModalAction.None:
+        break;
+      case MaxModalAction.Cancel:
+      case MaxModalAction.Save:
+      default:
+        this.declarationCall();
+        break;
     }
   }
 

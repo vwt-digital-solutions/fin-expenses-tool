@@ -10,6 +10,7 @@ import { ActivatedRoute } from '@angular/router';
 import { CostTypePipe } from 'src/app/pipes/cost-type.pipe';
 import { map } from 'rxjs/operators';
 import { GridOptions } from 'ag-grid-community';
+import { MaxModalAction, MaxModalResult } from '../../models/maxmodal';
 
 @Component({
   selector: 'app-expenses',
@@ -237,6 +238,8 @@ export class FinanceComponent {
     return newNode;
   }
 
+  // This function seems to want to open the next expense after a previous expense is done.
+  // However it also seems not to work. Grand.
   getNextExpense(next: boolean) {
     setTimeout(() => {
       let rowNode = null;
@@ -256,22 +259,15 @@ export class FinanceComponent {
     }, 100);
   }
 
-  receiveMessage(message) {
+  receiveMessage(result: MaxModalResult) {
     this.wantsNewModal = false;
-    if (message[0]) {
-      this.expenses.getExpenses().subscribe((response) => {
-        if (response) {
-          // @ts-ignore
-          this.rowData = [...response];
-          if (message[1]) {
-            this.getNextExpense(true);
-          }
-        } else {
-          this.gridApi.setRowData([]);
-        }
-      });
-    } else if (message[1]) {
-      this.getNextExpense(false);
+
+    switch (result.action) {
+      case MaxModalAction.Approved:
+      case MaxModalAction.Rejected:
+        this.rowData = this.rowData.filter(expense => expense !== this.expenseData)
+        // this.getNextExpense(true) ?
+        break;
     }
   }
 

@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 import { CostTypePipe } from 'src/app/pipes/cost-type.pipe';
 import { GridOptions } from 'ag-grid-community';
+import { MaxModalResult } from '../../models/maxmodal';
 
 @Component({
   selector: 'app-manager',
@@ -131,7 +132,7 @@ export class ControllerComponent {
     }
   }
 
-  receiveMessage(message) {
+  receiveMessage(result: MaxModalResult) {
     this.wantsNewModal = false;
   }
 
