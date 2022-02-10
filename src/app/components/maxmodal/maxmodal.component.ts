@@ -284,15 +284,12 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
       dataVerified[`status`] = null;
     }
 
-    Object.keys(dataVerified).length !== 0 ?
-      this.expensesConfigService.updateExpenseFinance(dataVerified, expenseId)
-        .subscribe(
-          result => this.closeModal(this.action),
-          error => {
-            console.error(error);
-            this.errorMessage = 'detail' in error.error ? error.error['detail'].nl : error.error;
-          })
-      : (this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.');
+    if (Object.keys(dataVerified).length !== 0) {
+      this.expensesConfigService.updateExpenseFinance(dataVerified, expenseId);
+      this.closeModal(this.action);
+    } else {
+      this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.';
+    }
   }
 
   bulkAttachmentUpload(expenseID: number) {
