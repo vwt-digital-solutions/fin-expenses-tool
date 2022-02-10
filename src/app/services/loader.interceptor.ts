@@ -3,13 +3,16 @@ import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/c
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { LoaderService } from '../services/loader.service';
+import {Endpoint} from '../models/endpoint.enum';
 
 @Injectable()
 export class LoaderInterceptor implements HttpInterceptor {
     constructor(public loaderService: LoaderService) { }
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        this.loaderService.show();
+        if (!req.url.includes(Endpoint.finance)) {
+            this.loaderService.show();
+        }
         return next.handle(req).pipe(
             finalize(() => this.loaderService.hide())
         );

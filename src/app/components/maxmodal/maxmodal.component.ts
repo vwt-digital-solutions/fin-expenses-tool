@@ -285,7 +285,7 @@ export class MaxModalComponent implements OnInit, AfterContentChecked {
     }
 
     if (Object.keys(dataVerified).length !== 0) {
-      this.expensesConfigService.updateExpenseFinance(dataVerified, expenseId);
+      this.expensesConfigService.updateExpenseFinance(dataVerified, expenseId).toPromise();
       this.closeModal(this.action);
     } else {
       this.errorMessage = 'Declaratie niet aangepast. Probeer het later nog eens.';
